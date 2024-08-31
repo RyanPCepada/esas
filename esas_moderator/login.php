@@ -1,8 +1,9 @@
+
 <?php
 session_start();
 include '../config.php';
 
-$email = ''; // Initialize variables
+$email = '';
 $password = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -22,9 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $moderator_result = checkModerator($pdo, $email, $password);
     if ($moderator_result) {
         $_SESSION['moderator_id'] = $moderator_result['moderator_id'];
-        // Redirect to home.php upon successful login
+        // Redirect to clubs.php upon successful login
         echo "<script>alert('Logged in successfully!');</script>";
-        echo "<script>window.location.href = '/esas/esas-moderator/public/home.php';</script>";
+        echo "<script>window.location.href = '/esas/esas-moderator/public/dashboard.php';</script>";
         exit();
     } else {
         // Show an alert if login credentials are incorrect
@@ -32,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -44,19 +46,90 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="../assets/js/all.js" crossorigin="anonymous"></script>
+    <script src="../assets/js/jquery-3.6.0.js"></script>
+    <link href="../assets/css/styles.css" rel="stylesheet" />
+    <link href="../assets/img/nbsclogo.png" rel="icon">
+
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica';
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 0px;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+        .nbsc-sas {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            padding-top: 0px; /*To lift up the whole login container*/
+            display: block;
+            margin: 0 auto;
+        }
+        #nbsc_sas_name {
+            margin-bottom: 10px;
+        }
+        #system_name {
+            line-height: 1.2 !important;
+            font-weight: normal !important; 
+        }
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            display: block;
+            margin: 0 auto;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #sas_logo {
+            width: 25%;
+            display: block; /* Ensures image is centered */
+            margin: 0 auto; /* Centers image horizontally */
+        }
+        #label_login {
+            margin-bottom: 20px;
+        }
+        .form-control {
+            font-size: 16px;
+            padding: 10px;
+        }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #28a745;
+        }
+
+        @media (min-width: 768px) {
+            #sas_logo {
+                width: 25%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <link rel="stylesheet" href="../esas-moderator/css/login.css">
     <div class="container">
         <div class="nbsc-sas text-center">
-            <img src="icons/SAS_LOGO.png" id="sas_logo" alt="SAS Logo">
+            <img src="../assets/img/SAS_LOGO.png" id="sas_logo" alt="SAS Logo">
             <h3 class="mb-1" id="nbsc_sas_name">NBSC-SAS</h3>
-            <h5 class="text-muted" id="system_name">Student Organization Club Membership and Information System</h5>
+            <h5 class="text-muted" id="system_name">Student Organization Information System<h5>
         </div>
 
         <div class="login-container">
             <h4 class="text-center" id="label_login">Moderator Login</h4>
-            <form action="" method="POST" id="login_form">
+            <form action="" method="POST">
                 <div class="form-group">
                     <label for="email">Username/Email</label>
                     <input type="text" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
@@ -70,5 +143,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
     </div>
 
+    
+    <!-- <?php include 'assets/components/modals.php' ?> -->
+    <script src="../assets/js/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/global_script.js"></script>
+    <script>
+        // clickSubModule('nav/userreg/userreg_main.php')
+        // clickSubModule('nav/purchaserequest/pr_main.php');
+        // clickSubModule('nav/purchaserequest/pr_main.php')
+    </script>
 </body>
 </html>
