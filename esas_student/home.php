@@ -74,11 +74,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eSAS - Student Home</title>
-    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
@@ -158,6 +158,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             animation: zoomAndWave 1.2s ease-in-out;
             animation-play-state: paused; /* Start with the animation paused */
         }
+
+        .card {
+            padding: 0px;
+        }
+        .card-header {
+            padding: 10px;
+        }
+        .moderator-name {
+            margin-left: 10px !important;
+        }
+        .card-body {
+            padding: 15px;
+        }
+        .card-footer {
+            padding: 10px;
+        }
+        .comment-form {
+            padding: 5px;
+        }
         
         @keyframes zoomAndWave {
             0% {
@@ -178,6 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .card-footer .form-control {
+            margin: 5px 0px !important;
             border-radius: 20px;
         }
         .card-footer img, .comment img {
@@ -187,12 +207,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .send-icon {
             color: #007bff;
             font-size: 22px;
+            margin-left: 5px;
             cursor: pointer;
             transition: transform 0.2s ease-in-out;
         }
         .send-icon:hover {
             transform: scale(1.1);
             color: #0056b3;
+        }
+
+        .comsec {
+            margin-left: 10px;
         }
 
         @media (min-width: 768px) {
@@ -299,8 +324,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="col-md-12 mb-3">
                                         <div class="card" id="card_posts">
                                             <div class="card-header d-flex align-items-start">
-                                                <img src="/esas/esas-moderator/images/${post.profilePic}" alt="${post.fullName}" class="rounded-circle mr-3" width="50" height="50">
-                                                <div>
+                                                <img src="/esas/esas_moderator/images/${post.profilePic}" alt="${post.fullName}" class="rounded-circle mr-3" width="50" height="50">
+                                                <div class="moderator-name">
                                                     <h5 class="card-title mb-1">${post.fullName}</h5>
                                                     <p class="text-muted mb-0">${postDate} @ ${postTime}</p>
                                                 </div>
@@ -309,7 +334,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <p class="card-text">${post.post}</p>
                                             </div>
                                             <div class="card-footer d-flex align-items-center">
-                                                <img src="/esas/esas-student/images/<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture" class="rounded-circle mr-2" width="40" height="40">
+                                                <img src="/esas/esas_student/images/<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture" class="rounded-circle mr-2" width="40" height="40">
                                                 <form class="comment-form d-flex align-items-center w-100" method="POST" action="" data-post-id="${post.post_id}">
                                                     <input type="hidden" name="post_id" value="${post.post_id}">
                                                     <input type="text" class="form-control" name="comment" placeholder="Add a comment..." required>
@@ -324,7 +349,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         <span id="comment-count-${post.post_id}">${commentText}</span>
                                                     </a>
                                                 </div>
-                                                <div class="comment-section mt-3 ml-3 mr-2" id="comments-${post.post_id}" style="display: none;">
+                                                <div class="comment-section mt-3 ml-3 mr-2" id="comments-${post.post_id}" style="display: none; padding: 10px;">
                                                     <!-- Comments will be dynamically loaded here -->
                                                 </div>
                                             </div>
@@ -362,9 +387,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 return `
                                     <div class="comment d-flex align-items-start mb-2">
                                         <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
-                                        <div>
-                                            <p class="mb-1"><strong>${comment.student_name}</strong>: ${comment.comment}</p>
-                                            <p class="text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
+                                        <div class="comsec">
+                                            <p class="student-name mb-1"><strong>${comment.student_name}</strong><br>${comment.comment}</p>
+                                            <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
                                         </div>
                                     </div>
                                 `;
