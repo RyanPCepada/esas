@@ -1,5 +1,5 @@
 <?php
-require_once '../config.php';
+require_once '../../config.php';
 
 // Set the content type to JSON
 header('Content-Type: application/json');
@@ -38,7 +38,7 @@ switch ($method) {
             // Fetch a single post by post_id
             $post_id = $_GET['post_id'];
             $stmt = $pdo->prepare('
-                SELECT posts.*, tbl_moderators.firstName, tbl_moderators.middleName, tbl_moderators.lastName, tbl_moderators.profilePic
+                SELECT tbl_posts.*, tbl_moderators.firstName, tbl_moderators.middleName, tbl_moderators.lastName, tbl_moderators.profilePic
                 FROM tbl_posts
                 JOIN tbl_moderators ON tbl_posts.moderator_id = tbl_moderators.moderator_id
                 WHERE tbl_posts.post_id = ? AND tbl_posts.club_id = ?
@@ -57,7 +57,7 @@ switch ($method) {
         } else {
             // Fetch all posts for the current club
             $stmt = $pdo->prepare('
-                SELECT posts.*, tbl_moderators.firstName, tbl_moderators.middleName, tbl_moderators.lastName, tbl_moderators.profilePic
+                SELECT tbl_posts.*, tbl_moderators.firstName, tbl_moderators.middleName, tbl_moderators.lastName, tbl_moderators.profilePic
                 FROM tbl_posts
                 JOIN tbl_moderators ON tbl_posts.moderator_id = tbl_moderators.moderator_id
                 WHERE tbl_posts.club_id = ?
