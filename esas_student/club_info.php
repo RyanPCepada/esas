@@ -1,0 +1,180 @@
+<?php
+require_once '../config.php';
+
+// Initialize variables
+$clubName = '';
+$information = '';
+
+// Check if club_id is set and valid
+if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
+    $club_id = $_GET['club_id'];
+
+    try {
+        // Prepare SQL query to fetch club information
+        $stmt = $pdo->prepare("SELECT clubName, information FROM tbl_clubs WHERE club_id = ?");
+        $stmt->execute([$club_id]);
+        $club = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($club) {
+            $clubName = htmlspecialchars($club['clubName']);
+            $information = nl2br(htmlspecialchars($club['information']));
+        } else {
+            $clubName = 'Club Not Found';
+            $information = 'No information available for this club.';
+        }
+
+    } catch (PDOException $e) {
+        die("Error: " . $e->getMessage());
+    }
+
+} else {
+    $clubName = 'Invalid Club ID';
+    $information = 'Please provide a valid club ID.';
+}
+
+// Encode clubName for JavaScript use
+$encodedClubName = addslashes($clubName); // Ensure to escape any special characters properly
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eSAS - Club Information</title>
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
+    
+    
+    <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="../assets/js/all.js" crossorigin="anonymous"></script>
+    <script src="../assets/js/jquery-3.6.0.js"></script>
+    <link href="../assets/css/styles.css" rel="stylesheet" />
+    <link href="../assets/img/nbsclogo.png" rel="icon">
+
+    <style>
+        /* body {
+            font: 14px Helvetica;
+        } */
+        .container-fluid {
+            padding: 20px;
+        }
+        .navbar-darkblue {
+            background-color: #003366;
+        }
+        .navbar-darkblue .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .navbar-darkblue .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+        }
+        #dashboard_navigations {
+            float: flex-end;
+        }
+        .club-info {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+
+<body class="sb-nav-fixed">
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
+        <a class="navbar-brand ps-2" href="#">
+            <img src="../assets/img/nbsclogo.png" style="height: 0.3in;">
+            NBSC SIS</a>
+        </button>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse hide" id="main_nav">
+            <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
+                <?php include 'nav/nav_main.php' ?>
+            </div>
+        </div>
+    </nav>
+    <!-- <nav class="navbar navbar-expand-lg navbar-darkblue">
+        <img src="icons/SAS_LOGO.png" height="50" class="d-inline-block align-top" alt="SAS Logo">
+        <h5 class="ml-2 mb-0 text-light" id="nbsc_sas_name">Student Organization Club Membership and Information System</h5>
+        <button class="navbar-toggler mt-2" type="button" data-toggle="collapse" data-target="#dashboard_navigations" aria-controls="dashboard_navigations" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="dashboard_navigations">
+            <ul class="navbar-nav mr-auto"></ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+            </form>
+            <!-- <a href="logout.php" class="btn btn-danger ml-3">Log out</a> --
+            <a href="../logout.php" class="btn btn-danger ml-3">Log out</a>
+        </div>
+    </nav> -->
+
+    <div class="container-fluid">
+        <!-- <div class="mt-2 mb-2">
+            <a href="javascript:history.go(-1)" class="btn btn-secondary"><i class="fa fa-arrow-left"></i></a>
+        </div> -->
+        <h2 class="mt-4"><?php echo htmlspecialchars($clubName); ?></h2>
+        <div class="club-info">
+            <p><?php echo htmlspecialchars($information); ?></p>
+        </div>
+        <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
+            <h4 class="mb-3">Join Us Now!</h4>
+            <p class="lead">If you want to be a part of us, register now and become a member of <?php echo htmlspecialchars($clubName); ?>.</p>
+            <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo $encodedClubName; ?>')">Register Now</button>
+            <div class="mt-1">
+                <a href="javascript:history.go(-1)" class="btn btn-transparent">Go Back</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function registerNow(clubId, clubName) {
+            const url = `/esas/esas_student/registration.php?club_id=${clubId}&club_name=${encodeURIComponent(clubName)}`;
+            window.location.href = url;
+        }
+    </script>
+
+    <footer class="navbar-darkblue text-white mt-1 p-4 text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <ul class="list-unstyled">
+                        <li>Email: sas@nbsc.edu.ph</li>
+                        <li>Phone: 0927 669 0090</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Follow Us</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://www.facebook.com/nbscstudentaffairsandservices" class="text-white"><i class="fa fa-facebook-square"></i> Facebook</a></li>
+                        <li><a href="#" class="text-white"><i class="fa fa-twitter-square"></i> Twitter</a></li>
+                        <li><a href="#" class="text-white"><i class="fa fa-instagram"></i> Instagram</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="http://nbsc.edu.ph" class="text-white">NBSC Website</a></li>
+                        <li><a href="https://nbsc.edu.ph/student-affairs-services/" class="text-white">SAS Website</a></li>
+                        <li><a href="#" class="text-white">About Us</a></li>
+                        <li><a href="#" class="text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <p class="mb-0">© 2024 Student Organization Club Membership and Information System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
