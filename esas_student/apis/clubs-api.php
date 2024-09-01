@@ -1,5 +1,5 @@
 <?php
-require_once '../config.php';
+require_once '../../config.php';
 
 // Set the content type to JSON
 header('Content-Type: application/json');
