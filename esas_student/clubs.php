@@ -266,7 +266,7 @@
         });
 
         // Fetch clubs data from API
-fetch('/esas/esas_student/clubs-api.php')
+fetch('/esas/esas_student/apis/clubs-api.php')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
