@@ -44,7 +44,7 @@
         .card-img-only {
             position: relative;
             width: 100%;
-            border: none;
+            border: solid 3px transparent;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 10px 20px rgba(0, 0, 0, .5);
@@ -52,7 +52,7 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .card-img-only:hover {
-            transform: scale(1.01);
+            transform: scale(1.03);
             border: solid 3px lightblue;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
         }
