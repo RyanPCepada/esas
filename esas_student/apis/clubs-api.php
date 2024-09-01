@@ -1,0 +1,113 @@
+<?php
+require_once '../config.php';
+
+// Set the content type to JSON
+header('Content-Type: application/json');
+
+// Handle HTTP methods
+$method = $_SERVER['REQUEST_METHOD'];
+
+switch ($method) {
+    case 'GET':
+        // Check if an ID parameter is provided
+        if (isset($_GET['club_id'])) {
+            // Read operation (fetch a single club by club_id)
+            $club_id = $_GET['club_id'];
+            $stmt = $pdo->prepare('
+                SELECT c.*, m.firstName AS moderatorFirstName, m.profilePic AS moderatorProfilePic
+                FROM tbl_clubs c
+                LEFT JOIN tbl_moderators m ON c.club_id = m.club_id
+                WHERE c.club_id = ?
+            ');
+            $stmt->execute([$club_id]);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($result) {
+                // Fetch count of students in this club
+                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_registered_students WHERE club_id = ?');
+                $stmt_count->execute([$club_id]);
+                $member_count = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
+
+                // Format the moderators
+                $moderatorNames = array_column($result, 'moderatorFirstName');
+                $moderatorPics = array_column($result, 'moderatorProfilePic');
+                $formattedModerators = formatModerators($moderatorNames, $moderatorPics);
+
+                // Append member count and formatted moderators to each result
+                foreach ($result as &$club) {
+                    $club['membersCount'] = $member_count;
+                    $club['formattedModerators'] = $formattedModerators;
+                }
+
+                echo json_encode($result);
+            } else {
+                http_response_code(404);
+                echo json_encode(['error' => 'Club not found']);
+            }
+        } else {
+            // Read operation (fetch all clubs)
+            $stmt = $pdo->query('
+                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, c.dateAdded, c.dateModified,
+                       GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderators,
+                       GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS profilePics
+                FROM tbl_clubs c
+                LEFT JOIN tbl_moderators m ON c.club_id = m.club_id
+                GROUP BY c.club_id
+            ');
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Fetch counts of students for all clubs
+            foreach ($result as &$club) {
+                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_registered_students WHERE club_id = ?');
+                $stmt_count->execute([$club['club_id']]);
+                $club['membersCount'] = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
+
+                // Format the moderators
+                $moderatorNames = explode(", ", $club['moderators']);
+                $moderatorPics = explode(", ", $club['profilePics']);
+                $club['formattedModerators'] = formatModerators($moderatorNames, $moderatorPics);
+            }
+
+            echo json_encode($result);
+        }
+        break;
+        
+    default:
+        // Invalid method
+        http_response_code(405);
+        echo json_encode(['error' => 'Method not allowed']);
+        break;
+}
+
+/**
+ * Format the list of moderators with profile pictures
+ * @param array $moderatorNames
+ * @param array $moderatorPics
+ * @return string
+ */
+function formatModerators($moderatorNames, $moderatorPics) {
+    $count = count($moderatorNames);
+    $formattedNames = '';
+    if ($count === 0) {
+        $formattedNames = 'No moderators';
+    } elseif ($count === 1) {
+        $formattedNames = $moderatorNames[0];
+    } elseif ($count === 2) {
+        $formattedNames = implode(' & ', $moderatorNames);
+    } else {
+        $last = array_pop($moderatorNames);
+        $formattedNames = implode(', ', $moderatorNames) . ' & ' . $last;
+    }
+    
+    // Add profile pictures
+    $picsHTML = '';
+    foreach ($moderatorPics as $pic) {
+        if ($pic) {
+            $picsHTML .= "<img src='/esas/esas_moderator/images/$pic' alt='Profile Pic' class='moderator-pic'>";
+        }
+    }
+    
+    return "<div class='moderator-pics'>$picsHTML</div><div class='moderator-names'>$formattedNames</div>";
+}
+
+?>
