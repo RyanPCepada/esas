@@ -125,7 +125,7 @@ if ($student) {
             padding: 10px;
             border-radius: 5px;
             line-height: .5; /* Adjust line height for closer spacing */
-            margin-top: -80px;
+            margin-top: -50px;
         }
         .overlay-text h4 {
             line-height: .9; /* Adjust line height for closer spacing */
@@ -349,6 +349,7 @@ if ($student) {
                         postsContainer.innerHTML = '<p>Failed to fetch posts. Please try again later.</p>';
                     });
             }
+            
 
             // Function to fetch comments for a post
             function fetchComments(postId) {
