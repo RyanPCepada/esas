@@ -88,9 +88,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="../assets/img/nbsclogo.png" rel="icon">
 
     <style>
-        body {
+        /* body {
             font: 14px Helvetica;
-        }
+        } */
         .wrapper {
             width: 100%;
             max-width: 800px;
@@ -255,6 +255,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+     <!-- <?php include 'assets/components/modals.php' ?> -->
+     <script src="../assets/js/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/global_script.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Function to format a date as "Month Day, Year"
@@ -271,7 +276,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Function to fetch and display posts
             function fetchPosts() {
-                fetch('/esas/esas_student/posts-api.php')
+                fetch('/esas/esas_student/apis/posts-api.php')
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
@@ -345,7 +350,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Function to fetch comments for a post
             function fetchComments(postId) {
                 console.log(`Fetching comments for post ID: ${postId}`); // Debug log
-                fetch(`/esas/esas-student/public/comments-api.php?post_id=${postId}`)
+                fetch(`/esas/esas_student/apis/comments-api.php?post_id=${postId}`)
                     .then(response => response.json())
                     .then(data => {
                         console.log('Fetched comments:', data); // Debug log
@@ -356,7 +361,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 const [date, time] = comment.dateAdded.split(' ');
                                 return `
                                     <div class="comment d-flex align-items-start mb-2">
-                                        <img src="/esas/esas-student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
+                                        <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
                                         <div>
                                             <p class="mb-1"><strong>${comment.student_name}</strong>: ${comment.comment}</p>
                                             <p class="text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
