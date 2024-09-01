@@ -37,32 +37,10 @@ if ($student) {
     }
 }
 
-// Handle comment form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $post_id = isset($_POST['post_id']) ? $_POST['post_id'] : '';
-    $comment = isset($_POST['comment']) ? $_POST['comment'] : '';
-
-    if (!empty($post_id) && !empty($comment)) {
-        // Insert comment into database
-        $sql = "INSERT INTO tbl_comments (comment, dateAdded, post_id, club_id, student_id) VALUES (:comment, NOW(), :post_id, :club_id, :student_id)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(":comment", $comment, PDO::PARAM_STR);
-        $stmt->bindParam(":post_id", $post_id, PDO::PARAM_INT);
-        $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-        $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
-
-        if ($stmt->execute()) {
-            // Comment inserted successfully
-            echo '<script>alert("Comment added successfully.");</script>';
-        } else {
-            echo '<script>alert("Failed to add comment. Please try again.");</script>';
-        }
-    }
-}
-
 // Close connection (if not using a persistent connection)
 // unset($pdo); // Uncomment if $pdo is not a persistent connection
 ?>
+
 
 
 
@@ -335,7 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             </div>
                                             <div class="card-footer d-flex align-items-center">
                                                 <img src="/esas/esas_student/images/<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture" class="rounded-circle mr-2" width="40" height="40">
-                                                <form class="comment-form d-flex align-items-center w-100" method="POST" action="" data-post-id="${post.post_id}">
+                                                <form class="comment-form d-flex align-items-center w-100" method="POST" action="../esas_student/actions/send_comment_action.php" data-post-id="${post.post_id}">
                                                     <input type="hidden" name="post_id" value="${post.post_id}">
                                                     <input type="text" class="form-control" name="comment" placeholder="Add a comment..." required>
                                                     <button type="submit" class="btn btn-link ml-2 p-0">
