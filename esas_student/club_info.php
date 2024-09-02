@@ -1,9 +1,43 @@
 <?php
+// Start the session
+session_start();
+
+// Include the configuration file
 require_once '../config.php';
 
-// Initialize variables
+// Initialize variables for club information
 $clubName = '';
 $information = '';
+
+// Initialize variables for student information
+$firstName = $middleName = $lastName = 'UNKNOWN';
+
+// Fetch the current student's ID from the session
+if (isset($_SESSION['student_id'])) {
+    $student_id = $_SESSION['student_id'];
+
+    try {
+        // Prepare and execute the SQL statement for student information
+        $sql = "SELECT firstName, middleName, lastName FROM tbl_students WHERE student_id = :student_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        // Fetch the result
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Check if a result was found
+        if ($result) {
+            $firstName = strtoupper($result['firstName']);
+            $middleName = strtoupper($result['middleName']);
+            $lastName = strtoupper($result['lastName']);
+        }
+
+    } catch (PDOException $e) {
+        // Handle database connection or query error
+        die("Database error: " . $e->getMessage());
+    }
+}
 
 // Check if club_id is set and valid
 if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
@@ -35,7 +69,6 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 // Encode clubName for JavaScript use
 $encodedClubName = addslashes($clubName); // Ensure to escape any special characters properly
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -135,6 +168,12 @@ $encodedClubName = addslashes($clubName); // Ensure to escape any special charac
             </div>
         </div>
     </div>
+
+    <!-- <?php include 'assets/components/modals.php' ?> -->
+    <script src="../assets/js/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/global_script.js"></script>
+
 
     <script>
         function registerNow(clubId, clubName) {
