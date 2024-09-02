@@ -211,10 +211,6 @@
         });
     </script> -->
 
-
-    (ADD PROFILE PICTURE AND DASHBOARD HERE
-    
-    )
     <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -234,18 +230,24 @@
         </div>
     </div>
 
+
     <div class="container-fluid">
+        
+        <div class="row" id="studentClubsContainer">
+            <!-- Student club cards will be dynamically added here -->
+        </div>
+
         <div class="row">
             <div class="col-12 mb-3">
                 <h1 class="section-label">
-                    All Clubs <i class="fa fa-university"></i>
+                    All Student Club Organizations <i class="fa fa-university"></i>
                 </h1>
                 <p class="text-muted"><em>(Students are only allowed to choose two clubs.)</em></p>
             </div>
         </div>
 
         <div class="row" id="clubsContainer">
-            <!-- Cards will be dynamically added here -->
+            <!-- Club cards will be dynamically added here -->
         </div>
     </div>
     
@@ -265,50 +267,91 @@
             $('[data-toggle="tooltip"]').tooltip();
         });
 
+        // Fetch student-specific clubs data from API
+    fetch('/esas/esas_student/apis/student-clubs-api.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const studentClubsContainer = document.getElementById('studentClubsContainer');
+            if (data && data.length > 0) {
+                data.forEach(club => {
+                    const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
+                    const cardHTML = `
+                        <div class="col-md-4">
+                            <div class="card card-img-only">
+                                <small data-toggle="tooltip" title="${memberText}">
+                                    <i class="fa fa-user mr-1"></i>${club.membersCount}
+                                </small>
+                                <a href="/esas/esas_student/home.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
+                                    <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
+                                    <div class="overlay-text">
+                                        <h4>${club.clubName}</h4>
+                                        <!--<div class="moderators-container">
+                                            ${club.formattedModerators}
+                                        </div>-->
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    studentClubsContainer.innerHTML += cardHTML;
+                });
+            } else {
+                studentClubsContainer.innerHTML = '<p>No clubs found.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching student clubs:', error);
+            const studentClubsContainer = document.getElementById('studentClubsContainer');
+            studentClubsContainer.innerHTML = '<p>Failed to fetch your clubs. Please try again later.</p>';
+        });
+
         // Fetch clubs data from API
-fetch('/esas/esas_student/apis/clubs-api.php')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        const clubsContainer = document.getElementById('clubsContainer');
-        if (data && data.length > 0) {
-            data.forEach(club => {
-                const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
-                const cardHTML = `
-                    <div class="col-md-4">
-    <div class="card card-img-only">
-        <small data-toggle="tooltip" title="${memberText}">
-            <i class="fa fa-user mr-1"></i>${club.membersCount}
-        </small>
-        <a href="/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
-            <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
-            <div class="overlay-text">
-                <h4>${club.clubName}</h4>
-                <div class="moderators-container">
-                    ${club.formattedModerators}
-                </div>
-            </div>
-        </a>
-    </div>
-</div>
-
-
-                `;
-                clubsContainer.innerHTML += cardHTML;
+        fetch('/esas/esas_student/apis/clubs-api.php')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const clubsContainer = document.getElementById('clubsContainer');
+                if (data && data.length > 0) {
+                    data.forEach(club => {
+                        const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
+                        const cardHTML = `
+                            <div class="col-md-4">
+                                <div class="card card-img-only">
+                                    <small data-toggle="tooltip" title="${memberText}">
+                                        <i class="fa fa-user mr-1"></i>${club.membersCount}
+                                    </small>
+                                    <a href="/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
+                                        <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
+                                        <div class="overlay-text">
+                                            <h4>${club.clubName}</h4>
+                                            <div class="moderators-container">
+                                                ${club.formattedModerators}
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        clubsContainer.innerHTML += cardHTML;
+                    });
+                } else {
+                    clubsContainer.innerHTML = '<p>No clubs found.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching clubs:', error);
+                const clubsContainer = document.getElementById('clubsContainer');
+                clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
             });
-        } else {
-            clubsContainer.innerHTML = '<p>No clubs found.</p>';
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching clubs:', error);
-        const clubsContainer = document.getElementById('clubsContainer');
-        clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
-    });
 
 
         function registerNow(clubId) {
