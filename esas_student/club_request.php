@@ -35,7 +35,7 @@
                         <textarea name="activities" class="form-control" id="activities" rows="3"></textarea>
                     </div>
                     <input type="submit" class="btn btn-primary" value="Submit Request">
-                    <a href="clubs.php" class="btn btn-secondary">Cancel</a>
+                    <a href="#" onclick="history.back(); return false;"  class="btn btn-secondary">Cancel</a>
                 </form>
             </div>
         </div>
