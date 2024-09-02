@@ -181,8 +181,10 @@ $encodedClubName = addslashes($clubName); // Ensure to escape any special charac
             window.location.href = url;
         }
     </script>
+</body>
 
-    <footer class="navbar-darkblue text-white mt-1 p-4 text-center">
+
+<footer class="navbar-darkblue text-white mt-1 p-4 text-center">
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
@@ -215,5 +217,5 @@ $encodedClubName = addslashes($clubName); // Ensure to escape any special charac
             <p class="mb-0">© 2024 Student Organization Club Membership and Information System. All rights reserved.</p>
         </div>
     </footer>
-</body>
+    
 </html>
