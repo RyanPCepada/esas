@@ -276,10 +276,10 @@ try {
                 <p class="text-muted"><em>(These are the club you were registered in.)</em></p>
             </div>
             
-            <div class="club-request d-flex justify-content-end">
-            <button type="button" class="btn btn-primary" style="margin-left: auto; display: block; text-align: center; border-radius: 5px; padding: 10px 20px; line-height: normal; font-size: 1.25rem;"
-                onclick="window.location.href='club_request.php'">Request for a Club
-            </button>
+            <div class="club-request d-flex justify-content-end mb-3">
+                <button type="button" class="btn btn-primary" style="margin-left: auto; display: block; text-align: center; border-radius: 5px; padding: 10px 20px; line-height: normal; font-size: 1.25rem;"
+                    onclick="window.location.href='club_request.php'">Request for a Club
+                </button>
             </div>
         </div>
 
@@ -364,7 +364,7 @@ try {
                     studentClubsContainer.innerHTML += cardHTML;
                 });
             } else {
-                studentClubsContainer.innerHTML = '<p>No clubs found.</p>';
+                studentClubsContainer.innerHTML = '<h5>You are not yet registered to any of the club organizations.</h5>';
             }
         })
         .catch(error => {
