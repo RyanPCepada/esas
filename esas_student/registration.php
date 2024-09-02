@@ -300,7 +300,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <h4>Student Registration</h4>
                     <?php endif; ?>
                     <p class="mb-5">Please fill this form and submit to register.</p>
-                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                    <form action="../esas_student/actions/registration_action.php" method="post">
                         <div class="form-group">
                             <label>First Name</label>
                             <input type="text" name="firstName" class="form-control <?php echo (!empty($firstName_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $firstName; ?>" required>
