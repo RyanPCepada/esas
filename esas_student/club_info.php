@@ -8,6 +8,7 @@ require_once '../config.php';
 // Initialize variables for club information
 $clubName = '';
 $information = '';
+$coverPhoto = '';
 
 // Initialize variables for student information
 $firstName = $middleName = $lastName = 'UNKNOWN';
@@ -45,16 +46,18 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 
     try {
         // Prepare SQL query to fetch club information
-        $stmt = $pdo->prepare("SELECT clubName, information FROM tbl_clubs WHERE club_id = ?");
+        $stmt = $pdo->prepare("SELECT clubName, information, coverPhoto FROM tbl_clubs WHERE club_id = ?");
         $stmt->execute([$club_id]);
         $club = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($club) {
             $clubName = htmlspecialchars($club['clubName']);
             $information = nl2br(htmlspecialchars($club['information']));
+            $coverPhoto = nl2br(htmlspecialchars($club['coverPhoto']));
         } else {
             $clubName = 'Club Not Found';
             $information = 'No information available for this club.';
+            $coverPhoto = 'No coverphoto available for this club.';
         }
 
     } catch (PDOException $e) {
@@ -64,6 +67,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 } else {
     $clubName = 'Invalid Club ID';
     $information = 'Please provide a valid club ID.';
+    $coverPhoto = 'Please provide a valid club ID.';
 }
 
 // Encode clubName for JavaScript use
@@ -154,7 +158,19 @@ $encodedClubName = htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8'); // Properly
         <!-- <div class="mt-2 mb-2">
             <a href="javascript:history.go(-1)" class="btn btn-secondary"><i class="fa fa-arrow-left"></i></a>
         </div> -->
-        <h2 class="mt-4"><?php echo $clubName; ?></h2>
+        <div class="clubname-and-coverphoto">
+            <div class="row">
+                <div class="col-12 col-md-4">
+                    <h2 class="mt-4" style="max-width: 100%;"><?php echo $clubName; ?></h2>
+                </div>
+                <div class="col-12 col-md-8">
+                    <img class="mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo" style="max-width: 100%; border-radius: 30px;">
+                </div>
+            </div>
+        </div>
+
+
+
         <div class="club-info">
             <p><?php echo htmlspecialchars($information); ?></p>
         </div>
