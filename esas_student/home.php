@@ -13,38 +13,58 @@ $clubName = ""; // Initialize clubName variable
 $coverPhoto = ""; // Initialize coverPhoto variable
 $profilePic = ""; // Initialize profilePic variable
 
-// Fetch the club_id and profile picture for the current student
-$sql = "SELECT club_id, profilePic FROM tbl_registered_students WHERE student_id = :student_id";
-$stmt = $pdo->prepare($sql);
-$stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
-$stmt->execute();
-$student = $stmt->fetch(PDO::FETCH_ASSOC);
+try {
+    // Use the existing PDO instance from config.php
+    global $pdo;
 
-if ($student) {
-    $club_id = $student['club_id']; // Set club_id from student
-    $profilePic = $student['profilePic']; // Set profilePic from student
-
-    // Fetch the club name and cover photo using the club_id
-    $sql = "SELECT clubName, coverPhoto FROM tbl_clubs WHERE club_id = :club_id";
+    // Fetch the student's club_id and profile picture
+    $sql = "SELECT club_id, profilePic FROM tbl_registered_students WHERE student_id = :student_id";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+    $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
     $stmt->execute();
-    $club = $stmt->fetch(PDO::FETCH_ASSOC);
+    $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($club) {
-        $clubName = $club['clubName']; // Set clubName from clubs table
-        $coverPhoto = $club['coverPhoto']; // Set coverPhoto from clubs table
+    if ($student) {
+        $club_id = $student['club_id']; // Set club_id from student
+        $profilePic = $student['profilePic']; // Set profilePic from student
+
+        // Fetch the club name and cover photo using the club_id
+        $sql = "SELECT clubName, coverPhoto FROM tbl_clubs WHERE club_id = :club_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $club = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($club) {
+            $clubName = $club['clubName']; // Set clubName from clubs table
+            $coverPhoto = $club['coverPhoto']; // Set coverPhoto from clubs table
+        }
     }
+
+    // Fetch the student's full name
+    $sql = "SELECT firstName, middleName, lastName FROM tbl_students WHERE student_id = :student_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    // Fetch the result
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check if a result was found
+    if ($result) {
+        $firstName = strtoupper($result['firstName']);
+        $middleName = strtoupper($result['middleName']);
+        $lastName = strtoupper($result['lastName']);
+    } else {
+        // Handle the case where no data is found
+        $firstName = $middleName = $lastName = "UNKNOWN";
+    }
+
+} catch (PDOException $e) {
+    // Handle database connection or query error
+    die("Database error: " . $e->getMessage());
 }
-
-// Close connection (if not using a persistent connection)
-// unset($pdo); // Uncomment if $pdo is not a persistent connection
 ?>
-
-
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
