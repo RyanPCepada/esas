@@ -67,7 +67,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 }
 
 // Encode clubName for JavaScript use
-$encodedClubName = addslashes($clubName); // Ensure to escape any special characters properly
+$encodedClubName = htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8'); // Properly escape single quotes and other special characters
 ?>
 
 <!DOCTYPE html>
@@ -124,7 +124,6 @@ $encodedClubName = addslashes($clubName); // Ensure to escape any special charac
         <a class="navbar-brand ps-2" href="#">
             <img src="../assets/img/nbsclogo.png" style="height: 0.3in;">
             NBSC SIS</a>
-        </button>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -155,7 +154,7 @@ $encodedClubName = addslashes($clubName); // Ensure to escape any special charac
         <!-- <div class="mt-2 mb-2">
             <a href="javascript:history.go(-1)" class="btn btn-secondary"><i class="fa fa-arrow-left"></i></a>
         </div> -->
-        <h2 class="mt-4"><?php echo htmlspecialchars($clubName); ?></h2>
+        <h2 class="mt-4"><?php echo $clubName; ?></h2>
         <div class="club-info">
             <p><?php echo htmlspecialchars($information); ?></p>
         </div>
@@ -217,5 +216,5 @@ $encodedClubName = addslashes($clubName); // Ensure to escape any special charac
             <p class="mb-0">© 2024 Student Organization Club Membership and Information System. All rights reserved.</p>
         </div>
     </footer>
-    
+
 </html>
