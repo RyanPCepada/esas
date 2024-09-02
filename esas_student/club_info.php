@@ -9,9 +9,9 @@ require_once '../config.php';
 $clubName = '';
 $information = '';
 $coverPhoto = '';
-
-// Initialize variables for student information
-$firstName = $middleName = $lastName = 'UNKNOWN';
+$dateAdded = '';
+$moderators = '';
+$membersCount = '';
 
 // Fetch the current student's ID from the session
 if (isset($_SESSION['student_id'])) {
@@ -45,19 +45,47 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
     $club_id = $_GET['club_id'];
 
     try {
-        // Prepare SQL query to fetch club information
-        $stmt = $pdo->prepare("SELECT clubName, information, coverPhoto FROM tbl_clubs WHERE club_id = ?");
+        // Prepare SQL query to fetch club information and moderators' profile pictures
+        $stmt = $pdo->prepare("
+            SELECT c.clubName, c.information, c.coverPhoto, c.dateAdded,
+                GROUP_CONCAT(CONCAT(m.firstName, ' ', COALESCE(m.middleName, ''), ' ', m.lastName) ORDER BY m.firstName SEPARATOR '|') AS moderatorNames,
+                GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR '|') AS moderatorPics,
+                COUNT(rs.student_id) AS membersCount,
+                COUNT(DISTINCT m.moderator_id) AS numModerators
+            FROM tbl_clubs c
+            LEFT JOIN tbl_moderators m ON c.club_id = m.club_id
+            LEFT JOIN tbl_registered_students rs ON c.club_id = rs.club_id
+            WHERE c.club_id = ?
+            GROUP BY c.club_id
+        ");
         $stmt->execute([$club_id]);
         $club = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($club) {
             $clubName = htmlspecialchars($club['clubName']);
             $information = nl2br(htmlspecialchars($club['information']));
-            $coverPhoto = nl2br(htmlspecialchars($club['coverPhoto']));
+            $coverPhoto = htmlspecialchars($club['coverPhoto']);
+            $dateAdded = htmlspecialchars($club['dateAdded']); // Changed from dateOfEstablishment
+            $membersCount = htmlspecialchars($club['membersCount']);
+            
+            // Process moderators' names and profile pictures
+            $moderatorNames = explode('|', $club['moderatorNames']);
+            $moderatorPics = explode('|', $club['moderatorPics']);
+            $numModerators = $club['numModerators'];
+
+            // Generate moderators HTML
+            $moderators = '';
+            foreach ($moderatorNames as $index => $name) {
+                $pic = isset($moderatorPics[$index]) ? htmlspecialchars($moderatorPics[$index]) : '';
+                $moderators .= '<p><img src="/esas/esas_moderator/images/' . $pic . '" alt="Profile Pic" style="width: 50px; height: 50px; border-radius: 50%;"> ' . htmlspecialchars($name) . '</p>';
+            }
+
+            // Set the correct label for moderators
+            $moderatorsLabel = ($numModerators === 1) ? 'Moderator:' : 'Moderators:';
+
         } else {
             $clubName = 'Club Not Found';
             $information = 'No information available for this club.';
-            $coverPhoto = 'No coverphoto available for this club.';
         }
 
     } catch (PDOException $e) {
@@ -67,12 +95,12 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 } else {
     $clubName = 'Invalid Club ID';
     $information = 'Please provide a valid club ID.';
-    $coverPhoto = 'Please provide a valid club ID.';
 }
 
 // Encode clubName for JavaScript use
-$encodedClubName = htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8'); // Properly escape single quotes and other special characters
+$encodedClubName = addslashes($clubName); // Ensure to escape any special characters properly
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -162,9 +190,16 @@ $encodedClubName = htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8'); // Properly
             <div class="row">
                 <div class="col-12 col-md-4">
                     <h2 class="mt-4" style="max-width: 100%;"><?php echo $clubName; ?></h2>
+                    <p>Created: <?php echo $dateAdded; ?></p>
+                    <hr>
+                    <h5><?php echo $moderatorsLabel; ?></h5>
+                    <?php echo $moderators; ?>
+                    <hr>
+                    <h5>Members: <?php echo $membersCount; ?></h5>
+                    <hr>
                 </div>
                 <div class="col-12 col-md-8">
-                    <img class="mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo" style="max-width: 100%; border-radius: 30px;">
+                    <img class="mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo" style="max-width: 100%; border-radius: 20px;">
                 </div>
             </div>
         </div>
