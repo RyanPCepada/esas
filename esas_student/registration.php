@@ -213,7 +213,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->execute()) {
             // Records created successfully. Redirect to landing page
             echo "<script>alert('Registration successful!');</script>";
-            echo "<script>window.location.href = '/esas/esas_student/home.php';</script>";
+            echo "<script>window.location.href = '/esas/esas_student/clubs.php';</script>";
             exit();
         } else {
             echo "Oops! Something went wrong. Please try again later.";
