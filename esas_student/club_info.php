@@ -183,7 +183,7 @@ $encodedClubName = htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8'); // Properly
 </body>
 
 
-<footer class="navbar-darkblue text-white mt-1 p-4 text-center">
+<!-- <footer class="navbar-darkblue text-white mt-1 p-4 text-center">
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
@@ -215,6 +215,6 @@ $encodedClubName = htmlspecialchars($clubName, ENT_QUOTES, 'UTF-8'); // Properly
             <hr>
             <p class="mb-0">© 2024 Student Organization Club Membership and Information System. All rights reserved.</p>
         </div>
-    </footer>
+    </footer> -->
 
 </html>
