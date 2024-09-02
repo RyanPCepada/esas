@@ -183,7 +183,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check input errors before inserting into the database
     if (empty($firstName_err) && empty($middleName_err) && empty($lastName_err) && empty($age_err) && empty($birthday_err) && empty($gender_err) && empty($instiEmail_err) && empty($phoneNumber_err) && empty($department_err) && empty($course_err) && empty($year_err) && empty($street_err) && empty($barangay_err) && empty($municipality_err) && empty($province_err) && empty($zipcode_err) && empty($club_id_err)) {
         // Prepare an insert statement
-        $sql = "INSERT INTO registered_students (student_id, firstName, middleName, lastName, age, birthday, gender, instiEmail, phoneNumber, department, course, year, street, barangay, municipality, province, zipcode, profilePic, club_id) 
+        $sql = "INSERT INTO tbl_registered_students (student_id, firstName, middleName, lastName, age, birthday, gender, instiEmail, phoneNumber, department, course, year, street, barangay, municipality, province, zipcode, profilePic, club_id) 
                 VALUES (:student_id, :firstName, :middleName, :lastName, :age, :birthday, :gender, :instiEmail, :phoneNumber, :department, :course, :year, :street, :barangay, :municipality, :province, :zipcode, :profilePic, :club_id)";
 
         $stmt = $pdo->prepare($sql);
@@ -213,7 +213,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->execute()) {
             // Records created successfully. Redirect to landing page
             echo "<script>alert('Registration successful!');</script>";
-            echo "<script>window.location.href = '/esas/esas-student/public/home.php';</script>";
+            echo "<script>window.location.href = '/esas/esas_student/home.php';</script>";
             exit();
         } else {
             echo "Oops! Something went wrong. Please try again later.";
