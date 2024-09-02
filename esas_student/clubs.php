@@ -232,10 +232,38 @@
 
 
     <div class="container-fluid">
-        
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h1 class="section-label">
+                    Your Clubs <i class="fa fa-university"></i>
+                </h1>
+                <p class="text-muted"><em>(These are the club you were registered in.)</em></p>
+            </div>
+            
+            <div class="club-request d-flex justify-content-end">
+                <button type="button" class="btn btn-primary" style="margin-left: auto; display: block; text-align: end; border-radius: 5px;"
+                    onclick="window.location.href='club_request.php'">
+                    <h4>Request for a Club</h4>
+                </button>
+            </div>
+        </div>
+
         <div class="row" id="studentClubsContainer">
             <!-- Student club cards will be dynamically added here -->
         </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h1 class="section-label">
+                    The SBO Officers <i class="fa fa-users"></i>
+                </h1>
+                <p class="text-muted"><em></em></p>
+            </div>
+        </div>
+
+        <hr>
 
         <div class="row">
             <div class="col-12 mb-3">
