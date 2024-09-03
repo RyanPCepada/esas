@@ -1,11 +1,34 @@
 <?php
 session_start();
+require_once "../config.php";
+
+// Fetch the current student's ID
+$student_id = $_SESSION['student_id'];
 
 // Check if the user is logged in
 if (!isset($_SESSION['student_id'])) {
     // Redirect to login page
     header("Location: /esas/esas_student/login.php");
     exit(); // Ensure no further code is executed
+}
+
+// Fetch the student's full name
+$sql = "SELECT firstName, middleName, lastName FROM tbl_students WHERE student_id = :student_id";
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+$stmt->execute();
+
+// Fetch the result
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Check if a result was found
+if ($result) {
+    $firstName = strtoupper($result['firstName']);
+    $middleName = strtoupper($result['middleName']);
+    $lastName = strtoupper($result['lastName']);
+} else {
+    // Handle the case where no data is found
+    $firstName = $middleName = $lastName = "UNKNOWN";
 }
 ?>
 
