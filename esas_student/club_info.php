@@ -12,6 +12,7 @@ $coverPhoto = '';
 $dateAdded = '';
 $moderators = '';
 $membersCount = '';
+$maxClubsAllowed = 2; // Set the maximum number of clubs allowed
 
 // Fetch the current student's ID from the session
 if (isset($_SESSION['student_id'])) {
@@ -33,6 +34,15 @@ if (isset($_SESSION['student_id'])) {
             $middleName = strtoupper($result['middleName']);
             $lastName = strtoupper($result['lastName']);
         }
+
+        // Check how many clubs the student is already registered for
+        $sql = "SELECT COUNT(*) AS club_count FROM tbl_registered_students WHERE student_id = :student_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $clubCountResult = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $clubCount = (int)$clubCountResult['club_count'];
 
     } catch (PDOException $e) {
         // Handle database connection or query error
@@ -65,7 +75,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             $clubName = htmlspecialchars($club['clubName']);
             $information = nl2br(htmlspecialchars($club['information']));
             $coverPhoto = htmlspecialchars($club['coverPhoto']);
-            $dateAdded = htmlspecialchars($club['dateAdded']); // Changed from dateOfEstablishment
+            $dateAdded = htmlspecialchars($club['dateAdded']);
             $membersCount = htmlspecialchars($club['membersCount']);
             
             // Process moderators' names and profile pictures
@@ -212,8 +222,10 @@ $encodedClubName = addslashes($clubName); // Ensure to escape any special charac
         <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
             <h4 class="mb-3">Join Us Now!</h4>
             <p class="lead">If you want to be a part of us, register now and become a member of <?php echo htmlspecialchars($clubName); ?>.</p>
-            <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, &quot;<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>&quot;)">Register Now</button>
-
+            <button class="btn btn-primary btn-lg mt-3" 
+                onclick="registerNow(<?php echo $club_id; ?>, &quot;<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>&quot;, <?php echo $clubCount; ?>)">
+                Register Now
+            </button>
             <div class="mt-1">
                 <a href="javascript:history.go(-1)" class="btn btn-transparent">Go Back</a>
             </div>
@@ -226,7 +238,11 @@ $encodedClubName = addslashes($clubName); // Ensure to escape any special charac
     <script src="../assets/js/global_script.js"></script>
 
     <script>
-        function registerNow(clubId, clubName) {
+        function registerNow(clubId, clubName, clubCount) {
+            if (clubCount >= <?php echo $maxClubsAllowed; ?>) {
+                alert('You have already registered for the maximum of 2 clubs.');
+                return;
+            }
             const encodedClubName = encodeURIComponent(clubName);
             const url = `/esas/esas_student/registration.php?club_id=${clubId}&club_name=${encodedClubName}`;
             window.location.href = url;
