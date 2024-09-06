@@ -19,10 +19,10 @@ switch ($method) {
                 SELECT c.club_id, c.clubName, c.information, c.coverPhoto, c.dateAdded, c.dateModified,
                        GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderators,
                        GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS profilePics
-                FROM tbl_registered_students rs
-                JOIN tbl_clubs c ON rs.club_id = c.club_id
+                FROM tbl_registration r
+                JOIN tbl_clubs c ON r.club_id = c.club_id
                 LEFT JOIN tbl_moderators m ON c.club_id = m.club_id
-                WHERE rs.student_id = ?
+                WHERE r.student_id = ?
                 GROUP BY c.club_id
             ');
             $stmt->execute([$student_id]);
@@ -30,7 +30,7 @@ switch ($method) {
 
             // Fetch member counts and format moderators for each club
             foreach ($result as &$club) {
-                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_registered_students WHERE club_id = ?');
+                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_registration WHERE club_id = ?');
                 $stmt_count->execute([$club['club_id']]);
                 $club['membersCount'] = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
 
