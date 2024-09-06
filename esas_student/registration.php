@@ -24,6 +24,10 @@ if (isset($_GET['club_id'])) {
 if (empty($municipality)) {
     $municipality = 'Manolo Fortich';
 }
+
+if (empty($province)) {
+    $province = 'Bukidnon';
+}
 // Include the registration form
 ?>
 
