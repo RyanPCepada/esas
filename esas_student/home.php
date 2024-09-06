@@ -18,7 +18,7 @@ try {
     global $pdo;
 
     // Fetch the student's club_id and profile picture
-    $sql = "SELECT club_id, profilePic FROM tbl_registered_students WHERE student_id = :student_id";
+    $sql = "SELECT club_id, profilePic FROM tbl_registration WHERE student_id = :student_id";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
     $stmt->execute();
