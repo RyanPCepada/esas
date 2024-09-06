@@ -50,11 +50,11 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             SELECT c.clubName, c.information, c.coverPhoto, c.dateAdded,
                 GROUP_CONCAT(CONCAT(m.firstName, ' ', COALESCE(m.middleName, ''), ' ', m.lastName) ORDER BY m.firstName SEPARATOR '|') AS moderatorNames,
                 GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR '|') AS moderatorPics,
-                COUNT(rs.student_id) AS membersCount,
+                COUNT(r.student_id) AS membersCount,
                 COUNT(DISTINCT m.moderator_id) AS numModerators
             FROM tbl_clubs c
             LEFT JOIN tbl_moderators m ON c.club_id = m.club_id
-            LEFT JOIN tbl_registered_students rs ON c.club_id = rs.club_id
+            LEFT JOIN tbl_registration r ON c.club_id = r.club_id
             WHERE c.club_id = ?
             GROUP BY c.club_id
         ");
@@ -89,14 +89,14 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
         }
 
         // Check if the student is already registered in the club
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registered_students WHERE student_id = :student_id AND club_id = :club_id");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id");
         $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
         $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
         $stmt->execute();
         $isRegistered = $stmt->fetchColumn() > 0;
 
         // Check if the student is already registered in two clubs
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registered_students WHERE student_id = :student_id");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id");
         $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
         $stmt->execute();
         $clubsCount = $stmt->fetchColumn();
