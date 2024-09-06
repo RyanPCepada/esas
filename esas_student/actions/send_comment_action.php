@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Fetch the current student's ID
     $student_id = $_SESSION['student_id'];
     
-    // Fetch club_id from tbl_registered_students
-    $sql = "SELECT club_id FROM tbl_registered_students WHERE student_id = :student_id";
+    // Fetch club_id from tbl_registration
+    $sql = "SELECT club_id FROM tbl_registration WHERE student_id = :student_id";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
     $stmt->execute();
