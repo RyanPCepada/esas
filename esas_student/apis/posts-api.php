@@ -21,7 +21,7 @@ switch ($method) {
         $student_id = $_SESSION['student_id'];
 
         // Fetch the club_id for the logged-in student
-        $stmt = $pdo->prepare('SELECT club_id FROM tbl_registered_students WHERE student_id = ?');
+        $stmt = $pdo->prepare('SELECT club_id FROM tbl_registration WHERE student_id = ?');
         $stmt->execute([$student_id]);
         $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
