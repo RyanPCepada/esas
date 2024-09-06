@@ -20,6 +20,10 @@ if (isset($_GET['club_id'])) {
     unset($stmt);
 }
 
+// Set default values if not set or empty
+if (empty($municipality)) {
+    $municipality = 'Manolo Fortich';
+}
 // Include the registration form
 ?>
 
