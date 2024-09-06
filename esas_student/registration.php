@@ -28,6 +28,10 @@ if (empty($municipality)) {
 if (empty($province)) {
     $province = 'Bukidnon';
 }
+
+if (empty($zipcode)) {
+    $zipcode = '8703';
+}
 // Include the registration form
 ?>
 
