@@ -273,7 +273,7 @@ try {
                 <h1 class="section-label">
                     Your Clubs <i class="fa fa-university"></i>
                 </h1>
-                <p class="text-muted"><em>(These are the club you were registered in.)</em></p>
+                <p class="text-muted"><em></em></p>
             </div>
             
             <div class="club-request d-flex justify-content-end mb-3">

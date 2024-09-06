@@ -19,6 +19,7 @@
                     <a class="dropdown-item py-1">Library Resource</a>
                     <a class="dropdown-item py-1">Election Voting</a>
                     <a class="dropdown-item py-1" href="clubs.php">Club Registration</a>
+                    <a class="dropdown-item py-1" href="sample_filter.php">Sample Filter</a>
                 </div>
                 <!-- <div>
                     <div class="dropdown-header py-0">Settings</div>
