@@ -3,7 +3,7 @@
 require_once "../../config.php";
 
 // Define variables and initialize with empty values
-$firstName = $middleName = $lastName = $age = $birthday = $gender = $instiEmail = $phoneNumber = $department = $course = $year = $street = $barangay = $municipality = $province = $zipcode = $club_id = "";
+$firstName = $middleName = $lastName = $age = $birthday = $gender = $instiEmail = $phoneNumber = $department = $course = $year = $street = $barangay = $municipality = $province = $zipcode = $club_id = $status = "";
 $firstName_err = $middleName_err = $lastName_err = $age_err = $birthday_err = $gender_err = $instiEmail_err = $phoneNumber_err = $department_err = $course_err = $year_err = $street_err = $barangay_err = $municipality_err = $province_err = $zipcode_err = $club_id_err = "";
 
 // Processing form data when form is submitted
@@ -169,8 +169,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check input errors before inserting into the database
     if (empty($firstName_err) && empty($middleName_err) && empty($lastName_err) && empty($age_err) && empty($birthday_err) && empty($gender_err) && empty($instiEmail_err) && empty($phoneNumber_err) && empty($department_err) && empty($course_err) && empty($year_err) && empty($street_err) && empty($barangay_err) && empty($municipality_err) && empty($province_err) && empty($zipcode_err) && empty($club_id_err)) {
         // Prepare an insert statement
-        $sql = "INSERT INTO tbl_registered_students (student_id, firstName, middleName, lastName, age, birthday, gender, instiEmail, phoneNumber, department, course, year, street, barangay, municipality, province, zipcode, profilePic, club_id) 
-                VALUES (:student_id, :firstName, :middleName, :lastName, :age, :birthday, :gender, :instiEmail, :phoneNumber, :department, :course, :year, :street, :barangay, :municipality, :province, :zipcode, :profilePic, :club_id)";
+        $sql = "INSERT INTO tbl_registration (student_id, firstName, middleName, lastName, age, birthday, gender, instiEmail, phoneNumber, department, course, year, street, barangay, municipality, province, zipcode, profilePic, status, club_id) 
+                VALUES (:student_id, :firstName, :middleName, :lastName, :age, :birthday, :gender, :instiEmail, :phoneNumber, :department, :course, :year, :street, :barangay, :municipality, :province, :zipcode, :profilePic, :status, :club_id)";
 
         $stmt = $pdo->prepare($sql);
 
@@ -193,6 +193,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":province", $province);
         $stmt->bindParam(":zipcode", $zipcode);
         $stmt->bindParam(":profilePic", $profilePic);
+
+        // Add status with default value "pending" after profilePic
+        $status = 'pending';
+        $stmt->bindParam(":status", $status);
+
         $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
 
         // Attempt to execute the prepared statement
@@ -214,3 +219,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Close connection (if not using persistent connection)
 // unset($pdo); // Uncomment if $pdo is not a persistent connection
 ?>
+
