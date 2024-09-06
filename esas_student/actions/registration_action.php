@@ -193,6 +193,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(":province", $province);
         $stmt->bindParam(":zipcode", $zipcode);
         $stmt->bindParam(":profilePic", $profilePic);
+        $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
 
         // Add status with default value "pending" after profilePic
         $status = 'pending';
