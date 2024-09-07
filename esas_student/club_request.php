@@ -12,6 +12,14 @@
     <script src="../assets/js/jquery-3.6.0.js"></script>
     <link href="../assets/css/styles.css" rel="stylesheet" />
     <link href="../assets/img/nbsclogo.png" rel="icon">
+    <style>
+        .wrapper {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+    </style>
 </head>
 <body>
 <div class="row g-0 h-100">
@@ -93,9 +101,25 @@
         <div class="row g-0 h-100">
             <div id="divpr_requesdetails" class="table-responsive px-0 auto-scroll">
                 <div class="row g-0 p-4 px-2 pt-3 h-100">
-                    <div class="card ">
+                    <div class="card">
                         <div class="card-body">
-
+                            <h2 class="mt-3 mb-4">Request for a New Club</h2>
+                            <p class="py-2">Please fill out this form and submit your request for a new club.</p>
+                            <form id="clubRequestForm" action="club_request_action.php" method="POST" enctype="multipart/form-data">
+                                <div class="form-group mb-3">
+                                    <label for="clubName">Club Name</label>
+                                    <input type="text" name="clubName" class="form-control" id="clubName" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="description">What is the primary goal of this club?</label>
+                                    <textarea name="description" class="form-control" id="description" rows="4" required></textarea>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="activities">Proposed Activities</label>
+                                    <textarea name="activities" class="form-control" id="activities" rows="3"></textarea>
+                                </div>
+                                <a href="#" onclick="history.back(); return false;" class="btn btn-secondary float-end">Cancel</a>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -107,12 +131,24 @@
         <div class="row mt-3 g-0">
             <div class="col-12">
                 <div class="ps-2">
-                    <button id="prbtnsubmitforapproval" onclick="modal_confirm('submitPrSummary()', '', 'Are you sure you want to submit this <b>Purchase Request (PR)</b>?')" class="btn btn-sm btn-outline-primary rounded-3 w-100 mb-1"><i class="fa fa-plane" aria-hidden="true"></i> Submit for Approval</button>
+                    <button id="prbtnsubmitforapproval" onclick="submitClubRequest()" class="btn btn-sm btn-outline-primary rounded-3 w-100 mb-1"><i class="fa fa-plane" aria-hidden="true"></i> Submit for Approval</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        function submitClubRequest() {
+            document.getElementById('clubRequestForm').submit();
+        }
+    </script>
+
 </div>
+
+<!-- <?php include 'assets/components/modals.php' ?> -->
+<script src="../assets/js/jquery.dataTables.min.js"></script>
+<script src="../assets/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/global_script.js"></script>
 <script>
     $(document).ready(function() {
         $('.delprreq').click(function(e) {
