@@ -163,7 +163,7 @@
                 <div class="row g-0 p-4 px-2 pt-3 h-100">
                     <div class="card">
                         <div class="card-body">
-                            <h2 class="mt-3 mb-4">Request for a New Club</h2>
+                            <h2 class="mt-0 mb-4">Request for a New Club</h2>
                             <p class="py-2">Please fill out this form and submit your request for a new club.</p>
                             <form id="clubRequestForm" action="../esas_student/actions/club_request_action.php" method="POST" enctype="multipart/form-data">
                                 <div class="form-group mb-3">

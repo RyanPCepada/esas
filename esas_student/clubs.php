@@ -278,7 +278,7 @@ try {
             
             <div class="club-request d-flex justify-content-end mb-3">
                 <button type="button" class="btn btn-primary" style="margin-left: auto; display: block; text-align: center; border-radius: 5px; padding: 10px 20px; line-height: normal; font-size: 1.25rem;"
-                    onclick="window.location.href='club_request.php'">Request for a Club
+                    onclick="window.location.href='club_request.php'">Club Request
                 </button>
             </div>
         </div>
