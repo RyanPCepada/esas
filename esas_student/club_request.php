@@ -25,8 +25,6 @@
         .card-img-only {
             position: relative;
             width: 230px;
-            /* width: 1280px;
-            height: 720px; */
             height: 130px;
             border: solid 3px transparent;
             border-radius: 10px;
@@ -34,19 +32,26 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, .5);
             margin-top: 10px;
             margin-bottom: 10px;
+            display: flex; /* Flexbox added */
+            justify-content: center; /* Horizontally center the image */
+            align-items: center; /* Vertically center the image */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
         .card-img-only:hover {
             transform: scale(1.03);
             border: solid 3px lightblue;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
         }
+
         .card-img-only img {
-            width: 100%;
-            height: auto;
+            max-width: 100%; /* Image can scale down to fit container width */
+            max-height: 100%; /* Image can scale down to fit container height */
             display: block;
+            margin: auto; /* Center the image within the container */
             background: linear-gradient(to top right, rgba(0,0,0,0.6), rgba(255,255,255,0.2));
         }
+
         .card small {
             position: absolute;
             top: 5px;
@@ -252,10 +257,10 @@
                                                 <h4>${request.clubName}</h4>
                                             </div>
                                         </a>
-                                        <div class="card-footer">
+                                        <!--<div class="card-footer">
                                             <p><strong>Status:</strong> ${request.status}</p>
                                             <p><strong>Date Requested:</strong> ${new Date(request.dateRequested).toLocaleString()}</p>
-                                        </div>
+                                        </div>-->
                                     </div>
                                 </div>
                             `).join('');
