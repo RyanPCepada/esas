@@ -24,12 +24,12 @@
         .card-img-only {
             position: relative;
             width: 330px;
-            height: 187px;
+            height: 188px;
             border: solid 3px transparent;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 10px 20px rgba(0, 0, 0, .5);
-            margin-left: 10px;
+            margin-left: 15px;
             margin-top: 10px;
             margin-bottom: 10px;
             display: flex; /* Flexbox added */
@@ -155,7 +155,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
     <div class="col-7 bg-lgrey">
