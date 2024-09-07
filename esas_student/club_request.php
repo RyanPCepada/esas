@@ -87,7 +87,7 @@
 </head>
 <body>
 <div class="row g-0 h-100">
-    <div class="col-2 ps-0 pt-3 border-end ">
+    <div class="col-3 ps-0 pt-3 border-end ">
         <div class="pe-2">
             <h5>Your Club Requests</h5>
             <button class="btn btn-primary btn-sm py-1  mt-1 rounded-3 w-100">Create New Request</button>
@@ -158,7 +158,7 @@
 
         </div>
     </div>
-    <div class="col-8 bg-lgrey">
+    <div class="col-7 bg-lgrey">
         <div class="row g-0 h-100">
             <div id="divpr_requesdetails" class="table-responsive px-0 auto-scroll">
                 <div class="row g-0 p-4 px-2 pt-3 h-100">
