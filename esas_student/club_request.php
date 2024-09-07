@@ -19,6 +19,9 @@
             margin: 0 auto;
             padding: 50px;
         }
+        .tab-content {
+            height: auto;
+        }
         .card-img-only {
             position: relative;
             width: 230px;
@@ -29,7 +32,8 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 10px 20px rgba(0, 0, 0, .5);
-            margin-bottom: 20px;
+            margin-top: 10px;
+            margin-bottom: 10px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .card-img-only:hover {
@@ -93,10 +97,10 @@
                     <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;"><i class="fa-solid fa-sliders"></i></button>
                 </div>
             </nav>
-            <div class="col-12 pe-2 py-1">
-                <input id="inprsearchfilter" class="form-control form-control-sm me-1" placeholder="Search...">
-            </div>
-            <div class="tab-content">
+            <div class="tab-content" style="height: auto;">
+                <div class="col-12 pe-2 py-1">
+                    <input id="inprsearchfilter" class="form-control form-control-sm me-1" placeholder="Search...">
+                </div>
                 <div class="tab-pane fade show active" id="nav-prnew" role="tabpanel" aria-labelledby="nav-prnew-tab">
                     <div class="table-responsive auto-scroll" style="height: 400px">
                         <table id="tblprnewsumm" class="tblprfilter table table-sm table-hover">
