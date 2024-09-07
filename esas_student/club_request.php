@@ -90,13 +90,29 @@
         <div class="row g-0 mt-2">
             <nav>
                 <div class="nav nav-tabs n" role="tablist">
-                    <button title="New" class="ms-2 px-2 nav-link active" id="nav-prnew-tab" data-bs-toggle="tab" data-bs-target="#nav-prnew" type="button" role="tab" aria-controls="nav-prnew" aria-selected="true"><i class="fa-regular fa-file"></i></button>
-                    <button title="Ongoing" class="px-2 nav-link" id="nav-prongoing-tab" data-bs-toggle="tab" data-bs-target="#nav-prongoing" type="button" role="tab" aria-controls="nav-prongoing" aria-selected="false"><i class="fa-regular fa-clock"></i></button>
-                    <button title="Approved" class="px-2 nav-link" id="nav-prapproved-tab" data-bs-toggle="tab" data-bs-target="#nav-prapproved" type="button" role="tab" aria-controls="nav-prapproved" aria-selected="false"><i class="fa-regular fa-thumbs-up"></i></button>
-                    <button title="Rejected" class="px-2 nav-link" id="nav-prreject-tab" data-bs-toggle="tab" data-bs-target="#nav-prreject" type="button" role="tab" aria-controls="nav-prreject" aria-selected="false"><i class="fa-regular fa-thumbs-down"></i></button>
-                    <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;"><i class="fa-solid fa-sliders"></i></button>
+                    <button title="New" class="ms-2 px-2 nav-link active" id="nav-prnew-tab" data-bs-toggle="tab" data-bs-target="#nav-prnew" type="button" role="tab" aria-controls="nav-prnew" aria-selected="true" onclick="updateLabel('All')">
+                        <i class="fa-regular fa-file"></i>
+                    </button>
+                    <button title="Ongoing" class="px-2 nav-link" id="nav-prongoing-tab" data-bs-toggle="tab" data-bs-target="#nav-prongoing" type="button" role="tab" aria-controls="nav-prongoing" aria-selected="false" onclick="updateLabel('Pendings')">
+                        <i class="fa-regular fa-clock"></i>
+                    </button>
+                    <button title="Approved" class="px-2 nav-link" id="nav-prapproved-tab" data-bs-toggle="tab" data-bs-target="#nav-prapproved" type="button" role="tab" aria-controls="nav-prapproved" aria-selected="false" onclick="updateLabel('Approved')">
+                        <i class="fa-regular fa-thumbs-up"></i>
+                    </button>
+                    <button title="Rejected" class="px-2 nav-link" id="nav-prreject-tab" data-bs-toggle="tab" data-bs-target="#nav-prreject" type="button" role="tab" aria-controls="nav-prreject" aria-selected="false" onclick="updateLabel('Disapproved')">
+                        <i class="fa-regular fa-thumbs-down"></i>
+                    </button>
+                    <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;">
+                        <i class="fa-solid fa-sliders"></i>
+                    </button>
                 </div>
             </nav>
+
+            <!-- Label for displaying the current tab's name -->
+            <div class="mt-2 mb-0">
+                <h5 id="tabLabel">All</h5>
+            </div>
+
             <div class="tab-content" style="height: auto;">
                 <div class="col-12 pe-2 py-1">
                     <input id="inprsearchfilter" class="form-control form-control-sm me-1" placeholder="Search...">
@@ -134,6 +150,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     <div class="col-8 bg-lgrey">
@@ -201,6 +218,10 @@
     <script>
         function submitClubRequest() {
             document.getElementById('clubRequestForm').submit();
+        }
+
+        function updateLabel(label) {
+            document.getElementById("tabLabel").innerText = label;
         }
 
         document.addEventListener('DOMContentLoaded', function () {
