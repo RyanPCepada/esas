@@ -1,6 +1,9 @@
 <?php
 require_once '../../config.php';
 
+// Start the session to access session variables
+session_start();
+
 // Set the content type to JSON
 header('Content-Type: application/json');
 
@@ -9,21 +12,33 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        // Fetch all club requests
-        $stmt = $pdo->query('
+        // Check if the student_id is set in the session
+        if (!isset($_SESSION['student_id'])) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Unauthorized: No student_id found in session']);
+            exit();
+        }
+
+        // Get the student_id from the session
+        $student_id = $_SESSION['student_id'];
+
+        // Prepare and execute the query to fetch requests for the specific student
+        $stmt = $pdo->prepare('
             SELECT r.request_id, r.clubName, r.description, r.activities, r.status, r.coverPhoto, r.dateRequested, 
                    s.firstName, s.lastName
             FROM tbl_club_requests r
             LEFT JOIN tbl_students s ON r.student_id = s.student_id
+            WHERE r.student_id = :student_id
             ORDER BY r.dateRequested DESC
         ');
+        $stmt->execute(['student_id' => $student_id]);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if ($result) {
             echo json_encode($result);
         } else {
             http_response_code(404);
-            echo json_encode(['error' => 'No club requests found']);
+            echo json_encode(['error' => 'No club requests found for this student']);
         }
         break;
         
