@@ -199,20 +199,26 @@
             document.getElementById('clubRequestForm').submit();
         }
 
-        // Function to fetch and display club requests
-        function fetchClubRequests(apiUrl, tableId) {
-            fetch(apiUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const table = document.getElementById(tableId);
-                    if (data && data.length > 0) {
-                        data.forEach(request => {
-                            const cardHTML = `
+        document.addEventListener('DOMContentLoaded', function () {
+            const endpoints = {
+                all: '/esas/esas_student/apis/club-request-all-api.php',
+                pending: '/esas/esas_student/apis/club-request-pending-api.php',
+                approved: '/esas/esas_student/apis/club-request-approved-api.php',
+                disapproved: '/esas/esas_student/apis/club-request-disapproved-api.php'
+            };
+
+            function fetchData(endpoint, tableId) {
+                fetch(endpoint)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const table = document.getElementById(tableId);
+                        if (data && data.length > 0) {
+                            table.innerHTML = data.map(request => `
                                 <div class="col-md-12">
                                     <div class="card card-img-only">
                                         <a href="#">
@@ -223,37 +229,27 @@
                                         </a>
                                         <div class="card-footer">
                                             <p><strong>Status:</strong> ${request.status}</p>
-                                            <p><strong>Date Requested:</strong> ${request.dateRequested}</p>
+                                            <p><strong>Date Requested:</strong> ${new Date(request.dateRequested).toLocaleString()}</p>
                                         </div>
                                     </div>
                                 </div>
-                            `;
-                            table.innerHTML += cardHTML;
-                        });
-                    } else {
-                        table.innerHTML = '<p>No club requests found.</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching club requests:', error);
-                    const table = document.getElementById(tableId);
-                    table.innerHTML = '<p>Failed to fetch club requests. Please try again later.</p>';
-                });
-        }
+                            `).join('');
+                        } else {
+                            table.innerHTML = '<p>No requests found.</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        const table = document.getElementById(tableId);
+                        table.innerHTML = '<p>Failed to fetch data. Please try again later.</p>';
+                    });
+            }
 
-        // Fetch all club requests
-        fetchClubRequests('/esas/esas_student/apis/club-request-all-api.php', 'tblprnewsumm');
-
-        // Fetch pending club requests
-        fetchClubRequests('/esas/esas_student/apis/club-request-pending-api.php', 'tblprongoingsumm');
-
-        // Fetch approved club requests
-        fetchClubRequests('/esas/esas_student/apis/club-request-approved-api.php', 'tblprapprovedsumm');
-
-        // Fetch disapproved club requests
-        fetchClubRequests('/esas/esas_student/apis/club-request-disapproved-api.php', 'tblprrejectedsumm');
-
-
+            fetchData(endpoints.all, 'tblprnewsumm');
+            fetchData(endpoints.pending, 'tblprongoingsumm');
+            fetchData(endpoints.approved, 'tblprapprovedsumm');
+            fetchData(endpoints.disapproved, 'tblprrejectedsumm');
+        });
     </script>
 
 </div>
