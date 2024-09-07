@@ -20,16 +20,16 @@
             padding: 50px;
         }
         .tab-content {
-            height: auto;
         }
         .card-img-only {
             position: relative;
-            width: 230px;
-            height: 130px;
+            width: 330px;
+            height: 187px;
             border: solid 3px transparent;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 10px 20px rgba(0, 0, 0, .5);
+            margin-left: 10px;
             margin-top: 10px;
             margin-bottom: 10px;
             display: flex; /* Flexbox added */
@@ -87,8 +87,8 @@
 </head>
 <body>
 <div class="row g-0 h-100">
-    <div class="col-3 ps-0 pt-3 border-end ">
-        <div class="pe-2">
+    <div class="col-3 ps-0 pt-3 pl-3 border-end">
+        <div class="pe-2 ps-2">
             <h5>Your Club Requests</h5>
             <button class="btn btn-primary btn-sm py-1  mt-1 rounded-3 w-100">Create New Request</button>
         </div>
@@ -114,11 +114,11 @@
             </nav>
 
             <!-- Label for displaying the current tab's name -->
-            <div class="mt-2 mb-0">
+            <div class="mt-2 mb-0 ps-2">
                 <h5 id="tabLabel">All</h5>
             </div>
 
-            <div class="tab-content" style="height: auto;">
+            <div class="tab-content ps-2">
                 <div class="col-12 pe-2 py-1">
                     <input id="inprsearchfilter" class="form-control form-control-sm me-1" placeholder="Search...">
                 </div>
