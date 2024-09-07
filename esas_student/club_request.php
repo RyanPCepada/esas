@@ -19,6 +19,61 @@
             margin: 0 auto;
             padding: 50px;
         }
+        .card-img-only {
+            position: relative;
+            width: 95%;
+            /* width: 1280px;
+            height: 720px; */
+            height: auto;
+            border: solid 3px transparent;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, .5);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-img-only:hover {
+            transform: scale(1.03);
+            border: solid 3px lightblue;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+        }
+        .card-img-only img {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: linear-gradient(to top right, rgba(0,0,0,0.6), rgba(255,255,255,0.2));
+        }
+        .card small {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: white;
+            padding: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Shadow effect */
+        }
+        .overlay-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background: linear-gradient(to top, rgba(0, 0, 0, .7), rgba(0, 0, 0, 0));
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Shadow effect */
+            text-align: left;
+            line-height: 1.2; /* Adjust line height for closer spacing */
+        }
+        .overlay-text h4 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .overlay-text p {
+            margin: 5px 0 0;
+            font-size: 14px;
+        }
+
     </style>
 </head>
 <body>
@@ -45,7 +100,7 @@
                 <div class="tab-pane fade show active" id="nav-prnew" role="tabpanel" aria-labelledby="nav-prnew-tab">
                     <div class="table-responsive auto-scroll" style="height: 400px">
                         <table id="tblprnewsumm" class="tblprfilter table table-sm table-hover">
-                            <!-- LOAD DATA -->
+                            <!-- ALL STUDENT CLUB REQUESTS HERE -->
                         </table>
                         <div style="height: 150px;"></div>
                     </div>
@@ -53,7 +108,7 @@
                 <div class="tab-pane fade" id="nav-prongoing" role="tabpanel" aria-labelledby="nav-prongoing-tab">
                     <div class="table-responsive auto-scroll" style="height: 400px">
                         <table id="tblprongoingsumm" class="tblprfilter table table-sm table-hover">
-                            <!-- LOAD DATA -->
+                            <!-- ALL STUDENT PENDING CLUB REQUESTS HERE -->
                         </table>
                         <div style="height: 150px;"></div>
                     </div>
@@ -61,7 +116,7 @@
                 <div class="tab-pane fade" id="nav-prapproved" role="tabpanel" aria-labelledby="nav-prapproved-tab">
                     <div class="table-responsive auto-scroll" style="height: 400px">
                         <table id="tblprapprovedsumm" class="tblprfilter table table-sm table-hover">
-                            <!-- LOAD DATA -->
+                            <!-- ALL STUDENT APPROVED CLUB REQUESTS HERE -->
                         </table>
                         <div style="height: 150px;"></div>
                     </div>
@@ -69,7 +124,7 @@
                 <div class="tab-pane fade" id="nav-prreject" role="tabpanel" aria-labelledby="nav-prreject-tab">
                     <div class="table-responsive auto-scroll" style="height: 400px">
                         <table id="tblprrejectedsumm" class="tblprfilter table table-sm table-hover">
-                            <!-- LOAD DATA -->
+                            <!-- ALL STUDENT DISAPPROVED CLUB REQUESTS HERE -->
                         </table>
                         <div style="height: 150px;"></div>
                     </div>
@@ -143,6 +198,47 @@
         function submitClubRequest() {
             document.getElementById('clubRequestForm').submit();
         }
+
+        // Fetch all club requests
+fetch('/esas/esas_student/apis/club-request-all-api.php')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const table = document.getElementById('tblprnewsumm');
+        if (data && data.length > 0) {
+            data.forEach(request => {
+                const cardHTML = `
+                    <div class="col-md-12">
+                        <div class="card card-img-only">
+                            <a href="#">
+                                <img src="/esas/esas_student/images/${request.coverPhoto}" alt="Cover Photo">
+                                <div class="overlay-text">
+                                    <h4>${request.clubName}</h4>
+                                    <p>${request.description}</p>
+                                    <p>Status: ${request.status}</p>
+                                    <p>Requested on: ${new Date(request.dateRequested).toLocaleDateString()}</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                table.innerHTML += cardHTML;
+            });
+        } else {
+            table.innerHTML = '<p>No club requests found.</p>';
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching club requests:', error);
+        const table = document.getElementById('tblprnewsumm');
+        table.innerHTML = '<p>Failed to fetch club requests. Please try again later.</p>';
+    });
+
+
     </script>
 
 </div>
