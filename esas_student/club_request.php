@@ -13,11 +13,11 @@
     <link href="../assets/css/styles.css" rel="stylesheet" />
     <link href="../assets/img/nbsclogo.png" rel="icon">
     <style>
-        .wrapper {
+        .card-body {
             width: 100%;
-            max-width: 600px;
+            /* max-width: 600px; */
             margin: 0 auto;
-            padding: 15px;
+            padding: 50px;
         }
     </style>
 </head>
@@ -25,8 +25,8 @@
 <div class="row g-0 h-100">
     <div class="col-2 ps-0 pt-3 border-end ">
         <div class="pe-2">
-            <h5>Activity Design</h5>
-            <button class="btn btn-primary btn-sm py-1  mt-1 rounded-3 w-100">Create PR</button>
+            <h5>Your Club Requests</h5>
+            <button class="btn btn-primary btn-sm py-1  mt-1 rounded-3 w-100">Create New Request</button>
         </div>
         <div class="row g-0 mt-2">
             <nav>
@@ -45,27 +45,7 @@
                 <div class="tab-pane fade show active" id="nav-prnew" role="tabpanel" aria-labelledby="nav-prnew-tab">
                     <div class="table-responsive auto-scroll" style="height: 400px">
                         <table id="tblprnewsumm" class="tblprfilter table table-sm table-hover">
-                            <tr class="border-bottom highlight" onclick="loadPrDetailHeader('49',this, 'Purchase Request')">
-                                <td class="py-0 cursor-pointer">
-                                    <div class="d-flex bd-highlight">
-                                        <div class="p-2 py-1 w-100 bd-highlight">
-                                            <div style="width: 150px;">
-                                                <p class="mb-0 lh-3" style="font-size: small; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">wew</p>
-                                            </div>
-                                            <p class="mb-0 lh-2" style="font-size: x-small;">Date created: 2024/4/08 4:58pm
-                                            </p>
-                                            <p class="mb-0 lh-2" style="font-size: x-small;">By: PALabastida
-                                            </p>
-                                            <p class="mb-0 lh-2" style="font-size: x-small;">Information Management Office
-                                            </p>
-                                        </div>
-                                        <div class="p-1 py-1 pt-2 flex-shrink-1 bd-highlight">
-                                            <i class="fa fa-pencil" aria-hidden="true"></i>
-                                            <i class="fa fa-trash text-danger" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+                            <!-- LOAD DATA -->
                         </table>
                         <div style="height: 150px;"></div>
                     </div>
@@ -105,7 +85,7 @@
                         <div class="card-body">
                             <h2 class="mt-3 mb-4">Request for a New Club</h2>
                             <p class="py-2">Please fill out this form and submit your request for a new club.</p>
-                            <form id="clubRequestForm" action="club_request_action.php" method="POST" enctype="multipart/form-data">
+                            <form id="clubRequestForm" action="../esas_student/actions/club_request_action.php" method="POST" enctype="multipart/form-data">
                                 <div class="form-group mb-3">
                                     <label for="clubName">Club Name</label>
                                     <input type="text" name="clubName" class="form-control" id="clubName" required>
@@ -118,8 +98,30 @@
                                     <label for="activities">Proposed Activities</label>
                                     <textarea name="activities" class="form-control" id="activities" rows="3"></textarea>
                                 </div>
+                                <div class="form-group mb-3">
+                                    <label for="coverPhoto">Club Cover Photo</label>
+                                    <input type="file" name="coverPhoto" class="form-control" id="coverPhoto" required onchange="previewImage(event)">
+                                </div>
+                                
+                                <!-- Preview Container -->
+                                <div class="form-group mb-3">
+                                    <img id="coverPhotoPreview" src="#" alt="Cover Photo Preview" style="display:none; width: 50%; object-fit: cover;" />
+                                </div>
+                                
                                 <a href="#" onclick="history.back(); return false;" class="btn btn-secondary float-end">Cancel</a>
                             </form>
+
+                            <script>
+                                function previewImage(event) {
+                                    var reader = new FileReader();
+                                    reader.onload = function(){
+                                        var output = document.getElementById('coverPhotoPreview');
+                                        output.src = reader.result;
+                                        output.style.display = 'block';
+                                    }
+                                    reader.readAsDataURL(event.target.files[0]);
+                                }
+                            </script>
                         </div>
                     </div>
                 </div>
