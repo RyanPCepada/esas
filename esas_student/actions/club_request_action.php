@@ -1,39 +1,72 @@
 <?php
-// Include config file
-require_once "../config.php";
+// Include database configuration file
+require_once '../../config.php';
 
-// Handle form submission
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
-    $clubName = trim($_POST['clubName']);
-    $description = trim($_POST['description']);
-    $activities = trim($_POST['activities']);
-    $status = 'Pending'; // Initial status for the request
-    $student_id = $_SESSION['student_id'];
-    $registration_id = $_SESSION['registration_id'];
+    $clubName = $_POST['clubName'];
+    $description = $_POST['description'];
+    $activities = $_POST['activities'] ?? '';
+    $status = 'pending'; // Default status for a new request
+    $dateRequested = date('Y-m-d H:i:s'); // Current timestamp
+    $student_id = 123; // Example student ID (you'll need to retrieve this dynamically)
+    $registration_id = 456; // Example registration ID (you'll need to retrieve this dynamically)
 
-    // Insert the request into the database
-    $sql = "INSERT INTO tbl_club_requests (clubName, description, activities, status, dateRequested, student_id, registration_id) 
-            VALUES (?, ?, ?, ?, NOW(), ?, ?)";
-
-    if ($stmt = $conn->prepare($sql)) {
-        // Bind parameters: "ssssi" corresponds to the data types (string, string, string, string, integer, integer)
-        $stmt->bind_param("ssssi", $clubName, $description, $activities, $status, $student_id, $registration_id);
-
-        // Execute the statement
-        if ($stmt->execute()) {
-            echo "<script>alert('Request submitted successfully! Please wait for the Admin approval of your request.');</script>";
+    // File upload logic
+    $coverPhoto = '';
+    $targetDir = "/esas/esas_student/images/"; // Directory for uploaded images
+    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
+    
+    if (isset($_FILES['coverPhoto']) && $_FILES['coverPhoto']['error'] == 0) {
+        $fileName = basename($_FILES['coverPhoto']['name']);
+        $fileSize = $_FILES['coverPhoto']['size'];
+        $fileTmpName = $_FILES['coverPhoto']['tmp_name'];
+        $fileType = pathinfo($fileName, PATHINFO_EXTENSION);
+        
+        // Validate file type and size (2MB limit)
+        if (in_array(strtolower($fileType), $allowedTypes) && $fileSize <= 10 * 1024 * 1024) {
+            $newFileName = uniqid() . "." . $fileType; // Generate unique file name
+            $targetFilePath = $_SERVER['DOCUMENT_ROOT'] . $targetDir . $newFileName;
+            
+            if (move_uploaded_file($fileTmpName, $targetFilePath)) {
+                $coverPhoto = $newFileName; // Store the file name for the database
+            } else {
+                die("Error uploading the file.");
+            }
         } else {
-            echo "<script>alert('Error submitting your request. Please try again.');</script>";
+            die("Invalid file type or file too large. Only JPG, JPEG, PNG, GIF under 10MB allowed.");
         }
-
-        // Close the statement
-        $stmt->close();
     } else {
-        echo "<script>alert('Error preparing the SQL statement.');</script>";
+        die("Please upload a cover photo.");
     }
 
-    // Close the connection
-    $conn->close();
+    // Insert data into the database
+    $sql = "INSERT INTO tbl_club_requests (clubName, description, activities, status, coverPhoto, dateRequested, student_id, registration_id) 
+            VALUES (:clubName, :description, :activities, :status, :coverPhoto, :dateRequested, :student_id, :registration_id)";
+
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':clubName', $clubName);
+        $stmt->bindParam(':description', $description);
+        $stmt->bindParam(':activities', $activities);
+        $stmt->bindParam(':status', $status);
+        $stmt->bindParam(':coverPhoto', $coverPhoto);
+        $stmt->bindParam(':dateRequested', $dateRequested);
+        $stmt->bindParam(':student_id', $student_id);
+        $stmt->bindParam(':registration_id', $registration_id);
+
+        // Execute the query
+        if ($stmt->execute()) {
+            // Redirect to success page or show success message
+            echo "<script>alert('Club request submitted successfully!'); window.location.href = '../club_request.php';</script>";
+        } else {
+            echo "Something went wrong. Please try again.";
+        }
+    } catch (PDOException $e) {
+        die("Error: " . $e->getMessage());
+    }
 }
 ?>
