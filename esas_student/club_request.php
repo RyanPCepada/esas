@@ -163,7 +163,7 @@
                                     <img id="coverPhotoPreview" src="#" alt="Cover Photo Preview" style="display:none; width: 50%; object-fit: cover;" />
                                 </div>
                                 
-                                <a href="#" onclick="history.back(); return false;" class="btn btn-secondary float-end">Cancel</a>
+                                <a href="javascript:history.go(-1)" return false;" class="btn btn-secondary float-end">Cancel</a>
                             </form>
 
                             <script>
