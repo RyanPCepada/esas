@@ -270,7 +270,7 @@
                     .catch(error => {
                         console.error('Error fetching data:', error);
                         const table = document.getElementById(tableId);
-                        table.innerHTML = '<p>Failed to fetch data. Please try again later.</p>';
+                        table.innerHTML = '<p class="mt-3">No club requests found.</p>';
                     });
             }
 
