@@ -19,30 +19,39 @@
             margin: 0 auto;
             padding: 50px;
         }
+        .tab-content {
+            height: auto;
+        }
         .card-img-only {
             position: relative;
             width: 230px;
-            /* width: 1280px;
-            height: 720px; */
             height: 130px;
             border: solid 3px transparent;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 10px 20px rgba(0, 0, 0, .5);
-            margin-bottom: 20px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            display: flex; /* Flexbox added */
+            justify-content: center; /* Horizontally center the image */
+            align-items: center; /* Vertically center the image */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
         .card-img-only:hover {
             transform: scale(1.03);
             border: solid 3px lightblue;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
         }
+
         .card-img-only img {
-            width: 100%;
-            height: auto;
+            max-width: 100%; /* Image can scale down to fit container width */
+            max-height: 100%; /* Image can scale down to fit container height */
             display: block;
+            margin: auto; /* Center the image within the container */
             background: linear-gradient(to top right, rgba(0,0,0,0.6), rgba(255,255,255,0.2));
         }
+
         .card small {
             position: absolute;
             top: 5px;
@@ -86,17 +95,33 @@
         <div class="row g-0 mt-2">
             <nav>
                 <div class="nav nav-tabs n" role="tablist">
-                    <button title="New" class="ms-2 px-2 nav-link active" id="nav-prnew-tab" data-bs-toggle="tab" data-bs-target="#nav-prnew" type="button" role="tab" aria-controls="nav-prnew" aria-selected="true"><i class="fa-regular fa-file"></i></button>
-                    <button title="Ongoing" class="px-2 nav-link" id="nav-prongoing-tab" data-bs-toggle="tab" data-bs-target="#nav-prongoing" type="button" role="tab" aria-controls="nav-prongoing" aria-selected="false"><i class="fa-regular fa-clock"></i></button>
-                    <button title="Approved" class="px-2 nav-link" id="nav-prapproved-tab" data-bs-toggle="tab" data-bs-target="#nav-prapproved" type="button" role="tab" aria-controls="nav-prapproved" aria-selected="false"><i class="fa-regular fa-thumbs-up"></i></button>
-                    <button title="Rejected" class="px-2 nav-link" id="nav-prreject-tab" data-bs-toggle="tab" data-bs-target="#nav-prreject" type="button" role="tab" aria-controls="nav-prreject" aria-selected="false"><i class="fa-regular fa-thumbs-down"></i></button>
-                    <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;"><i class="fa-solid fa-sliders"></i></button>
+                    <button title="New" class="ms-2 px-2 nav-link active" id="nav-prnew-tab" data-bs-toggle="tab" data-bs-target="#nav-prnew" type="button" role="tab" aria-controls="nav-prnew" aria-selected="true" onclick="updateLabel('All')">
+                        <i class="fa-regular fa-file"></i>
+                    </button>
+                    <button title="Ongoing" class="px-2 nav-link" id="nav-prongoing-tab" data-bs-toggle="tab" data-bs-target="#nav-prongoing" type="button" role="tab" aria-controls="nav-prongoing" aria-selected="false" onclick="updateLabel('Pendings')">
+                        <i class="fa-regular fa-clock"></i>
+                    </button>
+                    <button title="Approved" class="px-2 nav-link" id="nav-prapproved-tab" data-bs-toggle="tab" data-bs-target="#nav-prapproved" type="button" role="tab" aria-controls="nav-prapproved" aria-selected="false" onclick="updateLabel('Approved')">
+                        <i class="fa-regular fa-thumbs-up"></i>
+                    </button>
+                    <button title="Rejected" class="px-2 nav-link" id="nav-prreject-tab" data-bs-toggle="tab" data-bs-target="#nav-prreject" type="button" role="tab" aria-controls="nav-prreject" aria-selected="false" onclick="updateLabel('Disapproved')">
+                        <i class="fa-regular fa-thumbs-down"></i>
+                    </button>
+                    <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;">
+                        <i class="fa-solid fa-sliders"></i>
+                    </button>
                 </div>
             </nav>
-            <div class="col-12 pe-2 py-1">
-                <input id="inprsearchfilter" class="form-control form-control-sm me-1" placeholder="Search...">
+
+            <!-- Label for displaying the current tab's name -->
+            <div class="mt-2 mb-0">
+                <h5 id="tabLabel">All</h5>
             </div>
-            <div class="tab-content">
+
+            <div class="tab-content" style="height: auto;">
+                <div class="col-12 pe-2 py-1">
+                    <input id="inprsearchfilter" class="form-control form-control-sm me-1" placeholder="Search...">
+                </div>
                 <div class="tab-pane fade show active" id="nav-prnew" role="tabpanel" aria-labelledby="nav-prnew-tab">
                     <div class="table-responsive auto-scroll" style="height: 400px">
                         <table id="tblprnewsumm" class="tblprfilter table table-sm table-hover">
@@ -130,6 +155,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     <div class="col-8 bg-lgrey">
@@ -199,20 +225,30 @@
             document.getElementById('clubRequestForm').submit();
         }
 
-        // Function to fetch and display club requests
-        function fetchClubRequests(apiUrl, tableId) {
-            fetch(apiUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const table = document.getElementById(tableId);
-                    if (data && data.length > 0) {
-                        data.forEach(request => {
-                            const cardHTML = `
+        function updateLabel(label) {
+            document.getElementById("tabLabel").innerText = label;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const endpoints = {
+                all: '/esas/esas_student/apis/club-request-all-api.php',
+                pending: '/esas/esas_student/apis/club-request-pending-api.php',
+                approved: '/esas/esas_student/apis/club-request-approved-api.php',
+                disapproved: '/esas/esas_student/apis/club-request-disapproved-api.php'
+            };
+
+            function fetchData(endpoint, tableId) {
+                fetch(endpoint)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const table = document.getElementById(tableId);
+                        if (data && data.length > 0) {
+                            table.innerHTML = data.map(request => `
                                 <div class="col-md-12">
                                     <div class="card card-img-only">
                                         <a href="#">
@@ -221,39 +257,29 @@
                                                 <h4>${request.clubName}</h4>
                                             </div>
                                         </a>
-                                        <div class="card-footer">
+                                        <!--<div class="card-footer">
                                             <p><strong>Status:</strong> ${request.status}</p>
-                                            <p><strong>Date Requested:</strong> ${request.dateRequested}</p>
-                                        </div>
+                                            <p><strong>Date Requested:</strong> ${new Date(request.dateRequested).toLocaleString()}</p>
+                                        </div>-->
                                     </div>
                                 </div>
-                            `;
-                            table.innerHTML += cardHTML;
-                        });
-                    } else {
-                        table.innerHTML = '<p>No club requests found.</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching club requests:', error);
-                    const table = document.getElementById(tableId);
-                    table.innerHTML = '<p>Failed to fetch club requests. Please try again later.</p>';
-                });
-        }
+                            `).join('');
+                        } else {
+                            table.innerHTML = '<p>No requests found.</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        const table = document.getElementById(tableId);
+                        table.innerHTML = '<p>Failed to fetch data. Please try again later.</p>';
+                    });
+            }
 
-        // Fetch all club requests
-        fetchClubRequests('/esas/esas_student/apis/club-request-all-api.php', 'tblprnewsumm');
-
-        // Fetch pending club requests
-        fetchClubRequests('/esas/esas_student/apis/club-request-pending-api.php', 'tblprongoingsumm');
-
-        // Fetch approved club requests
-        fetchClubRequests('/esas/esas_student/apis/club-request-approved-api.php', 'tblprapprovedsumm');
-
-        // Fetch disapproved club requests
-        fetchClubRequests('/esas/esas_student/apis/club-request-disapproved-api.php', 'tblprrejectedsumm');
-
-
+            fetchData(endpoints.all, 'tblprnewsumm');
+            fetchData(endpoints.pending, 'tblprongoingsumm');
+            fetchData(endpoints.approved, 'tblprapprovedsumm');
+            fetchData(endpoints.disapproved, 'tblprrejectedsumm');
+        });
     </script>
 
 </div>
