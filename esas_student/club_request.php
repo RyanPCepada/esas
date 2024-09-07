@@ -21,10 +21,10 @@
         }
         .card-img-only {
             position: relative;
-            width: 95%;
+            width: 230px;
             /* width: 1280px;
             height: 720px; */
-            height: auto;
+            height: 130px;
             border: solid 3px transparent;
             border-radius: 10px;
             overflow: hidden;
@@ -199,7 +199,7 @@
             document.getElementById('clubRequestForm').submit();
         }
 
-        // Fetch all club requests
+        // Fetch all, pending, approved, and disapproved club requests
 fetch('/esas/esas_student/apis/club-request-all-api.php')
     .then(response => {
         if (!response.ok) {
@@ -218,9 +218,6 @@ fetch('/esas/esas_student/apis/club-request-all-api.php')
                                 <img src="/esas/esas_student/images/${request.coverPhoto}" alt="Cover Photo">
                                 <div class="overlay-text">
                                     <h4>${request.clubName}</h4>
-                                    <p>${request.description}</p>
-                                    <p>Status: ${request.status}</p>
-                                    <p>Requested on: ${new Date(request.dateRequested).toLocaleDateString()}</p>
                                 </div>
                             </a>
                         </div>
