@@ -235,7 +235,7 @@ try {
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
+    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
         <a class="navbar-brand ps-2" href="#">
             <img src="../assets/img/nbsclogo.png" style="height: 0.3in;">
             NBSC SIS</a>
@@ -245,10 +245,10 @@ try {
         </button>
         <div class="navbar-collapse collapse hide" id="main_nav">
             <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
-                <?php include 'nav/nav_main.php' ?>
+                <php include 'nav/nav_main.php' ?>
             </div>
         </div>
-    </nav>
+    </nav> -->
 
 
     <div class="wrapper">
