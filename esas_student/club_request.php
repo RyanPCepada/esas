@@ -96,7 +96,7 @@ try {
             /* width: 230px;
             height: 130px; */
             width: 260px;
-            height: 130px;
+            height: 147px;
             border: solid 2px transparent;
             border-radius: 10px;
             overflow: hidden;
@@ -310,10 +310,14 @@ try {
                     <div class="card">
                         <div class="card-body">
                             
+                            <h2 class="mt-0 mb-4">Student Club Organizations</h2>
+                            <hr>
+                            
                             <div class="row" id="clubsContainer">
                                 <!-- Club cards will be dynamically added here -->
                             </div>
                             <a href="../esas_student/clubs.php" class="btn btn-secondary float-end">Cancel</a>
+
                             
                             <!-- <h2 class="mt-0 mb-4">Request for a New Club</h2>
                             <p class="py-2">Please fill out this form and submit your request for a new club.</p>
@@ -363,9 +367,12 @@ try {
     <div id="divprstatussection" class="col-2 border-start">
         <div class="row mt-3 g-0">
             <div class="col-12">
-                <div class="ps-2">
-                    <button id="prbtnsubmitforapproval" onclick="submitClubRequest()" class="btn btn-sm btn-outline-primary rounded-3 w-100 mb-1"><i class="fa fa-plane" aria-hidden="true"></i> Submit for Approval</button>
+                <div class="pe-2 ps-2">
+                    <h5>SBO Officers</h5>
                 </div>
+                <!-- <div class="ps-2">
+                    <button id="prbtnsubmitforapproval" onclick="submitClubRequest()" class="btn btn-sm btn-outline-primary rounded-3 w-100 mb-1"><i class="fa fa-plane" aria-hidden="true"></i> Submit for Approval</button>
+                </div> -->
             </div>
         </div>
     </div>
