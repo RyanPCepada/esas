@@ -63,10 +63,10 @@ try {
             height: 130px; */
             width: 220px;
             height: 124px;
-            border: solid 3px transparent;
+            border: solid 2px transparent;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, .5);
+            /* box-shadow: 0 5px 10px rgba(0, 0, 0, .5); */
             margin-left: 7px;
             margin-top: 10px;
             margin-bottom: 10px;
@@ -83,6 +83,40 @@ try {
         }
 
         .card-img-only img {
+            max-width: 100%; /* Image can scale down to fit container width */
+            max-height: 100%; /* Image can scale down to fit container height */
+            display: block;
+            margin: auto; /* Center the image within the container */
+            background: linear-gradient(to top right, rgba(0,0,0,0.6), rgba(255,255,255,0.2));
+        }
+
+        
+        .card-img-only-all {
+            position: relative;
+            /* width: 230px;
+            height: 130px; */
+            width: 260px;
+            height: 130px;
+            border: solid 2px transparent;
+            border-radius: 10px;
+            overflow: hidden;
+            /* box-shadow: 0 5px 10px rgba(0, 0, 0, .5); */
+            margin-left: 7px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            display: flex; /* Flexbox added */
+            justify-content: center; /* Horizontally center the image */
+            align-items: center; /* Vertically center the image */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-img-only-all:hover {
+            transform: scale(1.03);
+            border: solid 3px lightblue;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .card-img-only-all img {
             max-width: 100%; /* Image can scale down to fit container width */
             max-height: 100%; /* Image can scale down to fit container height */
             display: block;
@@ -275,6 +309,12 @@ try {
                 <div class="row g-0 p-4 px-2 pt-3 h-100">
                     <div class="card">
                         <div class="card-body">
+                            
+                            <div class="row" id="clubsContainer">
+                                <!-- Club cards will be dynamically added here -->
+                            </div>
+                            <a href="../esas_student/clubs.php" class="btn btn-secondary float-end">Cancel</a>
+                            
                             <!-- <h2 class="mt-0 mb-4">Request for a New Club</h2>
                             <p class="py-2">Please fill out this form and submit your request for a new club.</p>
                             <form id="clubRequestForm" action="../esas_student/actions/club_request_action.php" method="POST" enctype="multipart/form-data">
@@ -339,16 +379,8 @@ try {
             document.getElementById("tabLabel").innerText = label;
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-    const clubEndpoints = {
-        all: '/esas/esas_student/apis/student-clubs-all-api.php',
-        pending: '/esas/esas_student/apis/student-clubs-pending-api.php',
-        approved: '/esas/esas_student/apis/student-clubs-approved-api.php',
-        disapproved: '/esas/esas_student/apis/student-clubs-disapproved-api.php'
-    };
-
-    function fetchStudentClubs(endpoint, tableId) {
-        fetch(endpoint)
+        // Fetch clubs data from API
+        fetch('/esas/esas_student/apis/clubs-api.php')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -356,39 +388,91 @@ try {
                 return response.json();
             })
             .then(data => {
-                const table = document.getElementById(tableId);
+                const clubsContainer = document.getElementById('clubsContainer');
                 if (data && data.length > 0) {
-                    table.innerHTML = data.map(club => `
-                        <div class="col-md-12">
-                            <div class="card card-img-only">
-                                <small data-toggle="tooltip" title="${club.membersCount} members">
-                                    <i class="fa fa-user mr-1"></i>${club.membersCount}
-                                </small>
-                                <a href="/esas/esas_student/home.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
-                                    <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
-                                    <div class="overlay-text">
-                                        <h4>${club.clubName}</h4>
-                                    </div>
-                                </a>
+                    data.forEach(club => {
+                        const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
+                        const cardHTML = `
+                            <div class="col-md-4">
+                                <div class="card card-img-only-all">
+                                    <small data-toggle="tooltip" title="${memberText}">
+                                        <i class="fa fa-user mr-1"></i>${club.membersCount}
+                                    </small>
+                                    <a href="/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
+                                        <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
+                                        <div class="overlay-text">
+                                            <h4>${club.clubName}</h4>
+                                            <!--<div class="moderators-container">
+                                                ${club.formattedModerators}
+                                            </div>-->
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                        clubsContainer.innerHTML += cardHTML;
+                    });
                 } else {
-                    table.innerHTML = '<p>No clubs found.</p>';
+                    clubsContainer.innerHTML = '<p>No clubs found.</p>';
                 }
             })
             .catch(error => {
-                console.error('Error fetching data:', error);
-                const table = document.getElementById(tableId);
-                table.innerHTML = '<p class="mt-3">Failed to load clubs. Please try again later.</p>';
+                console.error('Error fetching clubs:', error);
+                const clubsContainer = document.getElementById('clubsContainer');
+                clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
             });
-    }
 
-    // Fetch data for each tab
-    fetchStudentClubs(clubEndpoints.all, 'tblAllClubs');         // For "All Clubs"
-    fetchStudentClubs(clubEndpoints.pending, 'tblActiveClubs');  // For "Pending Approval"
-    fetchStudentClubs(clubEndpoints.approved, 'tblInactiveClubs'); // For "Approved Clubs"
-});
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const clubEndpoints = {
+                all: '/esas/esas_student/apis/student-clubs-all-api.php',
+                pending: '/esas/esas_student/apis/student-clubs-pending-api.php',
+                approved: '/esas/esas_student/apis/student-clubs-approved-api.php',
+                disapproved: '/esas/esas_student/apis/student-clubs-disapproved-api.php'
+            };
+
+            function fetchStudentClubs(endpoint, tableId) {
+                fetch(endpoint)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const table = document.getElementById(tableId);
+                        if (data && data.length > 0) {
+                            table.innerHTML = data.map(club => `
+                                <div class="col-md-12">
+                                    <div class="card card-img-only">
+                                        <small data-toggle="tooltip" title="${club.membersCount} members">
+                                            <i class="fa fa-user mr-1"></i>${club.membersCount}
+                                        </small>
+                                        <a href="/esas/esas_student/home.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
+                                            <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
+                                            <div class="overlay-text">
+                                                <h4>${club.clubName}</h4>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            `).join('');
+                        } else {
+                            table.innerHTML = '<p>No clubs found.</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        const table = document.getElementById(tableId);
+                        table.innerHTML = '<p class="mt-3">Failed to load clubs. Please try again later.</p>';
+                    });
+            }
+
+            // Fetch data for each tab
+            fetchStudentClubs(clubEndpoints.all, 'tblAllClubs');         // For "All Clubs"
+            fetchStudentClubs(clubEndpoints.pending, 'tblActiveClubs');  // For "Pending Approval"
+            fetchStudentClubs(clubEndpoints.approved, 'tblInactiveClubs'); // For "Approved Clubs"
+        });
 
 
         document.addEventListener('DOMContentLoaded', function () {
