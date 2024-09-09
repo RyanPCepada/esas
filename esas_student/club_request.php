@@ -248,6 +248,7 @@ try {
         <!-- YOUR CLUB REQUESTS -->
         <div class="pe-2 ps-2">
             <h5>Your Club Requests</h5>
+            <button class="btn btn-primary btn-sm py-1 mt-1 rounded-3 w-100">Create New Club Request</button>
         </div>
         <div class="row g-0 mt-2">
             <nav>
