@@ -23,13 +23,15 @@
         }
         .card-img-only {
             position: relative;
-            width: 330px;
-            height: 188px;
+            /* width: 230px;
+            height: 130px; */
+            width: 220px;
+            height: 124px;
             border: solid 3px transparent;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, .5);
-            margin-left: 15px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, .5);
+            margin-left: 7px;
             margin-top: 10px;
             margin-bottom: 10px;
             display: flex; /* Flexbox added */
@@ -87,7 +89,17 @@
 </head>
 <body>
 <div class="row g-0 h-100">
-    <div class="col-3 ps-0 pt-3 pl-3 border-end">
+    
+    <!-- LEFT SIDEBAR -->
+    <div class="col-2 ps-0 pt-3 pl-3 border-end">
+        <!-- YOUR CLUBS -->
+        <div class="pe-2 ps-2">
+            <h5>Your Clubs</h5>
+        </div>
+        <div class="row g-0 mt-2">
+        </div>
+        <hr>
+        <!-- CLUB REQUESTS -->
         <div class="pe-2 ps-2">
             <h5>Your Club Requests</h5>
             <button class="btn btn-primary btn-sm py-1  mt-1 rounded-3 w-100">Create New Request</button>
@@ -157,7 +169,9 @@
             </div>
         </div>
     </div>
-    <div class="col-7 bg-lgrey">
+    <!-- LEFT SIDEBAR END -->
+
+    <div class="col-8 bg-lgrey">
         <div class="row g-0 h-100">
             <div id="divpr_requesdetails" class="table-responsive px-0 auto-scroll">
                 <div class="row g-0 p-4 px-2 pt-3 h-100">
