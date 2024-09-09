@@ -1,3 +1,39 @@
+<?php
+session_start();
+require_once "../config.php";
+
+// Fetch the current student's ID from the session
+$student_id = $_SESSION['student_id'];
+
+try {
+    // Use the existing PDO instance from config.php
+    global $pdo;
+
+    // Prepare and execute the SQL statement
+    $sql = "SELECT firstName, middleName, lastName FROM tbl_students WHERE student_id = :student_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    // Fetch the result
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check if a result was found
+    if ($result) {
+        $firstName = strtoupper($result['firstName']);
+        $middleName = strtoupper($result['middleName']);
+        $lastName = strtoupper($result['lastName']);
+    } else {
+        // Handle the case where no data is found
+        $firstName = $middleName = $lastName = "UNKNOWN";
+    }
+
+} catch (PDOException $e) {
+    // Handle database connection or query error
+    die("Database error: " . $e->getMessage());
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,11 +131,15 @@
         <!-- YOUR CLUBS -->
         <div class="pe-2 ps-2">
             <h5>Your Clubs</h5>
+            <div class="row" id="studentClubsContainer">
+                <!-- Student club cards will be dynamically added here -->
+            </div>
         </div>
         <div class="row g-0 mt-2">
         </div>
+        <!-- YOUR CLUBS END -->
         <hr>
-        <!-- CLUB REQUESTS -->
+        <!-- YOUR CLUB REQUESTS -->
         <div class="pe-2 ps-2">
             <h5>Your Club Requests</h5>
             <button class="btn btn-primary btn-sm py-1  mt-1 rounded-3 w-100">Create New Request</button>
@@ -168,6 +208,7 @@
                 </div>
             </div>
         </div>
+        <!-- YOUR CLUB REQUESTS END -->
     </div>
     <!-- LEFT SIDEBAR END -->
 
@@ -241,6 +282,46 @@
         function updateLabel(label) {
             document.getElementById("tabLabel").innerText = label;
         }
+
+        // Fetch student-specific clubs data from API
+        fetch('/esas/esas_student/apis/student-clubs-api.php')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const studentClubsContainer = document.getElementById('studentClubsContainer');
+                if (data && data.length > 0) {
+                    data.forEach(club => {
+                        const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
+                        const cardHTML = `
+                            <div class="col-md-12"> <!-- Changed col-md-4 to col-md-12 -->
+                                <div class="card card-img-only">
+                                    <small data-toggle="tooltip" title="${memberText}">
+                                        <i class="fa fa-user mr-1"></i>${club.membersCount}
+                                    </small>
+                                    <a href="/esas/esas_student/home.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
+                                        <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
+                                        <div class="overlay-text">
+                                            <h4>${club.clubName}</h4>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        studentClubsContainer.innerHTML += cardHTML;
+                    });
+                } else {
+                    studentClubsContainer.innerHTML = '<h5>You are not yet registered to any of the club organizations.</h5>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching student clubs:', error);
+                const studentClubsContainer = document.getElementById('studentClubsContainer');
+                studentClubsContainer.innerHTML = '<p>Failed to fetch your clubs. Please try again later.</p>';
+            });
 
         document.addEventListener('DOMContentLoaded', function () {
             const endpoints = {
