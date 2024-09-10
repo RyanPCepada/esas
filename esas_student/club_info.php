@@ -138,6 +138,13 @@ $encodedClubName = addslashes($clubName);
         /* body {
             font: 14px Helvetica;
         } */
+        .wrapper {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0px;
+            min-height: 500px;
+        }
         .container-fluid {
             padding: 20px;
         }
@@ -165,7 +172,7 @@ $encodedClubName = addslashes($clubName);
 
 <body class="sb-nav-fixed">
     
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
+    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
         <a class="navbar-brand ps-2" href="#">
             <img src="../assets/img/nbsclogo.png" style="height: 0.3in;">
             NBSC SIS</a>
@@ -174,10 +181,10 @@ $encodedClubName = addslashes($clubName);
         </button>
         <div class="navbar-collapse collapse hide" id="main_nav">
             <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
-                <?php include 'nav/nav_main.php' ?>
+                <php include 'nav/nav_main.php' ?>
             </div>
         </div>
-    </nav>
+    </nav> -->
     <!-- <nav class="navbar navbar-expand-lg navbar-darkblue">
         <img src="icons/SAS_LOGO.png" height="50" class="d-inline-block align-top" alt="SAS Logo">
         <h5 class="ml-2 mb-0 text-light" id="nbsc_sas_name">Student Organization Club Membership and Information System</h5>
@@ -195,6 +202,7 @@ $encodedClubName = addslashes($clubName);
         </div>
     </nav> -->
 
+    <div class="wrapper">
     <div class="container-fluid">
         <!-- <div class="mt-2 mb-2">
             <a href="javascript:history.go(-1)" class="btn btn-secondary"><i class="fa fa-arrow-left"></i></a>
@@ -209,7 +217,7 @@ $encodedClubName = addslashes($clubName);
                     <?php echo $moderators; ?>
                     <hr>
                     <h5>Members: <?php echo $membersCount; ?></h5>
-                    <hr>
+                    <!-- <hr> -->
                 </div>
                 <div class="col-12 col-md-8">
                     <img class="mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo" style="max-width: 100%; border-radius: 20px;">
@@ -230,6 +238,7 @@ $encodedClubName = addslashes($clubName);
                 <a href="javascript:history.go(-1)" class="btn btn-transparent">Go Back</a>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- <?php include 'assets/components/modals.php' ?> -->

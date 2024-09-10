@@ -37,67 +37,93 @@ try {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Clubs</title>
-    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
-
-    
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Sample Template</title>
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../assets/js/jquery-3.6.0.js"></script>
     <link href="../assets/css/styles.css" rel="stylesheet" />
     <link href="../assets/img/nbsclogo.png" rel="icon">
     <style>
-        /* body {
-            font: 14px Helvetica;
-        } */
-        .container-fluid {
-            text-align: center;
-            padding: 20px;
+        .card-body {
+            width: 100%;
+            /* max-width: 600px; */
+            margin: 0 auto;
+            padding: 50px;
         }
-        .navbar-darkblue {
-            background-color: #003366;
-        }
-        .navbar-darkblue .navbar-toggler {
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-        .navbar-darkblue .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-        }
-        #dashboard_navigations {
-            float: flex-end;
-        }
-        .section-label {
-            margin-top: 10px;
-            margin-bottom: 0px;
-            color: #343a40;
+        .tab-content {
         }
         .card-img-only {
             position: relative;
-            width: 100%;
-            border: solid 3px transparent;
+            /* width: 230px;
+            height: 130px; */
+            width: 220px;
+            height: 124px;
+            border: solid 2px transparent;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, .5);
-            margin-bottom: 20px;
+            /* box-shadow: 0 5px 10px rgba(0, 0, 0, .5); */
+            margin-left: 7px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            display: flex; /* Flexbox added */
+            justify-content: center; /* Horizontally center the image */
+            align-items: center; /* Vertically center the image */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
         .card-img-only:hover {
             transform: scale(1.03);
             border: solid 3px lightblue;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
         }
+
         .card-img-only img {
-            width: 100%;
-            height: auto;
+            max-width: 100%; /* Image can scale down to fit container width */
+            max-height: 100%; /* Image can scale down to fit container height */
             display: block;
+            margin: auto; /* Center the image within the container */
             background: linear-gradient(to top right, rgba(0,0,0,0.6), rgba(255,255,255,0.2));
         }
+
+        
+        .card-img-only-all {
+            position: relative;
+            /* width: 230px;
+            height: 130px; */
+            width: 270px;
+            height: 152px;
+            border: solid 2px transparent;
+            border-radius: 10px;
+            overflow: hidden;
+            /* box-shadow: 0 5px 10px rgba(0, 0, 0, .5); */
+            margin-left: 7px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            display: flex; /* Flexbox added */
+            justify-content: center; /* Horizontally center the image */
+            align-items: center; /* Vertically center the image */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-img-only-all:hover {
+            transform: scale(1.03);
+            border: solid 3px lightblue;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .card-img-only-all img {
+            max-width: 100%; /* Image can scale down to fit container width */
+            max-height: 100%; /* Image can scale down to fit container height */
+            display: block;
+            margin: auto; /* Center the image within the container */
+            background: linear-gradient(to top right, rgba(0,0,0,0.6), rgba(255,255,255,0.2));
+        }
+
         .card small {
             position: absolute;
             top: 5px;
@@ -129,87 +155,10 @@ try {
             font-size: 14px;
         }
 
-        .moderators-container {
-    display: flex;
-    align-items: center;
-    padding-left: 0; /* Removed padding */
-}
-
-.moderator-pics {
-    display: flex;
-    align-items: center;
-    margin-left: 10px; /* Space between pictures and names */
-}
-
-.moderator-pic {
-    width: 25px !important; /* Adjust size as needed */
-    height: 30px;
-    /* border: solid 3px rgba(255, 255, 255, 0.5); */
-    border-radius: 50%;
-    margin-left: -6px; /* Adjust to make the pics overlap */
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
-}
-
-
-.moderator-names {
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap; /* Ensure names stay in one row */
-    white-space: nowrap; /* Prevent line breaks in names */
-    font-size: 14px; /* Adjust font size as needed */
-    color: white;
-}
-
-
-.moderator-pic:nth-child(1) {
-    z-index: 3; /* First picture on top */
-}
-
-.moderator-pic:nth-child(2) {
-    z-index: 2; /* Second picture below the first */
-}
-
-.moderator-pic:nth-child(3) {
-    z-index: 1; /* Third picture below the second */
-}
-
-.moderator-pic:nth-child(4) {
-    z-index: 0; /* Fourth picture below the third */
-}
-
-.moderator-names {
-    margin-left: 10px; /* Space between profile pics and names */
-}
-
-
-        .list-unstyled{
-            line-height: 1.5;
-        }
-        
-        @media (min-width: 768px) {
-            .card-img-only {
-                margin-bottom: 30px;
-            }
-            .overlay-text h4{
-                font-size: 28px;
-                margin-right: 10px;
-                line-height: 1.2; /* Adjust line height for closer spacing */
-            }
-            .overlay-text {
-                left: 0; /* Ensure it stays aligned to the left */
-                bottom: 0; /* Keep it at the bottom */
-                right: 0; /* Ensure it covers full width */
-                padding: 15px; /* Increased padding */
-            }
-            .moderator-pic {
-                width: 30px !important;
-            }
-        }
-
     </style>
 </head>
-<!-- <body class="sb-nav-fixed"> -->
 <body>
+<div class="row g-0 h-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
         <a class="navbar-brand ps-2" href="#">
             <img src="../assets/img/nbsclogo.png" style="height: 0.3in;">
@@ -224,154 +173,239 @@ try {
             </div>
         </div>
     </nav>
-    <!-- <nav class="navbar navbar-expand-lg navbar-darkblue">
-        <img src="icons/SAS_LOGO.png" height="50" class="d-inline-block align-top" alt="SAS Logo">
-        <h5 class="ml-2 mb-0 text-light" id="nbsc_sas_name">Student Organization Club Membership and Information System</h5>
-        <button class="navbar-toggler mt-2" type="button" data-toggle="collapse" data-target="#dashboard_navigations" aria-controls="dashboard_navigations" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="dashboard_navigations">
-            <ul class="navbar-nav mr-auto"></ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
-            </form>
-            <!-- <a href="logout.php" class="btn btn-danger ml-3">Log out</a> --
-            <a href="../logout.php" class="btn btn-danger ml-3">Log out</a>
+    
+    <!-- LEFT SIDEBAR -->
+    <div class="col-2 ps-0 pt-3 pl-3 border-end">
+
+        <!-- YOUR CLUB -->
+        <div class="pe-2 ps-2">
+            <h5>Your Clubs</h5>
+            <!-- <button class="btn btn-primary btn-sm py-1 mt-1 rounded-3 w-100">Create New Request</button> -->
         </div>
-    </nav> -->
 
-    <!-- <script>
-        $(document).ready(function() {
-            alert("Welcome! Since you are new here, you need to pick or select one club.");
-        });
-    </script> -->
-
-    <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="welcomeModalLabel">Welcome to eSAS!</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+        <!-- Tabbed Section for Your Clubs -->
+        <div class="row g-0 mt-2">
+            <nav>
+                <div class="nav nav-tabs n" role="tablist">
+                    <button title="New" class="ms-2 px-2 nav-link active" id="nav-allclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-allclubs" type="button" role="tab" aria-controls="nav-allclubs" aria-selected="true" onclick="updateLabel('All')">
+                        <i class="fa-regular fa-file"></i>
+                    </button>
+                    <button title="Ongoing" class="px-2 nav-link" id="nav-activeclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-activeclubs" type="button" role="tab" aria-controls="nav-activeclubs" aria-selected="false" onclick="updateLabel('Pending Approval')">
+                        <i class="fa-regular fa-clock"></i>
+                    </button>
+                    <button title="Approved" class="px-2 nav-link" id="nav-inactiveclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-inactiveclubs" type="button" role="tab" aria-controls="nav-inactiveclubs" aria-selected="false" onclick="updateLabel('Approved')">
+                        <i class="fa-regular fa-thumbs-up"></i>
+                    </button>
+                    <button title="Rejected" class="px-2 nav-link" id="nav-rejectedclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-rejectedclubs" type="button" role="tab" aria-controls="nav-rejectedclubs" aria-selected="false" onclick="updateLabel('Rejected')">
+                        <i class="fa-regular fa-thumbs-down"></i>
+                    </button>
+                    <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;">
+                        <i class="fa-solid fa-sliders"></i>
                     </button>
                 </div>
-                <div class="modal-body">
-                    Since you are new here, we encourage you to explore the various clubs available and select the one that best aligns with your interests and goals. This is an excellent opportunity to engage with like-minded peers and enhance your college experience.
+            </nav>
+            <!-- Label for displaying the current tab's name -->
+            <div class="mt-2 mb-0 ps-2">
+                <h5 id="clubTabLabel">Registered Clubs</h5>
+            </div>
+
+            <div class="tab-content ps-2">
+                <!-- Tab for All Clubs -->
+                <div class="tab-pane fade show active" id="nav-allclubs" role="tabpanel" aria-labelledby="nav-allclubs-tab">
+                    <div class="table-responsive auto-scroll" style="height: auto;">
+                        <table id="tblAllClubs" class="table table-sm table-hover">
+                            <!-- ALL STUDENT CLUBS HERE -->
+                        </table>
+                        <div style="height: 0px;"></div>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Get Started</button>
+
+                <!-- Tab for Active Clubs -->
+                <div class="tab-pane fade" id="nav-activeclubs" role="tabpanel" aria-labelledby="nav-activeclubs-tab">
+                    <div class="table-responsive auto-scroll" style="height: 400px;">
+                        <table id="tblActiveClubs" class="table table-sm table-hover">
+                            <!-- ACTIVE STUDENT CLUBS HERE -->
+                        </table>
+                        <div style="height: 150px;"></div>
+                    </div>
+                </div>
+
+                <!-- Tab for Inactive Clubs -->
+                <div class="tab-pane fade" id="nav-inactiveclubs" role="tabpanel" aria-labelledby="nav-inactiveclubs-tab">
+                    <div class="table-responsive auto-scroll" style="height: 400px;">
+                        <table id="tblInactiveClubs" class="table table-sm table-hover">
+                            <!-- INACTIVE STUDENT CLUBS HERE -->
+                        </table>
+                        <div style="height: 150px;"></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12 mb-3">
-                <h1 class="section-label">
-                    Your Clubs <i class="fa fa-university"></i>
-                </h1>
-                <p class="text-muted"><em></em></p>
-            </div>
-            
-            <div class="club-request d-flex justify-content-end mb-3">
-                <button type="button" class="btn btn-primary" style="margin-left: auto; display: block; text-align: center; border-radius: 5px; padding: 10px 20px; line-height: normal; font-size: 1.25rem;"
-                    onclick="window.location.href='club_request.php'">Club Request
-                </button>
-            </div>
-        </div>
-
-        <div class="row" id="studentClubsContainer">
-            <!-- Student club cards will be dynamically added here -->
-        </div>
+        <!-- YOUR CLUB END -->
 
         <hr>
 
-        <div class="row">
-            <div class="col-12 mb-3">
-                <h1 class="section-label">
-                    The SBO Officers <i class="fa fa-users"></i>
-                </h1>
-                <p class="text-muted"><em></em></p>
+        <!-- YOUR CLUB REQUESTS -->
+        <div class="pe-2 ps-2">
+            <h5>Club Requests</h5>
+            <button class="btn btn-primary btn-sm py-1 mt-1 rounded-3 w-100">Create New Club Request</button>
+        </div>
+        <div class="row g-0 mt-2">
+            <nav>
+                <div class="nav nav-tabs n" role="tablist">
+                    <button title="New" class="ms-2 px-2 nav-link active" id="nav-prnew-tab" data-bs-toggle="tab" data-bs-target="#nav-prnew" type="button" role="tab" aria-controls="nav-prnew" aria-selected="true" onclick="updateLabel('All')">
+                        <i class="fa-regular fa-file"></i>
+                    </button>
+                    <button title="Ongoing" class="px-2 nav-link" id="nav-prongoing-tab" data-bs-toggle="tab" data-bs-target="#nav-prongoing" type="button" role="tab" aria-controls="nav-prongoing" aria-selected="false" onclick="updateLabel('Pendings')">
+                        <i class="fa-regular fa-clock"></i>
+                    </button>
+                    <button title="Approved" class="px-2 nav-link" id="nav-prapproved-tab" data-bs-toggle="tab" data-bs-target="#nav-prapproved" type="button" role="tab" aria-controls="nav-prapproved" aria-selected="false" onclick="updateLabel('Approved')">
+                        <i class="fa-regular fa-thumbs-up"></i>
+                    </button>
+                    <button title="Rejected" class="px-2 nav-link" id="nav-prreject-tab" data-bs-toggle="tab" data-bs-target="#nav-prreject" type="button" role="tab" aria-controls="nav-prreject" aria-selected="false" onclick="updateLabel('Disapproved')">
+                        <i class="fa-regular fa-thumbs-down"></i>
+                    </button>
+                    <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;">
+                        <i class="fa-solid fa-sliders"></i>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Label for displaying the current tab's name -->
+            <div class="mt-2 mb-0 ps-2">
+                <h5 id="tabLabel">All</h5>
+            </div>
+
+            <div class="tab-content ps-2">
+                <div class="col-12 pe-2 py-1">
+                    <input id="inprsearchfilter" class="form-control form-control-sm me-1" placeholder="Search...">
+                </div>
+                <div class="tab-pane fade show active" id="nav-prnew" role="tabpanel" aria-labelledby="nav-prnew-tab">
+                    <div class="table-responsive auto-scroll" style="height: 400px">
+                        <table id="tblprnewsumm" class="tblprfilter table table-sm table-hover">
+                            <!-- ALL STUDENT CLUB REQUESTS HERE -->
+                        </table>
+                        <div style="height: 150px;"></div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-prongoing" role="tabpanel" aria-labelledby="nav-prongoing-tab">
+                    <div class="table-responsive auto-scroll" style="height: 400px">
+                        <table id="tblprongoingsumm" class="tblprfilter table table-sm table-hover">
+                            <!-- ALL STUDENT PENDING CLUB REQUESTS HERE -->
+                        </table>
+                        <div style="height: 150px;"></div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-prapproved" role="tabpanel" aria-labelledby="nav-prapproved-tab">
+                    <div class="table-responsive auto-scroll" style="height: 400px">
+                        <table id="tblprapprovedsumm" class="tblprfilter table table-sm table-hover">
+                            <!-- ALL STUDENT APPROVED CLUB REQUESTS HERE -->
+                        </table>
+                        <div style="height: 150px;"></div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-prreject" role="tabpanel" aria-labelledby="nav-prreject-tab">
+                    <div class="table-responsive auto-scroll" style="height: 400px">
+                        <table id="tblprrejectedsumm" class="tblprfilter table table-sm table-hover">
+                            <!-- ALL STUDENT DISAPPROVED CLUB REQUESTS HERE -->
+                        </table>
+                        <div style="height: 150px;"></div>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <hr>
-
-        <div class="row">
-            <div class="col-12 mb-3">
-                <h1 class="section-label">
-                    All Student Club Organizations <i class="fa fa-university"></i>
-                </h1>
-                <p class="text-muted"><em>(Students are only allowed to choose two clubs.)</em></p>
-            </div>
-        </div>
-
-        <div class="row" id="clubsContainer">
-            <!-- Club cards will be dynamically added here -->
-        </div>
+        <!-- YOUR CLUB REQUESTS END -->
     </div>
-    
+    <!-- LEFT SIDEBAR END -->
 
-    
-    <!-- <?php include 'assets/components/modals.php' ?> -->
-    <script src="../assets/js/jquery.dataTables.min.js"></script>
-    <script src="../assets/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/global_script.js"></script>
-    <script>
-
-        // $(document).ready(function() {
-        //     $('#welcomeModal').modal('show');
-        // });
-
-        $(document).ready(function(){
-            $('[data-toggle="tooltip"]').tooltip();
-        });
-
-        // Fetch student-specific clubs data from API
-    fetch('/esas/esas_student/apis/student-clubs-api.php')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            const studentClubsContainer = document.getElementById('studentClubsContainer');
-            if (data && data.length > 0) {
-                data.forEach(club => {
-                    const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
-                    const cardHTML = `
-                        <div class="col-md-4">
-                            <div class="card card-img-only">
-                                <small data-toggle="tooltip" title="${memberText}">
-                                    <i class="fa fa-user mr-1"></i>${club.membersCount}
-                                </small>
-                                <a href="/esas/esas_student/home.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
-                                    <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
-                                    <div class="overlay-text">
-                                        <h4>${club.clubName}</h4>
-                                        <!--<div class="moderators-container">
-                                            ${club.formattedModerators}
-                                        </div>-->
-                                    </div>
-                                </a>
+    <div class="col-8 bg-lgrey">
+        <div class="row g-0 h-100">
+            <div id="divpr_requesdetails" class="table-responsive px-0 auto-scroll">
+                <div class="row g-0 p-4 px-2 pt-3 h-100">
+                    <div class="card">
+                        <div class="card-body">
+    <!-- <div class="col-8 bg-lgrey">
+    <div class="row g-0">
+        <div id="divpr_requesdetails" class="table-responsive px-0">
+            <div class="row g-0 p-4 px-2 pt-3">
+                <div class="card">
+                    <div class="card-body"> -->
+                            
+                            <h2 class="mt-0 mb-4">Student Club Organizations</h2>
+                            <hr>
+                            
+                            <div class="row" id="clubsContainer">
+                                <!-- Club cards will be dynamically added here -->
                             </div>
+                            <a href="../esas_student/clubs.php" class="btn btn-secondary float-end">Cancel</a>
+
+                            
+                            <!-- <h2 class="mt-0 mb-4">Request for a New Club</h2>
+                            <p class="py-2">Please fill out this form and submit your request for a new club.</p>
+                            <form id="clubRequestForm" action="../esas_student/actions/club_request_action.php" method="POST" enctype="multipart/form-data">
+                                <div class="form-group mb-3">
+                                    <label for="clubName">Club Name</label>
+                                    <input type="text" name="clubName" class="form-control" id="clubName" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="description">What is the primary goal of this club?</label>
+                                    <textarea name="description" class="form-control" id="description" rows="4" required></textarea>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="activities">Proposed Activities</label>
+                                    <textarea name="activities" class="form-control" id="activities" rows="3"></textarea>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="coverPhoto">Club Cover Photo</label>
+                                    <input type="file" name="coverPhoto" class="form-control" id="coverPhoto" required onchange="previewImage(event)">
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <img id="coverPhotoPreview" src="#" alt="Cover Photo Preview" style="display:none; width: 50%; object-fit: cover;" />
+                                </div>
+                                <!-- <a href="javascript:history.go(-1)" return false;" class="btn btn-secondary float-end">Cancel</a> --
+                                <a href="../esas_student/clubs.php" class="btn btn-secondary float-end">Cancel</a>
+                            </form>
+
+                            <script>
+                                function previewImage(event) {
+                                    var reader = new FileReader();
+                                    reader.onload = function(){
+                                        var output = document.getElementById('coverPhotoPreview');
+                                        output.src = reader.result;
+                                        output.style.display = 'block';
+                                    }
+                                    reader.readAsDataURL(event.target.files[0]);
+                                }
+                            </script> -->
                         </div>
-                    `;
-                    studentClubsContainer.innerHTML += cardHTML;
-                });
-            } else {
-                studentClubsContainer.innerHTML = '<h5>You are not yet registered to any of the club organizations.</h5>';
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching student clubs:', error);
-            const studentClubsContainer = document.getElementById('studentClubsContainer');
-            studentClubsContainer.innerHTML = '<p>Failed to fetch your clubs. Please try again later.</p>';
-        });
+                    </div>
+                </div>
+                <div style="height: 150px;"></div>
+            </div>
+        </div>
+    </div>
+    <div id="divprstatussection" class="col-2 border-start">
+        <div class="row mt-3 g-0">
+            <div class="col-12">
+                <div class="pe-2 ps-2">
+                    <h5>SBO Officers</h5>
+                </div>
+                <!-- <div class="ps-2">
+                    <button id="prbtnsubmitforapproval" onclick="submitClubRequest()" class="btn btn-sm btn-outline-primary rounded-3 w-100 mb-1"><i class="fa fa-plane" aria-hidden="true"></i> Submit for Approval</button>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function submitClubRequest() {
+            document.getElementById('clubRequestForm').submit();
+        }
+
+        function updateLabel(label) {
+            document.getElementById("tabLabel").innerText = label;
+        }
 
         // Fetch clubs data from API
         fetch('/esas/esas_student/apis/clubs-api.php')
@@ -382,13 +416,14 @@ try {
                 return response.json();
             })
             .then(data => {
+                // $('#post-26').html(data)
                 const clubsContainer = document.getElementById('clubsContainer');
                 if (data && data.length > 0) {
                     data.forEach(club => {
                         const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
                         const cardHTML = `
                             <div class="col-md-4">
-                                <div class="card card-img-only">
+                                <div class="card card-img-only-all">
                                     <small data-toggle="tooltip" title="${memberText}">
                                         <i class="fa fa-user mr-1"></i>${club.membersCount}
                                     </small>
@@ -396,9 +431,9 @@ try {
                                         <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
                                         <div class="overlay-text">
                                             <h4>${club.clubName}</h4>
-                                            <div class="moderators-container">
+                                            <!--<div class="moderators-container">
                                                 ${club.formattedModerators}
-                                            </div>
+                                            </div>-->
                                         </div>
                                     </a>
                                 </div>
@@ -417,46 +452,124 @@ try {
             });
 
 
-        function registerNow(clubId) {
-            window.location.href = `/esas/esas_student/registration.php?club_id=${clubId}`;
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            const clubEndpoints = {
+                all: '/esas/esas_student/apis/student-clubs-all-api.php',
+                pending: '/esas/esas_student/apis/student-clubs-pending-api.php',
+                approved: '/esas/esas_student/apis/student-clubs-approved-api.php',
+                disapproved: '/esas/esas_student/apis/student-clubs-disapproved-api.php'
+            };
 
+            function fetchStudentClubs(endpoint, tableId) {
+                fetch(endpoint)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const table = document.getElementById(tableId);
+                        if (data && data.length > 0) {
+                            table.innerHTML = data.map(club => `
+                                <div class="col-md-12">
+                                    <div class="card card-img-only">
+                                        <small data-toggle="tooltip" title="${club.membersCount} members">
+                                            <i class="fa fa-user mr-1"></i>${club.membersCount}
+                                        </small>
+                                        <a href="/esas/esas_student/home.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
+                                            <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
+                                            <div class="overlay-text">
+                                                <h4>${club.clubName}</h4>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            `).join('');
+                        } else {
+                            table.innerHTML = '<p>No clubs found.</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        const table = document.getElementById(tableId);
+                        table.innerHTML = '<p class="mt-3">Failed to load clubs. Please try again later.</p>';
+                    });
+            }
+
+            // Fetch data for each tab
+            fetchStudentClubs(clubEndpoints.all, 'tblAllClubs');         // For "All Clubs"
+            fetchStudentClubs(clubEndpoints.pending, 'tblActiveClubs');  // For "Pending Approval"
+            fetchStudentClubs(clubEndpoints.approved, 'tblInactiveClubs'); // For "Approved Clubs"
+        });
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const endpoints = {
+                all: '/esas/esas_student/apis/club-request-all-api.php',
+                pending: '/esas/esas_student/apis/club-request-pending-api.php',
+                approved: '/esas/esas_student/apis/club-request-approved-api.php',
+                disapproved: '/esas/esas_student/apis/club-request-disapproved-api.php'
+            };
+
+            function fetchData(endpoint, tableId) {
+                fetch(endpoint)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const table = document.getElementById(tableId);
+                        if (data && data.length > 0) {
+                            table.innerHTML = data.map(request => `
+                                <div class="col-md-12">
+                                    <div class="card card-img-only">
+                                        <a href="#">
+                                            <img src="/esas/esas_student/images/${request.coverPhoto}" alt="Cover Photo">
+                                            <div class="overlay-text">
+                                                <h4>${request.clubName}</h4>
+                                            </div>
+                                        </a>
+                                        <!--<div class="card-footer">
+                                            <p><strong>Status:</strong> ${request.status}</p>
+                                            <p><strong>Date Requested:</strong> ${new Date(request.dateRequested).toLocaleString()}</p>
+                                        </div>-->
+                                    </div>
+                                </div>
+                            `).join('');
+                        } else {
+                            table.innerHTML = '<p>No requests found.</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        const table = document.getElementById(tableId);
+                        table.innerHTML = '<p class="mt-3">No club requests found.</p>';
+                    });
+            }
+
+            fetchData(endpoints.all, 'tblprnewsumm');
+            fetchData(endpoints.pending, 'tblprongoingsumm');
+            fetchData(endpoints.approved, 'tblprapprovedsumm');
+            fetchData(endpoints.disapproved, 'tblprrejectedsumm');
+        });
     </script>
 
+</div>
+
+<!-- <?php include 'assets/components/modals.php' ?> -->
+<script src="../assets/js/jquery.dataTables.min.js"></script>
+<script src="../assets/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/global_script.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.delprreq').click(function(e) {
+            e.stopPropagation();
+        });
+        // let value= $("classname").val()
+    });
+</script>
 </body>
-
-<!-- <footer class="navbar-darkblue text-white mt-1 p-4 text-center">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <h5>Contact Us</h5>
-                <ul class="list-unstyled">
-                    <li>Email: sas@nbsc.edu.ph</li>
-                    <li>Phone: 0927 669 0090</li>
-                </ul>
-            </div>
-            <div class="col-md-4">
-                <h5>Follow Us</h5>
-                <ul class="list-unstyled">
-                    <li><a href="https://www.facebook.com/nbscstudentaffairsandservices" class="text-white"><i class="fa fa-facebook-square"></i> Facebook</a></li>
-                    <li><a href="#" class="text-white"><i class="fa fa-twitter-square"></i>Twitter</a></li>
-                    <li><a href="#" class="text-white"><i class="fa fa-instagram"></i>Instagram</a></li>
-                </ul>
-            </div>
-            <div class="col-md-4">
-                <h5>Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="http://nbsc.edu.ph" class="text-white">NBSC Website</a></li>
-                    <li><a href="https://nbsc.edu.ph/student-affairs-services/" class="text-white">SAS Website</a></li>
-                    <li><a href="#" class="text-white">About Us</a></li>
-                    <li><a href="#" class="text-white">Privacy Policy</a></li>
-                    <li><a href="#" class="text-white">Terms of Service</a></li>
-                </ul>
-            </div>
-        </div>
-        <hr>
-        <p class="mb-0">© 2024 Student Organization Club Membership and Information System. All rights reserved.</p>
-    </div>
-</footer> -->
-
 </html>
