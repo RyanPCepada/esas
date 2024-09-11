@@ -274,6 +274,10 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                     <div class="alert alert-danger custom-alert" role="alert">
                         <p class="lead mb-0">You are no longer be qualified on this club. You can only register for up to 2 clubs.</p>
                     </div>
+                <?php elseif ($clubsCount >= 2 && $disapprovedCount >= 3): ?>
+                    <div class="alert alert-danger custom-alert" role="alert">
+                        <p class="lead mb-0">You are already registered in 2 clubs and reached the maximum number of registrations allowed for this club.</p>
+                    </div>
                 <?php elseif ($clubsCount >= 2): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
                         <p class="lead mb-0">You can only register for up to 2 clubs.</p>
