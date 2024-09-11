@@ -102,7 +102,7 @@
                 max-width: 100%; 
             }
 
-            .card-img-only-all {
+            .card-img-only {
                 margin: 10px auto;
             }
         }
