@@ -33,6 +33,7 @@
             /* width: 330px;
             height: 188px; */
             border: solid 3px transparent;
+            border: none;
             border-radius: 15px;
             overflow: hidden;
             /* box-shadow: 0 5px 10px rgba(0, 0, 0, .5); */
@@ -45,7 +46,7 @@
 
         .card-img-only:hover {
             transform: scale(1.01);
-            border: solid 3px white;
+            border: solid 3px transparent;
             border: none;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
         }
