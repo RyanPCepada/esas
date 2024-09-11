@@ -202,7 +202,7 @@
             });
 
             $('#nav-disapprovedclubs-tab').on('click', function() {
-                loadClubs('approved', 'disapprovedClubsContainer');
+                loadClubs('disapproved', 'disapprovedClubsContainer');
             });
         });
     </script>
