@@ -272,7 +272,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                     </div>
                 <?php elseif ($status === 'pending'): ?>
                     <div class="alert alert-warning custom-alert" role="alert">
-                        <p class="lead mb-0">You already applied to this club. Please wait for the Moderator's approval.</p>
+                        <p class="lead mb-0">You have already applied to this club. Please wait for the Moderator's approval.</p>
                     </div>
                 <?php elseif ($clubsCount >= 2): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
