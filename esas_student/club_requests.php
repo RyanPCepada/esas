@@ -29,7 +29,7 @@
         .card-img-only {
             position: relative;
             width: 295px;
-            height: 170px;
+            height: 166px;
             /* width: 330px;
             height: 188px; */
             border: solid 3px transparent;
