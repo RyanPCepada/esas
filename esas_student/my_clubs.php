@@ -168,7 +168,7 @@
                         const clubsContainer = document.getElementById(containerId);
                         if (response && response.length > 0) {
                             clubsContainer.innerHTML = response.map(club => `
-                                <div class="col-md-4">
+                                <div class="col-md-4 mb-4">
                                     <div class="card card-img-only">
                                         <a href="/esas/esas_student/home.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
                                             <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
