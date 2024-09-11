@@ -334,6 +334,56 @@ if (empty($zipcode)) {
             </div>
         </div>
     </div>
+
+
+
+
+    <!-- <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    ?php if (!empty($clubName)): ?>
+                        <h2>?php echo htmlspecialchars($clubName); ?></h2>
+                        <!-- <h2>?php echo htmlspecialchars($club_id); ?></h2> --
+                        <h4>Student Registration</h4>
+                    ?php endif; ?>
+                    <p class="mb-5">Please fill this form and submit to register.</p>
+                    <form action="../esas_student/actions/registration_action.php" method="post">
+                        <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($club_id); ?>">
+
+                        <!-- Question 1 --
+                        <div class="form-group">
+                            <label for="question1">Why do you want to join this club?</label>
+                            <textarea id="question1" name="question1" class="form-control" rows="4" required></textarea>
+                            <span class="text-danger"><?php echo $question1_err ?? ''; ?></span>
+                        </div>
+
+                        <!-- Question 2 --
+                        <div class="form-group">
+                            <label for="question2">What skills or experiences do you have that will contribute to the club's activities?</label>
+                            <textarea id="question2" name="question2" class="form-control" rows="4" required></textarea>
+                            <span class="text-danger"><?php echo $question2_err ?? ''; ?></span>
+                        </div>
+
+                        <!-- Question 3 --
+                        <div class="form-group">
+                            <label for="question3">How do you plan to balance your time between club activities and your academic responsibilities?</label>
+                            <textarea id="question3" name="question3" class="form-control" rows="4" required></textarea>
+                            <span class="text-danger"><?php echo $question3_err ?? ''; ?></span>
+                        </div>
+                        
+                        <input type="hidden" name="club_id" value="?php echo htmlspecialchars($club_id); ?>">
+
+                        <!-- Submit and Cancel Buttons --
+                        <input type="submit" class="btn btn-primary" value="Submit">
+                        <a href="#" onclick="window.history.back();" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+
 </body>
 
 <!-- <footer class="navbar-darkblue text-white mt-1 p-4 text-center">
