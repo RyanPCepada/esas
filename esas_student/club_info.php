@@ -78,7 +78,11 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             $moderators = '';
             foreach ($moderatorNames as $index => $name) {
                 $pic = isset($moderatorPics[$index]) ? htmlspecialchars($moderatorPics[$index]) : '';
-                $moderators .= '<p><img src="/esas/esas_moderator/images/' . $pic . '" alt="Profile Pic" style="width: 50px; height: 50px; border-radius: 50%;"> ' . htmlspecialchars($name) . '</p>';
+                $moderators .= '
+                <div class="moderator-item">
+                    <img src="/esas/esas_moderator/images/' . $pic . '" alt="Profile Pic" class="moderator-pic">
+                    <p class="moderator-name">' . htmlspecialchars($name) . '</p>
+                </div>';
             }
 
             // Set the correct label for moderators
@@ -194,48 +198,34 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
             margin: 0 auto;
         }
         .club-info p {
-    text-indent: 1em; /* Indent the first line of each paragraph */
-    margin: 0 0 1em 0; /* Add margin at the bottom to separate paragraphs */
-    line-height: 1.6; /* Adjust line height for readability */
-    text-align: justify; /* Justify text to align vertically */
-}
+            text-indent: 1em;
+            margin: 0 0 1em 0;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        .moderator-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
 
+        .moderator-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
 
+        .moderator-name {
+            font-size: 18px;
+            margin: 0;
+            line-height: 1.2;
+        }
     </style>
 </head>
 
 <body class="sb-nav-fixed">
     
-    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
-        <a class="navbar-brand ps-2" href="#">
-            <img src="../assets/img/nbsclogo.png" style="height: 0.3in;">
-            NBSC SIS</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="navbar-collapse collapse hide" id="main_nav">
-            <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
-                <php include 'nav/nav_main.php' ?>
-            </div>
-        </div>
-    </nav> -->
-    <!-- <nav class="navbar navbar-expand-lg navbar-darkblue">
-        <img src="icons/SAS_LOGO.png" height="50" class="d-inline-block align-top" alt="SAS Logo">
-        <h5 class="ml-2 mb-0 text-light" id="nbsc_sas_name">Student Organization Club Membership and Information System</h5>
-        <button class="navbar-toggler mt-2" type="button" data-toggle="collapse" data-target="#dashboard_navigations" aria-controls="dashboard_navigations" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="dashboard_navigations">
-            <ul class="navbar-nav mr-auto"></ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
-            </form>
-            <!-- <a href="logout.php" class="btn btn-danger ml-3">Log out</a> --
-            <a href="../logout.php" class="btn btn-danger ml-3">Log out</a>
-        </div>
-    </nav> -->
-
     <div class="wrapper">
         <div class="container-fluid">
             <!-- <div class="mt-2 mb-2">
@@ -247,7 +237,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                         <h2 class="mt-4" style="max-width: 100%;"><?php echo $clubName; ?></h2>
                         <p>Created: <?php echo $formattedDate; ?></p>
                         <hr>
-                        <h5><?php echo $moderatorsLabel; ?></h5>
+                        <h5 class="mb-3"><?php echo $moderatorsLabel; ?></h5>
                         <?php echo $moderators; ?>
                         <hr>
                         <h5>Members: <?php echo $membersCount; ?></h5>
