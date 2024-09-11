@@ -96,7 +96,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
         $isRegistered = $stmt->fetchColumn() > 0;
 
         // Check if the student is already registered in two clubs
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
         $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
         $stmt->execute();
         $clubsCount = $stmt->fetchColumn();
