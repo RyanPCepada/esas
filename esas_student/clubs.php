@@ -252,6 +252,10 @@ try {
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+
+
+
+
 <script>
 $(document).ready(function() {
     // Function to load content based on the clicked menu item
@@ -268,59 +272,67 @@ $(document).ready(function() {
         });
     }
 
-    // Function to handle active class and background color
-    function updateActiveMenu(activeLink) {
-        // Remove active class and background color from all links
-        $('.nav-link').removeClass('active');
-        $('.nav-link').css('background-color', ''); // Reset background color
-
-        // Add active class and primary blue background color to the clicked link
-        $(activeLink).addClass('active');
-        $(activeLink).css('background-color', '#007bff'); // Set primary blue background color for active link
+    // Function to set the active link and blue background
+    function setActiveMenu(activeLink) {
+        $('.nav-link').removeClass('active').css('background-color', ''); // Remove previous active states
+        $(activeLink).addClass('active').css('background-color', '#007bff'); // Set active and blue background
     }
 
-    // Load the page based on stored page URL
+    // Function to set default active link and blue background for "All Clubs"
+    function setDefaultActive() {
+        const defaultLink = $('#all-clubs');
+        setActiveMenu(defaultLink); // Ensure "All Clubs" is blue
+    }
+
+    // Load the stored page or default to "All Clubs"
     function loadStoredPage() {
-        const storedPage = localStorage.getItem('activePage');
-        if (storedPage) {
-            loadPage(storedPage);
-            // Set the appropriate menu item as active
-            $('#' + storedPage.replace('.php', '')).addClass('active').css('background-color', '#007bff');
-        } else {
-            loadPage('all_clubs.php'); // Default page
-            $('#all-clubs').addClass('active').css('background-color', '#007bff');
-        }
+        const storedPage = localStorage.getItem('activePage') || 'all_clubs.php'; // Default to "All Clubs"
+        loadPage(storedPage);
+
+        // Determine which link should be active based on the stored page
+        const linkId = storedPage.split('.')[0]; // Derive link ID from page name
+        const activeLink = $('#' + linkId);
+
+        // Set the appropriate button as active
+        setActiveMenu(activeLink);
     }
 
-    // Event listeners for each menu item
+    // Event listeners for menu items
     $('#my-clubs').on('click', function(e) {
         e.preventDefault();
         const page = 'my_clubs.php';
         loadPage(page);
-        localStorage.setItem('activePage', page); // Store the active page
-        updateActiveMenu(this);
+        localStorage.setItem('activePage', page); // Store the page
+        setActiveMenu(this); // Set the clicked button as active
     });
 
     $('#all-clubs').on('click', function(e) {
         e.preventDefault();
         const page = 'all_clubs.php';
         loadPage(page);
-        localStorage.setItem('activePage', page); // Store the active page
-        updateActiveMenu(this);
+        localStorage.setItem('activePage', page); // Store the page
+        setActiveMenu(this); // Set the clicked button as active
     });
 
     $('#club-requests').on('click', function(e) {
         e.preventDefault();
         const page = 'club_requests.php';
         loadPage(page);
-        localStorage.setItem('activePage', page); // Store the active page
-        updateActiveMenu(this);
+        localStorage.setItem('activePage', page); // Store the page
+        setActiveMenu(this); // Set the clicked button as active
     });
 
-    // Initialize the page load
+    // Initialize the page with the stored or default page
     loadStoredPage();
+    
+    // Ensure "All Clubs" has the default blue background if no page is stored
+    if (!localStorage.getItem('activePage')) {
+        setDefaultActive();
+    }
 });
 </script>
+
+
 
 
 
