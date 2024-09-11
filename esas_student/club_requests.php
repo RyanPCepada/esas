@@ -234,7 +234,7 @@
                             clubsContainer.innerHTML = response.map(club => `
                                 <div class="col-md-4 mb-4">
                                     <div class="card card-img-only">
-                                        <a href="/esas/esas_student/home.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
+                                        <a href="#">
                                             <img src="/esas/esas_student/images/${club.coverPhoto}" alt="Cover Photo">
                                             <div class="overlay-text">
                                                 <h4>${club.clubName}</h4>
