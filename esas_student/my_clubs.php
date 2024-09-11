@@ -167,9 +167,9 @@
                             clubsContainer.innerHTML = response.map(club => `
                                 <div class="col-md-4">
                                     <div class="card card-img-only">
-                                        <small data-toggle="tooltip" title="${club.membersCount === 1 ? '1 member' : `${club.membersCount} members`}">
+                                        <!--<small data-toggle="tooltip" title="${club.membersCount === 1 ? '1 member' : `${club.membersCount} members`}">
                                             <i class="fa fa-user mr-1"></i>${club.membersCount}
-                                        </small>
+                                        </small>-->
                                         <a href="/esas/esas_student/home.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
                                             <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
                                             <div class="overlay-text">
