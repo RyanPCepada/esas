@@ -175,6 +175,12 @@ $encodedClubName = addslashes($clubName);
             border-radius: 5px;
             background-color: #f8f9fa;
         }
+        .custom-alert {
+            display: inline-block;
+            max-width: 100%;
+            text-align: center;
+            margin: 0 auto;
+        }
     </style>
 </head>
 
@@ -211,42 +217,73 @@ $encodedClubName = addslashes($clubName);
     </nav> -->
 
     <div class="wrapper">
-    <div class="container-fluid">
-        <!-- <div class="mt-2 mb-2">
-            <a href="javascript:history.go(-1)" class="btn btn-secondary"><i class="fa fa-arrow-left"></i></a>
-        </div> -->
-        <div class="clubname-and-coverphoto">
-            <div class="row">
-                <div class="col-12 col-md-4">
-                    <h2 class="mt-4" style="max-width: 100%;"><?php echo $clubName; ?></h2>
-                    <p>Created: <?php echo $dateAdded; ?></p>
-                    <hr>
-                    <h5><?php echo $moderatorsLabel; ?></h5>
-                    <?php echo $moderators; ?>
-                    <hr>
-                    <h5>Members: <?php echo $membersCount; ?></h5>
-                    <!-- <hr> -->
-                </div>
-                <div class="col-12 col-md-8">
-                    <img class="mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo" style="max-width: 100%; border-radius: 20px;">
+        <div class="container-fluid">
+            <!-- <div class="mt-2 mb-2">
+                <a href="javascript:history.go(-1)" class="btn btn-secondary"><i class="fa fa-arrow-left"></i></a>
+            </div> -->
+            <div class="clubname-and-coverphoto">
+                <div class="row">
+                    <div class="col-12 col-md-4">
+                        <h2 class="mt-4" style="max-width: 100%;"><?php echo $clubName; ?></h2>
+                        <p>Created: <?php echo $dateAdded; ?></p>
+                        <hr>
+                        <h5><?php echo $moderatorsLabel; ?></h5>
+                        <?php echo $moderators; ?>
+                        <hr>
+                        <h5>Members: <?php echo $membersCount; ?></h5>
+                        <!-- <hr> -->
+                    </div>
+                    <div class="col-12 col-md-8">
+                        <img class="mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo" style="max-width: 100%; border-radius: 20px;">
+                    </div>
                 </div>
             </div>
+
+
+
+            <div class="club-info">
+                <p><?php echo htmlspecialchars($information); ?></p>
+            </div>
+
+            <!-- <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
+                <h4 class="mb-3">Join Us Now!</h4>
+                <p class="lead">If you want to be a part of us, register now and become a member of <?php echo htmlspecialchars($clubName); ?>.</p>
+                <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>)">Register Now</button>
+                <div class="mt-1">
+                    <a href="javascript:history.go(-1)" class="btn btn-transparent">Go Back</a>
+                </div>
+            </div> -->
+
+            <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
+                <?php if ($status === 'active'): ?>
+                    <div class="alert alert-info custom-alert" role="alert">
+                        <p class="lead mb-0">You are already a member of this club.
+                            <a href="/esas/esas_student/home.php"> Go to Home</a>
+                        </p>
+                    </div>
+                <?php elseif ($status === 'pending'): ?>
+                    <div class="alert alert-warning custom-alert" role="alert">
+                        <p class="lead mb-0">You already applied to this club. Please wait for the Moderator's approval.</p>
+                    </div>
+                <?php elseif ($clubsCount >= 2): ?>
+                    <div class="alert alert-danger custom-alert" role="alert">
+                        <p class="lead mb-0">You can only register for up to 2 clubs.</p>
+                    </div>
+                <?php elseif ($disapprovedCount >= 3): ?>
+                    <div class="alert alert-danger custom-alert" role="alert">
+                        <p class="lead mb-0">You have reached the maximum limit of requests for this club.</p>
+                    </div>
+                <?php else: ?>
+                    <h4 class="mb-3">Join Us Now!</h4>
+                    <p class="lead">If you want to be a part of us, register now and become a member of <?php echo htmlspecialchars($clubName); ?>.</p>
+                    <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>)">Register Now</button>
+                <?php endif; ?>
+                <div class="mt-3">
+                    <a href="javascript:history.go(-1)" class="btn btn-secondary">Go Back</a>
+                </div>
+            </div>
+
         </div>
-
-
-
-        <div class="club-info">
-            <p><?php echo htmlspecialchars($information); ?></p>
-        </div>
-        <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
-    <h4 class="mb-3">Join Us Now!</h4>
-    <p class="lead">If you want to be a part of us, register now and become a member of <?php echo htmlspecialchars($clubName); ?>.</p>
-    <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>)">Register Now</button>
-    <div class="mt-1">
-        <a href="javascript:history.go(-1)" class="btn btn-transparent">Go Back</a>
-    </div>
-</div>
-    </div>
     </div>
 
     <!-- <?php include 'assets/components/modals.php' ?> -->
