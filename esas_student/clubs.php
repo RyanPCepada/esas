@@ -49,6 +49,10 @@ try {
     <link href="../assets/css/styles.css" rel="stylesheet" />
     <link href="../assets/img/nbsclogo.png" rel="icon">
     <style>
+        .left-sidebar {
+            font-size: 18px;
+            text-align: start;
+        }
         /* .nav-link:hover {
           background-color: #cce4ff !important;
         } */
@@ -183,30 +187,27 @@ try {
             <div class="col-12 col-md-2 ps-0 pt-3 border-end">
 
             <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
-                <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none text-dark">
+                <!-- <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none text-dark">
                 <svg class="bi pe-none me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
                 <span class="fs-4"><h1><i class="fa fa-university text-primary"></i></h1></span>
                 </a>
-                <hr>
+                <hr> -->
                 <ul class="nav nav-pills flex-column mb-auto">
-                <li>
-                    <a href="#" class="nav-link text-dark" id="all-clubs">
-                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
-                    All Clubs
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link text-dark" aria-current="page" id="my-clubs">
-                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
-                    My Clubs
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link text-dark" id="club-requests">
-                    <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
-                    My Club Requests
-                    </a>
-                </li>
+                    <li>
+                        <a href="#" class="nav-link left-sidebar text-dark" id="all-clubs">
+                            All Clubs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                            My Clubs
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link left-sidebar text-dark" id="club-requests">
+                            My Club Requests
+                        </a>
+                    </li>
                 </ul>
 
                 <!-- <hr>
