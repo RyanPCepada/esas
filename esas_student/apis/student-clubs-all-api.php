@@ -22,7 +22,7 @@ switch ($method) {
                 FROM tbl_registration r
                 JOIN tbl_clubs c ON r.club_id = c.club_id
                 LEFT JOIN tbl_moderators m ON c.club_id = m.club_id
-                WHERE r.student_id = ?
+                WHERE r.student_id = ? AND r.status = "active"
                 GROUP BY c.club_id
             ');
             $stmt->execute([$student_id]);
