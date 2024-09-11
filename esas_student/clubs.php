@@ -251,61 +251,78 @@ try {
 <script src="../assets/js/global_script.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
 $(document).ready(function() {
-  // Function to load content based on the clicked menu item
-  function loadPage(page) {
-    $.ajax({
-      url: page, // Page to load
-      type: "GET",
-      success: function(response) {
-        $('.card-body').html(response); // Load the content into the card body
-      },
-      error: function() {
-        $('.card-body').html('<p>Error loading page.</p>');
-      }
+    // Function to load content based on the clicked menu item
+    function loadPage(page) {
+        $.ajax({
+            url: page, // Page to load
+            type: "GET",
+            success: function(response) {
+                $('.card-body').html(response); // Load the content into the card body
+            },
+            error: function() {
+                $('.card-body').html('<p>Error loading page.</p>');
+            }
+        });
+    }
+
+    // Function to handle active class and background color
+    function updateActiveMenu(activeLink) {
+        // Remove active class and background color from all links
+        $('.nav-link').removeClass('active');
+        $('.nav-link').css('background-color', ''); // Reset background color
+
+        // Add active class and primary blue background color to the clicked link
+        $(activeLink).addClass('active');
+        $(activeLink).css('background-color', '#007bff'); // Set primary blue background color for active link
+    }
+
+    // Load the page based on stored page URL
+    function loadStoredPage() {
+        const storedPage = localStorage.getItem('activePage');
+        if (storedPage) {
+            loadPage(storedPage);
+            // Set the appropriate menu item as active
+            $('#' + storedPage.replace('.php', '')).addClass('active').css('background-color', '#007bff');
+        } else {
+            loadPage('all_clubs.php'); // Default page
+            $('#all-clubs').addClass('active').css('background-color', '#007bff');
+        }
+    }
+
+    // Event listeners for each menu item
+    $('#my-clubs').on('click', function(e) {
+        e.preventDefault();
+        const page = 'my_clubs.php';
+        loadPage(page);
+        localStorage.setItem('activePage', page); // Store the active page
+        updateActiveMenu(this);
     });
-  }
 
-  // Load "All Clubs" by default on page load and set it as active
-  loadPage('all_clubs.php'); // Load the All Clubs content
-  $('#all-clubs').addClass('active'); // Set "All Clubs" as active
-  $('#all-clubs').css('background-color', '#007bff'); // Add primary blue background color for active state
+    $('#all-clubs').on('click', function(e) {
+        e.preventDefault();
+        const page = 'all_clubs.php';
+        loadPage(page);
+        localStorage.setItem('activePage', page); // Store the active page
+        updateActiveMenu(this);
+    });
 
-  // Event listeners for each menu item
-  $('#my-clubs').on('click', function(e) {
-    e.preventDefault();
-    loadPage('my_clubs.php');
-    updateActiveMenu(this);
-  });
+    $('#club-requests').on('click', function(e) {
+        e.preventDefault();
+        const page = 'club_requests.php';
+        loadPage(page);
+        localStorage.setItem('activePage', page); // Store the active page
+        updateActiveMenu(this);
+    });
 
-  $('#all-clubs').on('click', function(e) {
-    e.preventDefault();
-    loadPage('all_clubs.php');
-    updateActiveMenu(this);
-  });
-
-  $('#club-requests').on('click', function(e) {
-    e.preventDefault();
-    loadPage('club_requests.php');
-    updateActiveMenu(this);
-  });
-
-  // Function to handle active class and background color
-  function updateActiveMenu(activeLink) {
-    // Remove active class and background color from all links
-    $('.nav-link').removeClass('active');
-    $('.nav-link').css('background-color', ''); // Reset background color
-
-    // Add active class and primary blue background color to the clicked link
-    $(activeLink).addClass('active');
-    $(activeLink).css('background-color', '#007bff'); // Set primary blue background color for active link
-  }
+    // Initialize the page load
+    loadStoredPage();
 });
 </script>
 
 
-</script>
 
 <script>
     $(document).ready(function() {
