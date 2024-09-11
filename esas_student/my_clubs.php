@@ -100,7 +100,7 @@
         <h2 class="text-muted mt-0 mb-5">My Clubs</h2>
         <nav>
             <div class="nav nav-tabs n" role="tablist">
-                <button title="Registered Clubs" class="ms-2 px-2 nav-link active" id="nav-registeredclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-registeredclubs" type="button" role="tab" aria-controls="nav-registeredclubs" aria-selected="true" onclick="updateLabel('Registered Clubs')">
+                <button title="Registered Clubs" class="ms-2 px-2 nav-link active" id="nav-activeclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-activeclubs" type="button" role="tab" aria-controls="nav-activeclubs" aria-selected="true" onclick="updateLabel('Registered Clubs')">
                     Registered Clubs
                 </button>
                 <button title="Pending Approval" class="px-2 nav-link" id="nav-pendingclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-pendingclubs" type="button" role="tab" aria-controls="nav-pendingclubs" aria-selected="false" onclick="updateLabel('Pending Approval')">
@@ -116,8 +116,8 @@
         </nav>
         <div class="tab-content">
             <!-- Registered Clubs Tab -->
-            <div class="tab-pane fade show active" id="nav-registeredclubs" role="tabpanel" aria-labelledby="nav-registeredclubs-tab">
-                <div class="row g-2 mt-0" id="registeredClubsContainer">
+            <div class="tab-pane fade show active" id="nav-activeclubs" role="tabpanel" aria-labelledby="nav-activeclubs-tab">
+                <div class="row g-2 mt-0" id="activeClubsContainer">
                     <!-- All student clubs cards will be dynamically added here -->
                 </div>
             </div>
@@ -190,11 +190,11 @@
             }
 
             // Load initial content for All Clubs tab
-            loadClubs('all', 'registeredClubsContainer');
+            loadClubs('active', 'activeClubsContainer');
 
             // Event listeners for each tab
-            $('#nav-registeredclubs-tab').on('click', function() {
-                loadClubs('all', 'registeredClubsContainer');
+            $('#nav-activeclubs-tab').on('click', function() {
+                loadClubs('active', 'activeClubsContainer');
             });
 
             $('#nav-pendingclubs-tab').on('click', function() {
