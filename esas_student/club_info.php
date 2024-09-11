@@ -50,7 +50,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             SELECT c.clubName, c.information, c.coverPhoto, c.dateAdded,
                 GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', COALESCE(m.middleName, ''), ' ', m.lastName) ORDER BY m.firstName SEPARATOR '|') AS moderatorNames,
                 GROUP_CONCAT(DISTINCT m.profilePic ORDER BY m.firstName SEPARATOR '|') AS moderatorPics,
-                COUNT(DISTINCT r.student_id) AS membersCount,  -- Use DISTINCT to avoid duplicate counting
+                COUNT(DISTINCT CASE WHEN r.status = 'active' THEN r.student_id END) AS membersCount,  -- Count only active members
                 COUNT(DISTINCT m.moderator_id) AS numModerators
             FROM tbl_clubs c
             LEFT JOIN tbl_moderators m ON c.club_id = m.club_id
