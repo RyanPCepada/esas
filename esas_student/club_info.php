@@ -270,13 +270,17 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                             <a href="/esas/esas_student/home.php"> Go to Home</a>
                         </p>
                     </div>
-                <?php elseif ($status === 'pending'): ?>
-                    <div class="alert alert-warning custom-alert" role="alert">
-                        <p class="lead mb-0">You have already applied to this club. Please wait for the Moderator's approval.</p>
+                <?php elseif ($status === 'pending' && $clubsCount >= 2): ?>
+                    <div class="alert alert-danger custom-alert" role="alert">
+                        <p class="lead mb-0">You are no longer be qualified on this club. You can only register for up to 2 clubs.</p>
                     </div>
                 <?php elseif ($clubsCount >= 2): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
                         <p class="lead mb-0">You can only register for up to 2 clubs.</p>
+                    </div>
+                <?php elseif ($status === 'pending'): ?>
+                    <div class="alert alert-warning custom-alert" role="alert">
+                        <p class="lead mb-0">You have already applied to this club. Please wait for the Moderator's approval.</p>
                     </div>
                 <?php elseif ($disapprovedCount >= 3): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
