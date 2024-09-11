@@ -284,7 +284,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                     </div>
                 <?php else: ?>
                     <h4 class="mb-3">Join Us Now!</h4>
-                    <p class="lead">If you want to be a part of us, register now and become a member of <?php echo htmlspecialchars($clubName); ?>.</p>
+                    <p class="lead">If you want to be a part of us, register now and become a member of <?php echo $clubName; ?>.</p>
                     <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>)">Register Now</button>
                 <?php endif; ?>
                 <div class="mt-3">
