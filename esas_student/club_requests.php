@@ -90,6 +90,18 @@
         .date {
             margin-left: 12px;
         }
+
+
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 10px; 
+                max-width: 100%; 
+            }
+
+            .card-img-only-all {
+                margin: 10px auto;
+            }
+        }
     </style>
 </head>
 
