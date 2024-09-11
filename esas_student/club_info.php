@@ -83,6 +83,14 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             // Set the correct label for moderators
             $moderatorsLabel = ($numModerators === 1) ? 'Moderator:' : 'Moderators:';
 
+            // Format the date into "Month Year"
+            try {
+                $date = new DateTime($club['dateAdded']);
+                $formattedDate = $date->format('F j, Y'); // "Month Year" format
+            } catch (Exception $e) {
+                $formattedDate = 'Invalid date'; // Fallback if date parsing fails
+            }
+
         } else {
             $clubName = 'Club Not Found';
             $information = 'No information available for this club.';
@@ -225,7 +233,7 @@ $encodedClubName = addslashes($clubName);
                 <div class="row">
                     <div class="col-12 col-md-4">
                         <h2 class="mt-4" style="max-width: 100%;"><?php echo $clubName; ?></h2>
-                        <p>Created: <?php echo $dateAdded; ?></p>
+                        <p>Created: <?php echo $formattedDate; ?></p>
                         <hr>
                         <h5><?php echo $moderatorsLabel; ?></h5>
                         <?php echo $moderators; ?>
