@@ -89,24 +89,24 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
         }
 
         // Fetch the student's registration status for the current club
-$stmt = $pdo->prepare("SELECT status FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id");
-$stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-$stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-$stmt->execute();
-$status = $stmt->fetchColumn(); // Fetch the registration status (e.g., 'active', 'pending', etc.)
+        $stmt = $pdo->prepare("SELECT status FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id");
+        $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $status = $stmt->fetchColumn(); // Fetch the registration status (e.g., 'active', 'pending', etc.)
 
-// Count how many clubs the student is currently "active" in
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
-$stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-$stmt->execute();
-$clubsCount = $stmt->fetchColumn();
+        // Count how many clubs the student is currently "active" in
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
+        $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $clubsCount = $stmt->fetchColumn();
 
-// Count how many times the student has been "disapproved" for this club
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id AND status = 'disapproved'");
-$stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-$stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-$stmt->execute();
-$disapprovedCount = $stmt->fetchColumn();
+        // Count how many times the student has been "disapproved" for this club
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id AND status = 'disapproved'");
+        $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $disapprovedCount = $stmt->fetchColumn();
 
 
     } catch (PDOException $e) {
@@ -255,23 +255,24 @@ $encodedClubName = addslashes($clubName);
     <script src="../assets/js/global_script.js"></script>
 
     <script>
-    function registerNow(clubId, clubName, status, clubsCount, disapprovedCount) {
-    if (status === 'active') {
-        alert("You are already a member of this club.");
-    } else if (status === 'pending') {
-        alert("You already applied to this club. Please wait for the Moderator's approval.");
-    } else if (clubsCount >= 2) {
-        alert("You can only register for up to 2 clubs.");
-    } else if (disapprovedCount >= 3) {
-        alert("Sorry. You have reached the maximum limit of requests for this club.");
-    } else {
-        const encodedClubName = encodeURIComponent(clubName);
-        const url = `/esas/esas_student/registration.php?club_id=${clubId}&club_name=${encodedClubName}`;
-        window.location.href = url;
-    }
-}
+        function registerNow(clubId, clubName, status, clubsCount, disapprovedCount) {
+            if (status === 'active') {
+                alert("You are already a member of this club.");
+            } else if (status === 'pending') {
+                alert("You already applied to this club. Please wait for the Moderator's approval.");
+            } else if (clubsCount >= 2) {
+                alert("You can only register for up to 2 clubs.");
+            } else if (disapprovedCount >= 3) {
+                alert("Sorry. You have reached the maximum limit of requests for this club.");
+            } else {
+                const encodedClubName = encodeURIComponent(clubName);
+                const url = `/esas/esas_student/registration.php?club_id=${clubId}&club_name=${encodedClubName}`;
+                window.location.href = url;
+            }
+        }
+        
 
-</script>
+    </script>
 
 
 </body>
