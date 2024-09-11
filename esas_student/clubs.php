@@ -180,7 +180,7 @@ try {
             </nav>
             
             <!-- LEFT SIDEBAR -->
-            <div class="col-12 col-md-2 ps-0 pt-3 border-end">
+            <div class="col-12 ps-0 pt-3 border-end">
 
             <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
                 <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none text-dark">
@@ -228,7 +228,7 @@ try {
             </div>
             <!-- LEFT SIDEBAR END -->
 
-            <div class="col-12 col-md-10 bg-lgrey">
+            <div class="col-12 bg-lgrey">
                 <div class="row g-0 h-100">
                     <div id="divpr_requesdetails" class="table-responsive px-0 auto-scroll">
                         <div class="row g-0 p-4 px-2 pt-3 h-100">
