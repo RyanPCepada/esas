@@ -14,33 +14,47 @@ switch ($method) {
         if (isset($_SESSION['student_id'])) {
             $student_id = $_SESSION['student_id'];
 
-            // Query to fetch the clubs associated with the student
+            // Query to fetch all disapproved registrations and their associated clubs
             $stmt = $pdo->prepare('
-                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, c.dateAdded, c.dateModified,
-                       GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderators,
-                       GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS profilePics
+                SELECT r.registration_id, r.club_id, c.clubName, c.information, c.coverPhoto, c.dateAdded, c.dateModified
                 FROM tbl_registration r
                 JOIN tbl_clubs c ON r.club_id = c.club_id
-                LEFT JOIN tbl_moderators m ON c.club_id = m.club_id
                 WHERE r.student_id = ? AND r.status = "disapproved"
-                GROUP BY c.club_id
             ');
             $stmt->execute([$student_id]);
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $registrations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Fetch member counts and format moderators for each club
-            foreach ($result as &$club) {
-                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_registration WHERE club_id = ?');
-                $stmt_count->execute([$club['club_id']]);
-                $club['membersCount'] = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
+            // Initialize an array to hold the full details including moderators
+            $results = [];
 
-                // Format the moderators
-                $moderatorNames = explode(", ", $club['moderators']);
-                $moderatorPics = explode(", ", $club['profilePics']);
-                $club['formattedModerators'] = formatModerators($moderatorNames, $moderatorPics);
+            // Fetch and add moderators for each disapproved registration
+            foreach ($registrations as $registration) {
+                $clubId = $registration['club_id'];
+
+                // Fetch moderators for the current club
+                $stmt_moderators = $pdo->prepare('
+                    SELECT m.firstName, m.profilePic
+                    FROM tbl_moderators m
+                    WHERE m.club_id = ?
+                ');
+                $stmt_moderators->execute([$clubId]);
+                $moderators = $stmt_moderators->fetchAll(PDO::FETCH_ASSOC);
+
+                // Format the moderators' information
+                $formattedModerators = [];
+                foreach ($moderators as $moderator) {
+                    $formattedModerators[] = [
+                        'name' => $moderator['firstName'],
+                        'pic' => $moderator['profilePic'] ?: 'default.png'
+                    ];
+                }
+
+                // Add the current registration's details and moderators to the results
+                $registration['moderators'] = $formattedModerators;
+                $results[] = $registration;
             }
 
-            echo json_encode($result);
+            echo json_encode($results);
         } else {
             http_response_code(401);
             echo json_encode(['error' => 'Unauthorized. Please log in.']);
@@ -53,13 +67,4 @@ switch ($method) {
         echo json_encode(['error' => 'Method not allowed']);
         break;
 }
-
-// Function to format moderators' names and profile pictures
-function formatModerators($names, $pics) {
-    $formatted = '';
-    foreach ($names as $index => $name) {
-        $pic = $pics[$index] ?? 'default.png'; // Use default image if profilePic is missing
-        $formatted .= "<img src='/esas/esas_admin/images/$pic' alt='Moderator' class='moderator-pic'> $name<br>";
-    }
-    return $formatted;
-}
+?>
