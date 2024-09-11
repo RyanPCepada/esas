@@ -16,7 +16,7 @@ switch ($method) {
 
             // Query to fetch the clubs associated with the student
             $stmt = $pdo->prepare('
-                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, c.dateAdded, c.dateModified,
+                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, r.dateAdded, r.dateModified,
                        GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderators,
                        GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS profilePics
                 FROM tbl_registration r
@@ -30,6 +30,7 @@ switch ($method) {
 
             // Fetch member counts and format moderators for each club
             foreach ($result as &$club) {
+                $club['dateModified'] = (new DateTime($club['dateModified']))->format('F j, Y'); // Format the date
                 $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_registration WHERE club_id = ?');
                 $stmt_count->execute([$club['club_id']]);
                 $club['membersCount'] = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
@@ -63,3 +64,4 @@ function formatModerators($names, $pics) {
     }
     return $formatted;
 }
+?>

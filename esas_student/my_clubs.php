@@ -91,6 +91,9 @@
             margin: 5px 0 0;
             font-size: 14px;
         }
+        .date {
+            margin-left: 12px;
+        }
     </style>
 </head>
 
@@ -157,7 +160,7 @@
         }
 
         $(document).ready(function() {
-            function loadClubs(tab, containerId) {
+            function loadClubs(tab, containerId, dateLabel) {
                 $.ajax({
                     url: `/esas/esas_student/apis/student-clubs-${tab}-api.php`, // Adjust the URL for each tab
                     type: "GET",
@@ -167,15 +170,15 @@
                             clubsContainer.innerHTML = response.map(club => `
                                 <div class="col-md-4">
                                     <div class="card card-img-only">
-                                        <!--<small data-toggle="tooltip" title="${club.membersCount === 1 ? '1 member' : `${club.membersCount} members`}">
-                                            <i class="fa fa-user mr-1"></i>${club.membersCount}
-                                        </small>-->
                                         <a href="/esas/esas_student/home.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
                                             <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
                                             <div class="overlay-text">
                                                 <h4>${club.clubName}</h4>
                                             </div>
                                         </a>
+                                    </div>
+                                    <div class="date text-muted">
+                                        ${dateLabel}: ${club.dateModified}
                                     </div>
                                 </div>
                             `).join('');
@@ -191,21 +194,22 @@
             }
 
             // Load initial content for All Clubs tab
-            loadClubs('active', 'activeClubsContainer');
+            loadClubs('active', 'activeClubsContainer', 'Member since');
 
             // Event listeners for each tab
             $('#nav-activeclubs-tab').on('click', function() {
-                loadClubs('active', 'activeClubsContainer');
+                loadClubs('active', 'activeClubsContainer', 'Member since');
             });
 
             $('#nav-pendingclubs-tab').on('click', function() {
-                loadClubs('pending', 'pendingClubsContainer');
+                loadClubs('pending', 'pendingClubsContainer', 'Application date');
             });
 
             $('#nav-disapprovedclubs-tab').on('click', function() {
-                loadClubs('disapproved', 'disapprovedClubsContainer');
+                loadClubs('disapproved', 'disapprovedClubsContainer', 'Date disapproved');
             });
         });
+
     </script>
 
     <script>

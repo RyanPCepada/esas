@@ -14,47 +14,51 @@ switch ($method) {
         if (isset($_SESSION['student_id'])) {
             $student_id = $_SESSION['student_id'];
 
-            // Query to fetch all disapproved registrations and their associated clubs
-            $stmt = $pdo->prepare('
-                SELECT r.registration_id, r.club_id, c.clubName, c.information, c.coverPhoto, c.dateAdded, c.dateModified
-                FROM tbl_registration r
-                JOIN tbl_clubs c ON r.club_id = c.club_id
-                WHERE r.student_id = ? AND r.status = "disapproved"
-            ');
-            $stmt->execute([$student_id]);
-            $registrations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // Fetch all disapproved registrations and their associated clubs
+$stmt = $pdo->prepare('
+SELECT r.registration_id, r.club_id, c.clubName, c.information, c.coverPhoto, r.dateModified
+FROM tbl_registration r
+JOIN tbl_clubs c ON r.club_id = c.club_id
+WHERE r.student_id = ? AND r.status = "disapproved"
+');
+$stmt->execute([$student_id]);
+$registrations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Initialize an array to hold the full details including moderators
-            $results = [];
+// Initialize an array to hold the full details including moderators
+$results = [];
 
-            // Fetch and add moderators for each disapproved registration
-            foreach ($registrations as $registration) {
-                $clubId = $registration['club_id'];
+// Fetch and add moderators for each disapproved registration
+foreach ($registrations as $registration) {
+$clubId = $registration['club_id'];
 
-                // Fetch moderators for the current club
-                $stmt_moderators = $pdo->prepare('
-                    SELECT m.firstName, m.profilePic
-                    FROM tbl_moderators m
-                    WHERE m.club_id = ?
-                ');
-                $stmt_moderators->execute([$clubId]);
-                $moderators = $stmt_moderators->fetchAll(PDO::FETCH_ASSOC);
+// Format the dateModified field
+$registration['dateModified'] = (new DateTime($registration['dateModified']))->format('F j, Y'); // Format the date
 
-                // Format the moderators' information
-                $formattedModerators = [];
-                foreach ($moderators as $moderator) {
-                    $formattedModerators[] = [
-                        'name' => $moderator['firstName'],
-                        'pic' => $moderator['profilePic'] ?: 'default.png'
-                    ];
-                }
+// Fetch moderators for the current club
+$stmt_moderators = $pdo->prepare('
+    SELECT m.firstName, m.profilePic
+    FROM tbl_moderators m
+    WHERE m.club_id = ?
+');
+$stmt_moderators->execute([$clubId]);
+$moderators = $stmt_moderators->fetchAll(PDO::FETCH_ASSOC);
 
-                // Add the current registration's details and moderators to the results
-                $registration['moderators'] = $formattedModerators;
-                $results[] = $registration;
-            }
+// Format the moderators' information
+$formattedModerators = [];
+foreach ($moderators as $moderator) {
+    $formattedModerators[] = [
+        'name' => $moderator['firstName'],
+        'pic' => $moderator['profilePic'] ?: 'default.png'
+    ];
+}
 
-            echo json_encode($results);
+// Add the current registration's details and moderators to the results
+$registration['moderators'] = $formattedModerators;
+$results[] = $registration;
+}
+
+echo json_encode($results);
+
         } else {
             http_response_code(401);
             echo json_encode(['error' => 'Unauthorized. Please log in.']);
