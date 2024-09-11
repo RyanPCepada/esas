@@ -25,7 +25,7 @@ switch ($method) {
         // Prepare and execute the query to fetch requests for the specific student
         $stmt = $pdo->prepare('
             SELECT r.request_id, r.clubName, r.description, r.activities, r.status, r.coverPhoto, r.dateRequested, 
-                   s.firstName, s.lastName
+                   r.dateModified, s.firstName, s.lastName
             FROM tbl_club_requests r
             LEFT JOIN tbl_students s ON r.student_id = s.student_id
             WHERE r.student_id = :student_id
@@ -35,6 +35,12 @@ switch ($method) {
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if ($result) {
+            // Format the dateRequested and dateModified fields
+            foreach ($result as &$club) {
+                $club['dateRequested'] = (new DateTime($club['dateRequested']))->format('F j, Y'); // Format the date
+                $club['dateModified'] = (new DateTime($club['dateModified']))->format('F j, Y'); // Format the date
+            }
+
             echo json_encode($result);
         } else {
             http_response_code(404);
