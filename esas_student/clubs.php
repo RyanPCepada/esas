@@ -49,6 +49,15 @@ try {
     <link href="../assets/css/styles.css" rel="stylesheet" />
     <link href="../assets/img/nbsclogo.png" rel="icon">
     <style>
+        /* .nav-link:hover {
+          background-color: #cce4ff !important;
+        } */
+
+        .nav-link.active {
+          color: white !important;
+          background-color: #e9ecef;
+        }
+        
         .card-body {
             width: 100%;
             /* max-width: 600px; */
@@ -78,7 +87,7 @@ try {
 
         .card-img-only:hover {
             transform: scale(1.03);
-            border: solid 3px lightblue;
+            border: solid 3px white;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
         }
 
@@ -89,24 +98,18 @@ try {
             margin: auto; /* Center the image within the container */
             background: linear-gradient(to top right, rgba(0,0,0,0.6), rgba(255,255,255,0.2));
         }
-
         
         .card-img-only-all {
             position: relative;
-            /* width: 230px;
-            height: 130px; */
-            width: 270px;
-            height: 152px;
+            width: auto;
+            height: auto;
             border: solid 2px transparent;
             border-radius: 10px;
             overflow: hidden;
             /* box-shadow: 0 5px 10px rgba(0, 0, 0, .5); */
-            margin-left: 7px;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            display: flex; /* Flexbox added */
-            justify-content: center; /* Horizontally center the image */
-            align-items: center; /* Vertically center the image */
+            display: flex;
+            justify-content: center;
+            align-items: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -123,6 +126,7 @@ try {
             margin: auto; /* Center the image within the container */
             background: linear-gradient(to top right, rgba(0,0,0,0.6), rgba(255,255,255,0.2));
         }
+
 
         .card small {
             position: absolute;
@@ -177,392 +181,132 @@ try {
     <!-- LEFT SIDEBAR -->
     <div class="col-2 ps-0 pt-3 pl-3 border-end">
 
-        <!-- YOUR CLUB -->
-        <div class="pe-2 ps-2">
-            <h5>Your Clubs</h5>
-            <!-- <button class="btn btn-primary btn-sm py-1 mt-1 rounded-3 w-100">Create New Request</button> -->
-        </div>
-
-        <!-- Tabbed Section for Your Clubs -->
-        <div class="row g-0 mt-2">
-            <nav>
-                <div class="nav nav-tabs n" role="tablist">
-                    <button title="New" class="ms-2 px-2 nav-link active" id="nav-allclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-allclubs" type="button" role="tab" aria-controls="nav-allclubs" aria-selected="true" onclick="updateLabel('All')">
-                        <i class="fa-regular fa-file"></i>
-                    </button>
-                    <button title="Ongoing" class="px-2 nav-link" id="nav-activeclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-activeclubs" type="button" role="tab" aria-controls="nav-activeclubs" aria-selected="false" onclick="updateLabel('Pending Approval')">
-                        <i class="fa-regular fa-clock"></i>
-                    </button>
-                    <button title="Approved" class="px-2 nav-link" id="nav-inactiveclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-inactiveclubs" type="button" role="tab" aria-controls="nav-inactiveclubs" aria-selected="false" onclick="updateLabel('Approved')">
-                        <i class="fa-regular fa-thumbs-up"></i>
-                    </button>
-                    <button title="Rejected" class="px-2 nav-link" id="nav-rejectedclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-rejectedclubs" type="button" role="tab" aria-controls="nav-rejectedclubs" aria-selected="false" onclick="updateLabel('Rejected')">
-                        <i class="fa-regular fa-thumbs-down"></i>
-                    </button>
-                    <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;">
-                        <i class="fa-solid fa-sliders"></i>
-                    </button>
-                </div>
-            </nav>
-            <!-- Label for displaying the current tab's name -->
-            <div class="mt-2 mb-0 ps-2">
-                <h5 id="clubTabLabel">Registered Clubs</h5>
-            </div>
-
-            <div class="tab-content ps-2">
-                <!-- Tab for All Clubs -->
-                <div class="tab-pane fade show active" id="nav-allclubs" role="tabpanel" aria-labelledby="nav-allclubs-tab">
-                    <div class="table-responsive auto-scroll" style="height: auto;">
-                        <table id="tblAllClubs" class="table table-sm table-hover">
-                            <!-- ALL STUDENT CLUBS HERE -->
-                        </table>
-                        <div style="height: 0px;"></div>
-                    </div>
-                </div>
-
-                <!-- Tab for Active Clubs -->
-                <div class="tab-pane fade" id="nav-activeclubs" role="tabpanel" aria-labelledby="nav-activeclubs-tab">
-                    <div class="table-responsive auto-scroll" style="height: 400px;">
-                        <table id="tblActiveClubs" class="table table-sm table-hover">
-                            <!-- ACTIVE STUDENT CLUBS HERE -->
-                        </table>
-                        <div style="height: 150px;"></div>
-                    </div>
-                </div>
-
-                <!-- Tab for Inactive Clubs -->
-                <div class="tab-pane fade" id="nav-inactiveclubs" role="tabpanel" aria-labelledby="nav-inactiveclubs-tab">
-                    <div class="table-responsive auto-scroll" style="height: 400px;">
-                        <table id="tblInactiveClubs" class="table table-sm table-hover">
-                            <!-- INACTIVE STUDENT CLUBS HERE -->
-                        </table>
-                        <div style="height: 150px;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- YOUR CLUB END -->
+      <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none text-dark">
+          <svg class="bi pe-none me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+          <span class="fs-4"><h1><i class="fa fa-university text-primary"></i></h1></span>
+        </a>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+          <li>
+            <a href="#" class="nav-link text-dark" id="all-clubs">
+              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+              All Clubs
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link text-dark" aria-current="page" id="my-clubs">
+              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+              My Clubs
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link text-dark" id="club-requests">
+              <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+              My Club Requests
+            </a>
+          </li>
+        </ul>
 
         <hr>
-
-        <!-- YOUR CLUB REQUESTS -->
-        <div class="pe-2 ps-2">
-            <h5>Club Requests</h5>
-            <button class="btn btn-primary btn-sm py-1 mt-1 rounded-3 w-100">Create New Club Request</button>
+        <div class="dropdown">
+          <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+            <strong>mdo</strong>
+          </a>
+          <ul class="dropdown-menu text-small shadow">
+            <li><a class="dropdown-item" href="#">New project...</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Sign out</a></li>
+          </ul>
         </div>
-        <div class="row g-0 mt-2">
-            <nav>
-                <div class="nav nav-tabs n" role="tablist">
-                    <button title="New" class="ms-2 px-2 nav-link active" id="nav-prnew-tab" data-bs-toggle="tab" data-bs-target="#nav-prnew" type="button" role="tab" aria-controls="nav-prnew" aria-selected="true" onclick="updateLabel('All')">
-                        <i class="fa-regular fa-file"></i>
-                    </button>
-                    <button title="Ongoing" class="px-2 nav-link" id="nav-prongoing-tab" data-bs-toggle="tab" data-bs-target="#nav-prongoing" type="button" role="tab" aria-controls="nav-prongoing" aria-selected="false" onclick="updateLabel('Pendings')">
-                        <i class="fa-regular fa-clock"></i>
-                    </button>
-                    <button title="Approved" class="px-2 nav-link" id="nav-prapproved-tab" data-bs-toggle="tab" data-bs-target="#nav-prapproved" type="button" role="tab" aria-controls="nav-prapproved" aria-selected="false" onclick="updateLabel('Approved')">
-                        <i class="fa-regular fa-thumbs-up"></i>
-                    </button>
-                    <button title="Rejected" class="px-2 nav-link" id="nav-prreject-tab" data-bs-toggle="tab" data-bs-target="#nav-prreject" type="button" role="tab" aria-controls="nav-prreject" aria-selected="false" onclick="updateLabel('Disapproved')">
-                        <i class="fa-regular fa-thumbs-down"></i>
-                    </button>
-                    <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;">
-                        <i class="fa-solid fa-sliders"></i>
-                    </button>
-                </div>
-            </nav>
+      </div>
 
-            <!-- Label for displaying the current tab's name -->
-            <div class="mt-2 mb-0 ps-2">
-                <h5 id="tabLabel">All</h5>
-            </div>
-
-            <div class="tab-content ps-2">
-                <div class="col-12 pe-2 py-1">
-                    <input id="inprsearchfilter" class="form-control form-control-sm me-1" placeholder="Search...">
-                </div>
-                <div class="tab-pane fade show active" id="nav-prnew" role="tabpanel" aria-labelledby="nav-prnew-tab">
-                    <div class="table-responsive auto-scroll" style="height: 400px">
-                        <table id="tblprnewsumm" class="tblprfilter table table-sm table-hover">
-                            <!-- ALL STUDENT CLUB REQUESTS HERE -->
-                        </table>
-                        <div style="height: 150px;"></div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="nav-prongoing" role="tabpanel" aria-labelledby="nav-prongoing-tab">
-                    <div class="table-responsive auto-scroll" style="height: 400px">
-                        <table id="tblprongoingsumm" class="tblprfilter table table-sm table-hover">
-                            <!-- ALL STUDENT PENDING CLUB REQUESTS HERE -->
-                        </table>
-                        <div style="height: 150px;"></div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="nav-prapproved" role="tabpanel" aria-labelledby="nav-prapproved-tab">
-                    <div class="table-responsive auto-scroll" style="height: 400px">
-                        <table id="tblprapprovedsumm" class="tblprfilter table table-sm table-hover">
-                            <!-- ALL STUDENT APPROVED CLUB REQUESTS HERE -->
-                        </table>
-                        <div style="height: 150px;"></div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="nav-prreject" role="tabpanel" aria-labelledby="nav-prreject-tab">
-                    <div class="table-responsive auto-scroll" style="height: 400px">
-                        <table id="tblprrejectedsumm" class="tblprfilter table table-sm table-hover">
-                            <!-- ALL STUDENT DISAPPROVED CLUB REQUESTS HERE -->
-                        </table>
-                        <div style="height: 150px;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- YOUR CLUB REQUESTS END -->
     </div>
     <!-- LEFT SIDEBAR END -->
 
-    <div class="col-8 bg-lgrey">
+    <div class="col-10 bg-lgrey">
         <div class="row g-0 h-100">
             <div id="divpr_requesdetails" class="table-responsive px-0 auto-scroll">
                 <div class="row g-0 p-4 px-2 pt-3 h-100">
                     <div class="card">
                         <div class="card-body">
-    <!-- <div class="col-8 bg-lgrey">
-    <div class="row g-0">
-        <div id="divpr_requesdetails" class="table-responsive px-0">
-            <div class="row g-0 p-4 px-2 pt-3">
-                <div class="card">
-                    <div class="card-body"> -->
-                            
-                            <h2 class="mt-0 mb-4">Student Club Organizations</h2>
-                            <hr>
-                            
-                            <div class="row" id="clubsContainer">
-                                <!-- Club cards will be dynamically added here -->
-                            </div>
-                            <a href="../esas_student/clubs.php" class="btn btn-secondary float-end">Cancel</a>
-
-                            
-                            <!-- <h2 class="mt-0 mb-4">Request for a New Club</h2>
-                            <p class="py-2">Please fill out this form and submit your request for a new club.</p>
-                            <form id="clubRequestForm" action="../esas_student/actions/club_request_action.php" method="POST" enctype="multipart/form-data">
-                                <div class="form-group mb-3">
-                                    <label for="clubName">Club Name</label>
-                                    <input type="text" name="clubName" class="form-control" id="clubName" required>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="description">What is the primary goal of this club?</label>
-                                    <textarea name="description" class="form-control" id="description" rows="4" required></textarea>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="activities">Proposed Activities</label>
-                                    <textarea name="activities" class="form-control" id="activities" rows="3"></textarea>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <label for="coverPhoto">Club Cover Photo</label>
-                                    <input type="file" name="coverPhoto" class="form-control" id="coverPhoto" required onchange="previewImage(event)">
-                                </div>
-                                
-                                <div class="form-group mb-3">
-                                    <img id="coverPhotoPreview" src="#" alt="Cover Photo Preview" style="display:none; width: 50%; object-fit: cover;" />
-                                </div>
-                                <!-- <a href="javascript:history.go(-1)" return false;" class="btn btn-secondary float-end">Cancel</a> --
-                                <a href="../esas_student/clubs.php" class="btn btn-secondary float-end">Cancel</a>
-                            </form>
-
-                            <script>
-                                function previewImage(event) {
-                                    var reader = new FileReader();
-                                    reader.onload = function(){
-                                        var output = document.getElementById('coverPhotoPreview');
-                                        output.src = reader.result;
-                                        output.style.display = 'block';
-                                    }
-                                    reader.readAsDataURL(event.target.files[0]);
-                                }
-                            </script> -->
+                           <!-- DISPLAY CLICKED MENU PAGES HERE --> 
                         </div>
                     </div>
                 </div>
-                <div style="height: 150px;"></div>
             </div>
         </div>
     </div>
-    <div id="divprstatussection" class="col-2 border-start">
-        <div class="row mt-3 g-0">
-            <div class="col-12">
-                <div class="pe-2 ps-2">
-                    <h5>SBO Officers</h5>
-                </div>
-                <!-- <div class="ps-2">
-                    <button id="prbtnsubmitforapproval" onclick="submitClubRequest()" class="btn btn-sm btn-outline-primary rounded-3 w-100 mb-1"><i class="fa fa-plane" aria-hidden="true"></i> Submit for Approval</button>
-                </div> -->
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function submitClubRequest() {
-            document.getElementById('clubRequestForm').submit();
-        }
-
-        function updateLabel(label) {
-            document.getElementById("tabLabel").innerText = label;
-        }
-
-        // Fetch clubs data from API
-        fetch('/esas/esas_student/apis/clubs-api.php')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // $('#post-26').html(data)
-                const clubsContainer = document.getElementById('clubsContainer');
-                if (data && data.length > 0) {
-                    data.forEach(club => {
-                        const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
-                        const cardHTML = `
-                            <div class="col-md-4">
-                                <div class="card card-img-only-all">
-                                    <small data-toggle="tooltip" title="${memberText}">
-                                        <i class="fa fa-user mr-1"></i>${club.membersCount}
-                                    </small>
-                                    <a href="/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
-                                        <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
-                                        <div class="overlay-text">
-                                            <h4>${club.clubName}</h4>
-                                            <!--<div class="moderators-container">
-                                                ${club.formattedModerators}
-                                            </div>-->
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                        `;
-                        clubsContainer.innerHTML += cardHTML;
-                    });
-                } else {
-                    clubsContainer.innerHTML = '<p>No clubs found.</p>';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching clubs:', error);
-                const clubsContainer = document.getElementById('clubsContainer');
-                clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
-            });
-
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const clubEndpoints = {
-                all: '/esas/esas_student/apis/student-clubs-all-api.php',
-                pending: '/esas/esas_student/apis/student-clubs-pending-api.php',
-                approved: '/esas/esas_student/apis/student-clubs-approved-api.php',
-                disapproved: '/esas/esas_student/apis/student-clubs-disapproved-api.php'
-            };
-
-            function fetchStudentClubs(endpoint, tableId) {
-                fetch(endpoint)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        const table = document.getElementById(tableId);
-                        if (data && data.length > 0) {
-                            table.innerHTML = data.map(club => `
-                                <div class="col-md-12">
-                                    <div class="card card-img-only">
-                                        <small data-toggle="tooltip" title="${club.membersCount} members">
-                                            <i class="fa fa-user mr-1"></i>${club.membersCount}
-                                        </small>
-                                        <a href="/esas/esas_student/home.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
-                                            <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
-                                            <div class="overlay-text">
-                                                <h4>${club.clubName}</h4>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </div>
-                            `).join('');
-                        } else {
-                            table.innerHTML = '<p>No clubs found.</p>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        const table = document.getElementById(tableId);
-                        table.innerHTML = '<p class="mt-3">Failed to load clubs. Please try again later.</p>';
-                    });
-            }
-
-            // Fetch data for each tab
-            fetchStudentClubs(clubEndpoints.all, 'tblAllClubs');         // For "All Clubs"
-            fetchStudentClubs(clubEndpoints.pending, 'tblActiveClubs');  // For "Pending Approval"
-            fetchStudentClubs(clubEndpoints.approved, 'tblInactiveClubs'); // For "Approved Clubs"
-        });
-
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const endpoints = {
-                all: '/esas/esas_student/apis/club-request-all-api.php',
-                pending: '/esas/esas_student/apis/club-request-pending-api.php',
-                approved: '/esas/esas_student/apis/club-request-approved-api.php',
-                disapproved: '/esas/esas_student/apis/club-request-disapproved-api.php'
-            };
-
-            function fetchData(endpoint, tableId) {
-                fetch(endpoint)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        const table = document.getElementById(tableId);
-                        if (data && data.length > 0) {
-                            table.innerHTML = data.map(request => `
-                                <div class="col-md-12">
-                                    <div class="card card-img-only">
-                                        <a href="#">
-                                            <img src="/esas/esas_student/images/${request.coverPhoto}" alt="Cover Photo">
-                                            <div class="overlay-text">
-                                                <h4>${request.clubName}</h4>
-                                            </div>
-                                        </a>
-                                        <!--<div class="card-footer">
-                                            <p><strong>Status:</strong> ${request.status}</p>
-                                            <p><strong>Date Requested:</strong> ${new Date(request.dateRequested).toLocaleString()}</p>
-                                        </div>-->
-                                    </div>
-                                </div>
-                            `).join('');
-                        } else {
-                            table.innerHTML = '<p>No requests found.</p>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                        const table = document.getElementById(tableId);
-                        table.innerHTML = '<p class="mt-3">No club requests found.</p>';
-                    });
-            }
-
-            fetchData(endpoints.all, 'tblprnewsumm');
-            fetchData(endpoints.pending, 'tblprongoingsumm');
-            fetchData(endpoints.approved, 'tblprapprovedsumm');
-            fetchData(endpoints.disapproved, 'tblprrejectedsumm');
-        });
-    </script>
 
 </div>
+
+    
 
 <!-- <?php include 'assets/components/modals.php' ?> -->
 <script src="../assets/js/jquery.dataTables.min.js"></script>
 <script src="../assets/js/bootstrap.bundle.min.js"></script>
 <script src="../assets/js/global_script.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+  // Function to load content based on the clicked menu item
+  function loadPage(page) {
+    $.ajax({
+      url: page, // Page to load
+      type: "GET",
+      success: function(response) {
+        $('.card-body').html(response); // Load the content into the card body
+      },
+      error: function() {
+        $('.card-body').html('<p>Error loading page.</p>');
+      }
+    });
+  }
+
+  // Load "All Clubs" by default on page load and set it as active
+  loadPage('all_clubs.php'); // Load the All Clubs content
+  $('#all-clubs').addClass('active'); // Set "All Clubs" as active
+  $('#all-clubs').css('background-color', '#007bff'); // Add primary blue background color for active state
+
+  // Event listeners for each menu item
+  $('#my-clubs').on('click', function(e) {
+    e.preventDefault();
+    loadPage('my_clubs.php');
+    updateActiveMenu(this);
+  });
+
+  $('#all-clubs').on('click', function(e) {
+    e.preventDefault();
+    loadPage('all_clubs.php');
+    updateActiveMenu(this);
+  });
+
+  $('#club-requests').on('click', function(e) {
+    e.preventDefault();
+    loadPage('club_requests.php');
+    updateActiveMenu(this);
+  });
+
+  // Function to handle active class and background color
+  function updateActiveMenu(activeLink) {
+    // Remove active class and background color from all links
+    $('.nav-link').removeClass('active');
+    $('.nav-link').css('background-color', ''); // Reset background color
+
+    // Add active class and primary blue background color to the clicked link
+    $(activeLink).addClass('active');
+    $(activeLink).css('background-color', '#007bff'); // Set primary blue background color for active link
+  }
+});
+</script>
+
+
+</script>
+
 <script>
     $(document).ready(function() {
         $('.delprreq').click(function(e) {
