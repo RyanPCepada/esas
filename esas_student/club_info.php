@@ -280,7 +280,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                     </div>
                 <?php elseif ($disapprovedCount >= 3): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You have reached the maximum limit of requests for this club.</p>
+                        <p class="lead mb-0">You have reached the maximum number of registrations allowed for this club.</p>
                     </div>
                 <?php else: ?>
                     <h4 class="mb-3">Join Us Now!</h4>
