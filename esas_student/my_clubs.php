@@ -101,9 +101,11 @@
                 padding: 10px; 
                 max-width: 100%; 
             }
-
             .card-img-only {
                 margin: 10px auto;
+            }
+            .date {
+                margin-left: 20px;
             }
         }
     </style>
@@ -113,14 +115,14 @@
 
 <body>
     <div class="row g-0">
-        <h2 class="text-muted mt-0 mb-5">My Clubs</h2>
+        <h2 class="text-muted mt-0 p-3 mb-5">My Clubs</h2>
         <nav>
             <div class="nav nav-tabs n" role="tablist">
                 <button title="Registered Clubs" class="ms-2 px-2 nav-link active" id="nav-activeclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-activeclubs" type="button" role="tab" aria-controls="nav-activeclubs" aria-selected="true" onclick="updateLabel('Registered Clubs')">
                     Registered Clubs
                 </button>
                 <button title="Pending Approval" class="px-2 nav-link" id="nav-pendingclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-pendingclubs" type="button" role="tab" aria-controls="nav-pendingclubs" aria-selected="false" onclick="updateLabel('Pending Approval')">
-                    Pending Approval
+                    Pending
                 </button>
                 <button title="Disapproved" class="px-2 nav-link" id="nav-disapprovedclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-disapprovedclubs" type="button" role="tab" aria-controls="nav-disapprovedclubs" aria-selected="false" onclick="updateLabel('Disapproved')">
                     Disapproved

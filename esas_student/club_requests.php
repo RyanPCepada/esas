@@ -97,9 +97,11 @@
                 padding: 10px; 
                 max-width: 100%; 
             }
-
             .card-img-only {
                 margin: 10px auto;
+            }
+            .date {
+                margin-left: 20px;
             }
         }
     </style>
@@ -109,7 +111,7 @@
 
 <body>
     <div class="row g-0">
-        <div class="d-flex justify-content-between align-items-center mb-5">
+        <div class="d-flex justify-content-between align-items-center p-3 mb-5">
             <h2 class="text-muted mt-0 mb-0">My Club Requests</h2>
             <button type="button" class="btn btn-primary" id="request-club-btn" data-bs-toggle="modal" data-bs-target="#requestClubModal">
                 Request for a Club
