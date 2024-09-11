@@ -48,8 +48,8 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
         // Prepare SQL query to fetch club information and moderators' profile pictures
         $stmt = $pdo->prepare("
             SELECT c.clubName, c.information, c.coverPhoto, c.dateAdded,
-                GROUP_CONCAT(CONCAT(m.firstName, ' ', COALESCE(m.middleName, ''), ' ', m.lastName) ORDER BY m.firstName SEPARATOR '|') AS moderatorNames,
-                GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR '|') AS moderatorPics,
+                GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', COALESCE(m.middleName, ''), ' ', m.lastName) ORDER BY m.firstName SEPARATOR '|') AS moderatorNames,
+                GROUP_CONCAT(DISTINCT m.profilePic ORDER BY m.firstName SEPARATOR '|') AS moderatorPics,
                 COUNT(DISTINCT r.student_id) AS membersCount,  -- Use DISTINCT to avoid duplicate counting
                 COUNT(DISTINCT m.moderator_id) AS numModerators
             FROM tbl_clubs c
