@@ -88,18 +88,26 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             $information = 'No information available for this club.';
         }
 
-        // Check if the student is already registered in the club
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id");
-        $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-        $stmt->execute();
-        $isRegistered = $stmt->fetchColumn() > 0;
+        // Fetch the student's registration status for the current club
+$stmt = $pdo->prepare("SELECT status FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id");
+$stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+$stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+$stmt->execute();
+$status = $stmt->fetchColumn(); // Fetch the registration status (e.g., 'active', 'pending', etc.)
 
-        // Check if the student is already registered in two clubs
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
-        $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-        $stmt->execute();
-        $clubsCount = $stmt->fetchColumn();
+// Count how many clubs the student is currently "active" in
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
+$stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+$stmt->execute();
+$clubsCount = $stmt->fetchColumn();
+
+// Count how many times the student has been "disapproved" for this club
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id AND status = 'disapproved'");
+$stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+$stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+$stmt->execute();
+$disapprovedCount = $stmt->fetchColumn();
+
 
     } catch (PDOException $e) {
         die("Error: " . $e->getMessage());
@@ -231,13 +239,13 @@ $encodedClubName = addslashes($clubName);
             <p><?php echo htmlspecialchars($information); ?></p>
         </div>
         <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
-            <h4 class="mb-3">Join Us Now!</h4>
-            <p class="lead">If you want to be a part of us, register now and become a member of <?php echo htmlspecialchars($clubName); ?>.</p>
-            <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, &quot;<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>&quot;, <?php echo $isRegistered ? 'true' : 'false'; ?>, <?php echo $clubsCount; ?>)">Register Now</button>
-            <div class="mt-1">
-                <a href="javascript:history.go(-1)" class="btn btn-transparent">Go Back</a>
-            </div>
-        </div>
+    <h4 class="mb-3">Join Us Now!</h4>
+    <p class="lead">If you want to be a part of us, register now and become a member of <?php echo htmlspecialchars($clubName); ?>.</p>
+    <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>)">Register Now</button>
+    <div class="mt-1">
+        <a href="javascript:history.go(-1)" class="btn btn-transparent">Go Back</a>
+    </div>
+</div>
     </div>
     </div>
 
@@ -247,18 +255,24 @@ $encodedClubName = addslashes($clubName);
     <script src="../assets/js/global_script.js"></script>
 
     <script>
-        function registerNow(clubId, clubName, isRegistered, clubsCount) {
-            if (isRegistered) {
-                alert("You are already registered in this club.");
-            } else if (clubsCount >= 2) {
-                alert("You can only register for up to 2 clubs.");
-            } else {
-                const encodedClubName = encodeURIComponent(clubName);
-                const url = `/esas/esas_student/registration.php?club_id=${clubId}&club_name=${encodedClubName}`;
-                window.location.href = url;
-            }
-        }
-    </script>
+    function registerNow(clubId, clubName, status, clubsCount, disapprovedCount) {
+    if (status === 'active') {
+        alert("You are already a member of this club.");
+    } else if (status === 'pending') {
+        alert("You already applied to this club. Please wait for the Moderator's approval.");
+    } else if (clubsCount >= 2) {
+        alert("You can only register for up to 2 clubs.");
+    } else if (disapprovedCount >= 3) {
+        alert("Sorry. You have reached the maximum limit of requests for this club.");
+    } else {
+        const encodedClubName = encodeURIComponent(clubName);
+        const url = `/esas/esas_student/registration.php?club_id=${clubId}&club_name=${encodedClubName}`;
+        window.location.href = url;
+    }
+}
+
+</script>
+
 
 </body>
 
