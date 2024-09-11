@@ -99,7 +99,7 @@
     </style>
 </head>
 <body>
-    <div class="row g-0 h-100">
+    <div class="row g-0 h-100 p-3">
         <h2 class="text-muted mt-0 mb-5">Student Club Organizations</h2>
         <div class="row g-2 mt-0" id="allClubsContainer">
             <!-- Club cards will be dynamically added here -->
