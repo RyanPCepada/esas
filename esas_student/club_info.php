@@ -61,9 +61,10 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
         $stmt->execute([$club_id]);
         $club = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Fetch the club information
         if ($club) {
             $clubName = htmlspecialchars($club['clubName']);
-            $information = nl2br(htmlspecialchars($club['information']));
+            $information = htmlspecialchars_decode($club['information']); // Decode HTML entities
             $coverPhoto = htmlspecialchars($club['coverPhoto']);
             $dateAdded = htmlspecialchars($club['dateAdded']);
             $membersCount = htmlspecialchars($club['membersCount']);
@@ -128,6 +129,9 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 
 // Encode clubName for JavaScript use
 $encodedClubName = addslashes($clubName);
+
+$information = nl2br(htmlspecialchars($information)); // Convert newlines to <br>
+$information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; // Wrap paragraphs
 ?>
 
 
@@ -189,6 +193,14 @@ $encodedClubName = addslashes($clubName);
             text-align: center;
             margin: 0 auto;
         }
+        .club-info p {
+    text-indent: 1em; /* Indent the first line of each paragraph */
+    margin: 0 0 1em 0; /* Add margin at the bottom to separate paragraphs */
+    line-height: 1.6; /* Adjust line height for readability */
+    text-align: justify; /* Justify text to align vertically */
+}
+
+
     </style>
 </head>
 
@@ -247,11 +259,10 @@ $encodedClubName = addslashes($clubName);
                 </div>
             </div>
 
-
-
             <div class="club-info">
-                <p><?php echo htmlspecialchars($information); ?></p>
+                <?php echo $information; ?>
             </div>
+
 
             <!-- <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
                 <h4 class="mb-3">Join Us Now!</h4>
