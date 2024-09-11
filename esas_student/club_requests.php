@@ -113,7 +113,7 @@
     <div class="row g-0">
         <div class="d-flex justify-content-between align-items-center p-3 mb-5">
             <h2 class="text-muted mt-0 mb-0">My Club Requests</h2>
-            <button type="button" class="btn btn-primary" id="request-club-btn" data-bs-toggle="modal" data-bs-target="#requestClubModal">
+            <button type="button" class="btn btn-primary" id="request-club-btn" data-bs-toggle="modal" data-bs-target="#requestClubModal" style="width: 210px; border-radius: 5px;">
                 Request for a Club
             </button>
         </div>
@@ -174,9 +174,9 @@
                 <button title="Disapproved" class="px-2 nav-link" id="nav-disapprovedclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-disapprovedclubs" type="button" role="tab" aria-controls="nav-disapprovedclubs" aria-selected="false" onclick="updateLabel('Disapproved')">
                     Disapproved
                 </button>
-                <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;">
+                <!-- <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;">
                     <i class="fa-solid fa-sliders"></i>
-                </button>
+                </button> -->
             </div>
         </nav>
         <div class="tab-content">
