@@ -20,20 +20,16 @@ switch ($method) {
 
         $student_id = $_SESSION['student_id'];
 
-        // Fetch the club_id for the logged-in student
-        $stmt = $pdo->prepare('SELECT club_id FROM tbl_registration WHERE student_id = ?');
-        $stmt->execute([$student_id]);
-        $student = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$student) {
-            http_response_code(404);
-            echo json_encode(['error' => 'Student not found']);
+        // Check if the club_id parameter is provided
+        if (!isset($_GET['club_id'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'No club ID provided']);
             exit();
         }
 
-        $club_id = $student['club_id'];
+        $club_id = $_GET['club_id'];
 
-        // Check if an ID parameter is provided
+        // Check if an ID parameter is provided for a specific post
         if (isset($_GET['post_id'])) {
             // Fetch a single post by post_id
             $post_id = $_GET['post_id'];
@@ -55,7 +51,7 @@ switch ($method) {
                 echo json_encode(['error' => 'Post not found']);
             }
         } else {
-            // Fetch all posts for the current club
+            // Fetch all posts for the specified club
             $stmt = $pdo->prepare('
                 SELECT tbl_posts.*, tbl_moderators.firstName, tbl_moderators.middleName, tbl_moderators.lastName, tbl_moderators.profilePic
                 FROM tbl_posts

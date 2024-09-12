@@ -183,11 +183,6 @@ try {
                 });
             }
 
-            // Function to set the active link and blue background
-            function setActiveMenu(activeLink) {
-                $('.nav-link').removeClass('active').css('background-color', ''); // Remove previous active states
-                $(activeLink).addClass('active').css('background-color', '#007bff'); // Set active and blue background
-            }
 
             // Function to set default active link and blue background for "All Clubs"
             function setDefaultActive() {
