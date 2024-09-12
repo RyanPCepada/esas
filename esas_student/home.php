@@ -17,15 +17,27 @@ try {
     // Use the existing PDO instance from config.php
     global $pdo;
 
-    // Fetch the student's club_id and profile picture
-    $sql = "SELECT club_id, profilePic FROM tbl_registration WHERE student_id = :student_id";
+    // Check if a club_id is passed in the URL
+    if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
+        $club_id = $_GET['club_id']; // Use the passed club_id
+    } else {
+        // Default behavior if no club_id is passed (fallback)
+        $sql = "SELECT club_id FROM tbl_registration WHERE student_id = :student_id LIMIT 1";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $student = $stmt->fetch(PDO::FETCH_ASSOC);
+        $club_id = $student['club_id']; // Default to the first club
+    }
+
+    // Fetch the student's profile picture
+    $sql = "SELECT profilePic FROM tbl_registration WHERE student_id = :student_id";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
     $stmt->execute();
     $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($student) {
-        $club_id = $student['club_id']; // Set club_id from student
         $profilePic = $student['profilePic']; // Set profilePic from student
 
         // Fetch the club name and cover photo using the club_id
@@ -65,6 +77,7 @@ try {
     die("Database error: " . $e->getMessage());
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

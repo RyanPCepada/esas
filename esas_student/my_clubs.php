@@ -108,6 +108,7 @@
                 margin-left: 20px;
             }
         }
+        
     </style>
 </head>
 
@@ -184,7 +185,8 @@
                             clubsContainer.innerHTML = response.map(club => `
                                 <div class="col-md-4 mb-4">
                                     <div class="card card-img-only">
-                                        <a href="${tab === 'active' ? '/esas/esas_student/home.php' : `/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}`}">
+                                        <!-- <a href="${tab === 'active' ? '/esas/esas_student/home.php' : `/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}`}">-->
+                                        <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}` : `/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}`}">
                                             <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
                                             <div class="overlay-text">
                                                 <h4>${club.clubName}</h4>

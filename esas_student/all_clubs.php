@@ -96,6 +96,40 @@
                 margin: 10px auto;
             }
         }
+
+
+
+
+
+
+        .card-container {
+    opacity: 0;
+    transform: translateY(20px); /* Start from below */
+    animation: slideIn 0.6s forwards; /* Apply animation */
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px); /* Start from below */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0); /* End at normal position */
+    }
+}
+
+/* Optional: Adjust the delay for each card */
+.card-container:nth-child(1) {
+    animation-delay: 0s;
+}
+.card-container:nth-child(2) {
+    animation-delay: 0.1s;
+}
+.card-container:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
     </style>
 </head>
 <body>
@@ -137,7 +171,7 @@
                     data.forEach(club => {
                         const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
                         const cardHTML = `
-                            <div class="col-md-4">
+                            <div class="col-md-4 card-container">
                                 <div class="card card-img-only-all">
                                     <small data-toggle="tooltip" title="${memberText}">
                                         <i class="fa fa-user mr-1"></i>${club.membersCount}
