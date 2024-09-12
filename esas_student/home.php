@@ -350,6 +350,7 @@ try {
                                                 <img src="/esas/esas_student/images/<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture" class="rounded-circle mr-2" width="40" height="40">
                                                 <form class="comment-form d-flex align-items-center w-100" method="POST" action="../esas_student/actions/send_comment_action.php" data-post-id="${post.post_id}">
                                                     <input type="hidden" name="post_id" value="${post.post_id}">
+                                                    <input type="hidden" name="club_id" value="${club.club_id}">
                                                     <input type="text" class="form-control" name="comment" placeholder="Add a comment..." required>
                                                     <button type="submit" class="btn btn-link ml-2 p-0">
                                                         <i class="fas fa-paper-plane send-icon" aria-hidden="true"></i>
