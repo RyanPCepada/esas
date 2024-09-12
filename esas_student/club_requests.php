@@ -104,6 +104,37 @@
                 margin-left: 20px;
             }
         }
+
+
+
+        
+        .card-container {
+            opacity: 0;
+            transform: translateY(20px); /* Start from below */
+            animation: slideIn 0.6s forwards; /* Apply animation */
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px); /* Start from below */
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0); /* End at normal position */
+            }
+        }
+
+        /* Optional: Adjust the delay for each card */
+        .card-container:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .card-container:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        .card-container:nth-child(3) {
+            animation-delay: 0.2s;
+        }
     </style>
 </head>
 
@@ -246,7 +277,7 @@
                         const clubsContainer = document.getElementById(containerId);
                         if (response && response.length > 0) {
                             clubsContainer.innerHTML = response.map(club => `
-                                <div class="col-md-4 mb-4">
+                                <div class="col-md-4 mb-4 card-container">
                                     <div class="card card-img-only">
                                         <a href="#">
                                             <img src="/esas/esas_student/images/${club.coverPhoto}" alt="Cover Photo">
