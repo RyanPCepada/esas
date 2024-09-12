@@ -226,34 +226,49 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
 
 
         .club-info-coverphoto {
-    opacity: 0;
-    transform: translateY(20px); /* Start from below */
-    animation: slideIn 0.6s forwards; /* Apply animation */
-    box-shadow: 0 5px 10px rgba(0, 0, 0, .5);
-}
+            opacity: 0;
+            transform: translateY(20px); /* Start from below */
+            animation: slideIn 0.6s forwards; /* Apply animation */
+            box-shadow: 0 5px 10px rgba(0, 0, 0, .5);
+        }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(20px); /* Start from below */
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0); /* End at normal position */
-    }
-}
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px); /* Start from below */
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0); /* End at normal position */
+            }
+        }
 
-/* Optional: Adjust the delay for each card */
-.club-info-coverphoto:nth-child(1) {
-    animation-delay: 0s;
-}
-.club-info-coverphoto:nth-child(2) {
-    animation-delay: 0.1s;
-}
-.club-info-coverphoto:nth-child(3) {
-    animation-delay: 0.2s;
-}
+        /* Optional: Adjust the delay for each card */
+        .club-info-coverphoto:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .club-info-coverphoto:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        .club-info-coverphoto:nth-child(3) {
+            animation-delay: 0.2s;
+        }
 
+
+        .club-register-now .alert {
+            padding: 10px 20px;
+            max-width: 70%;
+        }
+        .club-register-now p {
+            font-size: 16px;
+        }
+
+        
+        @media (max-width: 768px) {
+            .club-register-now .alert {
+                max-width: 90%;
+            }
+        }
         
     </style>
 </head>
