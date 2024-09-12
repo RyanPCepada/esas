@@ -14,6 +14,7 @@
     <link href="../assets/img/nbsclogo.png" rel="icon">
     <style>
         .mainbar h2 {
+            margin-left: 15px;
             margin-bottom: 32px;
         }
         .card-body {
@@ -96,6 +97,7 @@
             }
             .mainbar h2 {
                 margin-bottom: 16px;
+                margin-left: 0px;
             }
             .card-body {
                 padding: 10px; 

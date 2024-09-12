@@ -22,6 +22,7 @@
             /* max-width: 600px; */
             margin: 0 auto;
             padding: 50px;
+            padding-top: 35px;
         }
         .tab-content {
         }
