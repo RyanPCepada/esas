@@ -13,11 +13,14 @@
     <link href="../assets/css/styles.css" rel="stylesheet" />
     <link href="../assets/img/nbsclogo.png" rel="icon">
     <style>
+        .mainbar h2 {
+            margin-bottom: 32px;
+        }
         .card-body {
             width: 100%;
             /* max-width: 600px; */
             margin: 0 auto;
-            padding: 0px;
+            padding: 50px;
         }
         
         .card-img-only-all {
@@ -87,11 +90,17 @@
 
 
         @media (max-width: 768px) {
+            
+            .mainbar {
+                padding: 16px;
+            }
+            .mainbar h2 {
+                margin-bottom: 16px;
+            }
             .card-body {
                 padding: 10px; 
                 max-width: 100%; 
             }
-        
             .card-img-only-all {
                 margin: 10px auto;
             }
@@ -133,8 +142,8 @@
     </style>
 </head>
 <body>
-    <div class="row g-0 h-100 p-5">
-        <h2 class="text-muted mt-0 mb-5">Student Club Organizations</h2>
+    <div class="row mainbar g-0 h-100">
+        <h2 class="text-muted mt-0">Student Club Organizations</h2>
         <div class="row g-2 mt-0" id="allClubsContainer">
             <!-- Club cards will be dynamically added here -->
         </div>
