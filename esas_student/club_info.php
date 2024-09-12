@@ -221,6 +221,40 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
             margin: 0;
             line-height: 1.2;
         }
+
+
+
+
+        .club-info-coverphoto {
+    opacity: 0;
+    transform: translateY(20px); /* Start from below */
+    animation: slideIn 0.6s forwards; /* Apply animation */
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .5);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px); /* Start from below */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0); /* End at normal position */
+    }
+}
+
+/* Optional: Adjust the delay for each card */
+.club-info-coverphoto:nth-child(1) {
+    animation-delay: 0s;
+}
+.club-info-coverphoto:nth-child(2) {
+    animation-delay: 0.1s;
+}
+.club-info-coverphoto:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+        
     </style>
 </head>
 
@@ -244,7 +278,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                         <!-- <hr> -->
                     </div>
                     <div class="col-12 col-md-8">
-                        <img class="mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo" style="max-width: 100%; border-radius: 20px;">
+                        <img class="club-info-coverphoto mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo" style="max-width: 100%; border-radius: 20px;">
                     </div>
                 </div>
             </div>
