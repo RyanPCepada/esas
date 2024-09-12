@@ -229,6 +229,7 @@ try {
 
         .comsec {
             margin-left: 10px;
+            max-width: 90%;
         }
 
         @media (min-width: 768px) {
@@ -312,81 +313,81 @@ try {
 
             // Function to fetch and display posts
             function fetchPosts() {
-    const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
+                const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
 
-    fetch(`/esas/esas_student/apis/posts-api.php?club_id=${clubId}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+                fetch(`/esas/esas_student/apis/posts-api.php?club_id=${clubId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Fetched posts:', data);
+                        const postsContainer = document.getElementById('postsContainer');
+                        if (data && data.length > 0) {
+                            postsContainer.innerHTML = ''; // Clear existing posts
+                            data.forEach(post => {
+                                const postDate = formatDate(post.dateAdded.split(' ')[0]);
+                                const postTime = formatTime(post.dateAdded.split(' ')[1]);
+
+                                const commentText = post.numberOfComments === 1 ? '1 comment' : `${post.numberOfComments || 0} comments`;
+
+                                const postHTML = `
+                                    <div class="col-md-12 mb-3">
+                                        <div class="card" id="card_posts">
+                                            <div class="card-header d-flex align-items-start">
+                                                <img src="/esas/esas_moderator/images/${post.profilePic}" alt="${post.fullName}" class="rounded-circle mr-3" width="50" height="50">
+                                                <div class="moderator-name">
+                                                    <h5 class="card-title mb-1">${post.fullName}</h5>
+                                                    <p class="text-muted mb-0">${postDate} @ ${postTime}</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="card-text">${post.post}</p>
+                                            </div>
+                                            <div class="card-footer d-flex align-items-center">
+                                                <img src="/esas/esas_student/images/<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture" class="rounded-circle mr-2" width="40" height="40">
+                                                <form class="comment-form d-flex align-items-center w-100" method="POST" action="../esas_student/actions/send_comment_action.php" data-post-id="${post.post_id}">
+                                                    <input type="hidden" name="post_id" value="${post.post_id}">
+                                                    <input type="text" class="form-control" name="comment" placeholder="Add a comment..." required>
+                                                    <button type="submit" class="btn btn-link ml-2 p-0">
+                                                        <i class="fas fa-paper-plane send-icon" aria-hidden="true"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <div class="post" id="post-${post.post_id}">
+                                                <div class="comment-section-header">
+                                                    <a class="btn btn-link ml-2 text-info" onclick="toggleComments(${post.post_id})">
+                                                        <span id="comment-count-${post.post_id}">${commentText}</span>
+                                                    </a>
+                                                </div>
+                                                <div class="comment-section mt-3 ml-3 mr-2" id="comments-${post.post_id}" style="display: none; padding: 10px;">
+                                                    <!-- Comments will be dynamically loaded here -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                                postsContainer.innerHTML += postHTML;
+
+                                fetchComments(post.post_id);
+                            });
+                        } else {
+                            postsContainer.innerHTML = '<div class="alert alert-danger ml-3 mr-3"><em>No announcements or updates at the moment. Stay tuned!</em></div>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching posts:', error);
+                        const postsContainer = document.getElementById('postsContainer');
+                        postsContainer.innerHTML = '<p>Failed to fetch posts. Please try again later.</p>';
+                    });
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Fetched posts:', data);
-            const postsContainer = document.getElementById('postsContainer');
-            if (data && data.length > 0) {
-                postsContainer.innerHTML = ''; // Clear existing posts
-                data.forEach(post => {
-                    const postDate = formatDate(post.dateAdded.split(' ')[0]);
-                    const postTime = formatTime(post.dateAdded.split(' ')[1]);
-
-                    const commentText = post.numberOfComments === 1 ? '1 comment' : `${post.numberOfComments || 0} comments`;
-
-                    const postHTML = `
-                        <div class="col-md-12 mb-3">
-                            <div class="card" id="card_posts">
-                                <div class="card-header d-flex align-items-start">
-                                    <img src="/esas/esas_moderator/images/${post.profilePic}" alt="${post.fullName}" class="rounded-circle mr-3" width="50" height="50">
-                                    <div class="moderator-name">
-                                        <h5 class="card-title mb-1">${post.fullName}</h5>
-                                        <p class="text-muted mb-0">${postDate} @ ${postTime}</p>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text">${post.post}</p>
-                                </div>
-                                <div class="card-footer d-flex align-items-center">
-                                    <img src="/esas/esas_student/images/<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture" class="rounded-circle mr-2" width="40" height="40">
-                                    <form class="comment-form d-flex align-items-center w-100" method="POST" action="../esas_student/actions/send_comment_action.php" data-post-id="${post.post_id}">
-                                        <input type="hidden" name="post_id" value="${post.post_id}">
-                                        <input type="text" class="form-control" name="comment" placeholder="Add a comment..." required>
-                                        <button type="submit" class="btn btn-link ml-2 p-0">
-                                            <i class="fas fa-paper-plane send-icon" aria-hidden="true"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                                <div class="post" id="post-${post.post_id}">
-                                    <div class="comment-section-header">
-                                        <a class="btn btn-link ml-2 text-info" onclick="toggleComments(${post.post_id})">
-                                            <span id="comment-count-${post.post_id}">${commentText}</span>
-                                        </a>
-                                    </div>
-                                    <div class="comment-section mt-3 ml-3 mr-2" id="comments-${post.post_id}" style="display: none; padding: 10px;">
-                                        <!-- Comments will be dynamically loaded here -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    postsContainer.innerHTML += postHTML;
-
-                    fetchComments(post.post_id);
-                });
-            } else {
-                postsContainer.innerHTML = '<div class="alert alert-danger ml-3 mr-3"><em>No announcements or updates at the moment. Stay tuned!</em></div>';
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching posts:', error);
-            const postsContainer = document.getElementById('postsContainer');
-            postsContainer.innerHTML = '<p>Failed to fetch posts. Please try again later.</p>';
-        });
-}
 
             
 
             // Function to fetch comments for a post
-            function fetchComments(postId) {
+function fetchComments(postId) {
     const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
 
     fetch(`/esas/esas_student/apis/comments-api.php?post_id=${postId}&club_id=${clubId}`)
@@ -402,10 +403,17 @@ try {
                         <div class="comment d-flex align-items-start mb-2">
                             <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
                             <div class="comsec">
-                                <p class="student-name mb-1"><strong>${comment.student_name}</strong><br>${comment.comment}</p>
+                                <p class="student-name mb-1">
+                                    <strong>${comment.student_name}</strong><br>
+                                    <span id="comment-text-${comment.id}">${comment.comment}</span>
+                                    <button class="btn btn-link btn-sm p-0" style="margin-top: -2px; margin-left: 5px;" onclick="editComment(${comment.id})">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                </p>
                                 <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
                             </div>
                         </div>
+
                     `;
                 }).join('');
                 commentCount.textContent = data.comments.length === 1 ? '1 comment' : `${data.comments.length} comments`;
@@ -415,6 +423,7 @@ try {
         })
         .catch(error => console.error('Error fetching comments:', error));
 }
+
 
 
             // Function to toggle comments visibility
