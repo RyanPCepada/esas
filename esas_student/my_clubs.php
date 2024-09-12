@@ -36,7 +36,7 @@
             border: none;
             border-radius: 15px;
             overflow: hidden;
-            /* box-shadow: 0 5px 10px rgba(0, 0, 0, .5); */
+            box-shadow: 0 5px 10px rgba(0, 0, 0, .5);
             margin: 10px;
             display: flex;
             justify-content: center;

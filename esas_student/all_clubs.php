@@ -17,7 +17,7 @@
             width: 100%;
             /* max-width: 600px; */
             margin: 0 auto;
-            padding: 50px;
+            padding: 0px;
         }
         
         .card-img-only-all {
@@ -30,8 +30,8 @@
             border: none;
             border-radius: 15px;
             overflow: hidden;
-            /* box-shadow: 0 5px 10px rgba(0, 0, 0, .5); */
-            margin: 10px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, .5);
+            margin: 10px auto;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -133,7 +133,7 @@
     </style>
 </head>
 <body>
-    <div class="row g-0 h-100 p-3">
+    <div class="row g-0 h-100 p-5">
         <h2 class="text-muted mt-0 mb-5">Student Club Organizations</h2>
         <div class="row g-2 mt-0" id="allClubsContainer">
             <!-- Club cards will be dynamically added here -->
