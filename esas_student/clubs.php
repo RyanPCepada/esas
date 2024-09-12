@@ -100,7 +100,7 @@ try {
                 <hr> -->
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li>
-                        <a href="#" class="nav-link left-sidebar text-dark" id="all-clubs">
+                        <a href="#" class="nav-link left-sidebar text-dark active" id="all-clubs">
                             All Clubs
                         </a>
                     </li>
@@ -143,7 +143,7 @@ try {
                         <div class="row g-0 p-4 px-2 pt-3 h-100">
                             <div class="card">
                                 <div class="card-body">
-                                <!-- DISPLAY CLICKED MENU PAGES HERE --> 
+                                    <!-- DISPLAY CLICKED MENU PAGES HERE --> 
                                 </div>
                             </div>
                         </div>
@@ -169,73 +169,59 @@ try {
 
     <script>
         $(document).ready(function() {
-            // Function to load content based on the clicked menu item
-            function loadPage(page) {
-                $.ajax({
-                    url: page, // Page to load
-                    type: "GET",
-                    success: function(response) {
-                        $('.card-body').html(response); // Load the content into the card body
-                    },
-                    error: function() {
-                        $('.card-body').html('<p>Error loading page.</p>');
-                    }
-                });
-            }
-
-
-            // Function to set default active link and blue background for "All Clubs"
-            function setDefaultActive() {
-                const defaultLink = $('#all-clubs');
-                setActiveMenu(defaultLink); // Ensure "All Clubs" is blue
-            }
-
-            // Load the stored page or default to "All Clubs"
-            function loadStoredPage() {
-                const storedPage = localStorage.getItem('activePage') || 'all_clubs.php'; // Default to "All Clubs"
-                loadPage(storedPage);
-
-                // Determine which link should be active based on the stored page
-                const linkId = storedPage.split('.')[0]; // Derive link ID from page name
-                const activeLink = $('#' + linkId);
-
-                // Set the appropriate button as active
-                setActiveMenu(activeLink);
-            }
-
-            // Event listeners for menu items
-            $('#my-clubs').on('click', function(e) {
-                e.preventDefault();
-                const page = 'my_clubs.php';
-                loadPage(page);
-                localStorage.setItem('activePage', page); // Store the page
-                setActiveMenu(this); // Set the clicked button as active
-            });
-
-            $('#all-clubs').on('click', function(e) {
-                e.preventDefault();
-                const page = 'all_clubs.php';
-                loadPage(page);
-                localStorage.setItem('activePage', page); // Store the page
-                setActiveMenu(this); // Set the clicked button as active
-            });
-
-            $('#club-requests').on('click', function(e) {
-                e.preventDefault();
-                const page = 'club_requests.php';
-                loadPage(page);
-                localStorage.setItem('activePage', page); // Store the page
-                setActiveMenu(this); // Set the clicked button as active
-            });
-
-            // Initialize the page with the stored or default page
-            loadStoredPage();
-            
-            // Ensure "All Clubs" has the default blue background if no page is stored
-            if (!localStorage.getItem('activePage')) {
-                setDefaultActive();
+    // Function to load content based on the clicked menu item
+    function loadPage(page) {
+        $.ajax({
+            url: page, // Page to load
+            type: "GET",
+            success: function(response) {
+                $('.card-body').html(response); // Load the content into the card body
+            },
+            error: function() {
+                $('.card-body').html('<p>Error loading page.</p>');
             }
         });
+    }
+
+    // Function to set the active link styling
+    function setActiveMenu(activeLink) {
+        $('.nav-link').removeClass('active'); // Remove 'active' from all links
+        $(activeLink).addClass('active'); // Add 'active' to the clicked link
+    }
+
+    // Load "All Clubs" as default page when the page is opened
+    function loadDefaultPage() {
+        const page = 'all_clubs.php'; // Default to "All Clubs"
+        loadPage(page);
+        setActiveMenu($('#all-clubs')); // Ensure "All Clubs" is active
+    }
+
+    // Event listeners for menu items
+    $('#my-clubs').on('click', function(e) {
+        e.preventDefault();
+        const page = 'my_clubs.php';
+        loadPage(page);
+        setActiveMenu(this); // Set the clicked button as active
+    });
+
+    $('#all-clubs').on('click', function(e) {
+        e.preventDefault();
+        const page = 'all_clubs.php';
+        loadPage(page);
+        setActiveMenu(this); // Set the clicked button as active
+    });
+
+    $('#club-requests').on('click', function(e) {
+        e.preventDefault();
+        const page = 'club_requests.php';
+        loadPage(page);
+        setActiveMenu(this); // Set the clicked button as active
+    });
+
+    // Initialize the page with "All Clubs" as the default
+    loadDefaultPage();
+});
+
     </script>
 
 
