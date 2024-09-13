@@ -89,6 +89,7 @@ try {
         .csg-officers-row, .sbo-officers-row {
             padding: 2px !important;
         }
+        
 
     </style>
 </head>
@@ -166,7 +167,7 @@ try {
                             <h5>SBO Officers</h5>
                             <?php foreach ($sboOfficers as $officer): ?>
                                 <div class="sbo-officers-row col-md-1 text-center align-items-center justify-content-center">
-                                    <div class="card card-sbo-officer text-center" style="width: auto; height: auto; margin: auto; background-color: white;">
+                                    <div class="card card-sbo-officer text-center" style="width: auto; height: auto; margin: auto; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
                                         <div class="text-center d-flex align-items-center justify-content-center" style="line-height: 1.1; height: 28px; margin-top: 3px;">
                                             <h7 style="font-size: 12px;"><?php echo $officer['position']; ?></h7>
                                         </div>
@@ -185,7 +186,7 @@ try {
                             <h5>CSG Officers</h5>
                             <?php foreach ($csgOfficers as $officer): ?>
                                 <div class="csg-officers-row col-md-1 text-center align-items-center justify-content-center">
-                                    <div class="card card-csg-officer text-center" style="width: auto; height: auto; margin: auto; background-color: white;">
+                                    <div class="card card-csg-officer text-center" style="width: auto; height: auto; margin: auto; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
                                         <div class="text-center d-flex align-items-center justify-content-center" style="line-height: 1.1; height: 30px; margin-top: 3px;">
                                             <h7 style="font-size: 12px;"><?php echo $officer['position']; ?></h7>
                                         </div>
