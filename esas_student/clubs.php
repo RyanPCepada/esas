@@ -89,7 +89,36 @@ try {
         .csg-officers-row, .sbo-officers-row {
             padding: 2px !important;
         }
-        
+
+
+
+        .card-sbo-officer, .card-csg-officer {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95); /* Start from below and slightly scaled down */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out; /* Smooth transition */
+        }
+
+        .card-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1); /* End at normal position and scale */
+        }
+
+        @keyframes waveIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateY(-10px) scale(1.05); /* Peak of the wave */
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+
 
     </style>
 </head>
@@ -291,6 +320,17 @@ try {
 
 
     <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.card-sbo-officer, .card-csg-officer');
+
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.animation = `waveIn 0.6s ease-out forwards`;
+        }, index * 100); // Adjust the delay as needed (e.g., 100ms per card)
+    });
+});
+
+
         $(document).ready(function() {
             $('.delprreq').click(function(e) {
                 e.stopPropagation();
