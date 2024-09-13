@@ -91,35 +91,6 @@ try {
         }
 
 
-
-        .card-sbo-officer, .card-csg-officer {
-            opacity: 0;
-            transform: translateY(20px) scale(0.95); /* Start from below and slightly scaled down */
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out; /* Smooth transition */
-        }
-
-        .card-visible {
-            opacity: 1;
-            transform: translateY(0) scale(1); /* End at normal position and scale */
-        }
-
-        @keyframes waveIn {
-            0% {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
-            }
-            50% {
-                opacity: 0.5;
-                transform: translateY(-10px) scale(1.05); /* Peak of the wave */
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-
-
     </style>
 </head>
 <body>
@@ -260,58 +231,154 @@ try {
 
     <script>
         $(document).ready(function() {
-    // Function to load content based on the clicked menu item
-    function loadPage(page) {
-        $.ajax({
-            url: page, // Page to load
-            type: "GET",
-            success: function(response) {
-                $('.card-body').html(response); // Load the content into the card body
-            },
-            error: function() {
-                $('.card-body').html('<p>Error loading page.</p>');
+            // Function to load content based on the clicked menu item
+            function loadPage(page) {
+                $.ajax({
+                    url: page, // Page to load
+                    type: "GET",
+                    success: function(response) {
+                        $('.card-body').html(response); // Load the content into the card body
+                    },
+                    error: function() {
+                        $('.card-body').html('<p>Error loading page.</p>');
+                    }
+                });
             }
+
+            // Function to set the active link styling
+            function setActiveMenu(activeLink) {
+                $('.nav-link').removeClass('active'); // Remove 'active' from all links
+                $(activeLink).addClass('active'); // Add 'active' to the clicked link
+            }
+
+            // Load "All Clubs" as default page when the page is opened
+            function loadDefaultPage() {
+                const page = 'all_clubs.php'; // Default to "All Clubs"
+                loadPage(page);
+                setActiveMenu($('#all-clubs')); // Ensure "All Clubs" is active
+            }
+
+            // Event listeners for menu items
+            $('#my-clubs').on('click', function(e) {
+                e.preventDefault();
+                const page = 'my_clubs.php';
+                loadPage(page);
+                setActiveMenu(this); // Set the clicked button as active
+            });
+
+            $('#all-clubs').on('click', function(e) {
+                e.preventDefault();
+                const page = 'all_clubs.php';
+                loadPage(page);
+                setActiveMenu(this); // Set the clicked button as active
+            });
+
+            $('#club-requests').on('click', function(e) {
+                e.preventDefault();
+                const page = 'club_requests.php';
+                loadPage(page);
+                setActiveMenu(this); // Set the clicked button as active
+            });
+
+            // Initialize the page with "All Clubs" as the default
+            loadDefaultPage();
         });
-    }
 
-    // Function to set the active link styling
-    function setActiveMenu(activeLink) {
-        $('.nav-link').removeClass('active'); // Remove 'active' from all links
-        $(activeLink).addClass('active'); // Add 'active' to the clicked link
-    }
 
-    // Load "All Clubs" as default page when the page is opened
-    function loadDefaultPage() {
-        const page = 'all_clubs.php'; // Default to "All Clubs"
-        loadPage(page);
-        setActiveMenu($('#all-clubs')); // Ensure "All Clubs" is active
-    }
 
-    // Event listeners for menu items
-    $('#my-clubs').on('click', function(e) {
-        e.preventDefault();
-        const page = 'my_clubs.php';
-        loadPage(page);
-        setActiveMenu(this); // Set the clicked button as active
-    });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cache the elements
+            const allClubsLink = document.getElementById('all-clubs');
+            const myClubsLink = document.getElementById('my-clubs');
+            const clubRequestsLink = document.getElementById('club-requests');
+            const officersDiv = document.querySelector('.officers-div');
+            const cards = document.querySelectorAll('.card-sbo-officer, .card-csg-officer');
 
-    $('#all-clubs').on('click', function(e) {
-        e.preventDefault();
-        const page = 'all_clubs.php';
-        loadPage(page);
-        setActiveMenu(this); // Set the clicked button as active
-    });
+            function resetWaveAnimation() {
+                // Loop through each card and remove the current animation, then force reflow to re-trigger it
+                cards.forEach(card => {
+                    card.style.animation = 'none';  // Remove the animation
+                    void card.offsetWidth;  // Force reflow (this is critical to reset the animation)
+                    card.style.animation = '';  // Re-apply the animation
+                });
+            }
 
-    $('#club-requests').on('click', function(e) {
-        e.preventDefault();
-        const page = 'club_requests.php';
-        loadPage(page);
-        setActiveMenu(this); // Set the clicked button as active
-    });
+            function updateVisibility() {
+                if (allClubsLink.classList.contains('active')) {
+                    officersDiv.style.display = 'block'; // Show officers div
 
-    // Initialize the page with "All Clubs" as the default
-    loadDefaultPage();
-});
+                    // Apply the animation waveIn dynamically
+                    cards.forEach((card, index) => {
+                        // Reset styles
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px) scale(0.95)';
+                        card.style.transition = 'none'; // Disable transition for reset
+
+                        // Trigger a reflow to apply reset styles
+                        void card.offsetWidth;
+
+                        // Re-enable transitions
+                        card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+
+                        // Apply animation with a delay (wave effect)
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0) scale(1)';
+                            card.style.animation = `waveIn 0.6s ease-out forwards`;
+                        }, index * 100); // Delay per card to create the wave effect
+                    });
+                } else {
+                    officersDiv.style.display = 'none'; // Hide officers div
+                }
+            }
+
+            // Add keyframes dynamically
+            const styleSheet = document.createElement('style');
+            styleSheet.type = 'text/css';
+            styleSheet.innerHTML = `
+                @keyframes waveIn {
+                    0% {
+                        opacity: 0;
+                        transform: translateY(20px) scale(0.95);
+                    }
+                    50% {
+                        opacity: 0.5;
+                        transform: translateY(-10px) scale(1.05); /* Peak of the wave */
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: translateY(0) scale(1);
+                    }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+
+            // Initial visibility setup
+            updateVisibility();
+
+            // Add click event listeners to update the active state and visibility
+            allClubsLink.addEventListener('click', function() {
+                allClubsLink.classList.add('active');
+                myClubsLink.classList.remove('active');
+                clubRequestsLink.classList.remove('active');
+                resetWaveAnimation(); // Reset the wave animation before updating visibility
+                updateVisibility(); // Re-trigger the wave effect when switching to "All Clubs"
+            });
+
+            myClubsLink.addEventListener('click', function() {
+                allClubsLink.classList.remove('active');
+                myClubsLink.classList.add('active');
+                clubRequestsLink.classList.remove('active');
+                updateVisibility();
+            });
+
+            clubRequestsLink.addEventListener('click', function() {
+                allClubsLink.classList.remove('active');
+                myClubsLink.classList.remove('active');
+                clubRequestsLink.classList.add('active');
+                updateVisibility();
+            });
+        });
 
     </script>
 
@@ -320,17 +387,6 @@ try {
 
 
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const cards = document.querySelectorAll('.card-sbo-officer, .card-csg-officer');
-
-    cards.forEach((card, index) => {
-        setTimeout(() => {
-            card.style.animation = `waveIn 0.6s ease-out forwards`;
-        }, index * 100); // Adjust the delay as needed (e.g., 100ms per card)
-    });
-});
-
-
         $(document).ready(function() {
             $('.delprreq').click(function(e) {
                 e.stopPropagation();
