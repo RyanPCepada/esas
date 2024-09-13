@@ -38,10 +38,20 @@ try {
 
 
 try {
-    // Fetch SBO Officers
-    $sboStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'SBO'");
-    $sboStmt->execute();
-    $sboOfficers = $sboStmt->fetchAll(PDO::FETCH_ASSOC);
+    // Fetch SBO-CCS Officers
+    $sboCCSStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'SBO' AND department = 'CCS'");
+    $sboCCSStmt->execute();
+    $sboCCSOfficers = $sboCCSStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fetch SBO-TEP Officers
+    $sboTEPStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'SBO' AND department = 'TEP'");
+    $sboTEPStmt->execute();
+    $sboTEPOfficers = $sboTEPStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fetch SBO-BSBA Officers
+    $sboBSBAStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'SBO' AND department = 'BSBA'");
+    $sboBSBAStmt->execute();
+    $sboBSBAOfficers = $sboBSBAStmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Fetch CSG Officers
     $csgStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'CSG'");
@@ -56,7 +66,7 @@ try {
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
@@ -80,14 +90,11 @@ try {
           background-color: #e9ecef;
         }
         
-        .card-body {
+        .card-body { 
             width: 100%;
             /* max-width: 600px; */
             margin: 0 auto;
             padding: 50px;
-        }
-        .csg-officers-row, .sbo-officers-row {
-            padding: 2px !important;
         }
 
 
@@ -164,16 +171,18 @@ try {
 
                     <div class="officers-div pt-3">
                         <div class="row g-0 p-1 px-2 pt-1">
-                            <h5>SBO Officers</h5>
-                            <?php foreach ($sboOfficers as $officer): ?>
-                                <div class="sbo-officers-row col-md-1 text-center align-items-center justify-content-center">
-                                    <div class="card card-sbo-officer text-center" style="width: auto; height: auto; margin: auto; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
-                                        <div class="text-center d-flex align-items-center justify-content-center" style="line-height: 1.1; height: 28px; margin-top: 3px;">
-                                            <h7 style="font-size: 12px;"><?php echo $officer['position']; ?></h7>
+                            <h5>CSG Officers</h5>
+                            <?php foreach ($csgOfficers as $officer): ?>
+                                <div class="csg-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
+                                    <div class="card card-csg-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
+                                        <!-- Profile Picture -->
+                                        <div class="profile-pic" style="margin-right: 10px;">
+                                            <img src="/esas/esas_admin/images/<?php echo $officer['profilePic']; ?>" alt="Profile Pic" style="width: 50px; height: 50px; border-radius: 50%;">
                                         </div>
-                                        <img src="/esas/esas_admin/images/<?php echo $officer['profilePic']; ?>" alt="Profile Pic" style="width: 60px; height: 60px; border-radius: 50%; margin: auto;">
-                                        <div class="text-center d-flex align-items-center justify-content-center" style="line-height: 1.1; height: 40px;">
-                                            <h7 style="font-size: 12px;"><?php echo $officer['firstName'] . ' ' . $officer['lastName']; ?></h7>
+                                        <!-- Officer Details (Name and Position) -->
+                                        <div class="officer-details text-left" style="line-height: 1.2; max-width: 80px;">
+                                            <h6 style="font-size: 12px; margin-bottom: 2px;"><?php echo $officer['firstName'] . ' ' . $officer['lastName']; ?></h6>
+                                            <p style="font-size: 10px; margin: 0;"><?php echo $officer['position']; ?></p>
                                         </div>
                                     </div>
                                 </div>
@@ -183,22 +192,55 @@ try {
                         <div class="mt-2"></div>
 
                         <div class="row g-0 p-1 px-2 pt-1">
-                            <h5>CSG Officers</h5>
-                            <?php foreach ($csgOfficers as $officer): ?>
-                                <div class="csg-officers-row col-md-1 text-center align-items-center justify-content-center">
-                                    <div class="card card-csg-officer text-center" style="width: auto; height: auto; margin: auto; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
-                                        <div class="text-center d-flex align-items-center justify-content-center" style="line-height: 1.1; height: 30px; margin-top: 3px;">
-                                            <h7 style="font-size: 12px;"><?php echo $officer['position']; ?></h7>
+                            <h5>SBO Officers</h5>
+                            <?php foreach ($sboCCSOfficers as $CCSofficer): ?>
+                                <div class="sbo-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
+                                    <div class="card card-sbo-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: #A6E22E; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
+                                        <!-- Profile Picture -->
+                                        <div class="profile-pic" style="margin-right: 10px;">
+                                            <img src="/esas/esas_admin/images/<?php echo $CCSofficer['profilePic']; ?>" alt="Profile Pic" style="width: 50px; height: 50px; border-radius: 50%;">
                                         </div>
-                                        <img src="/esas/esas_admin/images/<?php echo $officer['profilePic']; ?>" alt="Profile Pic" style="width: 60px; height: 60px; border-radius: 50%; margin: auto;">
-                                        <div class="text-center d-flex align-items-center justify-content-center" style="line-height: 1.1; height: 40px;">
-                                            <h7 style="font-size: 12px;"><?php echo $officer['firstName'] . ' ' . $officer['lastName']; ?></h7>
+                                        <!-- Officer Details (Name and Position) -->
+                                        <div class="officer-details text-left" style="line-height: 1.2; max-width: 80px;">
+                                            <h6 style="font-size: 12px; margin-bottom: 2px;"><?php echo $CCSofficer['firstName'] . ' ' . $CCSofficer['lastName']; ?></h6>
+                                            <p style="font-size: 10px; margin: 0;"><?php echo $CCSofficer['position']; ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                            <?php foreach ($sboTEPOfficers as $TEPofficer): ?>
+                                <div class="sbo-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
+                                    <div class="card card-sbo-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: #6A8CCF; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
+                                        <!-- Profile Picture -->
+                                        <div class="profile-pic" style="margin-right: 10px;">
+                                            <img src="/esas/esas_admin/images/<?php echo $TEPofficer['profilePic']; ?>" alt="Profile Pic" style="width: 50px; height: 50px; border-radius: 50%;">
+                                        </div>
+                                        <!-- Officer Details (Name and Position) -->
+                                        <div class="officer-details text-left" style="line-height: 1.2; max-width: 80px;">
+                                            <h6 style="font-size: 12px; margin-bottom: 2px;"><?php echo $TEPofficer['firstName'] . ' ' . $TEPofficer['lastName']; ?></h6>
+                                            <p style="font-size: 10px; margin: 0;"><?php echo $TEPofficer['position']; ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                            <?php foreach ($sboBSBAOfficers as $BSBAofficer): ?>
+                                <div class="sbo-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
+                                    <div class="card card-sbo-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: #FFF176; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
+                                        <!-- Profile Picture -->
+                                        <div class="profile-pic" style="margin-right: 10px;">
+                                            <img src="/esas/esas_admin/images/<?php echo $BSBAofficer['profilePic']; ?>" alt="Profile Pic" style="width: 50px; height: 50px; border-radius: 50%;">
+                                        </div>
+                                        <!-- Officer Details (Name and Position) -->
+                                        <div class="officer-details text-left" style="line-height: 1.2; max-width: 80px;">
+                                            <h6 style="font-size: 12px; margin-bottom: 2px;"><?php echo $BSBAofficer['firstName'] . ' ' . $BSBAofficer['lastName']; ?></h6>
+                                            <p style="font-size: 10px; margin: 0;"><?php echo $BSBAofficer['position']; ?></p>
                                         </div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
+
                     
                     <div id="divpr_requesdetails" class="table-responsive px-0">
                         <div class="row g-0 p-4 px-2 pt-3 h-100">
