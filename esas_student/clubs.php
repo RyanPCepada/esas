@@ -32,6 +32,24 @@ try {
     // Handle database connection or query error
     die("Database error: " . $e->getMessage());
 }
+
+
+
+
+
+try {
+    // Fetch SBO Officers
+    $sboStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'SBO'");
+    $sboStmt->execute();
+    $sboOfficers = $sboStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fetch CSG Officers
+    $csgStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'CSG'");
+    $csgStmt->execute();
+    $csgOfficers = $csgStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+}
 ?>
 
 <!DOCTYPE html>
@@ -68,6 +86,9 @@ try {
             margin: 0 auto;
             padding: 50px;
         }
+        .csg-officers-row, .sbo-officers-row {
+            padding: 2px !important;
+        }
 
     </style>
 </head>
@@ -92,54 +113,93 @@ try {
             <!-- LEFT SIDEBAR -->
             <div class="col-12 col-md-2 ps-0 pt-3 border-end">
 
-            <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
-                <!-- <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none text-dark">
-                <svg class="bi pe-none me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
-                <span class="fs-4"><h1><i class="fa fa-university text-primary"></i></h1></span>
-                </a>
-                <hr> -->
-                <ul class="nav nav-pills flex-column mb-auto">
-                    <li>
-                        <a href="#" class="nav-link left-sidebar text-dark active" id="all-clubs">
-                            All Clubs
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
-                            My Clubs
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-link left-sidebar text-dark" id="club-requests">
-                            My Club Requests
-                        </a>
-                    </li>
-                </ul>
-
-                <!-- <hr>
-                <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
-                        <strong>mdo</strong>
+                <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
+                    <!-- <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none text-dark">
+                    <svg class="bi pe-none me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+                    <span class="fs-4"><h1><i class="fa fa-university text-primary"></i></h1></span>
                     </a>
-                    <ul class="dropdown-menu text-small shadow">
-                        <li><a class="dropdown-item" href="#">New project...</a></li>
-                        <li><a class="dropdown-item" href="#">Settings</a></li>
-                        <li><a class="dropdown-item" href="#">Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Sign out</a></li>
+                    <hr> -->
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li>
+                            <a href="#" class="nav-link left-sidebar text-dark active" id="all-clubs">
+                                All Clubs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                                My Clubs
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link left-sidebar text-dark" id="club-requests">
+                                My Club Requests
+                            </a>
+                        </li>
                     </ul>
-                </div> -->
-            </div>
+
+                    <!-- <hr>
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                            <strong>mdo</strong>
+                        </a>
+                        <ul class="dropdown-menu text-small shadow">
+                            <li><a class="dropdown-item" href="#">New project...</a></li>
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Sign out</a></li>
+                        </ul>
+                    </div> -->
+                </div>
 
             </div>
             <!-- LEFT SIDEBAR END -->
 
             
             <!-- MAINPAGE BAR -->
-            <div class="col-12 col-md-10 bg-lgrey">
+            <div class="col-12 col-md-10 bg-lgrey auto-scroll">
                 <div class="row g-0 h-100">
-                    <div id="divpr_requesdetails" class="table-responsive px-0 auto-scroll">
+
+                    <div class="officers-div pt-3">
+                        <div class="row g-0 p-1 px-2 pt-1">
+                            <h5>SBO Officers</h5>
+                            <?php foreach ($sboOfficers as $officer): ?>
+                                <div class="sbo-officers-row col-md-1 text-center align-items-center justify-content-center">
+                                    <div class="card card-sbo-officer text-center" style="width: auto; height: auto; margin: auto; background-color: white;">
+                                        <div class="text-center d-flex align-items-center justify-content-center" style="line-height: 1.1; height: 28px; margin-top: 3px;">
+                                            <h7 style="font-size: 12px;"><?php echo $officer['position']; ?></h7>
+                                        </div>
+                                        <img src="/esas/esas_admin/images/<?php echo $officer['profilePic']; ?>" alt="Profile Pic" style="width: 60px; height: 60px; border-radius: 50%; margin: auto;">
+                                        <div class="text-center d-flex align-items-center justify-content-center" style="line-height: 1.1; height: 40px;">
+                                            <h7 style="font-size: 12px;"><?php echo $officer['firstName'] . ' ' . $officer['lastName']; ?></h7>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div class="mt-2"></div>
+
+                        <div class="row g-0 p-1 px-2 pt-1">
+                            <h5>CSG Officers</h5>
+                            <?php foreach ($csgOfficers as $officer): ?>
+                                <div class="csg-officers-row col-md-1 text-center align-items-center justify-content-center">
+                                    <div class="card card-csg-officer text-center" style="width: auto; height: auto; margin: auto; background-color: white;">
+                                        <div class="text-center d-flex align-items-center justify-content-center" style="line-height: 1.1; height: 30px; margin-top: 3px;">
+                                            <h7 style="font-size: 12px;"><?php echo $officer['position']; ?></h7>
+                                        </div>
+                                        <img src="/esas/esas_admin/images/<?php echo $officer['profilePic']; ?>" alt="Profile Pic" style="width: 60px; height: 60px; border-radius: 50%; margin: auto;">
+                                        <div class="text-center d-flex align-items-center justify-content-center" style="line-height: 1.1; height: 40px;">
+                                            <h7 style="font-size: 12px;"><?php echo $officer['firstName'] . ' ' . $officer['lastName']; ?></h7>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    
+                    <div id="divpr_requesdetails" class="table-responsive px-0">
                         <div class="row g-0 p-4 px-2 pt-3 h-100">
                             <div class="card">
                                 <div class="card-body">
@@ -148,6 +208,7 @@ try {
                             </div>
                         </div>
                     </div>
+                    
                 </div>
             </div>
             <!-- MAINPAGE BAR END -->
