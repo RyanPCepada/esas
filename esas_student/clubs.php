@@ -97,6 +97,20 @@ try {
             padding: 50px;
         }
 
+        /* Default for larger screens (6 cards per row) */
+        .sbo-officers-row, .csg-officers-row {
+            flex: 0 0 16.66%; /* 100% / 6 = 16.66% width per card */
+            max-width: 16.66%;
+        }
+
+        /* Media query for mobile screens (2 cards per row) */
+        @media (max-width: 768px) {
+            .sbo-officers-row, .csg-officers-row {
+                flex: 0 0 50%; /* 100% / 2 = 50% width per card */
+                max-width: 50%;
+            }
+        }
+
 
     </style>
 </head>
