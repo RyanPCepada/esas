@@ -86,10 +86,10 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eSAS - Student Home</title>
     <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
 
     
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
@@ -246,23 +246,17 @@ try {
             }
 
         }
+
+        body.modal-open {
+            padding-right: 0 !important;
+        }
+        /* html {
+            overflow-y: scroll;
+        } */
+
     </style>
 </head>
 <body>
-    <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
-        <a class="navbar-brand ps-2" href="#">
-            <img src="../assets/img/nbsclogo.png" style="height: 0.3in;">
-            NBSC SIS</a>
-        </button>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="navbar-collapse collapse hide" id="main_nav">
-            <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
-                <php include 'nav/nav_main.php' ?>
-            </div>
-        </div>
-    </nav> -->
 
 
     <div class="wrapper">
@@ -291,6 +285,17 @@ try {
             </div>
         </div>
     </div>
+
+
+
+
+
+
+ 
+    
+
+
+
 
      <!-- <?php include 'assets/components/modals.php' ?> -->
      <script src="../assets/js/jquery.dataTables.min.js"></script>
@@ -387,43 +392,92 @@ try {
 
             
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
             // Function to fetch comments for a post
-function fetchComments(postId) {
-    const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
+            function fetchComments(postId) {
+                const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
 
-    fetch(`/esas/esas_student/apis/comments-api.php?post_id=${postId}&club_id=${clubId}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Fetched comments:', data);
-            if (data.success) {
-                const commentsSection = document.getElementById(`comments-${postId}`);
-                const commentCount = document.getElementById(`comment-count-${postId}`);
-                commentsSection.innerHTML = data.comments.map(comment => {
-                    const [date, time] = comment.dateAdded.split(' ');
-                    return `
-                        <div class="comment d-flex align-items-start mb-2">
-                            <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
-                            <div class="comsec">
-                                <p class="student-name mb-1">
-                                    <strong>${comment.student_name}</strong><br>
-                                    <span id="comment-text-${comment.id}">${comment.comment}</span>
-                                    <button class="btn btn-link btn-sm p-0" style="margin-top: -2px; margin-left: 5px;" onclick="editComment(${comment.id})">
-                                        <i class="fa fa-edit"></i>
-                                    </button>
-                                </p>
-                                <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
-                            </div>
-                        </div>
-
-                    `;
-                }).join('');
-                commentCount.textContent = data.comments.length === 1 ? '1 comment' : `${data.comments.length} comments`;
-            } else {
-                console.error(data.message);
+                fetch(`/esas/esas_student/apis/comments-api.php?post_id=${postId}&club_id=${clubId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Fetched comments:', data);
+                        if (data.success) {
+                            const commentsSection = document.getElementById(`comments-${postId}`);
+                            const commentCount = document.getElementById(`comment-count-${postId}`);
+                            commentsSection.innerHTML = data.comments.map(comment => {
+                                const [date, time] = comment.dateAdded.split(' ');
+                                return `
+                                    <div class="comment d-flex align-items-start mb-2">
+                                        <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
+                                        <div class="comsec">
+                                            <p class="student-name mb-1">
+                                                <strong>${comment.student_name}</strong><br>
+                                                <span id="comment-text-${comment.id}">${comment.comment}</span>
+                                                <button class="btn btn-link btn-sm p-0" style="margin-top: -2px; margin-left: 5px;" data-comment-id="${comment.id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
+                                                    <i class="fa fa-edit"></i>
+                                                </button>
+                                            </p>
+                                            <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('');
+                            commentCount.textContent = data.comments.length === 1 ? '1 comment' : `${data.comments.length} comments`;
+                        } else {
+                            console.error(data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error fetching comments:', error));
             }
-        })
-        .catch(error => console.error('Error fetching comments:', error));
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -441,6 +495,14 @@ function fetchComments(postId) {
             // Call fetchPosts on page load
             fetchPosts();
         });
+
+
+
+        
+
+
+        
+
     </script>
 
     <script>
@@ -465,40 +527,55 @@ function fetchComments(postId) {
         });
     </script>
 
-</body>
 
-<!-- <footer class="navbar-darkblue text-white mt-1 p-4 text-center">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <h5>Contact Us</h5>
-                <ul class="list-unstyled">
-                    <li>Email: sas@nbsc.edu.ph</li>
-                    <li>Phone: 0927 669 0090</li>
-                </ul>
+
+
+
+
+<!-- EDIT COMMENT MODAL -->
+<div class="modal fade" id="editCommentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content editCommentModal">
+            <div class="modal-header">
+                <h6 class="mb-0">Edit Comment</h6>
             </div>
-            <div class="col-md-4">
-                <h5>Follow Us</h5>
-                <ul class="list-unstyled">
-                    <li><a href="https://www.facebook.com/nbscstudentaffairsandservices" class="text-white"><i class="fa fa-facebook-square"></i> Facebook</a></li>
-                    <li><a href="#" class="text-white"><i class="fa fa-twitter-square"></i>Twitter</a></li>
-                    <li><a href="#" class="text-white"><i class="fa fa-instagram"></i>Instagram</a></li>
-                </ul>
-            </div>
-            <div class="col-md-4">
-                <h5>Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="http://nbsc.edu.ph" class="text-white">NBSC Website</a></li>
-                    <li><a href="https://nbsc.edu.ph/student-affairs-services/" class="text-white">SAS Website</a></li>
-                    <li><a href="#" class="text-white">About Us</a></li>
-                    <li><a href="#" class="text-white">Privacy Policy</a></li>
-                    <li><a href="#" class="text-white">Terms of Service</a></li>
-                </ul>
+            <div class="modal-body">
+                <form action="../esas_student/actions/edit_comment_action.php" method="post">
+                    <div class="row">
+                        <div class="col-12">
+                            <textarea id="editCommentText" name="new_comment" class="form-control form-control-sm" rows="3" required></textarea>
+                            <input type="hidden" name="comment_id" id="editCommentId">
+                        </div>
+                    </div>
+                    <div class="modal-footer py-0">
+                        <button type="button" class="btn btn-sm btn-default" data-bs-dismiss="modal">Cancel</button>
+                        <input type="submit" class="btn btn-primary" value="Submit">
+                    </div>
+                </form>
             </div>
         </div>
-        <hr>
-        <p class="mb-0">© 2024 Student Organization Club Membership and Information System. All rights reserved.</p>
     </div>
-</footer> -->
+</div>
+
+<script>
+    // Function to open the edit comment modal and populate fields
+    function openEditCommentModal(button) {
+        const commentId = button.getAttribute('data-comment-id');
+        const commentText = button.getAttribute('data-comment-text');
+
+        console.log('Opening modal for Comment ID:', commentId); // Debugging output
+
+        // Set the comment text and ID in the modal fields
+        document.getElementById('editCommentText').value = commentText;
+        document.getElementById('editCommentId').value = commentId;
+
+        // Show the modal
+        $('#editCommentModal').modal('show');
+    }
+</script>
+
+
+
+</body>
 
 </html>
