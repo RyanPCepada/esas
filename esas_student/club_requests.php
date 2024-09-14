@@ -216,17 +216,17 @@ try {
                     <ul class="nav nav-pills flex-column mb-auto">
                         <li>
                             <a href="../esas_student/all_clubs.php" class="nav-link left-sidebar text-dark" id="all-clubs">
-                                All Clubs
+                                <i class="fas fa-university"></i> All Clubs
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
-                                My Clubs
+                                <i class="fas fa-user"></i> My Clubs
                             </a>
                         </li>
                         <li>
                             <a href="../esas_student/club_requests.php" class="nav-link left-sidebar text-dark active" id="club-requests">
-                                My Club Requests
+                                <i class="fas fa-file-alt"></i> My Club Requests
                             </a>
                         </li>
                     </ul>
