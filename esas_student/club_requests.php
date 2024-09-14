@@ -185,6 +185,12 @@ try {
         .card-container:nth-child(3) {
             animation-delay: 0.2s;
         }
+
+
+        
+        body.modal-open {
+            padding-right: 0 !important;
+        }
     </style>
 </head>
 
@@ -244,8 +250,8 @@ try {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row g-0">
-                                        <div class="d-flex justify-content-between align-items-center p-3 mb-5">
-                                            <h2 class="text-muted mt-0 mb-0">My Club Requests</h2>
+                                        <div class="d-flex align-items-center justify-content-end pb-3 mb-2">
+                                            <!-- <h2 class="text-muted mt-0 mb-0">My Club Requests</h2> -->
                                             <button type="button" class="btn btn-primary" id="request-club-btn" data-bs-toggle="modal" data-bs-target="#requestClubModal" style="width: 210px; border-radius: 5px;">
                                                 Request for a Club
                                             </button>
