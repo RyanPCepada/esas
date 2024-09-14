@@ -1,17 +1,12 @@
 <?php
+// Start the session to access the session variables
+session_start();
+
 // Include database configuration file
 require_once '../../config.php';
 
-// Start the session
-session_start();
-
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
-
-// Check if the user is logged in and session data is available
-if (!isset($_SESSION['student_id']) || !isset($_SESSION['registration_id'])) {
-    die("You must be logged in to submit a club request.");
-}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
@@ -20,24 +15,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $activities = $_POST['activities'] ?? '';
     $status = 'pending'; // Default status for a new request
     $dateRequested = date('Y-m-d H:i:s'); // Current timestamp
-    
+
+    // Retrieve student_id from the session
+    if (isset($_SESSION['student_id'])) {
+        $student_id = $_SESSION['student_id'];
+    } else {
+        die("Error: Student ID not found in the session.");
+    }
+
+    // You'll need to retrieve the registration_id dynamically
+    // Placeholder value for registration_id (make sure to adjust based on your logic)
+    $registration_id = 456; // Example registration ID
 
     // File upload logic
     $coverPhoto = '';
     $targetDir = "/esas/esas_student/images/"; // Directory for uploaded images
     $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
-    
+
     if (isset($_FILES['coverPhoto']) && $_FILES['coverPhoto']['error'] == 0) {
         $fileName = basename($_FILES['coverPhoto']['name']);
         $fileSize = $_FILES['coverPhoto']['size'];
         $fileTmpName = $_FILES['coverPhoto']['tmp_name'];
         $fileType = pathinfo($fileName, PATHINFO_EXTENSION);
-        
+
         // Validate file type and size (10MB limit)
         if (in_array(strtolower($fileType), $allowedTypes) && $fileSize <= 10 * 1024 * 1024) {
             $newFileName = uniqid() . "." . $fileType; // Generate unique file name
             $targetFilePath = $_SERVER['DOCUMENT_ROOT'] . $targetDir . $newFileName;
-            
+
             if (move_uploaded_file($fileTmpName, $targetFilePath)) {
                 $coverPhoto = $newFileName; // Store the file name for the database
             } else {
@@ -55,6 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES (:clubName, :description, :activities, :status, :coverPhoto, :dateRequested, :student_id, :registration_id)";
 
     try {
+        // Prepare the SQL statement
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':clubName', $clubName);
         $stmt->bindParam(':description', $description);
@@ -62,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(':status', $status);
         $stmt->bindParam(':coverPhoto', $coverPhoto);
         $stmt->bindParam(':dateRequested', $dateRequested);
-        $stmt->bindParam(':student_id', $student_id);
+        $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT); // Use student_id from session
         $stmt->bindParam(':registration_id', $registration_id);
 
         // Execute the query
