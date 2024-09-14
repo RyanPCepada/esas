@@ -419,6 +419,7 @@ try {
             // Function to fetch comments for a post
 function fetchComments(postId) {
     const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
+    const currentStudentId = "<?php echo $student_id; ?>"; // Get the current student's ID from PHP
 
     fetch(`/esas/esas_student/apis/comments-api.php?post_id=${postId}&club_id=${clubId}`)
         .then(response => response.json())
@@ -429,17 +430,21 @@ function fetchComments(postId) {
                 const commentCount = document.getElementById(`comment-count-${postId}`);
                 commentsSection.innerHTML = data.comments.map(comment => {
                     const [date, time] = comment.dateAdded.split(' ');
+                    
+                    // Only show the edit button if the comment's student_id matches the current user's student_id
+                    const showEditButton = comment.student_id == currentStudentId ? `
+                        <button class="btn btn-link btn-sm p-0" style="margin-top: -2px; margin-left: 5px;" data-comment-id="${comment.comment_id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
+                            <i class="fa fa-edit"></i>
+                        </button>` : '';
+                    
                     return `
                         <div class="comment d-flex align-items-start mb-2">
                             <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
                             <div class="comsec">
                                 <p class="student-name mb-1">
                                     <strong>${comment.student_name}</strong><br>
-                                    <!--<span id="comment-id-${comment.comment_id}">#${comment.comment_id}</span><br>-->
                                     <span id="comment-text-${comment.comment_id}">${comment.comment}</span>
-                                    <button class="btn btn-link btn-sm p-0" style="margin-top: -2px; margin-left: 5px;" data-comment-id="${comment.comment_id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
-                                        <i class="fa fa-edit"></i>
-                                    </button>
+                                    ${showEditButton} <!-- Conditionally render the edit button -->
                                 </p>
                                 <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
                             </div>
@@ -453,6 +458,7 @@ function fetchComments(postId) {
         })
         .catch(error => console.error('Error fetching comments:', error));
 }
+
 
 // Function to open the edit comment modal and populate fields
 function openEditCommentModal(button) {

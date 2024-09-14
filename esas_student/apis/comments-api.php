@@ -9,8 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if (!empty($post_id)) {
         try {
-            // Fetch comments, student profile pictures, and comment_id
-            $sql = "SELECT c.comment_id, c.comment, c.dateAdded, CONCAT(s.firstName, ' ', s.lastName) as student_name, s.profilePic
+            // Fetch comments, student profile pictures, comment_id, and student_id
+            $sql = "SELECT c.comment_id, c.comment, c.dateAdded, c.student_id, CONCAT(s.firstName, ' ', s.lastName) as student_name, s.profilePic
                     FROM tbl_comments c
                     JOIN tbl_students s ON c.student_id = s.student_id
                     WHERE c.post_id = :post_id
