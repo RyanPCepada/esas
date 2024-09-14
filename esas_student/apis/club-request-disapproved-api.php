@@ -42,8 +42,8 @@ switch ($method) {
 
             echo json_encode($result);
         } else {
-            http_response_code(404);
-            echo json_encode(['error' => 'No disapproved club requests found for this student']);
+            // Return an empty array with a 200 status code
+            echo json_encode([]);
         }
         break;
         
