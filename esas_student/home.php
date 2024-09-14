@@ -414,41 +414,57 @@ try {
             
 
             // Function to fetch comments for a post
-            function fetchComments(postId) {
-                const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
+function fetchComments(postId) {
+    const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
 
-                fetch(`/esas/esas_student/apis/comments-api.php?post_id=${postId}&club_id=${clubId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Fetched comments:', data);
-                        if (data.success) {
-                            const commentsSection = document.getElementById(`comments-${postId}`);
-                            const commentCount = document.getElementById(`comment-count-${postId}`);
-                            commentsSection.innerHTML = data.comments.map(comment => {
-                                const [date, time] = comment.dateAdded.split(' ');
-                                return `
-                                    <div class="comment d-flex align-items-start mb-2">
-                                        <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
-                                        <div class="comsec">
-                                            <p class="student-name mb-1">
-                                                <strong>${comment.student_name}</strong><br>
-                                                <span id="comment-text-${comment.id}">${comment.comment}</span>
-                                                <button class="btn btn-link btn-sm p-0" style="margin-top: -2px; margin-left: 5px;" data-comment-id="${comment.id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                            </p>
-                                            <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('');
-                            commentCount.textContent = data.comments.length === 1 ? '1 comment' : `${data.comments.length} comments`;
-                        } else {
-                            console.error(data.message);
-                        }
-                    })
-                    .catch(error => console.error('Error fetching comments:', error));
+    fetch(`/esas/esas_student/apis/comments-api.php?post_id=${postId}&club_id=${clubId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Fetched comments:', data);
+            if (data.success) {
+                const commentsSection = document.getElementById(`comments-${postId}`);
+                const commentCount = document.getElementById(`comment-count-${postId}`);
+                commentsSection.innerHTML = data.comments.map(comment => {
+                    const [date, time] = comment.dateAdded.split(' ');
+                    return `
+                        <div class="comment d-flex align-items-start mb-2">
+                            <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
+                            <div class="comsec">
+                                <p class="student-name mb-1">
+                                    <strong>${comment.student_name}</strong><br>
+                                    <!--<span id="comment-id-${comment.comment_id}">#${comment.comment_id}</span><br>-->
+                                    <span id="comment-text-${comment.comment_id}">${comment.comment}</span>
+                                    <button class="btn btn-link btn-sm p-0" style="margin-top: -2px; margin-left: 5px;" data-comment-id="${comment.comment_id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                </p>
+                                <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                commentCount.textContent = data.comments.length === 1 ? '1 comment' : `${data.comments.length} comments`;
+            } else {
+                console.error(data.message);
             }
+        })
+        .catch(error => console.error('Error fetching comments:', error));
+}
+
+// Function to open the edit comment modal and populate fields
+function openEditCommentModal(button) {
+    const commentId = button.getAttribute('data-comment-id');
+    const commentText = button.getAttribute('data-comment-text');
+
+    console.log('Opening modal for Comment ID:', commentId); // Debugging output
+
+    // Set the comment text and ID in the modal fields
+    document.getElementById('editCommentText').value = commentText;
+    document.getElementById('editCommentId').value = commentId;
+
+    // Show the modal
+    $('#editCommentModal').modal('show');
+}
 
 
 
