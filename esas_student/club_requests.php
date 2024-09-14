@@ -266,10 +266,10 @@ try {
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <p class="py-2">Please fill out this form and submit your request for a new club.</p>
+                                                        <!-- <p class="py-2">Please fill out this form and submit your request for a new club.</p> -->
                                                         <form id="clubRequestForm" action="../esas_student/actions/club_request_action.php" method="POST" enctype="multipart/form-data">
                                                             <div class="form-group mb-3">
-                                                                <label for="clubName">Club Name</label>
+                                                                <label for="clubName">Club name</label>
                                                                 <input type="text" name="clubName" class="form-control" id="clubName" required>
                                                             </div>
                                                             <div class="form-group mb-3">
@@ -277,11 +277,11 @@ try {
                                                                 <textarea name="description" class="form-control" id="description" rows="3" required></textarea>
                                                             </div>
                                                             <div class="form-group mb-3">
-                                                                <label for="activities">Proposed Activities</label>
+                                                                <label for="activities">Proposed activities</label>
                                                                 <textarea name="activities" class="form-control" id="activities" rows="2"></textarea>
                                                             </div>
                                                             <div class="form-group mb-3">
-                                                                <label for="coverPhoto">Club Cover Photo</label>
+                                                                <label for="coverPhoto">Add a coverphoto</label>
                                                                 <input type="file" name="coverPhoto" class="form-control" id="coverPhoto" required onchange="previewImage(event)">
                                                             </div>
                                                             
