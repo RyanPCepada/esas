@@ -545,6 +545,7 @@ try {
                         <div class="col-12">
                             <textarea id="editCommentText" name="new_comment" class="form-control form-control-sm" rows="3" required></textarea>
                             <input type="hidden" name="comment_id" id="editCommentId">
+                            <input type="hidden" name="club_id" value="<?php echo $club_id; ?>">
                         </div>
                     </div>
                     <div class="modal-footer py-0">

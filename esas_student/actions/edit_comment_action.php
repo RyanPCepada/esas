@@ -6,6 +6,7 @@ require_once "../../config.php";
 $new_comment = "";
 $new_comment_err = "";
 $comment_id = ""; // Handle comment ID
+$club_id = "";
 
 // Start the session
 session_start();
@@ -36,6 +37,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $comment_id = trim($_POST["comment_id"]);
     }
 
+    // Validate club_id
+    if (empty($_POST["club_id"])) {
+        $club_id_err = "Club ID is required.";
+    } else {
+        $club_id = trim($_POST["club_id"]);
+    }
+
     // Check input errors before updating the database
     if (empty($new_comment_err) && empty($comment_id_err)) {
         // Prepare an update statement
@@ -53,8 +61,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Attempt to execute the prepared statement
         if ($stmt->execute()) {
             // Comment updated successfully. Redirect to comments page
-            echo "<script>alert('Comment updated successfully!\\nNew Comment: " . addslashes($new_comment) . "\\nComment ID: " . htmlspecialchars($comment_id) . "');</script>";
-            echo "<script>window.location.href = '/esas/esas_student/home.php';</script>";
+            echo "<script>
+                alert('Comment updated successfully!\\nNew Comment: " . addslashes($new_comment) . "\\nComment ID: " . htmlspecialchars($comment_id) . "');
+                window.location.href = '../home.php?club_id=" . urlencode($club_id) . "';
+            </script>";
             exit();
         } else {
             echo "Oops! Something went wrong. Please try again later.";
