@@ -297,11 +297,11 @@ try {
             <div class="col-12 col-md-10 bg-lgrey auto-scroll">
                 <div class="row g-0 h-100">
 
-                    <div class="officers-div pt-3">
+                    <div class="officers-div pt-2">
                         <div class="row g-0 p-1 px-2 pt-1">
                             <h5 class="ms-2">CSG Officers</h5>
                             <?php foreach ($csgOfficers as $officer): ?>
-                                <div class="csg-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
+                                <div class="csg-officers-row col-md-2 p-1 text-center align-items-center justify-content-center">
                                     <div class="card card-csg-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
                                         <!-- Profile Picture -->
                                         <div class="profile-pic" style="margin-right: 10px;">
@@ -322,7 +322,7 @@ try {
                         <div class="row g-0 p-1 px-2 pt-1">
                             <h5 class="ms-2">SBO Officers</h5>
                             <?php foreach ($sboCCSOfficers as $CCSofficer): ?>
-                                <div class="sbo-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
+                                <div class="sbo-officers-row col-md-2 p-1 text-center align-items-center justify-content-center">
                                     <div class="card card-sbo-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: #A6E22E; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
                                         <!-- Profile Picture -->
                                         <div class="profile-pic" style="margin-right: 10px;">
@@ -337,7 +337,7 @@ try {
                                 </div>
                             <?php endforeach; ?>
                             <?php foreach ($sboTEPOfficers as $TEPofficer): ?>
-                                <div class="sbo-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
+                                <div class="sbo-officers-row col-md-2 p-1 text-center align-items-center justify-content-center">
                                     <div class="card card-sbo-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: #6A8CCF; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
                                         <!-- Profile Picture -->
                                         <div class="profile-pic" style="margin-right: 10px;">
@@ -352,7 +352,7 @@ try {
                                 </div>
                             <?php endforeach; ?>
                             <?php foreach ($sboBSBAOfficers as $BSBAofficer): ?>
-                                <div class="sbo-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
+                                <div class="sbo-officers-row col-md-2 p-1 text-center align-items-center justify-content-center">
                                     <div class="card card-sbo-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: #FFF176; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
                                         <!-- Profile Picture -->
                                         <div class="profile-pic" style="margin-right: 10px;">
@@ -456,110 +456,84 @@ try {
     </script>
 
 
-    <script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cache the elements
+        const allClubsLink = document.getElementById('all-clubs');
+        const myClubsLink = document.getElementById('my-clubs');
+        const clubRequestsLink = document.getElementById('club-requests');
+        const officersDiv = document.querySelector('.officers-div');
+        const csgCards = document.querySelectorAll('.card-csg-officer'); // CSG officer cards
+        const sboCards = document.querySelectorAll('.card-sbo-officer'); // SBO officer cards
 
-        
-document.addEventListener('DOMContentLoaded', function() {
-            // Cache the elements
-            const allClubsLink = document.getElementById('all-clubs');
-            const myClubsLink = document.getElementById('my-clubs');
-            const clubRequestsLink = document.getElementById('club-requests');
-            const officersDiv = document.querySelector('.officers-div');
-            const cards = document.querySelectorAll('.card-sbo-officer, .card-csg-officer');
+        function animateCards(cards) {
+            // Apply the animation waveIn dynamically for a group of cards
+            cards.forEach((card, index) => {
+                // Reset styles
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px) scale(0.95)';
+                card.style.transition = 'none'; // Disable transition for reset
 
-            function resetWaveAnimation() {
-                // Loop through each card and remove the current animation, then force reflow to re-trigger it
-                cards.forEach(card => {
-                    card.style.animation = 'none';  // Remove the animation
-                    void card.offsetWidth;  // Force reflow (this is critical to reset the animation)
-                    card.style.animation = '';  // Re-apply the animation
-                });
+                // Trigger a reflow to apply reset styles
+                void card.offsetWidth;
+
+                // Re-enable transitions
+                card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+
+                // Apply animation with a delay (wave effect)
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0) scale(1)';
+                    card.style.animation = `waveIn 0.6s ease-out forwards`;
+                }, index * 100); // Delay per card to create the wave effect
+            });
+        }
+
+        function updateVisibility() {
+            if (allClubsLink.classList.contains('active')) {
+                officersDiv.style.display = 'block'; // Show officers div
+
+                // Trigger animations for CSG and SBO cards at the same time but separately
+                animateCards(csgCards);  // Animate CSG officers
+                animateCards(sboCards);  // Animate SBO officers
+            } else {
+                officersDiv.style.display = 'none'; // Hide officers div
             }
+        }
 
-            function updateVisibility() {
-                if (allClubsLink.classList.contains('active')) {
-                    officersDiv.style.display = 'block'; // Show officers div
-
-                    // Apply the animation waveIn dynamically
-                    cards.forEach((card, index) => {
-                        // Reset styles
-                        card.style.opacity = '0';
-                        card.style.transform = 'translateY(20px) scale(0.95)';
-                        card.style.transition = 'none'; // Disable transition for reset
-
-                        // Trigger a reflow to apply reset styles
-                        void card.offsetWidth;
-
-                        // Re-enable transitions
-                        card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-
-                        // Apply animation with a delay (wave effect)
-                        setTimeout(() => {
-                            card.style.opacity = '1';
-                            card.style.transform = 'translateY(0) scale(1)';
-                            card.style.animation = `waveIn 0.6s ease-out forwards`;
-                        }, index * 100); // Delay per card to create the wave effect
-                    });
-                } else {
-                    officersDiv.style.display = 'none'; // Hide officers div
+        // Add keyframes dynamically
+        const styleSheet = document.createElement('style');
+        styleSheet.type = 'text/css';
+        styleSheet.innerHTML = `
+            @keyframes waveIn {
+                0% {
+                    opacity: 0;
+                    transform: translateY(20px) scale(0.95);
+                }
+                50% {
+                    opacity: 0.5;
+                    transform: translateY(-10px) scale(1.05); /* Peak of the wave */
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
                 }
             }
+        `;
+        document.head.appendChild(styleSheet);
 
-            // Add keyframes dynamically
-            const styleSheet = document.createElement('style');
-            styleSheet.type = 'text/css';
-            styleSheet.innerHTML = `
-                @keyframes waveIn {
-                    0% {
-                        opacity: 0;
-                        transform: translateY(20px) scale(0.95);
-                    }
-                    50% {
-                        opacity: 0.5;
-                        transform: translateY(-10px) scale(1.05); /* Peak of the wave */
-                    }
-                    100% {
-                        opacity: 1;
-                        transform: translateY(0) scale(1);
-                    }
-                }
-            `;
-            document.head.appendChild(styleSheet);
+        // Initial visibility setup
+        updateVisibility();
+    });
 
-            // Initial visibility setup
-            updateVisibility();
 
-            // Add click event listeners to update the active state and visibility
-            allClubsLink.addEventListener('click', function() {
-                allClubsLink.classList.add('active');
-                myClubsLink.classList.remove('active');
-                clubRequestsLink.classList.remove('active');
-                resetWaveAnimation(); // Reset the wave animation before updating visibility
-                updateVisibility(); // Re-trigger the wave effect when switching to "All Clubs"
-            });
-
-            myClubsLink.addEventListener('click', function() {
-                allClubsLink.classList.remove('active');
-                myClubsLink.classList.add('active');
-                clubRequestsLink.classList.remove('active');
-                updateVisibility();
-            });
-
-            clubRequestsLink.addEventListener('click', function() {
-                allClubsLink.classList.remove('active');
-                myClubsLink.classList.remove('active');
-                clubRequestsLink.classList.add('active');
-                updateVisibility();
-            });
+    $(document).ready(function() {
+        $('.delprreq').click(function(e) {
+            e.stopPropagation();
         });
+        // let value= $("classname").val()
+    });
+</script>
 
-
-        $(document).ready(function() {
-            $('.delprreq').click(function(e) {
-                e.stopPropagation();
-            });
-            // let value= $("classname").val()
-        });
-    </script>
 </body>
 </html>
