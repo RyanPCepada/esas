@@ -1,3 +1,68 @@
+<?php
+session_start();
+require_once "../config.php";
+
+// Fetch the current student's ID from the session
+$student_id = $_SESSION['student_id'];
+
+try {
+    // Use the existing PDO instance from config.php
+    global $pdo;
+
+    // Prepare and execute the SQL statement
+    $sql = "SELECT firstName, middleName, lastName FROM tbl_students WHERE student_id = :student_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    // Fetch the result
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check if a result was found
+    if ($result) {
+        $firstName = strtoupper($result['firstName']);
+        $middleName = strtoupper($result['middleName']);
+        $lastName = strtoupper($result['lastName']);
+    } else {
+        // Handle the case where no data is found
+        $firstName = $middleName = $lastName = "UNKNOWN";
+    }
+
+} catch (PDOException $e) {
+    // Handle database connection or query error
+    die("Database error: " . $e->getMessage());
+}
+
+
+
+
+
+try {
+    // Fetch SBO-CCS Officers
+    $sboCCSStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'SBO' AND department = 'CCS'");
+    $sboCCSStmt->execute();
+    $sboCCSOfficers = $sboCCSStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fetch SBO-TEP Officers
+    $sboTEPStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'SBO' AND department = 'TEP'");
+    $sboTEPStmt->execute();
+    $sboTEPOfficers = $sboTEPStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fetch SBO-BSBA Officers
+    $sboBSBAStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'SBO' AND department = 'BSBA'");
+    $sboBSBAStmt->execute();
+    $sboBSBAOfficers = $sboBSBAStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fetch CSG Officers
+    $csgStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'CSG'");
+    $csgStmt->execute();
+    $csgOfficers = $csgStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,6 +78,18 @@
     <link href="../assets/css/styles.css" rel="stylesheet" />
     <link href="../assets/img/nbsclogo.png" rel="icon">
     <style>
+        .left-sidebar {
+            font-size: 16px;
+            text-align: start;
+        }
+        /* .nav-link:hover {
+          background-color: #cce4ff !important;
+        } */
+
+        .nav-link.active {
+          color: white !important;
+          background-color: black;
+        }
         .mainbar h2 {
             margin-left: 15px;
             margin-bottom: 32px;
@@ -100,7 +177,7 @@
                 margin-left: 0px;
             }
             .card-body {
-                padding: 10px; 
+                padding: 10px !important; 
                 max-width: 100%; 
             }
             .card-img-only-all {
@@ -114,40 +191,204 @@
 
 
         .card-container {
-    opacity: 0;
-    transform: translateY(20px); /* Start from below */
-    animation: slideIn 0.6s forwards; /* Apply animation */
-}
+            opacity: 0;
+            transform: translateY(20px); /* Start from below */
+            animation: slideIn 0.6s forwards; /* Apply animation */
+        }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(20px); /* Start from below */
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0); /* End at normal position */
-    }
-}
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px); /* Start from below */
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0); /* End at normal position */
+            }
+        }
 
-/* Optional: Adjust the delay for each card */
-.card-container:nth-child(1) {
-    animation-delay: 0s;
-}
-.card-container:nth-child(2) {
-    animation-delay: 0.1s;
-}
-.card-container:nth-child(3) {
-    animation-delay: 0.2s;
-}
+        /* Optional: Adjust the delay for each card */
+        .card-container:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .card-container:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        .card-container:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+
+
+
+
+        
+        
+        .card-body { 
+            width: 100%;
+            /* max-width: 600px; */
+            margin: 0 auto;
+            padding: 50px;
+        }
+
+        /* Default for larger screens (6 cards per row) */
+        .sbo-officers-row, .csg-officers-row {
+            flex: 0 0 16.66%; /* 100% / 6 = 16.66% width per card */
+            max-width: 16.66%;
+        }
+
+        /* Media query for mobile screens (2 cards per row) */
+        @media (max-width: 768px) {
+            .sbo-officers-row, .csg-officers-row {
+                flex: 0 0 50%; /* 100% / 2 = 50% width per card */
+                max-width: 50%;
+            }
+        }
 
     </style>
 </head>
 <body>
-    <div class="row mainbar g-0 h-100">
-        <h2 class="text-muted mt-0">Student Club Organizations</h2>
-        <div class="row g-2 mt-0" id="allClubsContainer">
-            <!-- Club cards will be dynamically added here -->
+    
+    <div class="container-fluid">
+        <div class="row g-0 h-100">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
+                <a class="navbar-brand ps-2" href="#">
+                    <img src="../assets/img/nbsclogo.png" style="height: 0.3in;">
+                    NBSC SIS</a>
+                </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse hide" id="main_nav">
+                    <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
+                        <?php include 'nav/nav_main.php' ?>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- LEFT SIDEBAR -->
+            <div class="col-12 col-md-2 ps-0 pt-3 border-end">
+
+                <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li>
+                            <a href="../esas_student/all_clubs.php" class="nav-link left-sidebar text-dark active" id="all-clubs">
+                                All Clubs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                                My Clubs
+                            </a>
+                        </li>
+                        <li>
+                            <a href="../esas_student/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
+                                My Club Requests
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+            <!-- LEFT SIDEBAR END -->
+
+            
+            <!-- MAINPAGE BAR -->
+            <div class="col-12 col-md-10 bg-lgrey auto-scroll">
+                <div class="row g-0 h-100">
+
+                    <div class="officers-div pt-3">
+                        <div class="row g-0 p-1 px-2 pt-1">
+                            <h5 class="ms-2">CSG Officers</h5>
+                            <?php foreach ($csgOfficers as $officer): ?>
+                                <div class="csg-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
+                                    <div class="card card-csg-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
+                                        <!-- Profile Picture -->
+                                        <div class="profile-pic" style="margin-right: 10px;">
+                                            <img src="/esas/esas_admin/images/<?php echo $officer['profilePic']; ?>" alt="Profile Pic" style="width: 50px; height: 50px; border-radius: 50%;">
+                                        </div>
+                                        <!-- Officer Details (Name and Position) -->
+                                        <div class="officer-details text-left" style="line-height: 1.2; max-width: 80px;">
+                                            <h6 style="font-size: 12px; margin-bottom: 2px;"><?php echo $officer['firstName'] . ' ' . $officer['lastName']; ?></h6>
+                                            <p style="font-size: 10px; margin: 0;"><?php echo $officer['position']; ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div class="mt-2"></div>
+
+                        <div class="row g-0 p-1 px-2 pt-1">
+                            <h5 class="ms-2">SBO Officers</h5>
+                            <?php foreach ($sboCCSOfficers as $CCSofficer): ?>
+                                <div class="sbo-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
+                                    <div class="card card-sbo-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: #A6E22E; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
+                                        <!-- Profile Picture -->
+                                        <div class="profile-pic" style="margin-right: 10px;">
+                                            <img src="/esas/esas_admin/images/<?php echo $CCSofficer['profilePic']; ?>" alt="Profile Pic" style="width: 50px; height: 50px; border-radius: 50%;">
+                                        </div>
+                                        <!-- Officer Details (Name and Position) -->
+                                        <div class="officer-details text-left" style="line-height: 1.2; max-width: 80px;">
+                                            <h6 style="font-size: 12px; margin-bottom: 2px;"><?php echo $CCSofficer['firstName'] . ' ' . $CCSofficer['lastName']; ?></h6>
+                                            <p style="font-size: 10px; margin: 0;"><?php echo $CCSofficer['position']; ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                            <?php foreach ($sboTEPOfficers as $TEPofficer): ?>
+                                <div class="sbo-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
+                                    <div class="card card-sbo-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: #6A8CCF; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
+                                        <!-- Profile Picture -->
+                                        <div class="profile-pic" style="margin-right: 10px;">
+                                            <img src="/esas/esas_admin/images/<?php echo $TEPofficer['profilePic']; ?>" alt="Profile Pic" style="width: 50px; height: 50px; border-radius: 50%;">
+                                        </div>
+                                        <!-- Officer Details (Name and Position) -->
+                                        <div class="officer-details text-left" style="line-height: 1.2; max-width: 80px;">
+                                            <h6 style="font-size: 12px; margin-bottom: 2px;"><?php echo $TEPofficer['firstName'] . ' ' . $TEPofficer['lastName']; ?></h6>
+                                            <p style="font-size: 10px; margin: 0;"><?php echo $TEPofficer['position']; ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                            <?php foreach ($sboBSBAOfficers as $BSBAofficer): ?>
+                                <div class="sbo-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
+                                    <div class="card card-sbo-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: #FFF176; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
+                                        <!-- Profile Picture -->
+                                        <div class="profile-pic" style="margin-right: 10px;">
+                                            <img src="/esas/esas_admin/images/<?php echo $BSBAofficer['profilePic']; ?>" alt="Profile Pic" style="width: 50px; height: 50px; border-radius: 50%;">
+                                        </div>
+                                        <!-- Officer Details (Name and Position) -->
+                                        <div class="officer-details text-left" style="line-height: 1.2; max-width: 80px;">
+                                            <h6 style="font-size: 12px; margin-bottom: 2px;"><?php echo $BSBAofficer['firstName'] . ' ' . $BSBAofficer['lastName']; ?></h6>
+                                            <p style="font-size: 10px; margin: 0;"><?php echo $BSBAofficer['position']; ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    
+                    <div id="divpr_requesdetails" class="table-responsive px-0">
+                        <div class="row g-0 p-4 px-2 pt-3 h-100">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row mainbar g-0 h-100">
+                                        <h2 class="text-muted mt-0">Student Club Organizations</h2>
+                                        <div class="row g-2 mt-0" id="allClubsContainer">
+                                            <!-- Club cards will be dynamically added here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            <!-- MAINPAGE BAR END -->
+
         </div>
     </div>
 
@@ -216,6 +457,103 @@
 
 
     <script>
+
+        
+document.addEventListener('DOMContentLoaded', function() {
+            // Cache the elements
+            const allClubsLink = document.getElementById('all-clubs');
+            const myClubsLink = document.getElementById('my-clubs');
+            const clubRequestsLink = document.getElementById('club-requests');
+            const officersDiv = document.querySelector('.officers-div');
+            const cards = document.querySelectorAll('.card-sbo-officer, .card-csg-officer');
+
+            function resetWaveAnimation() {
+                // Loop through each card and remove the current animation, then force reflow to re-trigger it
+                cards.forEach(card => {
+                    card.style.animation = 'none';  // Remove the animation
+                    void card.offsetWidth;  // Force reflow (this is critical to reset the animation)
+                    card.style.animation = '';  // Re-apply the animation
+                });
+            }
+
+            function updateVisibility() {
+                if (allClubsLink.classList.contains('active')) {
+                    officersDiv.style.display = 'block'; // Show officers div
+
+                    // Apply the animation waveIn dynamically
+                    cards.forEach((card, index) => {
+                        // Reset styles
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px) scale(0.95)';
+                        card.style.transition = 'none'; // Disable transition for reset
+
+                        // Trigger a reflow to apply reset styles
+                        void card.offsetWidth;
+
+                        // Re-enable transitions
+                        card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+
+                        // Apply animation with a delay (wave effect)
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0) scale(1)';
+                            card.style.animation = `waveIn 0.6s ease-out forwards`;
+                        }, index * 100); // Delay per card to create the wave effect
+                    });
+                } else {
+                    officersDiv.style.display = 'none'; // Hide officers div
+                }
+            }
+
+            // Add keyframes dynamically
+            const styleSheet = document.createElement('style');
+            styleSheet.type = 'text/css';
+            styleSheet.innerHTML = `
+                @keyframes waveIn {
+                    0% {
+                        opacity: 0;
+                        transform: translateY(20px) scale(0.95);
+                    }
+                    50% {
+                        opacity: 0.5;
+                        transform: translateY(-10px) scale(1.05); /* Peak of the wave */
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: translateY(0) scale(1);
+                    }
+                }
+            `;
+            document.head.appendChild(styleSheet);
+
+            // Initial visibility setup
+            updateVisibility();
+
+            // Add click event listeners to update the active state and visibility
+            allClubsLink.addEventListener('click', function() {
+                allClubsLink.classList.add('active');
+                myClubsLink.classList.remove('active');
+                clubRequestsLink.classList.remove('active');
+                resetWaveAnimation(); // Reset the wave animation before updating visibility
+                updateVisibility(); // Re-trigger the wave effect when switching to "All Clubs"
+            });
+
+            myClubsLink.addEventListener('click', function() {
+                allClubsLink.classList.remove('active');
+                myClubsLink.classList.add('active');
+                clubRequestsLink.classList.remove('active');
+                updateVisibility();
+            });
+
+            clubRequestsLink.addEventListener('click', function() {
+                allClubsLink.classList.remove('active');
+                myClubsLink.classList.remove('active');
+                clubRequestsLink.classList.add('active');
+                updateVisibility();
+            });
+        });
+
+
         $(document).ready(function() {
             $('.delprreq').click(function(e) {
                 e.stopPropagation();

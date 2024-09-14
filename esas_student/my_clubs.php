@@ -1,3 +1,40 @@
+<?php
+session_start();
+require_once "../config.php";
+
+// Fetch the current student's ID from the session
+$student_id = $_SESSION['student_id'];
+
+try {
+    // Use the existing PDO instance from config.php
+    global $pdo;
+
+    // Prepare and execute the SQL statement
+    $sql = "SELECT firstName, middleName, lastName FROM tbl_students WHERE student_id = :student_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    // Fetch the result
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check if a result was found
+    if ($result) {
+        $firstName = strtoupper($result['firstName']);
+        $middleName = strtoupper($result['middleName']);
+        $lastName = strtoupper($result['lastName']);
+    } else {
+        // Handle the case where no data is found
+        $firstName = $middleName = $lastName = "UNKNOWN";
+    }
+
+} catch (PDOException $e) {
+    // Handle database connection or query error
+    die("Database error: " . $e->getMessage());
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,6 +50,18 @@
     <link href="../assets/css/styles.css" rel="stylesheet" />
     <link href="../assets/img/nbsclogo.png" rel="icon">
     <style>
+        .left-sidebar {
+            font-size: 16px;
+            text-align: start;
+        }
+        /* .nav-link:hover {
+          background-color: #cce4ff !important;
+        } */
+
+        .nav-link.active {
+          color: white !important;
+          background-color: black;
+        }
         .nav-tabs {
             margin-top: -20px !important;
             margin-bottom: 50px;
@@ -146,45 +195,108 @@
 <!--HERE-->
 
 <body>
-    <div class="row g-0">
-        <h2 class="text-muted mt-0 p-3 mb-5">My Clubs</h2>
-        <nav>
-            <div class="nav nav-tabs n" role="tablist">
-                <button title="Registered Clubs" class="ms-2 px-2 nav-link active" id="nav-activeclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-activeclubs" type="button" role="tab" aria-controls="nav-activeclubs" aria-selected="true" onclick="updateLabel('Registered Clubs')">
-                    Registered Clubs
+    
+    <div class="container-fluid">
+        <div class="row g-0 h-100">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
+                <a class="navbar-brand ps-2" href="#">
+                    <img src="../assets/img/nbsclogo.png" style="height: 0.3in;">
+                    NBSC SIS</a>
                 </button>
-                <button title="Pending Approval" class="px-2 nav-link" id="nav-pendingclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-pendingclubs" type="button" role="tab" aria-controls="nav-pendingclubs" aria-selected="false" onclick="updateLabel('Pending Approval')">
-                    Pending
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
+                    <span class="navbar-toggler-icon"></span>
                 </button>
-                <button title="Disapproved" class="px-2 nav-link" id="nav-disapprovedclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-disapprovedclubs" type="button" role="tab" aria-controls="nav-disapprovedclubs" aria-selected="false" onclick="updateLabel('Disapproved')">
-                    Disapproved
-                </button>
-                <!-- <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;">
-                    <i class="fa-solid fa-sliders"></i>
-                </button> -->
-            </div>
-        </nav>
-        <div class="tab-content">
-            <!-- Registered Clubs Tab -->
-            <div class="tab-pane fade show active" id="nav-activeclubs" role="tabpanel" aria-labelledby="nav-activeclubs-tab">
-                <div class="row g-2 mt-0" id="activeClubsContainer">
-                    <!-- All student clubs cards will be dynamically added here -->
+                <div class="navbar-collapse collapse hide" id="main_nav">
+                    <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
+                        <?php include 'nav/nav_main.php' ?>
+                    </div>
                 </div>
-            </div>
+            </nav>
+            
+            <!-- LEFT SIDEBAR -->
+            <div class="col-12 col-md-2 ps-0 pt-3 border-end">
 
-            <!-- Pending Approval Clubs Tab -->
-            <div class="tab-pane fade" id="nav-pendingclubs" role="tabpanel" aria-labelledby="nav-pendingclubs-tab">
-                <div class="row g-2 mt-0" id="pendingClubsContainer">
-                    <!-- All student pending clubs cards will be dynamically added here -->
+                <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li>
+                            <a href="../esas_student/all_clubs.php" class="nav-link left-sidebar text-dark" id="all-clubs">
+                                All Clubs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="my-clubs">
+                                My Clubs
+                            </a>
+                        </li>
+                        <li>
+                            <a href="../esas_student/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
+                                My Club Requests
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-            </div>
 
-            <!-- Disapproved Clubs Tab -->
-            <div class="tab-pane fade" id="nav-disapprovedclubs" role="tabpanel" aria-labelledby="nav-disapprovedclubs-tab">
-                <div class="row g-2 mt-0" id="disapprovedClubsContainer">
-                    <!-- All student disapproved clubs cards will be dynamically added here -->
+            </div>
+            <!-- LEFT SIDEBAR END -->
+
+            
+            <!-- MAINPAGE BAR -->
+            <div class="col-12 col-md-10 bg-lgrey auto-scroll">
+                <div class="row g-0 h-100">
+                    <div id="divpr_requesdetails" class="table-responsive px-0">
+                        <div class="row g-0 p-4 px-2 pt-3 h-100">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row g-0">
+                                        <h2 class="text-muted mt-0 p-3 mb-5">My Clubs</h2>
+                                        <nav>
+                                            <div class="nav nav-tabs n" role="tablist">
+                                                <button title="Registered Clubs" class="ms-2 px-2 nav-link active" id="nav-activeclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-activeclubs" type="button" role="tab" aria-controls="nav-activeclubs" aria-selected="true" onclick="updateLabel('Registered Clubs')">
+                                                    Registered Clubs
+                                                </button>
+                                                <button title="Pending Approval" class="px-2 nav-link" id="nav-pendingclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-pendingclubs" type="button" role="tab" aria-controls="nav-pendingclubs" aria-selected="false" onclick="updateLabel('Pending Approval')">
+                                                    Pending
+                                                </button>
+                                                <button title="Disapproved" class="px-2 nav-link" id="nav-disapprovedclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-disapprovedclubs" type="button" role="tab" aria-controls="nav-disapprovedclubs" aria-selected="false" onclick="updateLabel('Disapproved')">
+                                                    Disapproved
+                                                </button>
+                                                <!-- <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;">
+                                                    <i class="fa-solid fa-sliders"></i>
+                                                </button> -->
+                                            </div>
+                                        </nav>
+                                        <div class="tab-content">
+                                            <!-- Registered Clubs Tab -->
+                                            <div class="tab-pane fade show active" id="nav-activeclubs" role="tabpanel" aria-labelledby="nav-activeclubs-tab">
+                                                <div class="row g-2 mt-0" id="activeClubsContainer">
+                                                    <!-- All student clubs cards will be dynamically added here -->
+                                                </div>
+                                            </div>
+
+                                            <!-- Pending Approval Clubs Tab -->
+                                            <div class="tab-pane fade" id="nav-pendingclubs" role="tabpanel" aria-labelledby="nav-pendingclubs-tab">
+                                                <div class="row g-2 mt-0" id="pendingClubsContainer">
+                                                    <!-- All student pending clubs cards will be dynamically added here -->
+                                                </div>
+                                            </div>
+
+                                            <!-- Disapproved Clubs Tab -->
+                                            <div class="tab-pane fade" id="nav-disapprovedclubs" role="tabpanel" aria-labelledby="nav-disapprovedclubs-tab">
+                                                <div class="row g-2 mt-0" id="disapprovedClubsContainer">
+                                                    <!-- All student disapproved clubs cards will be dynamically added here -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
+            <!-- MAINPAGE BAR END -->
+
         </div>
     </div>
 
