@@ -2,8 +2,16 @@
 // Include database configuration file
 require_once '../../config.php';
 
+// Start the session
+session_start();
+
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
+
+// Check if the user is logged in and session data is available
+if (!isset($_SESSION['student_id']) || !isset($_SESSION['registration_id'])) {
+    die("You must be logged in to submit a club request.");
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
@@ -12,8 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $activities = $_POST['activities'] ?? '';
     $status = 'pending'; // Default status for a new request
     $dateRequested = date('Y-m-d H:i:s'); // Current timestamp
-    $student_id = 123; // Example student ID (you'll need to retrieve this dynamically)
-    $registration_id = 456; // Example registration ID (you'll need to retrieve this dynamically)
+    
 
     // File upload logic
     $coverPhoto = '';
@@ -26,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $fileTmpName = $_FILES['coverPhoto']['tmp_name'];
         $fileType = pathinfo($fileName, PATHINFO_EXTENSION);
         
-        // Validate file type and size (2MB limit)
+        // Validate file type and size (10MB limit)
         if (in_array(strtolower($fileType), $allowedTypes) && $fileSize <= 10 * 1024 * 1024) {
             $newFileName = uniqid() . "." . $fileType; // Generate unique file name
             $targetFilePath = $_SERVER['DOCUMENT_ROOT'] . $targetDir . $newFileName;

@@ -5,6 +5,9 @@ require_once "../../config.php";
 // Start the session
 session_start();
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Ensure student_id is set in the session
 if (!isset($_SESSION['student_id'])) {
     echo json_encode(['success' => false, 'message' => 'Student not logged in.']);

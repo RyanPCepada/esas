@@ -2,6 +2,9 @@
 session_start();
 require_once "../../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Handle comment form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $post_id = isset($_POST['post_id']) ? $_POST['post_id'] : '';
