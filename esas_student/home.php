@@ -253,7 +253,6 @@ try {
         /* Comment container to position ellipsis */
         .comment {
             position: relative; /* Ensure positioning context for the absolute element */
-            padding-right: 40px; /* Add padding to prevent overlap with ellipsis */
             transition: background-color 0.3s ease;
         }
 
@@ -417,7 +416,7 @@ try {
                                                         <span id="comment-count-${post.post_id}">${commentText}</span>
                                                     </a>
                                                 </div>
-                                                <div class="comment-section mt-3 ml-3 mr-2" id="comments-${post.post_id}" style="display: none; padding: 10px;">
+                                                <div class="comment-section mt-1 ml-1 mr-2" id="comments-${post.post_id}" style="display: none; padding: 10px;">
                                                     <!-- Comments will be dynamically loaded here -->
                                                 </div>
                                             </div>
@@ -491,7 +490,7 @@ function fetchComments(postId) {
                             </div>
                         </div>` : '';
                     return `
-                        <div class="comment d-flex align-items-start mb-2">
+                        <div class="comment d-flex align-items-start">
                             <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
                             <div class="comsec">
                                 <p class="student-name mb-1">
