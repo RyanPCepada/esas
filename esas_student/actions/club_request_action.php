@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Execute the query
         if ($stmt->execute()) {
             // Redirect to success page or show success message
-            echo "<script>alert('Club request submitted successfully!'); window.location.href = '../club_request.php';</script>";
+            echo "<script>alert('Club request submitted successfully!'); window.location.href = '../club_requests.php';</script>";
         } else {
             echo "Something went wrong. Please try again.";
         }

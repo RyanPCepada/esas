@@ -250,9 +250,9 @@ try {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row g-0">
-                                        <div class="d-flex align-items-center justify-content-end pb-3 mb-2">
+                                        <div class="d-flex align-items-center justify-content-end pb-3 mt-2 mb-3">
                                             <!-- <h2 class="text-muted mt-0 mb-0">My Club Requests</h2> -->
-                                            <button type="button" class="btn btn-primary" id="request-club-btn" data-bs-toggle="modal" data-bs-target="#requestClubModal" style="width: 210px; border-radius: 5px;">
+                                            <button type="button" class="btn btn-primary" id="request-club-btn" data-bs-toggle="modal" data-bs-target="#requestClubModal" style="width: 160px; border-radius: 5px;">
                                                 Request for a Club
                                             </button>
                                         </div>
@@ -392,7 +392,7 @@ try {
                         const clubsContainer = document.getElementById(containerId);
                         if (response && response.length > 0) {
                             clubsContainer.innerHTML = response.map(club => `
-                                <div class="col-md-4 mb-4 card-container">
+                                <div class="col-md-4 card-container">
                                     <div class="card card-img-only">
                                         <a href="#">
                                             <img src="/esas/esas_student/images/${club.coverPhoto}" alt="Cover Photo">
@@ -401,9 +401,9 @@ try {
                                             </div>
                                         </a>
                                     </div>
-                                    <div class="date text-muted">
+                                    <!--<div class="date text-muted">
                                         ${dateLabel}: ${club.dateModified}
-                                    </div>
+                                    </div>-->
                                 </div>
                             `).join('');
                         } else {
