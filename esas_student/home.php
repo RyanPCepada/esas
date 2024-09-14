@@ -92,6 +92,12 @@ try {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
 
     
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../assets/js/jquery-3.6.0.js"></script>
@@ -254,6 +260,11 @@ try {
             overflow-y: scroll;
         } */
 
+
+
+
+
+        
     </style>
 </head>
 <body>
@@ -296,7 +307,6 @@ try {
 
  
     
-
 
 
 
@@ -433,9 +443,17 @@ function fetchComments(postId) {
                     
                     // Only show the edit button if the comment's student_id matches the current user's student_id
                     const showEditButton = comment.student_id == currentStudentId ? `
-                        <button class="btn btn-link btn-sm p-0" style="margin-top: -2px; margin-left: 5px;" data-comment-id="${comment.comment_id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
-                            <i class="fa fa-pencil"></i>
-                        </button>` : '';
+                        <div class="dropdown">
+                            <i class="fas fa-ellipsis-v dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+                            <div class="dropdown-menu">
+                                <button class="dropdown-item" data-comment-id="${comment.comment_id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
+                                    <i class="fa fa-pencil"></i> Edit
+                                </button>
+                                <button class="dropdown-item text-danger" data-comment-id="${comment.comment_id}" onclick="deleteComment(this)">
+                                    <i class="fa fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>` : '';
                     
                     return `
                         <div class="comment d-flex align-items-start mb-2">
@@ -444,7 +462,7 @@ function fetchComments(postId) {
                                 <p class="student-name mb-1">
                                     <strong>${comment.student_name}</strong><br>
                                     <span id="comment-text-${comment.comment_id}">${comment.comment}</span>
-                                    ${showEditButton} <!-- Conditionally render the edit button -->
+                                    ${showEditButton} <!-- Conditionally render the dropdown -->
                                 </p>
                                 <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
                             </div>
@@ -458,7 +476,6 @@ function fetchComments(postId) {
         })
         .catch(error => console.error('Error fetching comments:', error));
 }
-
 
 // Function to open the edit comment modal and populate fields
 function openEditCommentModal(button) {
@@ -474,6 +491,14 @@ function openEditCommentModal(button) {
     // Show the modal
     $('#editCommentModal').modal('show');
 }
+
+// Function to delete a comment (dummy implementation)
+function deleteComment(button) {
+    const commentId = button.getAttribute('data-comment-id');
+    console.log('Deleting Comment ID:', commentId);
+    // Add delete comment logic here
+}
+
 
 
 
