@@ -434,7 +434,7 @@ function fetchComments(postId) {
                     // Only show the edit button if the comment's student_id matches the current user's student_id
                     const showEditButton = comment.student_id == currentStudentId ? `
                         <button class="btn btn-link btn-sm p-0" style="margin-top: -2px; margin-left: 5px;" data-comment-id="${comment.comment_id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
-                            <i class="fa fa-edit"></i>
+                            <i class="fa fa-pencil"></i>
                         </button>` : '';
                     
                     return `
