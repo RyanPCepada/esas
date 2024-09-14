@@ -2,12 +2,6 @@
 // Include config file
 require_once "../../config.php";
 
-// Define variables and initialize with empty values
-$new_comment = "";
-$new_comment_err = "";
-$comment_id = ""; // Handle comment ID
-$club_id = "";
-
 // Start the session
 session_start();
 
@@ -20,16 +14,14 @@ if (!isset($_SESSION['student_id'])) {
 // Retrieve student_id from the session
 $student_id = $_SESSION['student_id'];
 
+// Define variables and initialize with empty values
+$comment_id = "";
+$club_id = "";
+$comment_id_err = "";
+$club_id_err = "";
+
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validate new_comment
-    $input_new_comment = trim($_POST["new_comment"]);
-    if (empty($input_new_comment)) {
-        $new_comment_err = "Comment cannot be empty.";
-    } else {
-        $new_comment = $input_new_comment;
-    }
-
     // Validate comment_id
     if (empty($_POST["comment_id"])) {
         $comment_id_err = "Comment ID is required.";
@@ -44,31 +36,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $club_id = trim($_POST["club_id"]);
     }
 
-    // Check input errors before updating the database
-    if (empty($new_comment_err) && empty($comment_id_err)) {
-        // Prepare an update statement
-        $sql = "UPDATE tbl_comments
-                SET comment = :new_comment
-                WHERE comment_id = :comment_id AND student_id = :student_id";
+    // Check input errors before deleting from the database
+    if (empty($comment_id_err) && empty($club_id_err)) {
+        // Prepare a delete statement
+        $sql = "DELETE FROM tbl_comments WHERE comment_id = :comment_id AND student_id = :student_id";
 
         $stmt = $pdo->prepare($sql);
 
         // Bind variables to the prepared statement as parameters
-        $stmt->bindParam(":new_comment", $new_comment);
         $stmt->bindParam(":comment_id", $comment_id, PDO::PARAM_INT);
         $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
 
         // Attempt to execute the prepared statement
         if ($stmt->execute()) {
-            // Comment updated successfully. Return a success response
+            // Correct the redirect URL to include the full path
             $redirect_url = '/esas/esas_student/home.php?club_id=' . urlencode($club_id);
-            echo json_encode(['success' => true, 'message' => 'Comment updated successfully.', 'redirect_url' => $redirect_url]);
+            echo json_encode(['success' => true, 'message' => 'Comment deleted successfully.', 'redirect_url' => $redirect_url]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Oops! Something went wrong. Please try again later.']);
         }
     } else {
         // Display errors if any
-        echo json_encode(['success' => false, 'message' => 'Errors: ' . $new_comment_err . ' ' . $comment_id_err . ' ' . $club_id_err]);
+        echo json_encode(['success' => false, 'message' => 'Errors: ' . $comment_id_err . ' ' . $club_id_err]);
     }
 
     // Close statement

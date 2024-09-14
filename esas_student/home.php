@@ -478,7 +478,7 @@ function fetchComments(postId) {
                     const [date, time] = comment.dateAdded.split(' ');
 
                     // Only show the edit button if the comment's student_id matches the current user's student_id
-                    const showEditButton = comment.student_id == currentStudentId ? `
+                    const showEllipsisButton = comment.student_id == currentStudentId ? `
                         <div class="dropdown">
                             <i class="fas fa-ellipsis-v ellipsis" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
                             <div class="dropdown-menu">
@@ -495,7 +495,7 @@ function fetchComments(postId) {
                             <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
                             <div class="comsec">
                                 <p class="student-name mb-1">
-                                    ${showEditButton} <!-- Conditionally render the dropdown -->
+                                    ${showEllipsisButton} <!-- Conditionally render the dropdown -->
                                     <strong>${comment.student_name}</strong><br>
                                     <span id="comment-text-${comment.comment_id}">${comment.comment}</span>
                                     <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
@@ -511,59 +511,6 @@ function fetchComments(postId) {
         })
         .catch(error => console.error('Error fetching comments:', error));
 }
-
-
-// Function to open the edit comment modal and populate fields
-function openEditCommentModal(button) {
-    const commentId = button.getAttribute('data-comment-id');
-    const commentText = button.getAttribute('data-comment-text');
-
-    console.log('Opening modal for Comment ID:', commentId); // Debugging output
-
-    // Set the comment text and ID in the modal fields
-    document.getElementById('editCommentText').value = commentText;
-    document.getElementById('editCommentId').value = commentId;
-
-    // Show the modal
-    $('#editCommentModal').modal('show');
-}
-
-// Function to delete a comment (dummy implementation)
-function deleteComment(button) {
-    const commentId = button.getAttribute('data-comment-id');
-    console.log('Deleting Comment ID:', commentId);
-    // Add delete comment logic here
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -591,27 +538,6 @@ function deleteComment(button) {
 
     </script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var icon = document.getElementById("icon_announcement");
-
-            function triggerAnimation() {
-                icon.style.animation = "none"; // Reset the animation
-                icon.offsetHeight; // Trigger a reflow to restart the animation
-                icon.style.animation = "zoomAndWave 1.2s ease-in-out"; // Apply the animation
-
-                setTimeout(function() {
-                    icon.style.animationPlayState = "paused"; // Pause the animation after it completes
-                }, 1200);
-            }
-
-            // Trigger the animation every 5 seconds
-            setInterval(triggerAnimation, 5000);
-            
-            // Initial trigger
-            triggerAnimation();
-        });
-    </script>
 
 
 
@@ -636,7 +562,7 @@ function deleteComment(button) {
                     </div>
                     <div class="modal-footer py-0">
                         <button type="button" class="btn btn-sm btn-default" data-bs-dismiss="modal">Cancel</button>
-                        <input type="submit" class="btn btn-primary" value="Submit">
+                        <input type="submit" class="btn btn-primary" data-bs-dismiss="modal" value="Submit">
                     </div>
                 </form>
             </div>
@@ -644,24 +570,186 @@ function deleteComment(button) {
     </div>
 </div>
 
-<script>
-    // Function to open the edit comment modal and populate fields
-    function openEditCommentModal(button) {
-        const commentId = button.getAttribute('data-comment-id');
-        const commentText = button.getAttribute('data-comment-text');
+<!-- CONFIRMATION DELETE MODAL -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h6>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this comment?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confirmDeleteBtn">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        console.log('Opening modal for Comment ID:', commentId); // Debugging output
 
-        // Set the comment text and ID in the modal fields
-        document.getElementById('editCommentText').value = commentText;
-        document.getElementById('editCommentId').value = commentId;
+    <script>
+        
+        
 
-        // Show the modal
-        $('#editCommentModal').modal('show');
+        //EDIT MODAL FUNCTION START//
+        // Function to open the edit comment modal and populate fields
+function openEditCommentModal(button) {
+    const commentId = button.getAttribute('data-comment-id');
+    const commentText = button.getAttribute('data-comment-text');
+    const postId = button.getAttribute('data-post-id'); // Store the post ID
+
+    console.log('Opening modal for Comment ID:', commentId); // Debugging output
+
+    // Set the comment text and ID in the modal fields
+    document.getElementById('editCommentText').value = commentText;
+    document.getElementById('editCommentId').value = commentId;
+
+    // Show the modal
+    $('#editCommentModal').modal('show');
+}
+
+
+
+// Handle form submission for editing comment
+document.querySelector('#editCommentModal form').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent default form submission
+
+    // Retrieve form data
+    const formData = new FormData(this);
+
+    // Send request to edit the comment
+    fetch('../esas_student/actions/edit_comment_action.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())  // Parse JSON response
+    .then(data => {
+        console.log('Edit result:', data);
+        if (data.success) {
+            alert(data.message);  // Display success message
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url; // Redirect if URL is provided
+            } else {
+                // Reload comments or update the UI as needed
+                fetchComments(formData.get('club_id')); // Call function to fetch and update comments
+            }
+        } else {
+            alert(data.message);  // Display error message
+        }
+
+        // Hide the modal
+        $('#editCommentModal').modal('hide');
+    })
+    .catch(error => console.error('Error editing comment:', error));
+});
+
+
+        //EDIT MODAL FUNCTION END//
+
+
+
+        //DELETE MODAL FUNCTION START//
+        let commentToDelete = null; // Store the comment ID for deletion
+        let postId = null; // Store the post ID
+
+        function deleteComment(button) {
+            commentToDelete = button.getAttribute('data-comment-id'); // Store the comment ID
+            postId = button.getAttribute('data-post-id'); // Store the post ID
+
+            // Show confirmation modal
+            $('#confirmDeleteModal').modal('show');
+        }
+
+        // Handle the confirmation of deletion
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            console.log('Confirm delete button clicked');
+            if (commentToDelete) {
+                // Store the postId in localStorage to keep track of which post's comments section was open
+                localStorage.setItem('openPostId', postId);
+
+                // Send request to delete the comment
+                fetch('/esas/esas_student/actions/delete_comment_action.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'comment_id': commentToDelete,
+                        'club_id': "<?php echo $club_id; ?>"
+                    }),
+                })
+                .then(response => response.json())  // Parse JSON response
+                .then(data => {
+                    console.log('Delete result:', data);
+                    if (data.success) {
+                        alert(data.message);  // Display success message
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url; // Redirect to home.php with the club_id
+                        } else {
+                            fetchComments(postId); // Reload comments or update the UI as needed
+                        }
+                    } else {
+                        alert(data.message);  // Display error message
+                    }
+                })
+                .catch(error => console.error('Error deleting comment:', error));
+
+                // Hide the modal
+                $('#confirmDeleteModal').modal('hide');
+                commentToDelete = null; // Clear the stored comment ID
+            }
+        });
+
+        //DELETE MODAL FUNCTION END//
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+    // Check if there's a postId stored in localStorage
+    const openPostId = localStorage.getItem('openPostId');
+    
+    if (openPostId) {
+        console.log('Opening comments for post:', openPostId);
+
+        // Open the comments section of the stored postId
+        toggleComments(openPostId);
+        
+        // Remove the stored postId after using it
+        localStorage.removeItem('openPostId');
     }
-</script>
+});
 
 
+
+
+
+
+        //WAVE ANIMATION OF OFFICERS CARDS START//
+        document.addEventListener("DOMContentLoaded", function() {
+            var icon = document.getElementById("icon_announcement");
+
+            function triggerAnimation() {
+                icon.style.animation = "none"; // Reset the animation
+                icon.offsetHeight; // Trigger a reflow to restart the animation
+                icon.style.animation = "zoomAndWave 1.2s ease-in-out"; // Apply the animation
+
+                setTimeout(function() {
+                    icon.style.animationPlayState = "paused"; // Pause the animation after it completes
+                }, 1200);
+            }
+
+            // Trigger the animation every 5 seconds
+            setInterval(triggerAnimation, 5000);
+            
+            // Initial trigger
+            triggerAnimation();
+        });
+        //WAVE ANIMATION OF OFFICERS CARDS END//
+
+    </script>
 
 </body>
 
