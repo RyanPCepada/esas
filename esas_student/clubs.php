@@ -185,7 +185,7 @@ try {
 
                     <div class="officers-div pt-3">
                         <div class="row g-0 p-1 px-2 pt-1">
-                            <h5>CSG Officers</h5>
+                            <h5 class="ms-2">CSG Officers</h5>
                             <?php foreach ($csgOfficers as $officer): ?>
                                 <div class="csg-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
                                     <div class="card card-csg-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
@@ -206,7 +206,7 @@ try {
                         <div class="mt-2"></div>
 
                         <div class="row g-0 p-1 px-2 pt-1">
-                            <h5>SBO Officers</h5>
+                            <h5 class="ms-2">SBO Officers</h5>
                             <?php foreach ($sboCCSOfficers as $CCSofficer): ?>
                                 <div class="sbo-officers-row col-md-2 p-2 text-center align-items-center justify-content-center">
                                     <div class="card card-sbo-officer d-flex flex-row align-items-center p-2" style="width: auto; height: 70px; background-color: #A6E22E; background-color: white; box-shadow: 0 5px 10px rgba(0, 0, 0, .3);">
