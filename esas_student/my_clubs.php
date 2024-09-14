@@ -248,11 +248,16 @@ try {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row g-0">
-                                        <h2 class="text-muted mt-0 p-3 mb-5">My Clubs</h2>
+                                        <div class="d-flex align-items-center justify-content-end pb-3 mt-2 mb-3">
+                                            <!-- <h2 class="text-muted mt-0 mb-0">My Clubs</h2> -->
+                                            <!-- <button type="button" class="btn btn-primary" id="request-club-btn" data-bs-toggle="modal" data-bs-target="#requestClubModal" style="width: 210px; border-radius: 5px;">
+                                                Request for a Club
+                                            </button> -->
+                                        </div>
                                         <nav>
                                             <div class="nav nav-tabs n" role="tablist">
                                                 <button title="Registered Clubs" class="ms-2 px-2 nav-link active" id="nav-activeclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-activeclubs" type="button" role="tab" aria-controls="nav-activeclubs" aria-selected="true" onclick="updateLabel('Registered Clubs')">
-                                                    Registered Clubs
+                                                    My Clubs
                                                 </button>
                                                 <button title="Pending Approval" class="px-2 nav-link" id="nav-pendingclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-pendingclubs" type="button" role="tab" aria-controls="nav-pendingclubs" aria-selected="false" onclick="updateLabel('Pending Approval')">
                                                     Pending
@@ -336,9 +341,9 @@ try {
                                             </div>
                                         </a>
                                     </div>
-                                    <div class="date text-muted">
+                                    <!--<div class="date text-muted">
                                         ${dateLabel}: ${club.dateModified}
-                                    </div>
+                                    </div>-->
                                 </div>
                             `).join('');
                         } else {

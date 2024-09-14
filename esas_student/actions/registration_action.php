@@ -9,6 +9,9 @@ $question1_err = $question2_err = $question3_err = $club_id_err = "";
 // Start the session
 session_start();
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Ensure student_id is set in the session
 if (!isset($_SESSION['student_id'])) {
     echo "<script>alert('Student not logged in.'); window.history.back();</script>";
@@ -77,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->execute()) {
             // Records created successfully. Redirect to landing page
             echo "<script>alert('Registration successful!');</script>";
-            echo "<script>window.location.href = '/esas/esas_student/clubs.php';</script>";
+            echo "<script>window.location.href = '/esas/esas_student/all_clubs.php';</script>";
             exit();
         } else {
             echo "Oops! Something went wrong. Please try again later.";

@@ -92,6 +92,12 @@ try {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
 
     
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../assets/js/jquery-3.6.0.js"></script>
@@ -232,6 +238,54 @@ try {
             max-width: 90%;
         }
 
+
+        body.modal-open {
+            padding-right: 0 !important;
+        }
+        /* html {
+            overflow-y: scroll;
+        } */
+
+
+
+
+
+        /* Comment container to position ellipsis */
+        .comment {
+            position: relative; /* Ensure positioning context for the absolute element */
+            transition: background-color 0.3s ease;
+        }
+
+        .comment:hover {
+            background-color: #f7f7f7; /* Light background when hovering over the comment row */
+        }
+
+        .dropdown {
+            position: absolute;
+            margin-left: 93%;
+            z-index: 2;
+        }
+        .dropdown .ellipsis {
+            position: absolute !important;
+            right: 10px; /* Position it on the far right */
+            top: 0%;
+            border-radius: 50%;
+            padding: 5px;
+            transition: background-color 0.3s ease;
+            background-color: #f7f7f7; /* Ensure background color matches hover */
+        }
+        .dropdown .ellipsis:hover {
+            background-color: #d3d3d3; /* Light gray background on hover */
+            cursor: pointer;
+        }
+        .dropdown .dropdown-menu {
+            position: absolute;
+            margin-left: -170px !important;
+            z-index: 2;
+        }
+
+
+        
         @media (min-width: 768px) {
             .overlay-text {
                 padding: 10px;
@@ -246,14 +300,6 @@ try {
             }
 
         }
-
-        body.modal-open {
-            padding-right: 0 !important;
-        }
-        /* html {
-            overflow-y: scroll;
-        } */
-
     </style>
 </head>
 <body>
@@ -282,6 +328,9 @@ try {
                 <div class="row" id="postsContainer">
                     <!-- Posts will be dynamically inserted here -->
                 </div>
+                <div class="mt-2 text-center align-items-center justify-content-center">
+                    <a href="../esas_student/my_clubs.php" class="btn btn-secondary">Go Back</a>
+                </div>
             </div>
         </div>
     </div>
@@ -293,7 +342,6 @@ try {
 
  
     
-
 
 
 
@@ -368,7 +416,7 @@ try {
                                                         <span id="comment-count-${post.post_id}">${commentText}</span>
                                                     </a>
                                                 </div>
-                                                <div class="comment-section mt-3 ml-3 mr-2" id="comments-${post.post_id}" style="display: none; padding: 10px;">
+                                                <div class="comment-section mt-1 ml-1 mr-2" id="comments-${post.post_id}" style="display: none; padding: 10px;">
                                                     <!-- Comments will be dynamically loaded here -->
                                                 </div>
                                             </div>
@@ -414,70 +462,54 @@ try {
             
 
             // Function to fetch comments for a post
-            function fetchComments(postId) {
-                const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
+function fetchComments(postId) {
+    const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
+    const currentStudentId = "<?php echo $student_id; ?>"; // Get the current student's ID from PHP
 
-                fetch(`/esas/esas_student/apis/comments-api.php?post_id=${postId}&club_id=${clubId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Fetched comments:', data);
-                        if (data.success) {
-                            const commentsSection = document.getElementById(`comments-${postId}`);
-                            const commentCount = document.getElementById(`comment-count-${postId}`);
-                            commentsSection.innerHTML = data.comments.map(comment => {
-                                const [date, time] = comment.dateAdded.split(' ');
-                                return `
-                                    <div class="comment d-flex align-items-start mb-2">
-                                        <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
-                                        <div class="comsec">
-                                            <p class="student-name mb-1">
-                                                <strong>${comment.student_name}</strong><br>
-                                                <span id="comment-text-${comment.id}">${comment.comment}</span>
-                                                <button class="btn btn-link btn-sm p-0" style="margin-top: -2px; margin-left: 5px;" data-comment-id="${comment.id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                            </p>
-                                            <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('');
-                            commentCount.textContent = data.comments.length === 1 ? '1 comment' : `${data.comments.length} comments`;
-                        } else {
-                            console.error(data.message);
-                        }
-                    })
-                    .catch(error => console.error('Error fetching comments:', error));
+    fetch(`/esas/esas_student/apis/comments-api.php?post_id=${postId}&club_id=${clubId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Fetched comments:', data);
+            if (data.success) {
+                const commentsSection = document.getElementById(`comments-${postId}`);
+                const commentCount = document.getElementById(`comment-count-${postId}`);
+                commentsSection.innerHTML = data.comments.map(comment => {
+                    const [date, time] = comment.dateAdded.split(' ');
+
+                    // Only show the edit button if the comment's student_id matches the current user's student_id
+                    const showEllipsisButton = comment.student_id == currentStudentId ? `
+                        <div class="dropdown">
+                            <i class="fas fa-ellipsis-v ellipsis" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+                            <div class="dropdown-menu">
+                                <button class="dropdown-item" data-comment-id="${comment.comment_id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
+                                    <i class="fa fa-pencil"></i> Edit
+                                </button>
+                                <button class="dropdown-item text-danger" data-comment-id="${comment.comment_id}" onclick="deleteComment(this)">
+                                    <i class="fa fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>` : '';
+                    return `
+                        <div class="comment d-flex align-items-start">
+                            <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
+                            <div class="comsec">
+                                <p class="student-name mb-1">
+                                    ${showEllipsisButton} <!-- Conditionally render the dropdown -->
+                                    <strong>${comment.student_name}</strong><br>
+                                    <span id="comment-text-${comment.comment_id}">${comment.comment}</span>
+                                    <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                commentCount.textContent = data.comments.length === 1 ? '1 comment' : `${data.comments.length} comments`;
+            } else {
+                console.error(data.message);
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        })
+        .catch(error => console.error('Error fetching comments:', error));
+}
 
 
 
@@ -505,27 +537,6 @@ try {
 
     </script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var icon = document.getElementById("icon_announcement");
-
-            function triggerAnimation() {
-                icon.style.animation = "none"; // Reset the animation
-                icon.offsetHeight; // Trigger a reflow to restart the animation
-                icon.style.animation = "zoomAndWave 1.2s ease-in-out"; // Apply the animation
-
-                setTimeout(function() {
-                    icon.style.animationPlayState = "paused"; // Pause the animation after it completes
-                }, 1200);
-            }
-
-            // Trigger the animation every 5 seconds
-            setInterval(triggerAnimation, 5000);
-            
-            // Initial trigger
-            triggerAnimation();
-        });
-    </script>
 
 
 
@@ -545,11 +556,12 @@ try {
                         <div class="col-12">
                             <textarea id="editCommentText" name="new_comment" class="form-control form-control-sm" rows="3" required></textarea>
                             <input type="hidden" name="comment_id" id="editCommentId">
+                            <input type="hidden" name="club_id" value="<?php echo $club_id; ?>">
                         </div>
                     </div>
                     <div class="modal-footer py-0">
                         <button type="button" class="btn btn-sm btn-default" data-bs-dismiss="modal">Cancel</button>
-                        <input type="submit" class="btn btn-primary" value="Submit">
+                        <input type="submit" class="btn btn-primary" data-bs-dismiss="modal" value="Submit">
                     </div>
                 </form>
             </div>
@@ -557,24 +569,186 @@ try {
     </div>
 </div>
 
-<script>
-    // Function to open the edit comment modal and populate fields
-    function openEditCommentModal(button) {
-        const commentId = button.getAttribute('data-comment-id');
-        const commentText = button.getAttribute('data-comment-text');
+<!-- CONFIRMATION DELETE MODAL -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h6>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this comment?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confirmDeleteBtn">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        console.log('Opening modal for Comment ID:', commentId); // Debugging output
 
-        // Set the comment text and ID in the modal fields
-        document.getElementById('editCommentText').value = commentText;
-        document.getElementById('editCommentId').value = commentId;
+    <script>
+        
+        
 
-        // Show the modal
-        $('#editCommentModal').modal('show');
+        //EDIT MODAL FUNCTION START//
+        // Function to open the edit comment modal and populate fields
+function openEditCommentModal(button) {
+    const commentId = button.getAttribute('data-comment-id');
+    const commentText = button.getAttribute('data-comment-text');
+    const postId = button.getAttribute('data-post-id'); // Store the post ID
+
+    console.log('Opening modal for Comment ID:', commentId); // Debugging output
+
+    // Set the comment text and ID in the modal fields
+    document.getElementById('editCommentText').value = commentText;
+    document.getElementById('editCommentId').value = commentId;
+
+    // Show the modal
+    $('#editCommentModal').modal('show');
+}
+
+
+
+// Handle form submission for editing comment
+document.querySelector('#editCommentModal form').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent default form submission
+
+    // Retrieve form data
+    const formData = new FormData(this);
+
+    // Send request to edit the comment
+    fetch('../esas_student/actions/edit_comment_action.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())  // Parse JSON response
+    .then(data => {
+        console.log('Edit result:', data);
+        if (data.success) {
+            alert(data.message);  // Display success message
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url; // Redirect if URL is provided
+            } else {
+                // Reload comments or update the UI as needed
+                fetchComments(formData.get('club_id')); // Call function to fetch and update comments
+            }
+        } else {
+            alert(data.message);  // Display error message
+        }
+
+        // Hide the modal
+        $('#editCommentModal').modal('hide');
+    })
+    .catch(error => console.error('Error editing comment:', error));
+});
+
+
+        //EDIT MODAL FUNCTION END//
+
+
+
+        //DELETE MODAL FUNCTION START//
+        let commentToDelete = null; // Store the comment ID for deletion
+        let postId = null; // Store the post ID
+
+        function deleteComment(button) {
+            commentToDelete = button.getAttribute('data-comment-id'); // Store the comment ID
+            postId = button.getAttribute('data-post-id'); // Store the post ID
+
+            // Show confirmation modal
+            $('#confirmDeleteModal').modal('show');
+        }
+
+        // Handle the confirmation of deletion
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            console.log('Confirm delete button clicked');
+            if (commentToDelete) {
+                // Store the postId in localStorage to keep track of which post's comments section was open
+                localStorage.setItem('openPostId', postId);
+
+                // Send request to delete the comment
+                fetch('/esas/esas_student/actions/delete_comment_action.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'comment_id': commentToDelete,
+                        'club_id': "<?php echo $club_id; ?>"
+                    }),
+                })
+                .then(response => response.json())  // Parse JSON response
+                .then(data => {
+                    console.log('Delete result:', data);
+                    if (data.success) {
+                        alert(data.message);  // Display success message
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url; // Redirect to home.php with the club_id
+                        } else {
+                            fetchComments(postId); // Reload comments or update the UI as needed
+                        }
+                    } else {
+                        alert(data.message);  // Display error message
+                    }
+                })
+                .catch(error => console.error('Error deleting comment:', error));
+
+                // Hide the modal
+                $('#confirmDeleteModal').modal('hide');
+                commentToDelete = null; // Clear the stored comment ID
+            }
+        });
+
+        //DELETE MODAL FUNCTION END//
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+    // Check if there's a postId stored in localStorage
+    const openPostId = localStorage.getItem('openPostId');
+    
+    if (openPostId) {
+        console.log('Opening comments for post:', openPostId);
+
+        // Open the comments section of the stored postId
+        toggleComments(openPostId);
+        
+        // Remove the stored postId after using it
+        localStorage.removeItem('openPostId');
     }
-</script>
+});
 
 
+
+
+
+
+        //WAVE ANIMATION OF OFFICERS CARDS START//
+        document.addEventListener("DOMContentLoaded", function() {
+            var icon = document.getElementById("icon_announcement");
+
+            function triggerAnimation() {
+                icon.style.animation = "none"; // Reset the animation
+                icon.offsetHeight; // Trigger a reflow to restart the animation
+                icon.style.animation = "zoomAndWave 1.2s ease-in-out"; // Apply the animation
+
+                setTimeout(function() {
+                    icon.style.animationPlayState = "paused"; // Pause the animation after it completes
+                }, 1200);
+            }
+
+            // Trigger the animation every 5 seconds
+            setInterval(triggerAnimation, 5000);
+            
+            // Initial trigger
+            triggerAnimation();
+        });
+        //WAVE ANIMATION OF OFFICERS CARDS END//
+
+    </script>
 
 </body>
 

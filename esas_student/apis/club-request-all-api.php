@@ -34,6 +34,7 @@ switch ($method) {
         $stmt->execute(['student_id' => $student_id]);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Check if any records were found
         if ($result) {
             // Format the dateRequested and dateModified fields
             foreach ($result as &$club) {
@@ -43,11 +44,11 @@ switch ($method) {
 
             echo json_encode($result);
         } else {
-            http_response_code(404);
-            echo json_encode(['error' => 'No club requests found for this student']);
+            // Return an empty array with a 200 status code
+            echo json_encode([]);
         }
         break;
-        
+
     default:
         // Invalid method
         http_response_code(405);

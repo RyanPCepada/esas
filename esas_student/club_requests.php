@@ -185,6 +185,12 @@ try {
         .card-container:nth-child(3) {
             animation-delay: 0.2s;
         }
+
+
+        
+        body.modal-open {
+            padding-right: 0 !important;
+        }
     </style>
 </head>
 
@@ -244,9 +250,9 @@ try {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row g-0">
-                                        <div class="d-flex justify-content-between align-items-center p-3 mb-5">
-                                            <h2 class="text-muted mt-0 mb-0">My Club Requests</h2>
-                                            <button type="button" class="btn btn-primary" id="request-club-btn" data-bs-toggle="modal" data-bs-target="#requestClubModal" style="width: 210px; border-radius: 5px;">
+                                        <div class="d-flex align-items-center justify-content-end pb-3 mt-2 mb-3">
+                                            <!-- <h2 class="text-muted mt-0 mb-0">My Club Requests</h2> -->
+                                            <button type="button" class="btn btn-primary" id="request-club-btn" data-bs-toggle="modal" data-bs-target="#requestClubModal" style="width: 160px; border-radius: 5px;">
                                                 Request for a Club
                                             </button>
                                         </div>
@@ -260,10 +266,10 @@ try {
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <p class="py-2">Please fill out this form and submit your request for a new club.</p>
+                                                        <!-- <p class="py-2">Please fill out this form and submit your request for a new club.</p> -->
                                                         <form id="clubRequestForm" action="../esas_student/actions/club_request_action.php" method="POST" enctype="multipart/form-data">
                                                             <div class="form-group mb-3">
-                                                                <label for="clubName">Club Name</label>
+                                                                <label for="clubName">Club name</label>
                                                                 <input type="text" name="clubName" class="form-control" id="clubName" required>
                                                             </div>
                                                             <div class="form-group mb-3">
@@ -271,11 +277,11 @@ try {
                                                                 <textarea name="description" class="form-control" id="description" rows="3" required></textarea>
                                                             </div>
                                                             <div class="form-group mb-3">
-                                                                <label for="activities">Proposed Activities</label>
+                                                                <label for="activities">Proposed activities</label>
                                                                 <textarea name="activities" class="form-control" id="activities" rows="2"></textarea>
                                                             </div>
                                                             <div class="form-group mb-3">
-                                                                <label for="coverPhoto">Club Cover Photo</label>
+                                                                <label for="coverPhoto">Add a coverphoto</label>
                                                                 <input type="file" name="coverPhoto" class="form-control" id="coverPhoto" required onchange="previewImage(event)">
                                                             </div>
                                                             
@@ -386,7 +392,7 @@ try {
                         const clubsContainer = document.getElementById(containerId);
                         if (response && response.length > 0) {
                             clubsContainer.innerHTML = response.map(club => `
-                                <div class="col-md-4 mb-4 card-container">
+                                <div class="col-md-4 card-container">
                                     <div class="card card-img-only">
                                         <a href="#">
                                             <img src="/esas/esas_student/images/${club.coverPhoto}" alt="Cover Photo">
@@ -395,9 +401,9 @@ try {
                                             </div>
                                         </a>
                                     </div>
-                                    <div class="date text-muted">
+                                    <!--<div class="date text-muted">
                                         ${dateLabel}: ${club.dateModified}
-                                    </div>
+                                    </div>-->
                                 </div>
                             `).join('');
                         } else {

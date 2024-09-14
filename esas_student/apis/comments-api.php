@@ -20,8 +20,20 @@ if (isset($_GET['post_id']) && isset($_GET['club_id'])) {
         $stmt->bindParam(':post_id', $post_id);
         $stmt->bindParam(':club_id', $club_id);
         $stmt->execute();
-
         $comments = [];
+
+    if (!empty($post_id)) {
+        try {
+            // Fetch comments, student profile pictures, comment_id, and student_id
+            $sql = "SELECT c.comment_id, c.comment, c.dateAdded, c.student_id, CONCAT(s.firstName, ' ', s.lastName) as student_name, s.profilePic
+                    FROM tbl_comments c
+                    JOIN tbl_students s ON c.student_id = s.student_id
+                    WHERE c.post_id = :post_id
+                    ORDER BY c.dateAdded ASC";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(":post_id", $post_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $comments[] = [
