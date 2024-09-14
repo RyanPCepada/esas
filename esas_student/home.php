@@ -238,6 +238,55 @@ try {
             max-width: 90%;
         }
 
+
+        body.modal-open {
+            padding-right: 0 !important;
+        }
+        /* html {
+            overflow-y: scroll;
+        } */
+
+
+
+
+
+        /* Comment container to position ellipsis */
+        .comment {
+            position: relative; /* Ensure positioning context for the absolute element */
+            padding-right: 40px; /* Add padding to prevent overlap with ellipsis */
+            transition: background-color 0.3s ease;
+        }
+
+        .comment:hover {
+            background-color: #f7f7f7; /* Light background when hovering over the comment row */
+        }
+
+        .dropdown {
+            position: absolute;
+            margin-left: 93%;
+            z-index: 2;
+        }
+        .dropdown .ellipsis {
+            position: absolute !important;
+            right: 10px; /* Position it on the far right */
+            top: 0%;
+            border-radius: 50%;
+            padding: 5px;
+            transition: background-color 0.3s ease;
+            background-color: #f7f7f7; /* Ensure background color matches hover */
+        }
+        .dropdown .ellipsis:hover {
+            background-color: #d3d3d3; /* Light gray background on hover */
+            cursor: pointer;
+        }
+        .dropdown .dropdown-menu {
+            position: absolute;
+            margin-left: -170px !important;
+            z-index: 2;
+        }
+
+
+        
         @media (min-width: 768px) {
             .overlay-text {
                 padding: 10px;
@@ -252,19 +301,6 @@ try {
             }
 
         }
-
-        body.modal-open {
-            padding-right: 0 !important;
-        }
-        /* html {
-            overflow-y: scroll;
-        } */
-
-
-
-
-
-        
     </style>
 </head>
 <body>
@@ -440,11 +476,11 @@ function fetchComments(postId) {
                 const commentCount = document.getElementById(`comment-count-${postId}`);
                 commentsSection.innerHTML = data.comments.map(comment => {
                     const [date, time] = comment.dateAdded.split(' ');
-                    
+
                     // Only show the edit button if the comment's student_id matches the current user's student_id
                     const showEditButton = comment.student_id == currentStudentId ? `
                         <div class="dropdown">
-                            <i class="fas fa-ellipsis-v dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+                            <i class="fas fa-ellipsis-v ellipsis" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
                             <div class="dropdown-menu">
                                 <button class="dropdown-item" data-comment-id="${comment.comment_id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
                                     <i class="fa fa-pencil"></i> Edit
@@ -454,17 +490,16 @@ function fetchComments(postId) {
                                 </button>
                             </div>
                         </div>` : '';
-                    
                     return `
                         <div class="comment d-flex align-items-start mb-2">
                             <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
                             <div class="comsec">
                                 <p class="student-name mb-1">
+                                    ${showEditButton} <!-- Conditionally render the dropdown -->
                                     <strong>${comment.student_name}</strong><br>
                                     <span id="comment-text-${comment.comment_id}">${comment.comment}</span>
-                                    ${showEditButton} <!-- Conditionally render the dropdown -->
+                                    <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
                                 </p>
-                                <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
                             </div>
                         </div>
                     `;
@@ -476,6 +511,7 @@ function fetchComments(postId) {
         })
         .catch(error => console.error('Error fetching comments:', error));
 }
+
 
 // Function to open the edit comment modal and populate fields
 function openEditCommentModal(button) {

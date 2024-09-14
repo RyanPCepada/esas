@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->execute()) {
             // Comment updated successfully. Redirect to comments page
             echo "<script>
-                alert('Comment updated successfully!\\nNew Comment: " . addslashes($new_comment) . "\\nComment ID: " . htmlspecialchars($comment_id) . "');
+                // alert('Comment updated successfully!\\nNew Comment: " . addslashes($new_comment) . "\\nComment ID: " . htmlspecialchars($comment_id) . "');
                 window.location.href = '../home.php?club_id=" . urlencode($club_id) . "';
             </script>";
             exit();
