@@ -44,6 +44,19 @@ try {
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>Sample Template</title>
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
+
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../assets/js/jquery-3.6.0.js"></script>
@@ -191,6 +204,13 @@ try {
         body.modal-open {
             padding-right: 0 !important;
         }
+
+        .modal-paragraph {
+            text-align: justify;         /* Ensures text is justified (end-to-end alignment) */
+            text-indent: 30px;           /* Indents the first line of the paragraph */
+            margin-bottom: 15px;         /* Adds space between paragraphs */
+        }
+
     </style>
 </head>
 
@@ -384,59 +404,96 @@ try {
         }
 
         $(document).ready(function() {
-            function loadClubs(tab, containerId, dateLabel) {
-                $.ajax({
-                    url: `/esas/esas_student/apis/club-request-${tab}-api.php`, // Adjust the URL for each tab
-                    type: "GET",
-                    success: function(response) {
-                        const clubsContainer = document.getElementById(containerId);
-                        if (response && response.length > 0) {
-                            clubsContainer.innerHTML = response.map(club => `
-                                <div class="col-md-4 card-container">
-                                    <div class="card card-img-only">
-                                        <a href="#">
-                                            <img src="/esas/esas_student/images/${club.coverPhoto}" alt="Cover Photo">
-                                            <div class="overlay-text">
-                                                <h4>${club.clubName}</h4>
-                                            </div>
-                                        </a>
+    function loadClubs(tab, containerId, dateLabel) {
+        $.ajax({
+            url: `/esas/esas_student/apis/club-request-${tab}-api.php`,
+            type: "GET",
+            success: function(response) {
+                const clubsContainer = document.getElementById(containerId);
+                if (response && response.length > 0) {
+                    clubsContainer.innerHTML = response.map(club => `
+                        <div class="col-md-4 card-container">
+                            <div class="card card-img-only">
+                                <a href="#" class="club-card" data-id="${club.request_id}">
+                                    <img src="/esas/esas_student/images/${club.coverPhoto}" alt="Cover Photo">
+                                    <div class="overlay-text">
+                                        <h4>${club.clubName}</h4>
                                     </div>
-                                    <!--<div class="date text-muted">
-                                        ${dateLabel}: ${club.dateModified}
-                                    </div>-->
-                                </div>
-                            `).join('');
-                        } else {
-                            clubsContainer.innerHTML = '<p>No clubs found.</p>';
-                        }
-                    },
-                    error: function() {
-                        const clubsContainer = document.getElementById(containerId);
-                        clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
-                    }
-                });
+                                </a>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    clubsContainer.innerHTML = '<p>No clubs found.</p>';
+                }
+            },
+            error: function() {
+                const clubsContainer = document.getElementById(containerId);
+                clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
             }
-
-            // Load initial content for All Clubs tab
-            loadClubs('all', 'allClubRequestContainer', 'Date requested');
-
-            // Event listeners for each tab
-            $('#nav-requestedclubs-tab').on('click', function() {
-                loadClubs('all', 'allClubRequestContainer', 'Date requested');
-            });
-
-            $('#nav-pendingclubs-tab').on('click', function() {
-                loadClubs('pending', 'pendingClubRequestContainer', 'Date requested');
-            });
-
-            $('#nav-approvedclubs-tab').on('click', function() {
-                loadClubs('approved', 'approvedClubRequestContainer', 'Date approved');
-            });
-
-            $('#nav-disapprovedclubs-tab').on('click', function() {
-                loadClubs('disapproved', 'disapprovedClubRequestContainer', 'Date disapproved');
-            });
         });
+    }
+
+    function loadClubDetails(requestId) {
+    $.ajax({
+        url: `/esas/esas_student/apis/club-request-details-api.php`,
+        type: "GET",
+        data: { request_id: requestId },
+        success: function(response) {
+            if (response) {
+                // Set cover photo
+                $('#modalCoverPhoto').find('img').attr('src', `/esas/esas_student/images/${response.coverPhoto}`);
+
+                // Set club name
+                $('#modalClubName').text(response.clubName);
+
+                // Set date requested and status separately
+                $('#modalDateRequested').text(`Date Requested: ${response.dateRequested}`);
+                $('#modalStatus').text(`Status: ${response.status}`);
+
+                // Set description and activities
+                $('#modalDescription').text(response.description);
+                $('#modalActivities').text(response.activities);
+
+                // Show the modal
+                $('#clubDetailsModal').modal('show');
+            }
+        },
+        error: function() {
+            alert('Failed to fetch club details. Please try again later.');
+        }
+    });
+}
+
+
+    $(document).on('click', '.club-card', function(e) {
+        e.preventDefault();
+        const requestId = $(this).data('id');
+        loadClubDetails(requestId);
+    });
+
+    // Initial load for All Clubs tab
+    loadClubs('all', 'allClubRequestContainer', 'Date requested');
+
+    // Event listeners for each tab
+    $('#nav-requestedclubs-tab').on('click', function() {
+        loadClubs('all', 'allClubRequestContainer', 'Date requested');
+    });
+
+    $('#nav-pendingclubs-tab').on('click', function() {
+        loadClubs('pending', 'pendingClubRequestContainer', 'Date requested');
+    });
+
+    $('#nav-approvedclubs-tab').on('click', function() {
+        loadClubs('approved', 'approvedClubRequestContainer', 'Date approved');
+    });
+
+    $('#nav-disapprovedclubs-tab').on('click', function() {
+        loadClubs('disapproved', 'disapprovedClubRequestContainer', 'Date disapproved');
+    });
+});
+
+
 
     </script>
 
@@ -448,5 +505,39 @@ try {
             // let value= $("classname").val()
         });
     </script>
+
+
+
+<div id="clubDetailsModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="modalClubName"></h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 15px;">
+                <div id="modalCoverPhoto" class="text-center">
+                    <img src="" alt="Cover Photo" class="img-fluid">
+                </div>
+                <div class="d-flex justify-content-between mt-3">
+                    <p id="modalDateRequested" class="text-left"></p>
+                    <p id="modalStatus" class="text-right"></p>
+                </div>
+                <hr>
+                <label>Description:</label>
+                <p id="modalDescription" class="modal-paragraph"></p>
+                <label>Activities:</label>
+                <p id="modalActivities" class="modal-paragraph"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 </body>
 </html>
