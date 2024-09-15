@@ -129,298 +129,298 @@ try {
             
             
             <!-- MAINPAGE BAR -->
-<div class="col-12 col-md-10 bg-lgrey auto-scroll">
-    <div class="row g-0 h-100">
-        <div class="row g-0 p-4 px-2 pt-2 h-100">
-            <div class="row align-items-center mb-2">
-                <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
-                <div class="col-auto">
-                    <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                        <?php
-                        // Prepare the SQL query
-                        $sql = "
-                            SELECT c.club_id, c.clubName 
-                            FROM tbl_clubs c
-                            JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
-                            WHERE cm.moderator_id = :moderator_id
-                        ";
+            <div class="col-12 col-md-10 bg-lgrey auto-scroll">
+                <div class="row g-0 h-100">
+                    <div class="row g-0 p-4 px-2 pt-2 h-100">
+                        <div class="row align-items-center mb-2">
+                            <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
+                            <div class="col-auto">
+                                <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                                    <?php
+                                    // Prepare the SQL query
+                                    $sql = "
+                                        SELECT c.club_id, c.clubName 
+                                        FROM tbl_clubs c
+                                        JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                                        WHERE cm.moderator_id = :moderator_id
+                                    ";
 
-                        // Execute the query
-                        $stmt = $pdo->prepare($sql);
-                        $stmt->execute(['moderator_id' => $moderator_id]);
+                                    // Execute the query
+                                    $stmt = $pdo->prepare($sql);
+                                    $stmt->execute(['moderator_id' => $moderator_id]);
 
-                        // Fetch the results
-                        $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                    // Fetch the results
+                                    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                        // Generate the dropdown options
-                        foreach ($clubs as $club): ?>
-                            <option value="<?php echo htmlspecialchars($club['club_id']); ?>">
-                                <?php echo htmlspecialchars($club['clubName']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
-                    <div class="col-auto">
-                        <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                            <?php 
-                            // Get the current date
-                            $currentDate = new DateTime();
+                                    // Generate the dropdown options
+                                    foreach ($clubs as $club): ?>
+                                        <option value="<?php echo htmlspecialchars($club['club_id']); ?>">
+                                            <?php echo htmlspecialchars($club['clubName']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
+                                <div class="col-auto">
+                                    <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                                        <?php 
+                                        // Get the current date
+                                        $currentDate = new DateTime();
 
-                            // Calculate school years based on current date
-                            $schoolYears = [];
-                            for ($i = 0; $i < 5; $i++) {
-                                $startYear = $currentDate->format('Y') - $i;
-                                $endYear = $startYear + 1;
-                                $schoolYears[] = "{$startYear}-{$endYear}";
-                            }
-
-                            // Prepare and execute the SQL query
-                            $sql = "
-                                SELECT DISTINCT 
-                                    CONCAT(YEAR(dateAdded), '-', YEAR(dateAdded) + 1) AS schoolYear
-                                FROM tbl_clubs
-                                WHERE dateAdded IS NOT NULL
-                                AND YEAR(dateAdded) BETWEEN YEAR(DATE_SUB(NOW(), INTERVAL 5 YEAR)) AND YEAR(NOW())
-                            ";
-
-                            $stmt = $pdo->prepare($sql);
-                            $stmt->execute();
-                            $activeSchoolYears = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-                            // Determine which school years to display
-                            $displaySchoolYears = array_intersect($schoolYears, $activeSchoolYears);
-
-                            // Output school year options
-                            foreach ($displaySchoolYears as $schoolYear) {
-                                echo "<option value=\"" . htmlspecialchars($schoolYear) . "\">" . htmlspecialchars($schoolYear) . "</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-
-            </div>
-
-            <!-- THE MAIN PAGE START -->
-            <div class="card p-4">
-                <!-- UPPER CARDS START -->
-                <div class="row card-row1 col-md-12 mb-3" style="border: 1px solid transparent; margin: 0;">
-                    <!-- Card for TOTAL MODERATORS CLUBS -->
-                    <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                            <?php
-                            try {
-                                // Fetch total clubs associated with the moderator using tbl_club_and_moderators
-                                $stmt_clubs = $pdo->prepare("
-                                    SELECT COUNT(DISTINCT club_id) AS total_clubs 
-                                    FROM tbl_clubs_and_moderators 
-                                    WHERE moderator_id = :moderator_id
-                                ");
-                                $stmt_clubs->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                                $stmt_clubs->execute();
-                                $total_clubs = $stmt_clubs->fetchColumn();
-                                echo "<h3>$total_clubs</h3>";
-                            } catch (PDOException $e) {
-                                echo "Error: " . $e->getMessage();
-                            }
-                            ?>
-                            <p>Total Clubs</p>
-                        </div>
-                    </div>
-
-                    <!-- Card for TOTAL STUDENTS -->
-                    <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                            <?php
-                            try {
-                                // Fetch total distinct students who registered under clubs managed by this moderator
-                                $stmt_students = $pdo->prepare("
-                                    SELECT COUNT(DISTINCT tr.student_id) AS total_students 
-                                    FROM tbl_registration tr 
-                                    JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
-                                    JOIN tbl_moderators tm ON tc.club_id = tm.club_id 
-                                    WHERE tm.moderator_id = :moderator_id AND tr.status = 'active'
-                                ");
-                                $stmt_students->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                                $stmt_students->execute();
-                                $total_students = $stmt_students->fetchColumn();
-                                echo "<h3>$total_students</h3>";
-                            } catch (PDOException $e) {
-                                echo "Error: " . $e->getMessage();
-                            }
-                            ?>
-                            <p>Total Students</p>
-                        </div>
-                    </div>
-
-                    <!-- Card for TOTAL PENDING -->
-                    <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                            <?php
-                            try {
-                                // Fetch total pending student registrations for clubs managed by this moderator
-                                $stmt_pending = $pdo->prepare("
-                                    SELECT COUNT(tr.student_id) AS total_pending 
-                                    FROM tbl_registration tr
-                                    JOIN tbl_clubs tc ON tr.club_id = tc.club_id
-                                    JOIN tbl_moderators tm ON tc.club_id = tm.club_id
-                                    WHERE tr.status = 'pending' AND tm.moderator_id = :moderator_id
-                                ");
-                                $stmt_pending->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                                $stmt_pending->execute();
-                                $total_pending = $stmt_pending->fetchColumn();
-                                echo "<h3>$total_pending</h3>";
-                            } catch (PDOException $e) {
-                                echo "Error: " . $e->getMessage();
-                            }
-                            ?>
-                            <p>Total Pending Approval</p>
-                        </div>
-                    </div>
-
-                    <!-- Card for LEAVE REQUESTS (you can modify this query as needed) -->
-                    <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                            <h3>0</h3>
-                            <p>Leave Requests</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- UPPER CARDS END -->
-
-
-                <!-- CHARTS AND DIAGRAMS START -->
-                <div class="row card-row2 col-12" style="border: 1px solid transparent; margin: 0;">
-
-                    <!-- PIE CHART -->
-                    <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
-                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                            <h5>Students per Department</h5>
-                            <div style="height: 365px; background-color: transparent;">
-                                <?php
-                                try {
-                                    // Fetch the count of registered students per department for the clubs managed by the current moderator
-                                    $stmt = $pdo->prepare("
-                                        SELECT ts.department, COUNT(tr.student_id) AS member_count
-                                        FROM tbl_students ts
-                                        JOIN tbl_registration tr ON ts.student_id = tr.student_id
-                                        JOIN tbl_clubs_and_moderators cm ON tr.club_id = cm.club_id
-                                        WHERE cm.moderator_id = :moderator_id AND tr.status = 'active'
-                                        GROUP BY ts.department
-                                    ");
-                                    $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                                    $stmt->execute();
-                                    $department_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                                } catch (PDOException $e) {
-                                    echo "Error: " . $e->getMessage();
-                                }
-
-                                // Prepare data for the pie chart
-                                $departments = [];
-                                $counts = [];
-
-                                foreach ($department_data as $row) {
-                                    $departments[] = $row['department'];
-                                    $counts[] = $row['member_count'];
-                                }
-                                ?>
-                                <!-- Canvas for the pie chart -->
-                                <canvas id="pieChart" style="height: 100%;"></canvas>
-                                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                                <script>
-                                    // Fetching data from PHP arrays
-                                    const departments = <?php echo json_encode($departments); ?>;
-                                    const counts = <?php echo json_encode($counts); ?>;
-
-                                    // Render Pie Chart using Chart.js
-                                    const ctx = document.getElementById('pieChart').getContext('2d');
-                                    const pieChart = new Chart(ctx, {
-                                        type: 'pie',
-                                        data: {
-                                            labels: departments,  // Department names
-                                            datasets: [{
-                                                label: 'Members per Department',
-                                                data: counts,  // Member count per department
-                                                backgroundColor: [
-                                                    'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
-                                                    'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
-                                                    'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
-                                                    'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
-                                                    'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
-                                                    'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
-                                                ],
-                                                borderColor: [
-                                                    'rgba(65, 105, 225, 1)',     // Royal Blue border
-                                                    'rgba(255, 105, 180, 1)',     // Hot Pink border
-                                                    'rgba(255, 215, 0, 1)',       // Gold border
-                                                    'rgba(0, 255, 255, 1)',       // Cyan border
-                                                    'rgba(255, 165, 0, 1)',       // Orange border
-                                                    'rgba(0, 255, 0, 1)'          // Lime Green border
-                                                ],
-                                                borderWidth: 1
-                                            }]
-                                        },
-                                        options: {
-                                            responsive: true,
-                                            plugins: {
-                                                legend: {
-                                                    position: 'top',
-                                                }
-                                            }
+                                        // Calculate school years based on current date
+                                        $schoolYears = [];
+                                        for ($i = 0; $i < 5; $i++) {
+                                            $startYear = $currentDate->format('Y') - $i;
+                                            $endYear = $startYear + 1;
+                                            $schoolYears[] = "{$startYear}-{$endYear}";
                                         }
-                                    });
-                                </script>
-                            </div>
+
+                                        // Prepare and execute the SQL query
+                                        $sql = "
+                                            SELECT DISTINCT 
+                                                CONCAT(YEAR(dateAdded), '-', YEAR(dateAdded) + 1) AS schoolYear
+                                            FROM tbl_clubs
+                                            WHERE dateAdded IS NOT NULL
+                                            AND YEAR(dateAdded) BETWEEN YEAR(DATE_SUB(NOW(), INTERVAL 5 YEAR)) AND YEAR(NOW())
+                                        ";
+
+                                        $stmt = $pdo->prepare($sql);
+                                        $stmt->execute();
+                                        $activeSchoolYears = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+                                        // Determine which school years to display
+                                        $displaySchoolYears = array_intersect($schoolYears, $activeSchoolYears);
+
+                                        // Output school year options
+                                        foreach ($displaySchoolYears as $schoolYear) {
+                                            echo "<option value=\"" . htmlspecialchars($schoolYear) . "\">" . htmlspecialchars($schoolYear) . "</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
                         </div>
+
+                        <!-- THE MAIN PAGE START -->
+                        <div class="card p-4">
+                            <!-- UPPER CARDS START -->
+                            <div class="row card-row1 col-md-12 mb-3" style="border: 1px solid transparent; margin: 0;">
+                                <!-- Card for TOTAL MODERATORS CLUBS -->
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <?php
+                                        try {
+                                            // Fetch total clubs associated with the moderator using tbl_club_and_moderators
+                                            $stmt_clubs = $pdo->prepare("
+                                                SELECT COUNT(DISTINCT club_id) AS total_clubs 
+                                                FROM tbl_clubs_and_moderators 
+                                                WHERE moderator_id = :moderator_id
+                                            ");
+                                            $stmt_clubs->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                            $stmt_clubs->execute();
+                                            $total_clubs = $stmt_clubs->fetchColumn();
+                                            echo "<h3>$total_clubs</h3>";
+                                        } catch (PDOException $e) {
+                                            echo "Error: " . $e->getMessage();
+                                        }
+                                        ?>
+                                        <p>Total Clubs</p>
+                                    </div>
+                                </div>
+
+                                <!-- Card for TOTAL STUDENTS -->
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <?php
+                                        try {
+                                            // Fetch total distinct students who registered under clubs managed by this moderator
+                                            $stmt_students = $pdo->prepare("
+                                                SELECT COUNT(DISTINCT tr.student_id) AS total_students 
+                                                FROM tbl_registration tr 
+                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
+                                                JOIN tbl_moderators tm ON tc.club_id = tm.club_id 
+                                                WHERE tm.moderator_id = :moderator_id AND tr.status = 'active'
+                                            ");
+                                            $stmt_students->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                            $stmt_students->execute();
+                                            $total_students = $stmt_students->fetchColumn();
+                                            echo "<h3>$total_students</h3>";
+                                        } catch (PDOException $e) {
+                                            echo "Error: " . $e->getMessage();
+                                        }
+                                        ?>
+                                        <p>Total Students</p>
+                                    </div>
+                                </div>
+
+                                <!-- Card for TOTAL PENDING -->
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <?php
+                                        try {
+                                            // Fetch total pending student registrations for clubs managed by this moderator
+                                            $stmt_pending = $pdo->prepare("
+                                                SELECT COUNT(tr.student_id) AS total_pending 
+                                                FROM tbl_registration tr
+                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id
+                                                JOIN tbl_moderators tm ON tc.club_id = tm.club_id
+                                                WHERE tr.status = 'pending' AND tm.moderator_id = :moderator_id
+                                            ");
+                                            $stmt_pending->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                            $stmt_pending->execute();
+                                            $total_pending = $stmt_pending->fetchColumn();
+                                            echo "<h3>$total_pending</h3>";
+                                        } catch (PDOException $e) {
+                                            echo "Error: " . $e->getMessage();
+                                        }
+                                        ?>
+                                        <p>Total Pending Approval</p>
+                                    </div>
+                                </div>
+
+                                <!-- Card for LEAVE REQUESTS (you can modify this query as needed) -->
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <h3>0</h3>
+                                        <p>Leave Requests</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- UPPER CARDS END -->
+
+
+                            <!-- CHARTS AND DIAGRAMS START -->
+                            <div class="row card-row2 col-12" style="border: 1px solid transparent; margin: 0;">
+
+                                <!-- PIE CHART -->
+                                <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <h5>Students per Department</h5>
+                                        <div style="height: 365px; background-color: transparent;">
+                                            <?php
+                                            try {
+                                                // Fetch the count of registered students per department for the clubs managed by the current moderator
+                                                $stmt = $pdo->prepare("
+                                                    SELECT ts.department, COUNT(tr.student_id) AS member_count
+                                                    FROM tbl_students ts
+                                                    JOIN tbl_registration tr ON ts.student_id = tr.student_id
+                                                    JOIN tbl_clubs_and_moderators cm ON tr.club_id = cm.club_id
+                                                    WHERE cm.moderator_id = :moderator_id AND tr.status = 'active'
+                                                    GROUP BY ts.department
+                                                ");
+                                                $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                                $stmt->execute();
+                                                $department_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                            } catch (PDOException $e) {
+                                                echo "Error: " . $e->getMessage();
+                                            }
+
+                                            // Prepare data for the pie chart
+                                            $departments = [];
+                                            $counts = [];
+
+                                            foreach ($department_data as $row) {
+                                                $departments[] = $row['department'];
+                                                $counts[] = $row['member_count'];
+                                            }
+                                            ?>
+                                            <!-- Canvas for the pie chart -->
+                                            <canvas id="pieChart" style="height: 100%;"></canvas>
+                                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                                            <script>
+                                                // Fetching data from PHP arrays
+                                                const departments = <?php echo json_encode($departments); ?>;
+                                                const counts = <?php echo json_encode($counts); ?>;
+
+                                                // Render Pie Chart using Chart.js
+                                                const ctx = document.getElementById('pieChart').getContext('2d');
+                                                const pieChart = new Chart(ctx, {
+                                                    type: 'pie',
+                                                    data: {
+                                                        labels: departments,  // Department names
+                                                        datasets: [{
+                                                            label: 'Members per Department',
+                                                            data: counts,  // Member count per department
+                                                            backgroundColor: [
+                                                                'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
+                                                                'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
+                                                                'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
+                                                                'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
+                                                                'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
+                                                                'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
+                                                            ],
+                                                            borderColor: [
+                                                                'rgba(65, 105, 225, 1)',     // Royal Blue border
+                                                                'rgba(255, 105, 180, 1)',     // Hot Pink border
+                                                                'rgba(255, 215, 0, 1)',       // Gold border
+                                                                'rgba(0, 255, 255, 1)',       // Cyan border
+                                                                'rgba(255, 165, 0, 1)',       // Orange border
+                                                                'rgba(0, 255, 0, 1)'          // Lime Green border
+                                                            ],
+                                                            borderWidth: 1
+                                                        }]
+                                                    },
+                                                    options: {
+                                                        responsive: true,
+                                                        plugins: {
+                                                            legend: {
+                                                                position: 'top',
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- PIE CHART END -->
+
+
+
+                                <!-- OTHER CHARTS -->
+                                <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="row" style="border: 1px solid transparent; margin: 0;">
+                                        <!-- Student Gender -->
+                                        <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
+                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                                <h5>Student Gender</h5>
+                                                <div style="height: 150px;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Vertically divided Year Level Count and Members per School Year -->
+                                    <div class="row" style="border: 1px solid transparent; margin: 0;">
+                                        <!-- Year Level Count -->
+                                        <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                                <h5>Year Level Count</h5>
+                                                <div style="height: 150px; background-color: lightgray;">
+                                                    <!-- BAR GRAPH FOR NUMBERS OF YEAR LEVEL -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Members per School Year -->
+                                        <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                                <h5>Members per School Year</h5>
+                                                <div style="height: 150px; background-color: lightgray;">
+                                                    <!-- BAR GRAPH FOR NUMBERS OF YEAR LEVEL -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <!-- CHARTS AND DIAGRAMS END -->
+                        </div>
+                        <!-- THE MAIN PAGE END -->
                     </div>
-                    <!-- PIE CHART END -->
-
-
-
-                    <!-- OTHER CHARTS -->
-                    <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
-                        <div class="row" style="border: 1px solid transparent; margin: 0;">
-                            <!-- Student Gender -->
-                            <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
-                                <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                    <h5>Student Gender</h5>
-                                    <div style="height: 150px; background-color: lightgray;">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Vertically divided Year Level Count and Members per School Year -->
-                        <div class="row" style="border: 1px solid transparent; margin: 0;">
-                            <!-- Year Level Count -->
-                            <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
-                                <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                    <h5>Year Level Count</h5>
-                                    <div style="height: 150px; background-color: lightgray;">
-                                        <!-- BAR GRAPH FOR NUMBERS OF YEAR LEVEL -->
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Members per School Year -->
-                            <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
-                                <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                    <h5>Members per School Year</h5>
-                                    <div style="height: 150px; background-color: lightgray;">
-                                        <!-- BAR GRAPH FOR NUMBERS OF YEAR LEVEL -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
                 </div>
-                <!-- CHARTS AND DIAGRAMS END -->
             </div>
-            <!-- THE MAIN PAGE END -->
-        </div>
-    </div>
-</div>
-<!-- MAINPAGE BAR END -->
+            <!-- MAINPAGE BAR END -->
 
 
         </div>
