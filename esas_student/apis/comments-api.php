@@ -1,26 +1,11 @@
 <?php
-// Include database configuration file
-require_once '../../config.php';
+session_start();
+require_once "../../config.php";
 
-// Check if post_id and club_id are provided
-if (isset($_GET['post_id']) && isset($_GET['club_id'])) {
-    $post_id = $_GET['post_id'];
-    $club_id = $_GET['club_id'];
+$response = array('success' => false, 'message' => '', 'comments' => array());
 
-    try {
-        // Prepare the SQL query to fetch comments based on post_id and club_id
-        $stmt = $pdo->prepare("
-            SELECT c.comment_id, c.comment, c.dateAdded, s.firstName, s.lastName, s.profilePic
-            FROM tbl_comments c
-            JOIN tbl_students s ON c.student_id = s.student_id
-            WHERE c.post_id = :post_id AND c.club_id = :club_id
-            ORDER BY c.dateAdded ASC
-        ");
-        
-        $stmt->bindParam(':post_id', $post_id);
-        $stmt->bindParam(':club_id', $club_id);
-        $stmt->execute();
-        $comments = [];
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $post_id = isset($_GET['post_id']) ? $_GET['post_id'] : '';
 
     if (!empty($post_id)) {
         try {
@@ -35,25 +20,21 @@ if (isset($_GET['post_id']) && isset($_GET['club_id'])) {
             $stmt->execute();
             $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $comments[] = [
-                'id' => $row['comment_id'], // Fetch the comment_id
-                'comment' => $row['comment'],
-                'dateAdded' => $row['dateAdded'],
-                'student_name' => $row['firstName'] . ' ' . $row['lastName'],
-                'profilePic' => $row['profilePic']
-            ];
+            if ($comments) {
+                $response['success'] = true;
+                $response['comments'] = $comments;
+            } else {
+                $response['message'] = 'No comments found.';
+            }
+        } catch (PDOException $e) {
+            $response['message'] = 'Database error: ' . $e->getMessage();
         }
-
-        if (!empty($comments)) {
-            echo json_encode(['success' => true, 'comments' => $comments]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'No comments found']);
-        }
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+    } else {
+        $response['message'] = 'Post ID is required.';
     }
 } else {
-    echo json_encode(['success' => false, 'message' => 'Invalid parameters']);
+    $response['message'] = 'Invalid request method.';
 }
+
+echo json_encode($response);
 ?>
