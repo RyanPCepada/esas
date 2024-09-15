@@ -100,22 +100,27 @@ try {
             <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li>
-                        <a href="../esas_moderator/dashboard.php" class="nav-link left-sidebar text-dark active" id="all-clubs">
+                        <a href="../esas_admin/dashboard.php" class="nav-link left-sidebar text-dark active" id="all-clubs">
                             <i class="fas fa-chart-line"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_moderator/my_clubs.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
-                            <i class="fas fa-users"></i> My Clubs
+                        <a href="../esas_admin/all_clubs.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                            <i class="fas fa-university"></i> All Clubs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../esas_admin/moderators.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                            <i class="fa fa-universal-access"></i> Moderators
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../esas_admin/students.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                            <i class="fas fa-users"></i> Students
                         </a>
                     </li>
                     <li>
-                        <a href="../esas_moderator/pending_approvals.php" class="nav-link left-sidebar text-dark" id="pending-approvals">
-                            <i class="fas fa-hourglass-half"></i> Pending Approvals
-                        </a>
-                    </li>
-                    <li>
-                        <a href="../esas_moderator/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
+                        <a href="../esas_admin/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
                             <i class="fas fa-envelope"></i> Club Requests
                         </a>
                     </li>
