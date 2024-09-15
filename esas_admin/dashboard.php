@@ -73,6 +73,28 @@ try {
             padding: 50px;
         }
         
+        
+        
+
+        @keyframes waveIn {
+            0% {
+                opacity: 0;
+                transform: translateY(5px) scale(0.95); /* Adjusted Y translation */
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateY(-2px) scale(1.05); /* Peak of the wave, adjusted */
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .card {
+            /* Ensure your card styles are here */
+        }
+
 
     </style>
 </head>
@@ -183,18 +205,13 @@ try {
                         <div class="card p-2">
                             <!-- UPPER CARDS START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
-                                <!-- Card for TOTAL MODERATORS CLUBS -->
+                                <!-- Card for TOTAL CLUBS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
-                                            // Fetch total clubs associated with the moderator using tbl_club_and_moderators
-                                            $stmt_clubs = $pdo->prepare("
-                                                SELECT COUNT(DISTINCT club_id) AS total_clubs 
-                                                FROM tbl_clubs_and_moderators 
-                                                WHERE moderator_id = :moderator_id
-                                            ");
-                                            $stmt_clubs->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                            // Fetch total clubs in tbl_clubs
+                                            $stmt_clubs = $pdo->prepare("SELECT COUNT(*) AS total_clubs FROM tbl_clubs");
                                             $stmt_clubs->execute();
                                             $total_clubs = $stmt_clubs->fetchColumn();
                                             echo "<h3>$total_clubs</h3>";
@@ -206,66 +223,61 @@ try {
                                     </div>
                                 </div>
 
+                                <!-- Card for TOTAL MODERATORS -->
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                    <?php
+                                        try {
+                                            // Fetch total moderators from tbl_moderators
+                                            $stmt_moderators = $pdo->prepare("SELECT COUNT(*) AS total_moderators FROM tbl_moderators");
+                                            $stmt_moderators->execute(); // Execute the query
+                                            $total_moderators = $stmt_moderators->fetchColumn();
+                                            echo "<h3>" . htmlspecialchars($total_moderators) . "</h3>";
+                                        } catch (PDOException $e) {
+                                            echo "Error: " . htmlspecialchars($e->getMessage());
+                                        }
+                                        ?>
+                                        <p>Total Moderators</p>
+                                    </div>
+                                </div>
+
                                 <!-- Card for TOTAL STUDENTS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
-                                        try {
-                                            // Fetch total distinct students who registered under clubs managed by this moderator
-                                            $stmt_students = $pdo->prepare("
-                                                SELECT COUNT(DISTINCT tr.student_id) AS total_students 
-                                                FROM tbl_registration tr 
-                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
-                                                JOIN tbl_moderators tm ON tc.club_id = tm.club_id 
-                                                WHERE tm.moderator_id = :moderator_id AND tr.status = 'active'
-                                            ");
-                                            $stmt_students->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                                            $stmt_students->execute();
-                                            $total_students = $stmt_students->fetchColumn();
-                                            echo "<h3>$total_students</h3>";
-                                        } catch (PDOException $e) {
-                                            echo "Error: " . $e->getMessage();
-                                        }
+                                            try {
+                                                // Fetch total distinct students from tbl_registration
+                                                $stmt_students = $pdo->prepare("SELECT COUNT(DISTINCT student_id) AS total_students FROM tbl_registration WHERE status = 'active'");
+                                                $stmt_students->execute();
+                                                $total_students = $stmt_students->fetchColumn();
+                                                echo "<h3>" . htmlspecialchars($total_students) . "</h3>";
+                                            } catch (PDOException $e) {
+                                                echo "Error: " . htmlspecialchars($e->getMessage());
+                                            }
                                         ?>
                                         <p>Total Students</p>
                                     </div>
                                 </div>
 
-                                <!-- Card for TOTAL PENDING -->
+                                <!-- Card for CLUB REQUESTS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
-                                            // Fetch total pending student registrations for clubs managed by this moderator
-                                            $stmt_pending = $pdo->prepare("
-                                                SELECT COUNT(tr.student_id) AS total_pending 
-                                                FROM tbl_registration tr
-                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id
-                                                JOIN tbl_moderators tm ON tc.club_id = tm.club_id
-                                                WHERE tr.status = 'pending' AND tm.moderator_id = :moderator_id
-                                            ");
-                                            $stmt_pending->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                                            $stmt_pending->execute();
-                                            $total_pending = $stmt_pending->fetchColumn();
-                                            echo "<h3>$total_pending</h3>";
+                                            // Fetch total club requests from tbl_club_requests
+                                            $stmt_requests = $pdo->prepare("SELECT COUNT(request_id) AS total_requests FROM tbl_club_requests");
+                                            $stmt_requests->execute(); // Execute the query
+                                            $total_requests = $stmt_requests->fetchColumn(); // Fetch the count
+                                            echo "<h3>" . htmlspecialchars($total_requests) . "</h3>";
                                         } catch (PDOException $e) {
-                                            echo "Error: " . $e->getMessage();
+                                            echo "Error: " . htmlspecialchars($e->getMessage());
                                         }
                                         ?>
-                                        <p>Total Pending Approval</p>
-                                    </div>
-                                </div>
-
-                                <!-- Card for LEAVE REQUESTS (you can modify this query as needed) -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <h3>0</h3>
-                                        <p>Leave Requests</p>
+                                        <p>Total Club Requests</p>
                                     </div>
                                 </div>
                             </div>
                             <!-- UPPER CARDS END -->
-
 
                             <!-- CHARTS AND DIAGRAMS START -->
                             <div class="row card-row2 col-12" style="border: 1px solid transparent; margin: 0;">
@@ -273,33 +285,40 @@ try {
                                 <!-- PIE CHART -->
                                 <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <p>Students per Department</p>
+                                        <p>Registered Students per Club</p>
                                         <div style="height: 365px; background-color: transparent;">
                                             <?php
                                             try {
-                                                // Fetch the count of registered students per department for the clubs managed by the current moderator
+                                                // Fetch the count of distinct registered students per club with active status
                                                 $stmt = $pdo->prepare("
-                                                    SELECT ts.department, COUNT(tr.student_id) AS member_count
-                                                    FROM tbl_students ts
-                                                    JOIN tbl_registration tr ON ts.student_id = tr.student_id
-                                                    JOIN tbl_clubs_and_moderators cm ON tr.club_id = cm.club_id
-                                                    WHERE cm.moderator_id = :moderator_id AND tr.status = 'active'
-                                                    GROUP BY ts.department
+                                                    SELECT tc.clubName, COUNT(DISTINCT tr.student_id) AS member_count
+                                                    FROM tbl_registration tr
+                                                    JOIN tbl_clubs tc ON tr.club_id = tc.club_id
+                                                    WHERE tr.status = 'active'
+                                                    GROUP BY tc.club_id
                                                 ");
-                                                $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
                                                 $stmt->execute();
-                                                $department_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                $club_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             } catch (PDOException $e) {
                                                 echo "Error: " . $e->getMessage();
                                             }
 
                                             // Prepare data for the pie chart
-                                            $departments = [];
+                                            $clubs = [];
                                             $counts = [];
+                                            $total_students = 0;
 
-                                            foreach ($department_data as $row) {
-                                                $departments[] = $row['department'];
+                                            // Calculate total number of students and prepare data
+                                            foreach ($club_data as $row) {
+                                                $clubs[] = $row['clubName'];
                                                 $counts[] = $row['member_count'];
+                                                $total_students += $row['member_count'];
+                                            }
+
+                                            // Calculate percentages
+                                            $percentages = [];
+                                            foreach ($counts as $count) {
+                                                $percentages[] = round(($count / $total_students) * 100, 2); // Calculate percentage and round to 2 decimal places
                                             }
                                             ?>
                                             <!-- Canvas for the pie chart -->
@@ -307,25 +326,26 @@ try {
                                             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                                             <script>
                                                 // Fetching data from PHP arrays
-                                                const departments = <?php echo json_encode($departments); ?>;
+                                                const clubs = <?php echo json_encode($clubs); ?>;
                                                 const counts = <?php echo json_encode($counts); ?>;
+                                                const percentages = <?php echo json_encode($percentages); ?>; // Percentages
 
                                                 // Render Pie Chart using Chart.js
                                                 const ctx = document.getElementById('pieChart').getContext('2d');
                                                 const pieChart = new Chart(ctx, {
                                                     type: 'pie',
                                                     data: {
-                                                        labels: departments,  // Department names
+                                                        labels: clubs.map((club, index) => `${percentages[index]}% ${club}`),  // Show percentage and club name
                                                         datasets: [{
-                                                            label: 'Members per Department',
-                                                            data: counts,  // Member count per department
+                                                            label: 'Registered Students per Club',
+                                                            data: counts,  // Member count per club
                                                             backgroundColor: [
                                                                 'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
-                                                                'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
-                                                                'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
-                                                                'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
-                                                                'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
-                                                                'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
+                                                                'rgba(255, 105, 180, 0.8)',   // Hot Pink
+                                                                'rgba(255, 215, 0, 0.8)',     // Gold
+                                                                'rgba(0, 255, 255, 0.8)',     // Cyan
+                                                                'rgba(255, 165, 0, 0.8)',     // Orange
+                                                                'rgba(0, 255, 0, 0.8)'        // Lime Green
                                                             ],
                                                             borderColor: [
                                                                 'rgba(65, 105, 225, 1)',     // Royal Blue border
@@ -343,6 +363,10 @@ try {
                                                         plugins: {
                                                             legend: {
                                                                 position: 'top',
+                                                                labels: {
+                                                                    usePointStyle: true, // Use custom point style
+                                                                    pointStyle: 'rect',  // Set point style to square
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -354,99 +378,98 @@ try {
                                 <!-- PIE CHART END -->
 
 
-
                                 <!-- OTHER CHARTS -->
                                 <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
                                         <!-- Student Gender -->
-<div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
-    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-        <p>Student Gender</p>
-        <div style="height: 150px; position: relative;">
-            <?php
-            try {
-                // Replace with actual club_id value
-                $club_id = 1; // Example club_id
+                                        <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
+                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                                <p>Student Gender</p>
+                                                <div style="height: 150px; position: relative;">
+                                                    <?php
+                                                    try {
+                                                        // Replace with actual club_id value
+                                                        $club_id = 1; // Example club_id
 
-                // Prepare the SQL statement to get gender counts
-                $sqlCounts = "
-                    SELECT gender, COUNT(*) AS count
-                    FROM tbl_students
-                    JOIN tbl_registration ON tbl_students.student_id = tbl_registration.student_id
-                    WHERE tbl_registration.status = 'active' AND tbl_registration.club_id = :club_id
-                    GROUP BY gender
-                ";
+                                                        // Prepare the SQL statement to get gender counts
+                                                        $sqlCounts = "
+                                                            SELECT gender, COUNT(*) AS count
+                                                            FROM tbl_students
+                                                            JOIN tbl_registration ON tbl_students.student_id = tbl_registration.student_id
+                                                            WHERE tbl_registration.status = 'active' AND tbl_registration.club_id = :club_id
+                                                            GROUP BY gender
+                                                        ";
 
-                $stmtCounts = $pdo->prepare($sqlCounts);
-                $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-                $stmtCounts->execute();
-                $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
+                                                        $stmtCounts = $pdo->prepare($sqlCounts);
+                                                        $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                        $stmtCounts->execute();
+                                                        $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
 
-                $maleCount = 0;
-                $femaleCount = 0;
+                                                        $maleCount = 0;
+                                                        $femaleCount = 0;
 
-                foreach ($counts as $row) {
-                    if ($row['gender'] === 'Male') {
-                        $maleCount = $row['count'];
-                    } elseif ($row['gender'] === 'Female') {
-                        $femaleCount = $row['count'];
-                    }
-                }
+                                                        foreach ($counts as $row) {
+                                                            if ($row['gender'] === 'Male') {
+                                                                $maleCount = $row['count'];
+                                                            } elseif ($row['gender'] === 'Female') {
+                                                                $femaleCount = $row['count'];
+                                                            }
+                                                        }
 
-                // Prepare the SQL statement to get total student count
-                $sqlTotal = "SELECT COUNT(*) AS total_count FROM tbl_students";
-                $stmtTotal = $pdo->query($sqlTotal);
-                $totalCount = $stmtTotal->fetchColumn();
+                                                        // Prepare the SQL statement to get total student count
+                                                        $sqlTotal = "SELECT COUNT(*) AS total_count FROM tbl_students";
+                                                        $stmtTotal = $pdo->query($sqlTotal);
+                                                        $totalCount = $stmtTotal->fetchColumn();
 
-            } catch (PDOException $e) {
-                // Handle query error
-                echo 'Error: ' . $e->getMessage();
-            }
-            ?>
-            <canvas id="studentChart" style="width: 100%; height: 100%;"></canvas>
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const ctx = document.getElementById('studentChart').getContext('2d');
+                                                    } catch (PDOException $e) {
+                                                        // Handle query error
+                                                        echo 'Error: ' . $e->getMessage();
+                                                    }
+                                                    ?>
+                                                    <canvas id="studentChart" style="width: 100%; height: 100%;"></canvas>
+                                                    <script>
+                                                        document.addEventListener('DOMContentLoaded', function() {
+                                                            const ctx = document.getElementById('studentChart').getContext('2d');
 
-                    // Data from PHP
-                    const maleCount = <?php echo $maleCount; ?>;
-                    const femaleCount = <?php echo $femaleCount; ?>;
-                    const maxCount = <?php echo $totalCount; ?>; // Total student count
+                                                            // Data from PHP
+                                                            const maleCount = <?php echo $maleCount; ?>;
+                                                            const femaleCount = <?php echo $femaleCount; ?>;
+                                                            const maxCount = <?php echo $totalCount; ?>; // Total student count
 
-                    new Chart(ctx, {
-                        type: 'bar', // Use 'bar' type for horizontal bars
-                        data: {
-                            labels: ['Male', 'Female'],
-                            datasets: [{
-                                data: [maleCount, femaleCount],
-                                backgroundColor: ['#3498db', '#e74c3c'],
-                                borderColor: ['#2980b9', '#c0392b'],
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            indexAxis: 'y', // Set to 'y' to make bars horizontal
-                            scales: {
-                                x: {
-                                    beginAtZero: true,
-                                    suggestedMax: maxCount // Use total count as the maximum value
-                                },
-                                y: {
-                                    // Optional settings for y-axis if needed
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    display: false // Hide the legend
-                                }
-                            }
-                        }
-                    });
-                });
-            </script>
-        </div>
-    </div>
-</div>
+                                                            new Chart(ctx, {
+                                                                type: 'bar', // Use 'bar' type for horizontal bars
+                                                                data: {
+                                                                    labels: ['Male', 'Female'],
+                                                                    datasets: [{
+                                                                        data: [maleCount, femaleCount],
+                                                                        backgroundColor: ['#3498db', '#e74c3c'],
+                                                                        borderColor: ['#2980b9', '#c0392b'],
+                                                                        borderWidth: 1
+                                                                    }]
+                                                                },
+                                                                options: {
+                                                                    indexAxis: 'y', // Set to 'y' to make bars horizontal
+                                                                    scales: {
+                                                                        x: {
+                                                                            beginAtZero: true,
+                                                                            suggestedMax: maxCount // Use total count as the maximum value
+                                                                        },
+                                                                        y: {
+                                                                            // Optional settings for y-axis if needed
+                                                                        }
+                                                                    },
+                                                                    plugins: {
+                                                                        legend: {
+                                                                            display: false // Hide the legend
+                                                                        }
+                                                                    }
+                                                                }
+                                                            });
+                                                        });
+                                                    </script>
+                                                </div>
+                                            </div>
+                                        </div>
 
                                     </div>
                                     <!-- Vertically divided Year Level Count and Members per School Year -->
@@ -550,84 +573,42 @@ try {
     </script>
 
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Cache the elements
-        const allClubsLink = document.getElementById('all-clubs');
-        const myClubsLink = document.getElementById('my-clubs');
-        const clubRequestsLink = document.getElementById('club-requests');
-        const officersDiv = document.querySelector('.officers-div');
-        const csgCards = document.querySelectorAll('.card-csg-officer'); // CSG officer cards
-        const sboCards = document.querySelectorAll('.card-sbo-officer'); // SBO officer cards
+    <script>
 
-        function animateCards(cards) {
-            // Apply the animation waveIn dynamically for a group of cards
-            cards.forEach((card, index) => {
-                // Reset styles
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px) scale(0.95)';
-                card.style.transition = 'none'; // Disable transition for reset
 
-                // Trigger a reflow to apply reset styles
-                void card.offsetWidth;
+        // JavaScript to Animate Cards
+        document.addEventListener('DOMContentLoaded', function() {
+            function animateCards(cards) { 
+                cards.forEach((card, index) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(5px) scale(0.95)'; // Adjusted Y translation
+                    card.style.transition = 'none'; // Disable transition for reset
 
-                // Re-enable transitions
-                card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                    void card.offsetWidth; // Trigger reflow
 
-                // Apply animation with a delay (wave effect)
-                setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0) scale(1)';
-                    card.style.animation = `waveIn 0.6s ease-out forwards`;
-                }, index * 100); // Delay per card to create the wave effect
-            });
-        }
-
-        function updateVisibility() {
-            if (allClubsLink.classList.contains('active')) {
-                officersDiv.style.display = 'block'; // Show officers div
-
-                // Trigger animations for CSG and SBO cards at the same time but separately
-                animateCards(csgCards);  // Animate CSG officers
-                animateCards(sboCards);  // Animate SBO officers
-            } else {
-                officersDiv.style.display = 'none'; // Hide officers div
+                    card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0) scale(1)';
+                        card.style.animation = `waveIn 0.6s ease-out forwards`;
+                    }, index * 100); // Staggered delay
+                });
             }
-        }
 
-        // Add keyframes dynamically
-        const styleSheet = document.createElement('style');
-        styleSheet.type = 'text/css';
-        styleSheet.innerHTML = `
-            @keyframes waveIn {
-                0% {
-                    opacity: 0;
-                    transform: translateY(20px) scale(0.95);
-                }
-                50% {
-                    opacity: 0.5;
-                    transform: translateY(-10px) scale(1.05); /* Peak of the wave */
-                }
-                100% {
-                    opacity: 1;
-                    transform: translateY(0) scale(1);
-                }
-            }
-        `;
-        document.head.appendChild(styleSheet);
-
-        // Initial visibility setup
-        updateVisibility();
-    });
-
-
-    $(document).ready(function() {
-        $('.delprreq').click(function(e) {
-            e.stopPropagation();
+            // Select only the upper cards
+            const upperCards = document.querySelectorAll('.card-row1 .card');
+            animateCards(upperCards);
         });
-        // let value= $("classname").val()
-    });
-</script>
+
+
+        $(document).ready(function() {
+            $('.delprreq').click(function(e) {
+                e.stopPropagation();
+            });
+            // let value= $("classname").val()
+        });
+    </script>
 
 </body>
 </html>
