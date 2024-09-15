@@ -77,6 +77,24 @@ try {
             padding: 50px;
         }
         
+        @keyframes waveIn {
+            0% {
+                opacity: 0;
+                transform: translateY(5px) scale(0.95); /* Adjusted Y translation */
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateY(-2px) scale(1.05); /* Peak of the wave, adjusted */
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .card {
+            /* Ensure your card styles are here */
+        }
 
     </style>
 </head>
@@ -385,107 +403,194 @@ try {
                                 <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
                                         <!-- Student Gender -->
-<div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
+                                        <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
+                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                                <p>Student Gender</p>
+                                                <div style="height: 150px; position: relative;">
+                                                    <?php
+                                                    try {
+                                                        // Replace with actual club_id value
+                                                        $club_id = 1; // Example club_id
+
+                                                        // Prepare the SQL statement to get gender counts
+                                                        $sqlCounts = "
+                                                            SELECT gender, COUNT(*) AS count
+                                                            FROM tbl_students
+                                                            JOIN tbl_registration ON tbl_students.student_id = tbl_registration.student_id
+                                                            WHERE tbl_registration.status = 'active' AND tbl_registration.club_id = :club_id
+                                                            GROUP BY gender
+                                                        ";
+
+                                                        $stmtCounts = $pdo->prepare($sqlCounts);
+                                                        $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                        $stmtCounts->execute();
+                                                        $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
+
+                                                        $maleCount = 0;
+                                                        $femaleCount = 0;
+
+                                                        foreach ($counts as $row) {
+                                                            if ($row['gender'] === 'Male') {
+                                                                $maleCount = $row['count'];
+                                                            } elseif ($row['gender'] === 'Female') {
+                                                                $femaleCount = $row['count'];
+                                                            }
+                                                        }
+
+                                                        // Prepare the SQL statement to get total student count
+                                                        $sqlTotal = "SELECT COUNT(*) AS total_count FROM tbl_students";
+                                                        $stmtTotal = $pdo->query($sqlTotal);
+                                                        $totalCount = $stmtTotal->fetchColumn();
+
+                                                    } catch (PDOException $e) {
+                                                        // Handle query error
+                                                        echo 'Error: ' . $e->getMessage();
+                                                    }
+                                                    ?>
+                                                    <canvas id="studentChart" style="width: 100%; height: 100%;"></canvas>
+                                                    <script>
+                                                        document.addEventListener('DOMContentLoaded', function() {
+                                                            const ctx = document.getElementById('studentChart').getContext('2d');
+
+                                                            // Data from PHP
+                                                            const maleCount = <?php echo $maleCount; ?>;
+                                                            const femaleCount = <?php echo $femaleCount; ?>;
+                                                            const maxCount = <?php echo $totalCount; ?>; // Total student count
+
+                                                            new Chart(ctx, {
+                                                                type: 'bar', // Use 'bar' type for horizontal bars
+                                                                data: {
+                                                                    labels: ['Male', 'Female'],
+                                                                    datasets: [{
+                                                                        data: [maleCount, femaleCount],
+                                                                        backgroundColor: ['#3498db', '#e74c3c'],
+                                                                        borderColor: ['#2980b9', '#c0392b'],
+                                                                        borderWidth: 1
+                                                                    }]
+                                                                },
+                                                                options: {
+                                                                    indexAxis: 'y', // Set to 'y' to make bars horizontal
+                                                                    scales: {
+                                                                        x: {
+                                                                            beginAtZero: true,
+                                                                            suggestedMax: maxCount // Use total count as the maximum value
+                                                                        },
+                                                                        y: {
+                                                                            // Optional settings for y-axis if needed
+                                                                        }
+                                                                    },
+                                                                    plugins: {
+                                                                        legend: {
+                                                                            display: false // Hide the legend
+                                                                        }
+                                                                    }
+                                                                }
+                                                            });
+                                                        });
+                                                    </script>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+
+                                    <!-- Vertically divided Year Level Count and Members per School Year -->
+                                    <div class="row" style="border: 1px solid transparent; margin: 0;">
+
+
+
+                                    
+                                        <!-- Year Level Numbers -->
+<div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-        <p>Student Gender</p>
-        <div style="height: 150px; position: relative;">
+        <p>Year Level Count</p>
+        <div style="height: 150px; background-color: transparent;">
+            <div>
+                <canvas id="studentBarChart"></canvas>
+            </div>
             <?php
             try {
-                // Replace with actual club_id value
-                $club_id = 1; // Example club_id
+                $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                // Prepare the SQL statement to get gender counts
-                $sqlCounts = "
-                    SELECT gender, COUNT(*) AS count
-                    FROM tbl_students
-                    JOIN tbl_registration ON tbl_students.student_id = tbl_registration.student_id
-                    WHERE tbl_registration.status = 'active' AND tbl_registration.club_id = :club_id
-                    GROUP BY gender
-                ";
-
-                $stmtCounts = $pdo->prepare($sqlCounts);
+                // SQL Query to fetch year level counts
+                $sql = "SELECT s.year, COUNT(*) AS count
+                        FROM tbl_students s
+                        JOIN tbl_registration r ON s.student_id = r.student_id
+                        WHERE r.status = 'active' AND r.club_id = :club_id
+                        GROUP BY s.year";
+                
+                $stmtCounts = $pdo->prepare($sql);
                 $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
                 $stmtCounts->execute();
-                $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
 
-                $maleCount = 0;
-                $femaleCount = 0;
+                // Fetch the results into an associative array
+                $yearData = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
+                
+                // Initialize arrays for years and counts
+                $years = ['1', '2', '3', '4']; // Ensure all years are included
+                $counts = [0, 0, 0, 0]; // Initialize with zeros
 
-                foreach ($counts as $row) {
-                    if ($row['gender'] === 'Male') {
-                        $maleCount = $row['count'];
-                    } elseif ($row['gender'] === 'Female') {
-                        $femaleCount = $row['count'];
+                // Populate the counts array based on fetched data
+                foreach ($yearData as $row) {
+                    $year = $row['year'];
+                    if (isset($years[$year - 1])) {
+                        $counts[$year - 1] = (int)$row['count'];
                     }
                 }
-
-                // Prepare the SQL statement to get total student count
-                $sqlTotal = "SELECT COUNT(*) AS total_count FROM tbl_students";
-                $stmtTotal = $pdo->query($sqlTotal);
-                $totalCount = $stmtTotal->fetchColumn();
-
             } catch (PDOException $e) {
-                // Handle query error
-                echo 'Error: ' . $e->getMessage();
+                echo "Error: " . $e->getMessage();
             }
             ?>
-            <canvas id="studentChart" style="width: 100%; height: 100%;"></canvas>
+
+            <!-- Include Chart.js -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
             <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const ctx = document.getElementById('studentChart').getContext('2d');
+                // PHP arrays passed into JavaScript
+                const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+                const dataCounts = <?php echo json_encode($counts); ?>;
 
-                    // Data from PHP
-                    const maleCount = <?php echo $maleCount; ?>;
-                    const femaleCount = <?php echo $femaleCount; ?>;
-                    const maxCount = <?php echo $totalCount; ?>; // Total student count
+                // Data for the chart
+                const data = {
+                    labels: labels,
+                    datasets: [{
+                        data: dataCounts, // Dynamic data from PHP
+                        backgroundColor: ['blue', 'orange', 'green', 'red'], // Colors for bars
+                    }]
+                };
 
-                    new Chart(ctx, {
-                        type: 'bar', // Use 'bar' type for horizontal bars
-                        data: {
-                            labels: ['Male', 'Female'],
-                            datasets: [{
-                                data: [maleCount, femaleCount],
-                                backgroundColor: ['#3498db', '#e74c3c'],
-                                borderColor: ['#2980b9', '#c0392b'],
-                                borderWidth: 1
-                            }]
+                // Configurations for the chart
+                const config = {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 50 // Set max limit to 50
+                            }
                         },
-                        options: {
-                            indexAxis: 'y', // Set to 'y' to make bars horizontal
-                            scales: {
-                                x: {
-                                    beginAtZero: true,
-                                    suggestedMax: maxCount // Use total count as the maximum value
-                                },
-                                y: {
-                                    // Optional settings for y-axis if needed
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    display: false // Hide the legend
-                                }
+                        plugins: {
+                            legend: {
+                                display: false // Remove the "Number of Students" label
                             }
                         }
-                    });
-                });
+                    }
+                };
+
+                // Render the chart
+                const studentBarChart = new Chart(
+                    document.getElementById('studentBarChart'),
+                    config
+                );
             </script>
         </div>
     </div>
 </div>
 
-                                    </div>
-                                    <!-- Vertically divided Year Level Count and Members per School Year -->
-                                    <div class="row" style="border: 1px solid transparent; margin: 0;">
-                                        <!-- Year Level Count -->
-                                        <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
-                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Year Level Count</p>
-                                                <div style="height: 150px; background-color: lightgray;">
-                                                    <!-- BAR GRAPH FOR NUMBERS OF YEAR LEVEL -->
-                                                </div>
-                                            </div>
-                                        </div>
                                         <!-- Members per School Year -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
@@ -576,74 +681,33 @@ try {
     </script>
 
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Cache the elements
-        const allClubsLink = document.getElementById('all-clubs');
-        const myClubsLink = document.getElementById('my-clubs');
-        const clubRequestsLink = document.getElementById('club-requests');
-        const officersDiv = document.querySelector('.officers-div');
-        const csgCards = document.querySelectorAll('.card-csg-officer'); // CSG officer cards
-        const sboCards = document.querySelectorAll('.card-sbo-officer'); // SBO officer cards
 
-        function animateCards(cards) {
-            // Apply the animation waveIn dynamically for a group of cards
+<script>
+
+
+    // JavaScript to Animate Cards
+    document.addEventListener('DOMContentLoaded', function() {
+        function animateCards(cards) { 
             cards.forEach((card, index) => {
-                // Reset styles
                 card.style.opacity = '0';
-                card.style.transform = 'translateY(20px) scale(0.95)';
+                card.style.transform = 'translateY(5px) scale(0.95)'; // Adjusted Y translation
                 card.style.transition = 'none'; // Disable transition for reset
 
-                // Trigger a reflow to apply reset styles
-                void card.offsetWidth;
+                void card.offsetWidth; // Trigger reflow
 
-                // Re-enable transitions
                 card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-
-                // Apply animation with a delay (wave effect)
+                
                 setTimeout(() => {
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0) scale(1)';
                     card.style.animation = `waveIn 0.6s ease-out forwards`;
-                }, index * 100); // Delay per card to create the wave effect
+                }, index * 100); // Staggered delay
             });
         }
 
-        function updateVisibility() {
-            if (allClubsLink.classList.contains('active')) {
-                officersDiv.style.display = 'block'; // Show officers div
-
-                // Trigger animations for CSG and SBO cards at the same time but separately
-                animateCards(csgCards);  // Animate CSG officers
-                animateCards(sboCards);  // Animate SBO officers
-            } else {
-                officersDiv.style.display = 'none'; // Hide officers div
-            }
-        }
-
-        // Add keyframes dynamically
-        const styleSheet = document.createElement('style');
-        styleSheet.type = 'text/css';
-        styleSheet.innerHTML = `
-            @keyframes waveIn {
-                0% {
-                    opacity: 0;
-                    transform: translateY(20px) scale(0.95);
-                }
-                50% {
-                    opacity: 0.5;
-                    transform: translateY(-10px) scale(1.05); /* Peak of the wave */
-                }
-                100% {
-                    opacity: 1;
-                    transform: translateY(0) scale(1);
-                }
-            }
-        `;
-        document.head.appendChild(styleSheet);
-
-        // Initial visibility setup
-        updateVisibility();
+        // Select only the upper cards
+        const upperCards = document.querySelectorAll('.card-row1 .card');
+        animateCards(upperCards);
     });
 
 

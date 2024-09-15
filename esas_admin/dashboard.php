@@ -474,15 +474,118 @@ try {
                                     </div>
                                     <!-- Vertically divided Year Level Count and Members per School Year -->
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
+
+
+
+
+
+
+                                        
                                         <!-- Year Level Count -->
-                                        <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
-                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Year Level Count</p>
-                                                <div style="height: 150px; background-color: lightgray;">
-                                                    <!-- BAR GRAPH FOR NUMBERS OF YEAR LEVEL -->
-                                                </div>
-                                            </div>
-                                        </div>
+<div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+        <p>Year Level Count</p>
+        <div style="height: 150px; background-color: transparent;">
+            <div>
+                <canvas id="studentBarChart"></canvas>
+            </div>
+            <?php
+            try {
+                $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                // SQL Query to fetch year level counts
+                $sql = "SELECT s.year, COUNT(DISTINCT s.student_id) AS count
+                    FROM tbl_students s
+                    JOIN tbl_registration r ON s.student_id = r.student_id
+                    WHERE r.status = 'active'
+                    GROUP BY s.year";
+                
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute();
+                
+                // Fetch the results into an associative array
+                $yearData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                // Initialize arrays for years and counts
+                $years = ['1', '2', '3', '4']; // Ensure all years are included
+                $counts = [0, 0, 0, 0]; // Initialize with zeros
+
+                // Populate the counts array based on fetched data
+                foreach ($yearData as $row) {
+                    $year = $row['year'];
+                    if (isset($years[$year - 1])) {
+                        $counts[$year - 1] = (int)$row['count'];
+                    }
+                }
+
+                // Query to get the maximum number of distinct students with active status
+                $maxStmt = $pdo->prepare("SELECT COUNT(DISTINCT student_id) AS max_count FROM tbl_registration WHERE status = 'active'");
+                $maxStmt->execute();
+                $maxData = $maxStmt->fetch(PDO::FETCH_ASSOC);
+                $maxCount = (int)$maxData['max_count'];
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
+            ?>
+
+            <!-- Include Chart.js -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+            <script>
+                // PHP arrays passed into JavaScript
+                const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+                const dataCounts = <?php echo json_encode($counts); ?>;
+                const maxCount = <?php echo $maxCount; ?>; // Max count from PHP
+
+                // Data for the chart
+                const data = {
+                    labels: labels,
+                    datasets: [{
+                        data: dataCounts, // Dynamic data from PHP
+                        backgroundColor: ['blue', 'orange', 'green', 'red'], // Colors for bars
+                    }]
+                };
+
+                // Configurations for the chart
+                const config = {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: maxCount // Set max limit dynamically
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false // Remove the "Number of Students" label
+                            }
+                        }
+                    }
+                };
+
+                // Render the chart
+                const studentBarChart = new Chart(
+                    document.getElementById('studentBarChart'),
+                    config
+                );
+            </script>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
                                         <!-- Members per School Year -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
