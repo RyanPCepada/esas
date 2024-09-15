@@ -36,6 +36,10 @@ try {
     // Handle database connection or query error
     die("Database error: " . $e->getMessage());
 }
+
+
+
+
 ?>
 
 
@@ -202,9 +206,9 @@ try {
                         </div>
 
                         <!-- THE MAIN PAGE START -->
-                        <div class="card p-4">
+                        <div class="card p-2">
                             <!-- UPPER CARDS START -->
-                            <div class="row card-row1 col-md-12 mb-3" style="border: 1px solid transparent; margin: 0;">
+                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 <!-- Card for TOTAL MODERATORS CLUBS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
@@ -381,51 +385,95 @@ try {
                                 <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
                                         <!-- Student Gender -->
-                                        <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
-                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Student Gender</p>
-                                                <div style="height: 150px;">
-                                                <canvas id="studentChart"></canvas>
-                                                
-                                    <script>
-                                        // script.js
+<div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
+    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+        <p>Student Gender</p>
+        <div style="height: 150px; position: relative;">
+            <?php
+            try {
+                // Replace with actual club_id value
+                $club_id = 1; // Example club_id
 
-// Ensure the DOM is fully loaded before running the script
-document.addEventListener('DOMContentLoaded', function() {
-    // Get the canvas element
-    const ctx = document.getElementById('studentChart').getContext('2d');
+                // Prepare the SQL statement to get gender counts
+                $sqlCounts = "
+                    SELECT gender, COUNT(*) AS count
+                    FROM tbl_students
+                    JOIN tbl_registration ON tbl_students.student_id = tbl_registration.student_id
+                    WHERE tbl_registration.status = 'active' AND tbl_registration.club_id = :club_id
+                    GROUP BY gender
+                ";
 
-    // Create the bar chart
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Male Students', 'Female Students'],
-            datasets: [{
-                label: 'Number of Students',
-                data: [100, 80],
-                backgroundColor: ['#3498db', '#e74c3c'],
-                borderColor: ['#2980b9', '#c0392b'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
+                $stmtCounts = $pdo->prepare($sqlCounts);
+                $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                $stmtCounts->execute();
+                $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
+
+                $maleCount = 0;
+                $femaleCount = 0;
+
+                foreach ($counts as $row) {
+                    if ($row['gender'] === 'Male') {
+                        $maleCount = $row['count'];
+                    } elseif ($row['gender'] === 'Female') {
+                        $femaleCount = $row['count'];
+                    }
                 }
-            },
-            plugins: {
-                legend: {
-                    display: true
-                }
+
+                // Prepare the SQL statement to get total student count
+                $sqlTotal = "SELECT COUNT(*) AS total_count FROM tbl_students";
+                $stmtTotal = $pdo->query($sqlTotal);
+                $totalCount = $stmtTotal->fetchColumn();
+
+            } catch (PDOException $e) {
+                // Handle query error
+                echo 'Error: ' . $e->getMessage();
             }
-        }
-    });
-});
-</script>
-                                                </div>
-                                            </div>
-                                        </div>
+            ?>
+            <canvas id="studentChart" style="width: 100%; height: 100%;"></canvas>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const ctx = document.getElementById('studentChart').getContext('2d');
+
+                    // Data from PHP
+                    const maleCount = <?php echo $maleCount; ?>;
+                    const femaleCount = <?php echo $femaleCount; ?>;
+                    const maxCount = <?php echo $totalCount; ?>; // Total student count
+
+                    new Chart(ctx, {
+                        type: 'bar', // Use 'bar' type for horizontal bars
+                        data: {
+                            labels: ['Male', 'Female'],
+                            datasets: [{
+                                data: [maleCount, femaleCount],
+                                backgroundColor: ['#3498db', '#e74c3c'],
+                                borderColor: ['#2980b9', '#c0392b'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y', // Set to 'y' to make bars horizontal
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    suggestedMax: maxCount // Use total count as the maximum value
+                                },
+                                y: {
+                                    // Optional settings for y-axis if needed
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false // Hide the legend
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</div>
+
                                     </div>
                                     <!-- Vertically divided Year Level Count and Members per School Year -->
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
