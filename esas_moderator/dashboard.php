@@ -315,87 +315,113 @@ try {
                             <div class="row card-row2 col-12" style="border: 1px solid transparent; margin: 0;">
 
                                 <!-- PIE CHART -->
-                                <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
-                                    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <p>Students per Department</p>
-                                        <div style="height: 365px; background-color: transparent;">
-                                            <?php
-                                            try {
-                                                // Fetch the count of registered students per department for the clubs managed by the current moderator
-                                                $stmt = $pdo->prepare("
-                                                    SELECT ts.department, COUNT(tr.student_id) AS member_count
-                                                    FROM tbl_students ts
-                                                    JOIN tbl_registration tr ON ts.student_id = tr.student_id
-                                                    JOIN tbl_clubs_and_moderators cm ON tr.club_id = cm.club_id
-                                                    WHERE cm.moderator_id = :moderator_id AND tr.status = 'active'
-                                                    GROUP BY ts.department
-                                                ");
-                                                $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                                                $stmt->execute();
-                                                $department_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                                            } catch (PDOException $e) {
-                                                echo "Error: " . $e->getMessage();
-                                            }
+<div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
+    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+        <p>Students per Department</p>
+        <div style="height: 365px; background-color: transparent;">
+            <?php
+            try {
+                // Fetch the count of registered students per department for the clubs managed by the current moderator
+                $stmt = $pdo->prepare("
+                    SELECT ts.department, COUNT(tr.student_id) AS member_count
+                    FROM tbl_students ts
+                    JOIN tbl_registration tr ON ts.student_id = tr.student_id
+                    JOIN tbl_clubs_and_moderators cm ON tr.club_id = cm.club_id
+                    WHERE cm.moderator_id = :moderator_id AND tr.status = 'active'
+                    GROUP BY ts.department
+                ");
+                $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                $stmt->execute();
+                $department_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
 
-                                            // Prepare data for the pie chart
-                                            $departments = [];
-                                            $counts = [];
+            // Prepare data for the pie chart
+            $departments = [];
+            $counts = [];
+            $total_members = 0;
 
-                                            foreach ($department_data as $row) {
-                                                $departments[] = $row['department'];
-                                                $counts[] = $row['member_count'];
-                                            }
-                                            ?>
-                                            <!-- Canvas for the pie chart -->
-                                            <canvas id="pieChart" style="height: 100%;"></canvas>
-                                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                                            <script>
-                                                // Fetching data from PHP arrays
-                                                const departments = <?php echo json_encode($departments); ?>;
-                                                const counts = <?php echo json_encode($counts); ?>;
+            foreach ($department_data as $row) {
+                $departments[] = $row['department'];
+                $counts[] = $row['member_count'];
+                $total_members += $row['member_count'];
+            }
 
-                                                // Render Pie Chart using Chart.js
-                                                const ctx = document.getElementById('pieChart').getContext('2d');
-                                                const pieChart = new Chart(ctx, {
-                                                    type: 'pie',
-                                                    data: {
-                                                        labels: departments,  // Department names
-                                                        datasets: [{
-                                                            label: 'Members per Department',
-                                                            data: counts,  // Member count per department
-                                                            backgroundColor: [
-                                                                'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
-                                                                'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
-                                                                'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
-                                                                'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
-                                                                'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
-                                                                'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
-                                                            ],
-                                                            borderColor: [
-                                                                'rgba(65, 105, 225, 1)',     // Royal Blue border
-                                                                'rgba(255, 105, 180, 1)',     // Hot Pink border
-                                                                'rgba(255, 215, 0, 1)',       // Gold border
-                                                                'rgba(0, 255, 255, 1)',       // Cyan border
-                                                                'rgba(255, 165, 0, 1)',       // Orange border
-                                                                'rgba(0, 255, 0, 1)'          // Lime Green border
-                                                            ],
-                                                            borderWidth: 1
-                                                        }]
-                                                    },
-                                                    options: {
-                                                        responsive: true,
-                                                        plugins: {
-                                                            legend: {
-                                                                position: 'top',
-                                                            }
-                                                        }
-                                                    }
-                                                });
-                                            </script>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- PIE CHART END -->
+            // Calculate percentage for each department
+            $percentages = [];
+            foreach ($counts as $count) {
+                $percentages[] = round(($count / $total_members) * 100);
+            }
+
+            // Combine percentages and department names
+            $labels_with_percentages = [];
+            foreach ($departments as $index => $department) {
+                $labels_with_percentages[] = $percentages[$index] . '% ' . $department;
+            }
+            ?>
+            <!-- Canvas for the pie chart -->
+            <canvas id="pieChart" style="height: 100%;"></canvas>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                // Fetching data from PHP arrays
+                const labelsWithPercentages = <?php echo json_encode($labels_with_percentages); ?>;
+                const counts = <?php echo json_encode($counts); ?>;
+
+                // Render Pie Chart using Chart.js
+                const ctx = document.getElementById('pieChart').getContext('2d');
+                const pieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labelsWithPercentages,  // Department names with percentages
+                        datasets: [{
+                            label: 'Members per Department',
+                            data: counts,  // Member count per department
+                            backgroundColor: [
+                                'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
+                                'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
+                                'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
+                                'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
+                                'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
+                                'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
+                            ],
+                            borderColor: [
+                                'rgba(65, 105, 225, 1)',     // Royal Blue border
+                                'rgba(255, 105, 180, 1)',     // Hot Pink border
+                                'rgba(255, 215, 0, 1)',       // Gold border
+                                'rgba(0, 255, 255, 1)',       // Cyan border
+                                'rgba(255, 165, 0, 1)',       // Orange border
+                                'rgba(0, 255, 0, 1)'          // Lime Green border
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    boxWidth: 20,  // Set square shape
+                                    padding: 20    // Add spacing between labels and box
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            </script>
+        </div>
+    </div>
+</div>
+<!-- PIE CHART END -->
+
 
 
 
