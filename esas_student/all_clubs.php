@@ -2,7 +2,6 @@
 session_start();
 require_once "../config.php";
 
-// Fetch the current student's ID from the session
 $student_id = $_SESSION['student_id'];
 
 try {

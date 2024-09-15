@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['moderator_id'] = $moderator_result['moderator_id'];
         // Redirect to clubs.php upon successful login
         echo "<script>alert('Logged in successfully!');</script>";
-        echo "<script>window.location.href = '/esas/esas-moderator/public/dashboard.php';</script>";
+        echo "<script>window.location.href = '/esas/esas_moderator/dashboard.php';</script>";
         exit();
     } else {
         // Show an alert if login credentials are incorrect
