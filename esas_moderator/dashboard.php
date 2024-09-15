@@ -8,6 +8,7 @@ if (!isset($_SESSION['moderator_id'])) {
 }
 
 $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
+
 ?>
 
 
@@ -105,51 +106,81 @@ $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
     <div class="row g-0 h-100">
         <div class="row g-0 p-4 px-2 pt-2 h-100">
             <div class="row align-items-center mb-2">
-            <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
-<div class="col-auto">
-    <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-        <?php
-        // Prepare the SQL query
-        $sql = "
-            SELECT c.club_id, c.clubName 
-            FROM tbl_clubs c
-            JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
-            WHERE cm.moderator_id = :moderator_id
-        ";
-
-        // Execute the query
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['moderator_id' => $moderator_id]);
-
-        // Fetch the results
-        $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Generate the dropdown options
-        foreach ($clubs as $club): ?>
-            <option value="<?php echo htmlspecialchars($club['club_id']); ?>">
-                <?php echo htmlspecialchars($club['clubName']); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-</div>
-                <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
+                <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
                 <div class="col-auto">
-                    <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                        <option value="2024-2025">2024-2025</option>
-                        <option value="2023-2024">2023-2024</option>
-                        <option value="2022-2023">2022-2023</option>
-                        <option value="2021-2022">2021-2022</option>
+                    <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                        <?php
+                        // Prepare the SQL query
+                        $sql = "
+                            SELECT c.club_id, c.clubName 
+                            FROM tbl_clubs c
+                            JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                            WHERE cm.moderator_id = :moderator_id
+                        ";
+
+                        // Execute the query
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute(['moderator_id' => $moderator_id]);
+
+                        // Fetch the results
+                        $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        // Generate the dropdown options
+                        foreach ($clubs as $club): ?>
+                            <option value="<?php echo htmlspecialchars($club['club_id']); ?>">
+                                <?php echo htmlspecialchars($club['clubName']); ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
+                <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
+                    <div class="col-auto">
+                        <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                            <?php 
+                            // Get the current date
+                            $currentDate = new DateTime();
+
+                            // Calculate school years based on current date
+                            $schoolYears = [];
+                            for ($i = 0; $i < 5; $i++) {
+                                $startYear = $currentDate->format('Y') - $i;
+                                $endYear = $startYear + 1;
+                                $schoolYears[] = "{$startYear}-{$endYear}";
+                            }
+
+                            // Prepare and execute the SQL query
+                            $sql = "
+                                SELECT DISTINCT 
+                                    CONCAT(YEAR(dateAdded), '-', YEAR(dateAdded) + 1) AS schoolYear
+                                FROM tbl_clubs
+                                WHERE dateAdded IS NOT NULL
+                                AND YEAR(dateAdded) BETWEEN YEAR(DATE_SUB(NOW(), INTERVAL 5 YEAR)) AND YEAR(NOW())
+                            ";
+
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute();
+                            $activeSchoolYears = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+                            // Determine which school years to display
+                            $displaySchoolYears = array_intersect($schoolYears, $activeSchoolYears);
+
+                            // Output school year options
+                            foreach ($displaySchoolYears as $schoolYear) {
+                                echo "<option value=\"" . htmlspecialchars($schoolYear) . "\">" . htmlspecialchars($schoolYear) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+
             </div>
 
             <!-- THE MAIN PAGE START -->
             <div class="card p-4">
                 <!-- UPPER CARDS START -->
-                <div class="row card-row1 col-md-12 mb-3" style="border: 1px solid black; margin: 0;">
+                <div class="row card-row1 col-md-12 mb-3" style="border: 1px solid transparent; margin: 0;">
                     <!-- Card for TOTAL MODERATORS CLUBS -->
-                    <div class="col-md-3 p-1" style="border: 1px solid red; padding: 0;">
-                        <div class="card p-2" style="margin: 0;">
+                    <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                             <?php
                             try {
                                 // Fetch total clubs associated with the moderator using tbl_club_and_moderators
@@ -171,8 +202,8 @@ $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
                     </div>
 
                     <!-- Card for TOTAL STUDENTS -->
-                    <div class="col-md-3 p-1" style="border: 1px solid red; padding: 0;">
-                        <div class="card p-2" style="margin: 0;">
+                    <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                             <?php
                             try {
                                 // Fetch total distinct students who registered under clubs managed by this moderator
@@ -181,7 +212,7 @@ $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
                                     FROM tbl_registration tr 
                                     JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
                                     JOIN tbl_moderators tm ON tc.club_id = tm.club_id 
-                                    WHERE tm.moderator_id = :moderator_id
+                                    WHERE tm.moderator_id = :moderator_id AND tr.status = 'active'
                                 ");
                                 $stmt_students->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
                                 $stmt_students->execute();
@@ -196,8 +227,8 @@ $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
                     </div>
 
                     <!-- Card for TOTAL PENDING -->
-                    <div class="col-md-3 p-1" style="border: 1px solid red; padding: 0;">
-                        <div class="card p-2" style="margin: 0;">
+                    <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                             <?php
                             try {
                                 // Fetch total pending student registrations for clubs managed by this moderator
@@ -221,8 +252,8 @@ $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
                     </div>
 
                     <!-- Card for LEAVE REQUESTS (you can modify this query as needed) -->
-                    <div class="col-md-3 p-1" style="border: 1px solid red; padding: 0;">
-                        <div class="card p-2" style="margin: 0;">
+                    <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                             <h3>0</h3>
                             <p>Leave Requests</p>
                         </div>
@@ -232,23 +263,25 @@ $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 
 
                 <!-- CHARTS AND DIAGRAMS START -->
-                <div class="row card-row2 col-12" style="border: 1px solid black; margin: 0;">
+                <div class="row card-row2 col-12" style="border: 1px solid transparent; margin: 0;">
 
                     <!-- PIE CHART -->
-                    <div class="col-md-5 p-1" style="border: 1px solid blue; padding: 0;">
-                        <div class="card p-2" style="margin: 0;">
+                    <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
+                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                             <h5>Students per Department</h5>
                             <div style="height: 365px; background-color: transparent;">
                                 <?php
                                 try {
-                                    // Fetch the count of registered students per department with status 'active'
+                                    // Fetch the count of registered students per department for the clubs managed by the current moderator
                                     $stmt = $pdo->prepare("
                                         SELECT ts.department, COUNT(tr.student_id) AS member_count
                                         FROM tbl_students ts
                                         JOIN tbl_registration tr ON ts.student_id = tr.student_id
-                                        WHERE tr.status = 'active'
+                                        JOIN tbl_clubs_and_moderators cm ON tr.club_id = cm.club_id
+                                        WHERE cm.moderator_id = :moderator_id AND tr.status = 'active'
                                         GROUP BY ts.department
                                     ");
+                                    $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
                                     $stmt->execute();
                                     $department_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 } catch (PDOException $e) {
@@ -316,12 +349,13 @@ $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
                     <!-- PIE CHART END -->
 
 
+
                     <!-- OTHER CHARTS -->
-                    <div class="col-md-7" style="border: 1px solid blue; padding: 0;">
-                        <div class="row" style="border: 1px solid yellow; margin: 0;">
+                    <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
+                        <div class="row" style="border: 1px solid transparent; margin: 0;">
                             <!-- Student Gender -->
-                            <div class="col-md-12 p-1" style="border: 1px solid orange; padding: 0;">
-                                <div class="card p-2" style="margin: 0;">
+                            <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                     <h5>Student Gender</h5>
                                     <div style="height: 150px; background-color: lightgray;">
                                     </div>
@@ -329,10 +363,10 @@ $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
                             </div>
                         </div>
                         <!-- Vertically divided Year Level Count and Members per School Year -->
-                        <div class="row" style="border: 1px solid yellow; margin: 0;">
+                        <div class="row" style="border: 1px solid transparent; margin: 0;">
                             <!-- Year Level Count -->
-                            <div class="col-md-6 p-1" style="border: 1px solid orange; padding: 0;">
-                                <div class="card p-2" style="margin: 0;">
+                            <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                     <h5>Year Level Count</h5>
                                     <div style="height: 150px; background-color: lightgray;">
                                         <!-- BAR GRAPH FOR NUMBERS OF YEAR LEVEL -->
@@ -340,8 +374,8 @@ $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
                                 </div>
                             </div>
                             <!-- Members per School Year -->
-                            <div class="col-md-6 p-1" style="border: 1px solid orange; padding: 0;">
-                                <div class="card p-2" style="margin: 0;">
+                            <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                     <h5>Members per School Year</h5>
                                     <div style="height: 150px; background-color: lightgray;">
                                         <!-- BAR GRAPH FOR NUMBERS OF YEAR LEVEL -->
