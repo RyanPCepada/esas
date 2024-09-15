@@ -9,6 +9,33 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 
+try {
+    // Use the existing PDO instance from config.php
+    global $pdo;
+
+    // Prepare and execute the SQL statement
+    $sql = "SELECT firstName, middleName, lastName FROM tbl_moderators WHERE moderator_id = :moderator_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    // Fetch the result
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check if a result was found
+    if ($result) {
+        $firstName = strtoupper($result['firstName']);
+        $middleName = strtoupper($result['middleName']);
+        $lastName = strtoupper($result['lastName']);
+    } else {
+        // Handle the case where no data is found
+        $firstName = $middleName = $lastName = "UNKNOWN";
+    }
+
+} catch (PDOException $e) {
+    // Handle database connection or query error
+    die("Database error: " . $e->getMessage());
+}
 ?>
 
 
