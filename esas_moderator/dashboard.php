@@ -1,48 +1,14 @@
-<?php
+<?php 
 session_start();
 require_once "../config.php";  // Assuming this file holds your PDO connection
 
-// Check if moderator is logged in
 if (!isset($_SESSION['moderator_id'])) {
-    die("Moderator session not found.");
+    echo "Moderator ID is not set in the session.";
+    exit;
 }
 
-$moderator_id = $_SESSION['moderator_id'];
-
-try {
-    // Fetch total clubs associated with the moderator
-    $stmt_clubs = $pdo->prepare("SELECT COUNT(club_id) AS total_clubs FROM tbl_clubs WHERE moderator_id = :moderator_id");
-    $stmt_clubs->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-    $stmt_clubs->execute();
-    $total_clubs = $stmt_clubs->fetchColumn();
-
-    // Fetch total distinct students who registered under clubs managed by this moderator
-    $stmt_students = $pdo->prepare("
-        SELECT COUNT(DISTINCT tr.student_id) AS total_students 
-        FROM tbl_registration tr 
-        JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
-        WHERE tc.moderator_id = :moderator_id
-    ");
-    $stmt_students->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-    $stmt_students->execute();
-    $total_students = $stmt_students->fetchColumn();
-
-    // Fetch total pending requests for clubs managed by this moderator
-    $stmt_pending = $pdo->prepare("
-        SELECT COUNT(tcr.request_id) AS total_pending 
-        FROM tbl_club_requests tcr 
-        JOIN tbl_clubs tc ON tcr.club_id = tc.club_id 
-        WHERE tcr.status = 'pending' AND tc.moderator_id = :moderator_id
-    ");
-    $stmt_pending->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-    $stmt_pending->execute();
-    $total_pending = $stmt_pending->fetchColumn();
-
-} catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
-}
+$moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 ?>
-
 
 
 <!DOCTYPE html>
@@ -106,22 +72,22 @@ try {
             <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li>
-                        <a href="../esas_student/all_clubs.php" class="nav-link left-sidebar text-dark active" id="all-clubs">
+                        <a href="../esas_moderator/dashboard.php" class="nav-link left-sidebar text-dark active" id="all-clubs">
                             <i class="fas fa-chart-line"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                        <a href="../esas_moderator/my_clubs.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
                             <i class="fas fa-users"></i> My Clubs
                         </a>
                     </li>
                     <li>
-                        <a href="../esas_student/pending_approvals.php" class="nav-link left-sidebar text-dark" id="pending-approvals">
+                        <a href="../esas_moderator/pending_approvals.php" class="nav-link left-sidebar text-dark" id="pending-approvals">
                             <i class="fas fa-hourglass-half"></i> Pending Approvals
                         </a>
                     </li>
                     <li>
-                        <a href="../esas_student/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
+                        <a href="../esas_moderator/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
                             <i class="fas fa-envelope"></i> Club Requests
                         </a>
                     </li>
@@ -138,7 +104,34 @@ try {
 <div class="col-12 col-md-10 bg-lgrey auto-scroll">
     <div class="row g-0 h-100">
         <div class="row g-0 p-4 px-2 pt-2 h-100">
-            <div class="row align-items-center mb-3">
+            <div class="row align-items-center mb-2">
+            <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
+<div class="col-auto">
+    <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+        <?php
+        // Prepare the SQL query
+        $sql = "
+            SELECT c.club_id, c.clubName 
+            FROM tbl_clubs c
+            JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+            WHERE cm.moderator_id = :moderator_id
+        ";
+
+        // Execute the query
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['moderator_id' => $moderator_id]);
+
+        // Fetch the results
+        $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Generate the dropdown options
+        foreach ($clubs as $club): ?>
+            <option value="<?php echo htmlspecialchars($club['club_id']); ?>">
+                <?php echo htmlspecialchars($club['clubName']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>
                 <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
                 <div class="col-auto">
                     <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
@@ -154,10 +147,25 @@ try {
             <div class="card p-4">
                 <!-- UPPER CARDS START -->
                 <div class="row card-row1 col-md-12 mb-3" style="border: 1px solid black; margin: 0;">
-                    <!-- Card for TOTAL CLUBS -->
+                    <!-- Card for TOTAL MODERATORS CLUBS -->
                     <div class="col-md-3 p-1" style="border: 1px solid red; padding: 0;">
                         <div class="card p-2" style="margin: 0;">
-                            <h3>0</h3>
+                            <?php
+                            try {
+                                // Fetch total clubs associated with the moderator using tbl_club_and_moderators
+                                $stmt_clubs = $pdo->prepare("
+                                    SELECT COUNT(DISTINCT club_id) AS total_clubs 
+                                    FROM tbl_clubs_and_moderators 
+                                    WHERE moderator_id = :moderator_id
+                                ");
+                                $stmt_clubs->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                $stmt_clubs->execute();
+                                $total_clubs = $stmt_clubs->fetchColumn();
+                                echo "<h3>$total_clubs</h3>";
+                            } catch (PDOException $e) {
+                                echo "Error: " . $e->getMessage();
+                            }
+                            ?>
                             <p>Total Clubs</p>
                         </div>
                     </div>
@@ -165,7 +173,24 @@ try {
                     <!-- Card for TOTAL STUDENTS -->
                     <div class="col-md-3 p-1" style="border: 1px solid red; padding: 0;">
                         <div class="card p-2" style="margin: 0;">
-                            <h3>0</h3>
+                            <?php
+                            try {
+                                // Fetch total distinct students who registered under clubs managed by this moderator
+                                $stmt_students = $pdo->prepare("
+                                    SELECT COUNT(DISTINCT tr.student_id) AS total_students 
+                                    FROM tbl_registration tr 
+                                    JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
+                                    JOIN tbl_moderators tm ON tc.club_id = tm.club_id 
+                                    WHERE tm.moderator_id = :moderator_id
+                                ");
+                                $stmt_students->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                $stmt_students->execute();
+                                $total_students = $stmt_students->fetchColumn();
+                                echo "<h3>$total_students</h3>";
+                            } catch (PDOException $e) {
+                                echo "Error: " . $e->getMessage();
+                            }
+                            ?>
                             <p>Total Students</p>
                         </div>
                     </div>
@@ -173,8 +198,25 @@ try {
                     <!-- Card for TOTAL PENDING -->
                     <div class="col-md-3 p-1" style="border: 1px solid red; padding: 0;">
                         <div class="card p-2" style="margin: 0;">
-                            <h3>0</h3>
-                            <p>Total Pending Requests</p>
+                            <?php
+                            try {
+                                // Fetch total pending student registrations for clubs managed by this moderator
+                                $stmt_pending = $pdo->prepare("
+                                    SELECT COUNT(tr.student_id) AS total_pending 
+                                    FROM tbl_registration tr
+                                    JOIN tbl_clubs tc ON tr.club_id = tc.club_id
+                                    JOIN tbl_moderators tm ON tc.club_id = tm.club_id
+                                    WHERE tr.status = 'pending' AND tm.moderator_id = :moderator_id
+                                ");
+                                $stmt_pending->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                $stmt_pending->execute();
+                                $total_pending = $stmt_pending->fetchColumn();
+                                echo "<h3>$total_pending</h3>";
+                            } catch (PDOException $e) {
+                                echo "Error: " . $e->getMessage();
+                            }
+                            ?>
+                            <p>Total Pending Approval</p>
                         </div>
                     </div>
 
@@ -188,17 +230,91 @@ try {
                 </div>
                 <!-- UPPER CARDS END -->
 
+
                 <!-- CHARTS AND DIAGRAMS START -->
                 <div class="row card-row2 col-12" style="border: 1px solid black; margin: 0;">
+
                     <!-- PIE CHART -->
                     <div class="col-md-5 p-1" style="border: 1px solid blue; padding: 0;">
                         <div class="card p-2" style="margin: 0;">
                             <h5>Students per Department</h5>
-                            <div style="height: 365px; background-color: lightgray;">
-                                <!-- PIECHART -->
+                            <div style="height: 365px; background-color: transparent;">
+                                <?php
+                                try {
+                                    // Fetch the count of registered students per department with status 'active'
+                                    $stmt = $pdo->prepare("
+                                        SELECT ts.department, COUNT(tr.student_id) AS member_count
+                                        FROM tbl_students ts
+                                        JOIN tbl_registration tr ON ts.student_id = tr.student_id
+                                        WHERE tr.status = 'active'
+                                        GROUP BY ts.department
+                                    ");
+                                    $stmt->execute();
+                                    $department_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                } catch (PDOException $e) {
+                                    echo "Error: " . $e->getMessage();
+                                }
+
+                                // Prepare data for the pie chart
+                                $departments = [];
+                                $counts = [];
+
+                                foreach ($department_data as $row) {
+                                    $departments[] = $row['department'];
+                                    $counts[] = $row['member_count'];
+                                }
+                                ?>
+                                <!-- Canvas for the pie chart -->
+                                <canvas id="pieChart" style="height: 100%;"></canvas>
+                                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                                <script>
+                                    // Fetching data from PHP arrays
+                                    const departments = <?php echo json_encode($departments); ?>;
+                                    const counts = <?php echo json_encode($counts); ?>;
+
+                                    // Render Pie Chart using Chart.js
+                                    const ctx = document.getElementById('pieChart').getContext('2d');
+                                    const pieChart = new Chart(ctx, {
+                                        type: 'pie',
+                                        data: {
+                                            labels: departments,  // Department names
+                                            datasets: [{
+                                                label: 'Members per Department',
+                                                data: counts,  // Member count per department
+                                                backgroundColor: [
+                                                    'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
+                                                    'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
+                                                    'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
+                                                    'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
+                                                    'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
+                                                    'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
+                                                ],
+                                                borderColor: [
+                                                    'rgba(65, 105, 225, 1)',     // Royal Blue border
+                                                    'rgba(255, 105, 180, 1)',     // Hot Pink border
+                                                    'rgba(255, 215, 0, 1)',       // Gold border
+                                                    'rgba(0, 255, 255, 1)',       // Cyan border
+                                                    'rgba(255, 165, 0, 1)',       // Orange border
+                                                    'rgba(0, 255, 0, 1)'          // Lime Green border
+                                                ],
+                                                borderWidth: 1
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            plugins: {
+                                                legend: {
+                                                    position: 'top',
+                                                }
+                                            }
+                                        }
+                                    });
+                                </script>
                             </div>
                         </div>
                     </div>
+                    <!-- PIE CHART END -->
+
 
                     <!-- OTHER CHARTS -->
                     <div class="col-md-7" style="border: 1px solid blue; padding: 0;">
@@ -266,7 +382,7 @@ try {
         }
 
         // Fetch clubs data from API
-        fetch('/esas/esas_student/apis/clubs-api.php')
+        fetch('/esas/esas_moderator/apis/clubs-api.php')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -285,7 +401,7 @@ try {
                                     <small data-toggle="tooltip" title="${memberText}">
                                         <i class="fa fa-user mr-1"></i>${club.membersCount}
                                     </small>
-                                    <a href="/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
+                                    <a href="/esas/esas_moderator/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
                                         <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
                                         <div class="overlay-text">
                                             <h4>${club.clubName}</h4>
