@@ -295,7 +295,7 @@ try {
                                 <!-- PIE CHART -->
                                 <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <h5>Students per Department</h5>
+                                        <p>Students per Department</p>
                                         <div style="height: 365px; background-color: transparent;">
                                             <?php
                                             try {
@@ -383,8 +383,46 @@ try {
                                         <!-- Student Gender -->
                                         <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <h5>Student Gender</h5>
+                                                <p>Student Gender</p>
                                                 <div style="height: 150px;">
+                                                <canvas id="studentChart"></canvas>
+                                                
+                                    <script>
+                                        // script.js
+
+// Ensure the DOM is fully loaded before running the script
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the canvas element
+    const ctx = document.getElementById('studentChart').getContext('2d');
+
+    // Create the bar chart
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Male Students', 'Female Students'],
+            datasets: [{
+                label: 'Number of Students',
+                data: [100, 80],
+                backgroundColor: ['#3498db', '#e74c3c'],
+                borderColor: ['#2980b9', '#c0392b'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true
+                }
+            }
+        }
+    });
+});
+</script>
                                                 </div>
                                             </div>
                                         </div>
@@ -394,7 +432,7 @@ try {
                                         <!-- Year Level Count -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <h5>Year Level Count</h5>
+                                                <p>Year Level Count</p>
                                                 <div style="height: 150px; background-color: lightgray;">
                                                     <!-- BAR GRAPH FOR NUMBERS OF YEAR LEVEL -->
                                                 </div>
@@ -403,7 +441,7 @@ try {
                                         <!-- Members per School Year -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <h5>Members per School Year</h5>
+                                                <p>Members per School Year</p>
                                                 <div style="height: 150px; background-color: lightgray;">
                                                     <!-- BAR GRAPH FOR NUMBERS OF YEAR LEVEL -->
                                                 </div>
