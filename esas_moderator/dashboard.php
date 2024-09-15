@@ -535,9 +535,12 @@ try {
 
                 // Populate the counts array based on fetched data
                 foreach ($yearData as $row) {
-                    $year = $row['year'];
-                    if (isset($years[$year - 1])) {
-                        $counts[$year - 1] = (int)$row['count'];
+                    $year = (int)$row['year']; // Ensure $year is an integer
+                    $count = (int)$row['count']; // Ensure $count is an integer
+
+                    // Check if $year is within the valid range
+                    if ($year >= 1 && $year <= 4) {
+                        $counts[$year - 1] = $count;
                     }
                 }
             } catch (PDOException $e) {
