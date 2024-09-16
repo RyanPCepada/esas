@@ -296,7 +296,8 @@ try {
             <div class="col-12 col-md-10 bg-lgrey auto-scroll">
                 <div class="row g-0 h-100">
 
-                    
+                    <a href="../esas_student/officers/csg_officers.php">The CSG Officers</a>
+                    <a href="../esas_student/officers/sbo_officers.php">The SBO Officers</a>
 
                     
                     <div id="divpr_requesdetails" class="table-responsive px-0">
