@@ -96,6 +96,11 @@ try {
             /* Ensure your card styles are here */
         }
 
+        @media (max-width: 768px) {
+            .col-auto {
+                width: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -155,7 +160,7 @@ try {
                 <div class="row g-0 h-100">
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
                         
-                    <div class="row align-items-center mb-2">
+                        <div class="row align-items-center mb-2">
                             <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
                             <div class="col-auto">
                                 <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
@@ -237,7 +242,7 @@ try {
                             </div>
 
                             <!-- Display selected club name or default club name -->
-                            <div class="col-auto text-center" style="width: 540px;">
+                            <div class="clubname-display text-center" style="width: 540px;">
                                 <?php
                                 // Check if a club is selected via the URL
                                 $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId;
@@ -296,11 +301,11 @@ try {
                                             // Prepare the SQL query
                                             $sql = "
                                                 SELECT COUNT(DISTINCT tr.student_id) AS total_students 
-                                                FROM tbl_registration tr 
-                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
-                                                JOIN tbl_moderators tm ON tc.club_id = tm.club_id 
-                                                WHERE tm.moderator_id = :moderator_id 
-                                                AND tr.status = 'active'
+                                            FROM tbl_registration tr 
+                                            JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
+                                            JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id 
+                                            WHERE cm.moderator_id = :moderator_id 
+                                            AND tr.status = 'active'
                                             ";
 
                                             // Add condition for club_id if it's set
@@ -366,7 +371,7 @@ try {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
-                                        <p>Total Pending Approval</p>
+                                        <p>Total Pending Approvals</p>
                                     </div>
                                 </div>
 
@@ -450,61 +455,73 @@ try {
                                             ?>
                                             <!-- Canvas for the pie chart -->
                                             <canvas id="pieChart" style="height: 100%;"></canvas>
+                                            <p id="noDataMessage" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 35%;">No data available to display</p>
+
                                             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                                             <script>
                                                 // Fetching data from PHP arrays
                                                 const labelsWithPercentages = <?php echo json_encode($labels_with_percentages); ?>;
                                                 const counts = <?php echo json_encode($counts); ?>;
 
-                                                // Render Pie Chart using Chart.js
                                                 const ctx = document.getElementById('pieChart').getContext('2d');
-                                                const pieChart = new Chart(ctx, {
-                                                    type: 'pie',
-                                                    data: {
-                                                        labels: labelsWithPercentages,  // Department names with percentages
-                                                        datasets: [{
-                                                            label: 'Members per Department',
-                                                            data: counts,  // Member count per department
-                                                            backgroundColor: [
-                                                                'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
-                                                                'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
-                                                                'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
-                                                                'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
-                                                                'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
-                                                                'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
-                                                            ],
-                                                            borderColor: [
-                                                                'rgba(65, 105, 225, 1)',     // Royal Blue border
-                                                                'rgba(255, 105, 180, 1)',     // Hot Pink border
-                                                                'rgba(255, 215, 0, 1)',       // Gold border
-                                                                'rgba(0, 255, 255, 1)',       // Cyan border
-                                                                'rgba(255, 165, 0, 1)',       // Orange border
-                                                                'rgba(0, 255, 0, 1)'          // Lime Green border
-                                                            ],
-                                                            borderWidth: 1
-                                                        }]
-                                                    },
-                                                    options: {
-                                                        responsive: true,
-                                                        plugins: {
-                                                            legend: {
-                                                                position: 'top',
-                                                                labels: {
-                                                                    boxWidth: 20,  // Set square shape
-                                                                    padding: 20    // Add spacing between labels and box
-                                                                }
-                                                            },
-                                                            tooltip: {
-                                                                callbacks: {
-                                                                    label: function(tooltipItem) {
-                                                                        return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
+                                                const noDataMessage = document.getElementById('noDataMessage');
+                                                
+                                                // Check if there's any data to display
+                                                if (counts.length === 0 || labelsWithPercentages.length === 0) {
+                                                    // No data, hide the canvas and show the message
+                                                    document.getElementById('pieChart').style.display = 'none';
+                                                    noDataMessage.style.display = 'block';
+                                                } else {
+                                                    // Render Pie Chart using Chart.js
+                                                    const pieChart = new Chart(ctx, {
+                                                        type: 'pie',
+                                                        data: {
+                                                            labels: labelsWithPercentages,  // Department names with percentages
+                                                            datasets: [{
+                                                                label: 'Members per Department',
+                                                                data: counts,  // Member count per department
+                                                                backgroundColor: [
+                                                                    'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
+                                                                    'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
+                                                                    'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
+                                                                    'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
+                                                                    'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
+                                                                    'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
+                                                                ],
+                                                                borderColor: [
+                                                                    'rgba(65, 105, 225, 1)',     // Royal Blue border
+                                                                    'rgba(255, 105, 180, 1)',     // Hot Pink border
+                                                                    'rgba(255, 215, 0, 1)',       // Gold border
+                                                                    'rgba(0, 255, 255, 1)',       // Cyan border
+                                                                    'rgba(255, 165, 0, 1)',       // Orange border
+                                                                    'rgba(0, 255, 0, 1)'          // Lime Green border
+                                                                ],
+                                                                borderWidth: 1
+                                                            }]
+                                                        },
+                                                        options: {
+                                                            responsive: true,
+                                                            plugins: {
+                                                                legend: {
+                                                                    position: 'top',
+                                                                    labels: {
+                                                                        boxWidth: 20,  // Set square shape
+                                                                        padding: 20    // Add spacing between labels and box
+                                                                    }
+                                                                },
+                                                                tooltip: {
+                                                                    callbacks: {
+                                                                        label: function(tooltipItem) {
+                                                                            return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
+                                                                        }
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                    }
-                                                });
+                                                    });
+                                                }
                                             </script>
+
                                         </div>
                                     </div>
                                 </div>
