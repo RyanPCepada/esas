@@ -161,6 +161,7 @@ unset($pdo);
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th>Profile Picture</th>
                                 <th>#</th>
                                 <th>First Name</th>
                                 <th>Middle Name</th>
@@ -173,8 +174,11 @@ unset($pdo);
                                 <th>Department</th>
                                 <th>Course</th>
                                 <th>Year</th>
-                                <th>Address</th>
-                                <th>Profile Picture</th>
+                                <th>Street</th>
+                                <th>Barangay</th>
+                                <th>Municipality</th>
+                                <th>Province</th>
+                                <th>Zipcode</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -182,6 +186,13 @@ unset($pdo);
                             <?php if (count($students) > 0): ?>
                                 <?php foreach ($students as $row): ?>
                                     <tr>
+                                        <td>
+                                            <?php if ($row['profilePic']): ?>
+                                                <img src="<?php echo htmlspecialchars('/esas/esas_student/images/' . $row['profilePic']); ?>" alt="Profile Picture" class="rounded-circle mr-2" width="40" height="40">
+                                            <?php else: ?>
+                                                No Image
+                                            <?php endif; ?>
+                                        </td>
                                         <td><?php echo htmlspecialchars($row['student_id']); ?></td>
                                         <td><?php echo htmlspecialchars($row['firstName']); ?></td>
                                         <td><?php echo htmlspecialchars($row['middleName']); ?></td>
@@ -194,14 +205,11 @@ unset($pdo);
                                         <td><?php echo htmlspecialchars($row['department']); ?></td>
                                         <td><?php echo htmlspecialchars($row['course']); ?></td>
                                         <td><?php echo htmlspecialchars($row['year']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['street'] . ', ' . $row['barangay'] . ', ' . $row['municipality'] . ', ' . $row['province'] . ', ' . $row['zipcode']); ?></td>
-                                        <td>
-                                            <?php if ($row['profilePic']): ?>
-                                                <img src="<?php echo htmlspecialchars('/path/to/images/' . $row['profilePic']); ?>" alt="Profile Picture" style="width: 50px; height: 50px;">
-                                            <?php else: ?>
-                                                No Image
-                                            <?php endif; ?>
-                                        </td>
+                                        <td><?php echo htmlspecialchars($row['street']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['barangay']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['municipality']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['province']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['zipcode']); ?></td>
                                         <td>
                                             <a href="crud/student_read.php?student_id=<?php echo htmlspecialchars($row['student_id']); ?>" class="mr-3" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                             <a href="crud/student_update.php?student_id=<?php echo htmlspecialchars($row['student_id']); ?>" class="mr-3" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil-alt"></span></a>
@@ -211,12 +219,13 @@ unset($pdo);
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="15" class="text-center">No students found.</td>
+                                    <td colspan="18" class="text-center">No students found.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
+
                 <div id="noResultsMessage" class="alert alert-danger" style="display:none;"><em>No results found.</em></div>
             </div> <!-- Close col-md-12 -->
         </div> <!-- Close row -->
