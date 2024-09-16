@@ -155,12 +155,12 @@ try {
                 <div class="row g-0 h-100">
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
                         
-                        <div class="row align-items-center mb-2">
+                    <div class="row align-items-center mb-2">
                             <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
                             <div class="col-auto">
                                 <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                                <option value="" disabled selected>Select a Club</option>
-                                <?php
+                                    <!-- <option value="" disabled>Select a Club</option> -->
+                                    <?php
                                     // Prepare the SQL query to fetch clubs managed by the current moderator
                                     $sql = "
                                         SELECT c.club_id, c.clubName 
@@ -176,10 +176,15 @@ try {
                                     // Fetch the results
                                     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+                                    // Set the first club as default if no club is selected
+                                    $defaultClubId = $clubs[0]['club_id'] ?? null;  // Default to the first club if available
+                                    $defaultClubName = $clubs[0]['clubName'] ?? 'Club not available'; // Default club name
+
                                     // Generate the dropdown options
                                     foreach ($clubs as $club): ?>
-                                        <option value="<?php echo htmlspecialchars($club['club_id']); ?>">
-                                            <?php echo 'club_id #' . htmlspecialchars($club['club_id']) . ' - ' . htmlspecialchars($club['clubName']); ?>
+                                        <option value="<?php echo htmlspecialchars($club['club_id']); ?>"
+                                            <?php if (isset($_GET['club_id']) && $_GET['club_id'] == $club['club_id']) echo 'selected'; ?>>
+                                            <?php echo htmlspecialchars($club['clubName']); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -193,62 +198,65 @@ try {
                             </script>
 
                             <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
-                                <div class="col-auto">
-                                    <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                                        <?php 
-                                        // Get the current date
-                                        $currentDate = new DateTime();
+                            <div class="col-auto">
+                                <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                                    <?php 
+                                    // Get the current date
+                                    $currentDate = new DateTime();
 
-                                        // Calculate school years based on current date
-                                        $schoolYears = [];
-                                        for ($i = 0; $i < 5; $i++) {
-                                            $startYear = $currentDate->format('Y') - $i;
-                                            $endYear = $startYear + 1;
-                                            $schoolYears[] = "{$startYear}-{$endYear}";
-                                        }
+                                    // Calculate school years based on current date
+                                    $schoolYears = [];
+                                    for ($i = 0; $i < 5; $i++) {
+                                        $startYear = $currentDate->format('Y') - $i;
+                                        $endYear = $startYear + 1;
+                                        $schoolYears[] = "{$startYear}-{$endYear}";
+                                    }
 
-                                        // Prepare and execute the SQL query
-                                        $sql = "
-                                            SELECT DISTINCT 
-                                                CONCAT(YEAR(dateAdded), '-', YEAR(dateAdded) + 1) AS schoolYear
-                                            FROM tbl_clubs
-                                            WHERE dateAdded IS NOT NULL
-                                            AND YEAR(dateAdded) BETWEEN YEAR(DATE_SUB(NOW(), INTERVAL 5 YEAR)) AND YEAR(NOW())
-                                        ";
+                                    // Prepare and execute the SQL query
+                                    $sql = "
+                                        SELECT DISTINCT 
+                                            CONCAT(YEAR(dateAdded), '-', YEAR(dateAdded) + 1) AS schoolYear
+                                        FROM tbl_clubs
+                                        WHERE dateAdded IS NOT NULL
+                                        AND YEAR(dateAdded) BETWEEN YEAR(DATE_SUB(NOW(), INTERVAL 5 YEAR)) AND YEAR(NOW())
+                                    ";
 
-                                        $stmt = $pdo->prepare($sql);
-                                        $stmt->execute();
-                                        $activeSchoolYears = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                                    $stmt = $pdo->prepare($sql);
+                                    $stmt->execute();
+                                    $activeSchoolYears = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-                                        // Determine which school years to display
-                                        $displaySchoolYears = array_intersect($schoolYears, $activeSchoolYears);
+                                    // Determine which school years to display
+                                    $displaySchoolYears = array_intersect($schoolYears, $activeSchoolYears);
 
-                                        // Output school year options
-                                        foreach ($displaySchoolYears as $schoolYear) {
-                                            echo "<option value=\"" . htmlspecialchars($schoolYear) . "\">" . htmlspecialchars($schoolYear) . "</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
+                                    // Output school year options
+                                    foreach ($displaySchoolYears as $schoolYear) {
+                                        echo "<option value=\"" . htmlspecialchars($schoolYear) . "\">" . htmlspecialchars($schoolYear) . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+
+                            <!-- Display selected club name or default club name -->
                             <div class="col-auto text-center" style="width: 540px;">
                                 <?php
-                                // Display the selected club's name
-                                if (isset($_GET['club_id'])) {
-                                        $club_id = intval($_GET['club_id']);
-                                        $sql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
-                                        $stmt = $pdo->prepare($sql);
-                                        $stmt->execute(['club_id' => $club_id]);
-                                        $club = $stmt->fetch(PDO::FETCH_ASSOC);
-                                        if ($club) {
-                                            echo "<h5 class='text-muted mt-1 ms-3'>" . htmlspecialchars($club['clubName']) . "</h5>";
-                                        } else {
-                                            echo "<p>Club not found.</p>";
-                                        }
-                                    }
+                                // Check if a club is selected via the URL
+                                $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId;
+
+                                // Fetch and display the selected club name
+                                $sql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
+                                $stmt = $pdo->prepare($sql);
+                                $stmt->execute(['club_id' => $club_id]);
+                                $club = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                                if ($club) {
+                                    echo "<h5 class='text-muted mt-1 ms-3'>" . htmlspecialchars($club['clubName']) . "</h5>";
+                                } else {
+                                    echo "<p>Club not found.</p>";
+                                }
                                 ?>
-                                
                             </div>
                         </div>
+
 
                         <!-- THE MAIN PAGE START -->
                         <div class="card p-2">
@@ -310,7 +318,7 @@ try {
 
                                             $stmt_students->execute();
                                             $total_students = $stmt_students->fetchColumn();
-                                            echo "<h3>$total_students <small>club_id # $club_id</small></h3>";
+                                            echo "<h3>$total_students</h3>";
                                         } catch (PDOException $e) {
                                             echo "Error: " . $e->getMessage();
                                         }
@@ -353,7 +361,7 @@ try {
 
                                             $stmt_pending->execute();
                                             $total_pending = $stmt_pending->fetchColumn();
-                                            echo "<h3>$total_pending <small>club_id # $club_id</small></h3>";
+                                            echo "<h3>$total_pending</h3>";
                                         } catch (PDOException $e) {
                                             echo "Error: " . $e->getMessage();
                                         }
