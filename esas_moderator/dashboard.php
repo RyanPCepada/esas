@@ -430,133 +430,130 @@ try {
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
                                         
                                         <!-- Registry per SY -->
-<div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
-    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-        <p>Registry per SY</p>
-        <div style="height: 100%; width: 100%; background-color: transparent;">
-            <canvas id="registryPerSYChart"></canvas>
-        </div>
-        <?php
-        try {
-            // Get the current academic year based on today's date
-            $currentYear = date('Y');
-            $currentSY = $currentYear . '-' . ($currentYear + 1);
+                                        <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
+                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                                <p>Registry per SY</p>
+                                                <div style="height: 100%; width: 100%; background-color: transparent;">
+                                                    <canvas id="registryPerSYChart"></canvas>
+                                                </div>
+                                                <?php
+                                                try {
+                                                    // Get the current academic year based on today's date
+                                                    $currentYear = date('Y');
+                                                    $currentSY = $currentYear . '-' . ($currentYear + 1);
 
-            // SQL query to fetch the count of members per academic year including the placeholder year
-            $sql = "
-    SELECT academicYear, COALESCE(memberCount, 0) AS memberCount
-    FROM (
-        SELECT CONCAT(YEAR(r.dateModified), '-', YEAR(r.dateModified) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
-        FROM tbl_students s
-        JOIN tbl_registration r ON s.student_id = r.student_id
-        JOIN tbl_clubs c ON r.club_id = c.club_id
-        JOIN tbl_moderators m ON c.club_id = m.club_id
-        WHERE r.status = 'active' AND m.moderator_id = :moderator_id
-        GROUP BY academicYear
-        UNION ALL
-        SELECT '2023-2024' AS academicYear, 0 AS memberCount
-        WHERE NOT EXISTS (
-            SELECT 1 FROM tbl_registration
-            WHERE CONCAT(YEAR(dateModified), '-', YEAR(dateModified) + 1) = '2023-2024'
-        )
-    ) AS yearlyData
-    WHERE academicYear = '2023-2024' OR academicYear = '$currentSY'
-    ORDER BY academicYear
-";
+                                                    // SQL query to fetch the count of members per academic year including the placeholder year
+                                                    $sql = "
+                                                        SELECT academicYear, COALESCE(memberCount, 0) AS memberCount
+                                                        FROM (
+                                                            SELECT CONCAT(YEAR(r.dateModified), '-', YEAR(r.dateModified) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
+                                                            FROM tbl_students s
+                                                            JOIN tbl_registration r ON s.student_id = r.student_id
+                                                            JOIN tbl_clubs c ON r.club_id = c.club_id
+                                                            JOIN tbl_moderators m ON c.club_id = m.club_id
+                                                            WHERE r.status = 'active' AND m.moderator_id = :moderator_id
+                                                            GROUP BY academicYear
+                                                            UNION ALL
+                                                            SELECT '2023-2024' AS academicYear, 0 AS memberCount
+                                                            WHERE NOT EXISTS (
+                                                                SELECT 1 FROM tbl_registration
+                                                                WHERE CONCAT(YEAR(dateModified), '-', YEAR(dateModified) + 1) = '2023-2024'
+                                                            )
+                                                        ) AS yearlyData
+                                                        WHERE academicYear = '2023-2024' OR academicYear = '$currentSY'
+                                                        ORDER BY academicYear
+                                                    ";
 
+                                                    $stmt = $pdo->prepare($sql);
+                                                    $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                                    $stmt->execute();
+                                                    $registryPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-            $stmt->execute();
-            $registryPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                    // Initialize arrays for chart data
+                                                    $academicYears = [];
+                                                    $memberCountsPerSY = [];
 
-            // Initialize arrays for chart data
-            $academicYears = [];
-            $memberCountsPerSY = [];
+                                                    // Populate the arrays with data
+                                                    foreach ($registryPerSYData as $row) {
+                                                        $academicYears[] = $row['academicYear'];  // Academic year
+                                                        $memberCountsPerSY[] = $row['memberCount'];  // Number of members for each year
+                                                    }
 
-            // Populate the arrays with data
-            foreach ($registryPerSYData as $row) {
-                $academicYears[] = $row['academicYear'];  // Academic year
-                $memberCountsPerSY[] = $row['memberCount'];  // Number of members for each year
-            }
+                                                    // Fetch the total number of students for the max value
+                                                    $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
+                                                    $totalStudentsStmt->execute();
+                                                    $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
+                                                    $totalStudentCount = $totalStudentsData ? (int)$totalStudentsData['totalCount'] : 0;
 
-            // Fetch the total number of students for the max value
-            $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
-            $totalStudentsStmt->execute();
-            $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
-            $totalStudentCount = $totalStudentsData ? (int)$totalStudentsData['totalCount'] : 0;
+                                                    // Function to round up to the nearest even number
+                                                    function roundUpToEven($number) {
+                                                        return $number % 2 === 0 ? $number : $number + 1;
+                                                    }
 
-            // Function to round up to the nearest even number
-            function roundUpToEven($number) {
-                return $number % 2 === 0 ? $number : $number + 1;
-            }
+                                                    // Adjust max value to nearest even number
+                                                    $maxMemberCount = roundUpToEven($totalStudentCount);
+                                                } catch (PDOException $e) {
+                                                    echo "Error: " . $e->getMessage();
+                                                }
+                                                ?>
 
-            // Adjust max value to nearest even number
-            $maxMemberCount = roundUpToEven($totalStudentCount);
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
-        }
-        ?>
+                                                <!-- Include Chart.js -->
+                                                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        <!-- Include Chart.js -->
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                                                <script>
+                                                    // PHP arrays passed into JavaScript
+                                                    const academicYears = <?php echo json_encode($academicYears); ?>;
+                                                    const memberCountsPerSY = <?php echo json_encode($memberCountsPerSY); ?>;
+                                                    const maxMemberCount = <?php echo $maxMemberCount; ?>;
 
-        <script>
-            // PHP arrays passed into JavaScript
-            const academicYears = <?php echo json_encode($academicYears); ?>;
-            const memberCountsPerSY = <?php echo json_encode($memberCountsPerSY); ?>;
-            const maxMemberCount = <?php echo $maxMemberCount; ?>;
+                                                    // Data for the chart
+                                                    const registryPerSYData = {
+                                                        labels: academicYears,
+                                                        datasets: [{
+                                                            label: 'Registry per SY',
+                                                            data: memberCountsPerSY,
+                                                            fill: true,
+                                                            borderColor: 'rgba(75, 192, 192, 1)',
+                                                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                            tension: 0.1
+                                                        }]
+                                                    };
 
-            // Data for the chart
-            const registryPerSYData = {
-                labels: academicYears,
-                datasets: [{
-                    label: 'Registry per SY',
-                    data: memberCountsPerSY,
-                    fill: true,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.1
-                }]
-            };
+                                                    // Configuration for the chart
+                                                    const registryPerSYConfig = {
+                                                        type: 'line',
+                                                        data: registryPerSYData,
+                                                        options: {
+                                                            scales: {
+                                                                x: {
+                                                                    ticks: {
+                                                                        maxRotation: 45, // Rotate x-axis labels for better readability
+                                                                        autoSkip: true // Automatically skip labels if too many
+                                                                    }
+                                                                },
+                                                                y: {
+                                                                    beginAtZero: true,
+                                                                    max: maxMemberCount // Adjust max count dynamically to even number
+                                                                }
+                                                            },
+                                                            plugins: {
+                                                                legend: {
+                                                                    display: false // Disable the legend to remove label
+                                                                }
+                                                            },
+                                                            responsive: true,
+                                                            maintainAspectRatio: false // Allow chart to fill container width
+                                                        }
+                                                    };
 
-            // Configuration for the chart
-            const registryPerSYConfig = {
-                type: 'line',
-                data: registryPerSYData,
-                options: {
-                    scales: {
-                        x: {
-                            ticks: {
-                                maxRotation: 45, // Rotate x-axis labels for better readability
-                                autoSkip: true // Automatically skip labels if too many
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            max: maxMemberCount // Adjust max count dynamically to even number
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false // Disable the legend to remove label
-                        }
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false // Allow chart to fill container width
-                }
-            };
-
-            // Render the chart
-            const registryPerSYChart = new Chart(
-                document.getElementById('registryPerSYChart'),
-                registryPerSYConfig
-            );
-        </script>
-    </div>
-</div>
-
-
+                                                    // Render the chart
+                                                    const registryPerSYChart = new Chart(
+                                                        document.getElementById('registryPerSYChart'),
+                                                        registryPerSYConfig
+                                                    );
+                                                </script>
+                                            </div>
+                                        </div>
 
                                     </div>
 
