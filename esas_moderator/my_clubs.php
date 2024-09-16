@@ -108,17 +108,17 @@ try {
                         </li>
                         <li class="nav-item">
                             <a href="../esas_moderator/my_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="my-clubs">
-                                <i class="fas fa-users"></i> My Clubs
+                                <i class="fas fa-university"></i> My Clubs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="../esas_moderator/students.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                                <i class="fas fa-users"></i> Students
                             </a>
                         </li>
                         <li>
                             <a href="../esas_moderator/pending_approvals.php" class="nav-link left-sidebar text-dark" id="pending-approvals">
                                 <i class="fas fa-hourglass-half"></i> Pending Approvals
-                            </a>
-                        </li>
-                        <li>
-                            <a href="../esas_moderator/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
-                                <i class="fas fa-envelope"></i> Club Requests
                             </a>
                         </li>
                     </ul>
