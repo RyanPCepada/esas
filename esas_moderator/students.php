@@ -82,6 +82,9 @@ unset($pdo);
             /* Ensure your card styles are here */
         }
 
+
+        
+
     </style>
 </head>
 <body>
@@ -148,8 +151,7 @@ unset($pdo);
 
 
                    
-
-<div class="wrapper">
+                        <div class="wrapper">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
@@ -158,7 +160,7 @@ unset($pdo);
                     <h6 class="text-center mt-2" id="recordCount">Showing <span id="visibleRows"><?php echo count($students); ?></span> / <span id="totalRows"><?php echo count($students); ?></span> Records</h6>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-striped">
+                    <table class="table table-striped table-fixed">
                         <thead>
                             <tr>
                                 <th>Profile Picture</th>
@@ -188,7 +190,7 @@ unset($pdo);
                                     <tr>
                                         <td>
                                             <?php if ($row['profilePic']): ?>
-                                                <img src="<?php echo htmlspecialchars('/esas/esas_student/images/' . $row['profilePic']); ?>" alt="Profile Picture" class="rounded-circle mr-2" width="40" height="40">
+                                                <img src="<?php echo htmlspecialchars('/esas/esas_student/images/' . $row['profilePic']); ?>" alt="Profile Picture" class="rounded-circle mr-2" width="50" height="50">
                                             <?php else: ?>
                                                 No Image
                                             <?php endif; ?>
@@ -226,13 +228,14 @@ unset($pdo);
                     </table>
                 </div>
 
-                <div id="noResultsMessage" class="alert alert-danger" style="display:none;"><em>No results found.</em></div>
+                <!-- <div id="noResultsMessage" class="alert alert-danger" style="display:none;"><em>No results found.</em></div> -->
             </div> <!-- Close col-md-12 -->
         </div> <!-- Close row -->
     </div> <!-- Close container-fluid -->
 </div>
 
-<div class="fixed-bottom">
+
+<!-- <div class="fixed-bottom">
     <div class="container text-center align-items-center justify-content-center">
         <div class="row">
             <div class="search-container-bottom col-md-7">
@@ -243,7 +246,7 @@ unset($pdo);
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
