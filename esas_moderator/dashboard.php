@@ -148,12 +148,13 @@ try {
             <!-- LEFT SIDEBAR END -->
 
 
-            
+            <!--HERE-->
             
             <!-- MAINPAGE BAR -->
             <div class="col-12 col-md-10 bg-lgrey auto-scroll">
                 <div class="row g-0 h-100">
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
+                        
                         <div class="row align-items-center mb-2">
                             <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
                             <div class="col-auto">
@@ -182,6 +183,14 @@ try {
                                     <?php endforeach; ?>
                                 </select>
                             </div>
+
+                            <script>
+                                function filterDashboard() {
+                                    var club_id = document.getElementById('clubDropdown').value;
+                                    window.location.href = '?club_id=' + club_id; // Add club_id to the URL
+                                }
+                            </script>
+
                             <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
                                 <div class="col-auto">
                                     <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
@@ -254,16 +263,33 @@ try {
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
+                                        // Get the selected club_id from the URL, if available
+                                        $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+
                                         try {
-                                            // Fetch total distinct students who registered under clubs managed by this moderator
-                                            $stmt_students = $pdo->prepare("
+                                            // Prepare the SQL query
+                                            $sql = "
                                                 SELECT COUNT(DISTINCT tr.student_id) AS total_students 
                                                 FROM tbl_registration tr 
                                                 JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
                                                 JOIN tbl_moderators tm ON tc.club_id = tm.club_id 
-                                                WHERE tm.moderator_id = :moderator_id AND tr.status = 'active'
-                                            ");
+                                                WHERE tm.moderator_id = :moderator_id 
+                                                AND tr.status = 'active'
+                                            ";
+
+                                            // Add condition for club_id if it's set
+                                            if ($club_id) {
+                                                $sql .= " AND tr.club_id = :club_id";
+                                            }
+
+                                            $stmt_students = $pdo->prepare($sql);
                                             $stmt_students->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+
+                                            // Bind club_id parameter if it's set
+                                            if ($club_id) {
+                                                $stmt_students->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                            }
+
                                             $stmt_students->execute();
                                             $total_students = $stmt_students->fetchColumn();
                                             echo "<h3>$total_students</h3>";
@@ -274,6 +300,7 @@ try {
                                         <p>Total Students</p>
                                     </div>
                                 </div>
+
 
                                 <!-- Card for TOTAL PENDING -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
