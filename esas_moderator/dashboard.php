@@ -159,8 +159,9 @@ try {
                             <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
                             <div class="col-auto">
                                 <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                                    <?php
-                                    // Prepare the SQL query
+                                <option value="" disabled selected>Select a Club</option>
+                                <?php
+                                    // Prepare the SQL query to fetch clubs managed by the current moderator
                                     $sql = "
                                         SELECT c.club_id, c.clubName 
                                         FROM tbl_clubs c
@@ -178,7 +179,7 @@ try {
                                     // Generate the dropdown options
                                     foreach ($clubs as $club): ?>
                                         <option value="<?php echo htmlspecialchars($club['club_id']); ?>">
-                                            <?php echo htmlspecialchars($club['clubName']); ?>
+                                            <?php echo 'club_id #' . htmlspecialchars($club['club_id']) . ' - ' . htmlspecialchars($club['clubName']); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -229,7 +230,24 @@ try {
                                         ?>
                                     </select>
                                 </div>
-
+                            <div class="col-auto text-center" style="width: 540px;">
+                                <?php
+                                // Display the selected club's name
+                                if (isset($_GET['club_id'])) {
+                                        $club_id = intval($_GET['club_id']);
+                                        $sql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
+                                        $stmt = $pdo->prepare($sql);
+                                        $stmt->execute(['club_id' => $club_id]);
+                                        $club = $stmt->fetch(PDO::FETCH_ASSOC);
+                                        if ($club) {
+                                            echo "<h5 class='text-muted mt-1 ms-3'>" . htmlspecialchars($club['clubName']) . "</h5>";
+                                        } else {
+                                            echo "<p>Club not found.</p>";
+                                        }
+                                    }
+                                ?>
+                                
+                            </div>
                         </div>
 
                         <!-- THE MAIN PAGE START -->
@@ -364,7 +382,7 @@ try {
                                     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <p>Students per Department</p>
                                         <div style="height: 365px; background-color: transparent;">
-                                        <?php
+                                            <?php
                                             try {
                                                 // Get the selected club_id from the URL, if available
                                                 $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
