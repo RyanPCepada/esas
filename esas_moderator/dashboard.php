@@ -437,7 +437,8 @@ try {
                                                     try {
                                                         // Prepare the SQL statement to get gender counts filtered by club and moderator
                                                         $sqlCounts = "
-                                                            SELECT s.gender, COUNT(*) AS count
+
+                                                            SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
                                                             FROM tbl_students s
                                                             JOIN tbl_registration r ON s.student_id = r.student_id
                                                             JOIN tbl_clubs c ON r.club_id = c.club_id
