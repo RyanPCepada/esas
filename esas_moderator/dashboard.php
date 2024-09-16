@@ -541,13 +541,18 @@ try {
                                                 <div style="height: 100%; width: 100%; background-color: transparent;">
                                                     <canvas id="registryPerSYChart"></canvas>
                                                 </div>
+                                                <p id="noDataMessageSY" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 10%; margin-bottom: 11%;">No data available to display</p>
+
                                                 <?php
                                                 try {
                                                     // Get the current academic year based on today's date
                                                     $currentYear = date('Y');
                                                     $currentSY = $currentYear . '-' . ($currentYear + 1);
 
-                                                    // SQL query to fetch the count of members per academic year including the placeholder year
+                                                    // Get the selected club_id from the URL, if available
+                                                    $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+
+                                                    // SQL query to fetch the count of members per academic year
                                                     $sql = "
                                                         SELECT academicYear, COALESCE(memberCount, 0) AS memberCount
                                                         FROM (
@@ -557,6 +562,14 @@ try {
                                                             JOIN tbl_clubs c ON r.club_id = c.club_id
                                                             JOIN tbl_moderators m ON c.club_id = m.club_id
                                                             WHERE r.status = 'active' AND m.moderator_id = :moderator_id
+                                                    ";
+
+                                                    // Add condition for club_id if it's set
+                                                    if ($club_id) {
+                                                        $sql .= " AND r.club_id = :club_id";
+                                                    }
+
+                                                    $sql .= "
                                                             GROUP BY academicYear
                                                             UNION ALL
                                                             SELECT '2023-2024' AS academicYear, 0 AS memberCount
@@ -569,8 +582,15 @@ try {
                                                         ORDER BY academicYear
                                                     ";
 
+                                                    // Prepare the statement
                                                     $stmt = $pdo->prepare($sql);
                                                     $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+
+                                                    // Bind club_id parameter if it's set
+                                                    if ($club_id) {
+                                                        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                    }
+
                                                     $stmt->execute();
                                                     $registryPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -611,54 +631,64 @@ try {
                                                     const memberCountsPerSY = <?php echo json_encode($memberCountsPerSY); ?>;
                                                     const maxMemberCount = <?php echo $maxMemberCount; ?>;
 
-                                                    // Data for the chart
-                                                    const registryPerSYData = {
-                                                        labels: academicYears,
-                                                        datasets: [{
-                                                            label: 'Registry per SY',
-                                                            data: memberCountsPerSY,
-                                                            fill: true,
-                                                            borderColor: 'rgba(75, 192, 192, 1)',
-                                                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                                            tension: 0.1
-                                                        }]
-                                                    };
+                                                    // Check if there is no data to display
+                                                    const hasDataSY = memberCountsPerSY.some(count => count > 0);
 
-                                                    // Configuration for the chart
-                                                    const registryPerSYConfig = {
-                                                        type: 'line',
-                                                        data: registryPerSYData,
-                                                        options: {
-                                                            scales: {
-                                                                x: {
-                                                                    ticks: {
-                                                                        maxRotation: 45, // Rotate x-axis labels for better readability
-                                                                        autoSkip: true // Automatically skip labels if too many
+                                                    // Show or hide the "No Data" message based on data availability
+                                                    const registryPerSYChartElement = document.getElementById('registryPerSYChart');
+                                                    const noDataMessageSY = document.getElementById('noDataMessageSY');
+
+                                                    if (!hasDataSY) {
+                                                        registryPerSYChartElement.style.display = 'none';
+                                                        noDataMessageSY.style.display = 'block';
+                                                    } else {
+                                                        // Data for the chart
+                                                        const registryPerSYData = {
+                                                            labels: academicYears,
+                                                            datasets: [{
+                                                                label: 'Registry per SY',
+                                                                data: memberCountsPerSY,
+                                                                fill: true,
+                                                                borderColor: 'rgba(75, 192, 192, 1)',
+                                                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                                tension: 0.1
+                                                            }]
+                                                        };
+
+                                                        // Configuration for the chart
+                                                        const registryPerSYConfig = {
+                                                            type: 'line',
+                                                            data: registryPerSYData,
+                                                            options: {
+                                                                scales: {
+                                                                    x: {
+                                                                        ticks: {
+                                                                            maxRotation: 45, // Rotate x-axis labels for better readability
+                                                                            autoSkip: true // Automatically skip labels if too many
+                                                                        }
+                                                                    },
+                                                                    y: {
+                                                                        beginAtZero: true,
+                                                                        max: maxMemberCount // Adjust max count dynamically to even number
                                                                     }
                                                                 },
-                                                                y: {
-                                                                    beginAtZero: true,
-                                                                    max: maxMemberCount // Adjust max count dynamically to even number
-                                                                }
-                                                            },
-                                                            plugins: {
-                                                                legend: {
-                                                                    display: false // Disable the legend to remove label
-                                                                }
-                                                            },
-                                                            responsive: true,
-                                                            maintainAspectRatio: false // Allow chart to fill container width
-                                                        }
-                                                    };
+                                                                plugins: {
+                                                                    legend: {
+                                                                        display: false // Disable the legend to remove label
+                                                                    }
+                                                                },
+                                                                responsive: true,
+                                                                maintainAspectRatio: false // Allow chart to fill container width
+                                                            }
+                                                        };
 
-                                                    // Render the chart
-                                                    const registryPerSYChart = new Chart(
-                                                        document.getElementById('registryPerSYChart'),
-                                                        registryPerSYConfig
-                                                    );
+                                                        // Render the chart
+                                                        const registryPerSYChart = new Chart(registryPerSYChartElement, registryPerSYConfig);
+                                                    }
                                                 </script>
                                             </div>
                                         </div>
+
 
                                     </div>
 
