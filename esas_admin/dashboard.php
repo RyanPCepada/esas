@@ -388,31 +388,28 @@ try {
                                                 <div style="height: 150px; position: relative;">
                                                     <?php
                                                     try {
-                                                        // Replace with actual club_id value
-                                                        $club_id = 1; // Example club_id
-
-                                                        // Prepare the SQL statement to get gender counts
+                                                        // Prepare the SQL statement to get gender counts filtered by club and moderator
                                                         $sqlCounts = "
-                                                            SELECT gender, COUNT(*) AS count
-                                                            FROM tbl_students
-                                                            JOIN tbl_registration ON tbl_students.student_id = tbl_registration.student_id
-                                                            WHERE tbl_registration.status = 'active' AND tbl_registration.club_id = :club_id
-                                                            GROUP BY gender
+                                                            SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
+                                                            FROM tbl_students s
+                                                            JOIN tbl_registration r ON s.student_id = r.student_id
+                                                            WHERE r.status = 'active'
+                                                            GROUP BY s.gender
                                                         ";
-
                                                         $stmtCounts = $pdo->prepare($sqlCounts);
-                                                        $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
                                                         $stmtCounts->execute();
                                                         $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
 
-                                                        $maleCount = 0;
-                                                        $femaleCount = 0;
+                                                        // Initialize arrays for gender counts
+                                                        $genderCounts = [
+                                                            'Male' => 0,
+                                                            'Female' => 0
+                                                        ];
 
+                                                        // Populate the counts array based on fetched data
                                                         foreach ($counts as $row) {
-                                                            if ($row['gender'] === 'Male') {
-                                                                $maleCount = $row['count'];
-                                                            } elseif ($row['gender'] === 'Female') {
-                                                                $femaleCount = $row['count'];
+                                                            if (array_key_exists($row['gender'], $genderCounts)) {
+                                                                $genderCounts[$row['gender']] = $row['count'];
                                                             }
                                                         }
 
@@ -421,41 +418,49 @@ try {
                                                         $stmtTotal = $pdo->query($sqlTotal);
                                                         $totalCount = $stmtTotal->fetchColumn();
 
+                                                        // Prepare the data for JavaScript
+                                                        $labels = array_keys($genderCounts);
+                                                        $data = array_values($genderCounts);
+
                                                     } catch (PDOException $e) {
                                                         // Handle query error
                                                         echo 'Error: ' . $e->getMessage();
                                                     }
                                                     ?>
-                                                    <canvas id="studentChart" style="width: 100%; height: 100%;"></canvas>
+                                                    <canvas id="studentGenderChart" style="width: 100%; height: 100%;"></canvas>
                                                     <script>
                                                         document.addEventListener('DOMContentLoaded', function() {
-                                                            const ctx = document.getElementById('studentChart').getContext('2d');
+                                                            const ctx = document.getElementById('studentGenderChart').getContext('2d');
 
                                                             // Data from PHP
-                                                            const maleCount = <?php echo $maleCount; ?>;
-                                                            const femaleCount = <?php echo $femaleCount; ?>;
-                                                            const maxCount = <?php echo $totalCount; ?>; // Total student count
+                                                            const labels = <?php echo json_encode($labels); ?>;
+                                                            const dataCounts = <?php echo json_encode($data); ?>;
+                                                            const totalCount = <?php echo $totalCount; ?>;
 
-                                                            new Chart(ctx, {
-                                                                type: 'bar', // Use 'bar' type for horizontal bars
-                                                                data: {
-                                                                    labels: ['Male', 'Female'],
-                                                                    datasets: [{
-                                                                        data: [maleCount, femaleCount],
-                                                                        backgroundColor: ['#3498db', '#e74c3c'],
-                                                                        borderColor: ['#2980b9', '#c0392b'],
-                                                                        borderWidth: 1
-                                                                    }]
-                                                                },
+                                                            // Data for the chart
+                                                            const data = {
+                                                                labels: labels,
+                                                                datasets: [{
+                                                                    data: dataCounts,
+                                                                    backgroundColor: ['#3498db', '#e74c3c'], // Male: blue, Female: red
+                                                                    borderColor: ['#2980b9', '#c0392b'],
+                                                                    borderWidth: 1
+                                                                }]
+                                                            };
+
+                                                            // Configurations for the chart
+                                                            const config = {
+                                                                type: 'bar',
+                                                                data: data,
                                                                 options: {
-                                                                    indexAxis: 'y', // Set to 'y' to make bars horizontal
+                                                                    indexAxis: 'y', // Horizontal bar chart
                                                                     scales: {
                                                                         x: {
                                                                             beginAtZero: true,
-                                                                            suggestedMax: maxCount // Use total count as the maximum value
+                                                                            suggestedMax: totalCount // Set the maximum value to the total student count
                                                                         },
                                                                         y: {
-                                                                            // Optional settings for y-axis if needed
+                                                                            // Automatically handled by Chart.js for labels
                                                                         }
                                                                     },
                                                                     plugins: {
@@ -464,13 +469,16 @@ try {
                                                                         }
                                                                     }
                                                                 }
-                                                            });
+                                                            };
+
+                                                            // Render the chart
+                                                            new Chart(ctx, config);
                                                         });
                                                     </script>
+
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                     <!-- Vertically divided Year Level Count and Members per School Year -->
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
