@@ -128,17 +128,17 @@ try {
                     </li>
                     <li class="nav-item">
                         <a href="../esas_moderator/my_clubs.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
-                            <i class="fas fa-users"></i> My Clubs
+                            <i class="fas fa-university"></i> My Clubs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../esas_moderator/students.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                            <i class="fas fa-users"></i> Students
                         </a>
                     </li>
                     <li>
                         <a href="../esas_moderator/pending_approvals.php" class="nav-link left-sidebar text-dark" id="pending-approvals">
                             <i class="fas fa-hourglass-half"></i> Pending Approvals
-                        </a>
-                    </li>
-                    <li>
-                        <a href="../esas_moderator/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
-                            <i class="fas fa-envelope"></i> Club Requests
                         </a>
                     </li>
                 </ul>
@@ -315,112 +315,112 @@ try {
                             <div class="row card-row2 col-12" style="border: 1px solid transparent; margin: 0;">
 
                                 <!-- PIE CHART -->
-<div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
-    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-        <p>Students per Department</p>
-        <div style="height: 365px; background-color: transparent;">
-            <?php
-            try {
-                // Fetch the count of registered students per department for the clubs managed by the current moderator
-                $stmt = $pdo->prepare("
-                    SELECT ts.department, COUNT(tr.student_id) AS member_count
-                    FROM tbl_students ts
-                    JOIN tbl_registration tr ON ts.student_id = tr.student_id
-                    JOIN tbl_clubs_and_moderators cm ON tr.club_id = cm.club_id
-                    WHERE cm.moderator_id = :moderator_id AND tr.status = 'active'
-                    GROUP BY ts.department
-                ");
-                $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                $stmt->execute();
-                $department_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            } catch (PDOException $e) {
-                echo "Error: " . $e->getMessage();
-            }
+                                <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <p>Students per Department</p>
+                                        <div style="height: 365px; background-color: transparent;">
+                                            <?php
+                                            try {
+                                                // Fetch the count of registered students per department for the clubs managed by the current moderator
+                                                $stmt = $pdo->prepare("
+                                                    SELECT ts.department, COUNT(tr.student_id) AS member_count
+                                                    FROM tbl_students ts
+                                                    JOIN tbl_registration tr ON ts.student_id = tr.student_id
+                                                    JOIN tbl_clubs_and_moderators cm ON tr.club_id = cm.club_id
+                                                    WHERE cm.moderator_id = :moderator_id AND tr.status = 'active'
+                                                    GROUP BY ts.department
+                                                ");
+                                                $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                                $stmt->execute();
+                                                $department_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                            } catch (PDOException $e) {
+                                                echo "Error: " . $e->getMessage();
+                                            }
 
-            // Prepare data for the pie chart
-            $departments = [];
-            $counts = [];
-            $total_members = 0;
+                                            // Prepare data for the pie chart
+                                            $departments = [];
+                                            $counts = [];
+                                            $total_members = 0;
 
-            foreach ($department_data as $row) {
-                $departments[] = $row['department'];
-                $counts[] = $row['member_count'];
-                $total_members += $row['member_count'];
-            }
+                                            foreach ($department_data as $row) {
+                                                $departments[] = $row['department'];
+                                                $counts[] = $row['member_count'];
+                                                $total_members += $row['member_count'];
+                                            }
 
-            // Calculate percentage for each department
-            $percentages = [];
-            foreach ($counts as $count) {
-                $percentages[] = round(($count / $total_members) * 100);
-            }
+                                            // Calculate percentage for each department
+                                            $percentages = [];
+                                            foreach ($counts as $count) {
+                                                $percentages[] = round(($count / $total_members) * 100);
+                                            }
 
-            // Combine percentages and department names
-            $labels_with_percentages = [];
-            foreach ($departments as $index => $department) {
-                $labels_with_percentages[] = $percentages[$index] . '% ' . $department;
-            }
-            ?>
-            <!-- Canvas for the pie chart -->
-            <canvas id="pieChart" style="height: 100%;"></canvas>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <script>
-                // Fetching data from PHP arrays
-                const labelsWithPercentages = <?php echo json_encode($labels_with_percentages); ?>;
-                const counts = <?php echo json_encode($counts); ?>;
+                                            // Combine percentages and department names
+                                            $labels_with_percentages = [];
+                                            foreach ($departments as $index => $department) {
+                                                $labels_with_percentages[] = $percentages[$index] . '% ' . $department;
+                                            }
+                                            ?>
+                                            <!-- Canvas for the pie chart -->
+                                            <canvas id="pieChart" style="height: 100%;"></canvas>
+                                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                                            <script>
+                                                // Fetching data from PHP arrays
+                                                const labelsWithPercentages = <?php echo json_encode($labels_with_percentages); ?>;
+                                                const counts = <?php echo json_encode($counts); ?>;
 
-                // Render Pie Chart using Chart.js
-                const ctx = document.getElementById('pieChart').getContext('2d');
-                const pieChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: labelsWithPercentages,  // Department names with percentages
-                        datasets: [{
-                            label: 'Members per Department',
-                            data: counts,  // Member count per department
-                            backgroundColor: [
-                                'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
-                                'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
-                                'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
-                                'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
-                                'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
-                                'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
-                            ],
-                            borderColor: [
-                                'rgba(65, 105, 225, 1)',     // Royal Blue border
-                                'rgba(255, 105, 180, 1)',     // Hot Pink border
-                                'rgba(255, 215, 0, 1)',       // Gold border
-                                'rgba(0, 255, 255, 1)',       // Cyan border
-                                'rgba(255, 165, 0, 1)',       // Orange border
-                                'rgba(0, 255, 0, 1)'          // Lime Green border
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                                labels: {
-                                    boxWidth: 20,  // Set square shape
-                                    padding: 20    // Add spacing between labels and box
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(tooltipItem) {
-                                        return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            </script>
-        </div>
-    </div>
-</div>
-<!-- PIE CHART END -->
+                                                // Render Pie Chart using Chart.js
+                                                const ctx = document.getElementById('pieChart').getContext('2d');
+                                                const pieChart = new Chart(ctx, {
+                                                    type: 'pie',
+                                                    data: {
+                                                        labels: labelsWithPercentages,  // Department names with percentages
+                                                        datasets: [{
+                                                            label: 'Members per Department',
+                                                            data: counts,  // Member count per department
+                                                            backgroundColor: [
+                                                                'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
+                                                                'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
+                                                                'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
+                                                                'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
+                                                                'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
+                                                                'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
+                                                            ],
+                                                            borderColor: [
+                                                                'rgba(65, 105, 225, 1)',     // Royal Blue border
+                                                                'rgba(255, 105, 180, 1)',     // Hot Pink border
+                                                                'rgba(255, 215, 0, 1)',       // Gold border
+                                                                'rgba(0, 255, 255, 1)',       // Cyan border
+                                                                'rgba(255, 165, 0, 1)',       // Orange border
+                                                                'rgba(0, 255, 0, 1)'          // Lime Green border
+                                                            ],
+                                                            borderWidth: 1
+                                                        }]
+                                                    },
+                                                    options: {
+                                                        responsive: true,
+                                                        plugins: {
+                                                            legend: {
+                                                                position: 'top',
+                                                                labels: {
+                                                                    boxWidth: 20,  // Set square shape
+                                                                    padding: 20    // Add spacing between labels and box
+                                                                }
+                                                            },
+                                                            tooltip: {
+                                                                callbacks: {
+                                                                    label: function(tooltipItem) {
+                                                                        return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- PIE CHART END -->
 
 
 
@@ -530,107 +530,111 @@ try {
 
                                     
                                         <!-- Year Level Numbers -->
-<div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
-    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-        <p>Year Level Count</p>
-        <div style="height: 150px; background-color: transparent;">
-            <div>
-                <canvas id="studentBarChart"></canvas>
-            </div>
-            <?php
-            try {
-                $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                        <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                                <p>Year Level Count</p>
+                                                <div style="height: 150px; background-color: transparent;">
+                                                    <div>
+                                                        <canvas id="studentBarChart"></canvas>
+                                                    </div>
+                                                    <?php
+                                                    try {
+                                                        // SQL Query to fetch year level counts, filtered by moderator and using DISTINCT for students
+                                                        $sql = "SELECT s.year, COUNT(DISTINCT s.student_id) AS count
+                                                                FROM tbl_students s
+                                                                JOIN tbl_registration r ON s.student_id = r.student_id
+                                                                JOIN tbl_clubs c ON r.club_id = c.club_id
+                                                                JOIN tbl_moderators m ON c.club_id = m.club_id
+                                                                WHERE r.status = 'active' AND m.moderator_id = :moderator_id
+                                                                GROUP BY s.year";
+                                                        
+                                                        $stmtCounts = $pdo->prepare($sql);
+                                                        $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                                        $stmtCounts->execute();
+                                                    
+                                                        // Fetch the results into an associative array
+                                                        $yearData = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
+                                                        
+                                                        // Initialize arrays for years and counts
+                                                        $years = ['1', '2', '3', '4']; // Ensure all years are included
+                                                        $counts = [0, 0, 0, 0]; // Initialize with zeros
+                                                    
+                                                        // Populate the counts array based on fetched data
+                                                        foreach ($yearData as $row) {
+                                                            $year = (int)$row['year']; // Ensure $year is an integer
+                                                            $count = (int)$row['count']; // Ensure $count is an integer
+                                                    
+                                                            // Check if $year is within the valid range
+                                                            if ($year >= 1 && $year <= 4) {
+                                                                $counts[$year - 1] = $count;
+                                                            }
+                                                        }
+                                                    } catch (PDOException $e) {
+                                                        echo "Error: " . $e->getMessage();
+                                                    }
+                                                    
+                                                    ?>
 
-                // SQL Query to fetch year level counts
-                $sql = "SELECT s.year, COUNT(*) AS count
-                        FROM tbl_students s
-                        JOIN tbl_registration r ON s.student_id = r.student_id
-                        WHERE r.status = 'active' AND r.club_id = :club_id
-                        GROUP BY s.year";
-                
-                $stmtCounts = $pdo->prepare($sql);
-                $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-                $stmtCounts->execute();
+                                                    <!-- Include Chart.js -->
+                                                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-                // Fetch the results into an associative array
-                $yearData = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
-                
-                // Initialize arrays for years and counts
-                $years = ['1', '2', '3', '4']; // Ensure all years are included
-                $counts = [0, 0, 0, 0]; // Initialize with zeros
+                                                    <script>
+                                                        // PHP arrays passed into JavaScript
+                                                        const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+                                                        const dataCounts = <?php echo json_encode($counts); ?>;
 
-                // Populate the counts array based on fetched data
-                foreach ($yearData as $row) {
-                    $year = (int)$row['year']; // Ensure $year is an integer
-                    $count = (int)$row['count']; // Ensure $count is an integer
+                                                        // Data for the chart
+                                                        const data = {
+                                                            labels: labels,
+                                                            datasets: [{
+                                                                data: dataCounts, // Dynamic data from PHP
+                                                                backgroundColor: ['blue', 'orange', 'green', 'red'], // Colors for bars
+                                                            }]
+                                                        };
 
-                    // Check if $year is within the valid range
-                    if ($year >= 1 && $year <= 4) {
-                        $counts[$year - 1] = $count;
-                    }
-                }
-            } catch (PDOException $e) {
-                echo "Error: " . $e->getMessage();
-            }
-            ?>
+                                                        // Configurations for the chart
+                                                        const config = {
+                                                            type: 'bar',
+                                                            data: data,
+                                                            options: {
+                                                                scales: {
+                                                                    y: {
+                                                                        beginAtZero: true,
+                                                                        max: 15 // Set the maximum value to 30
+                                                                    }
+                                                                },
+                                                                plugins: {
+                                                                    legend: {
+                                                                        display: false // Remove the "Number of Students" label
+                                                                    }
+                                                                }
+                                                            }
+                                                        };
 
-            <!-- Include Chart.js -->
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-            <script>
-                // PHP arrays passed into JavaScript
-                const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
-                const dataCounts = <?php echo json_encode($counts); ?>;
-
-                // Data for the chart
-                const data = {
-                    labels: labels,
-                    datasets: [{
-                        data: dataCounts, // Dynamic data from PHP
-                        backgroundColor: ['blue', 'orange', 'green', 'red'], // Colors for bars
-                    }]
-                };
-
-                // Configurations for the chart
-                const config = {
-                    type: 'bar',
-                    data: data,
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 15 // Set the maximum value to 30
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false // Remove the "Number of Students" label
-                            }
-                        }
-                    }
-                };
-
-                // Render the chart
-                const studentBarChart = new Chart(
-                    document.getElementById('studentBarChart'),
-                    config
-                );
-            </script>
-        </div>
-    </div>
-</div>
+                                                        // Render the chart
+                                                        const studentBarChart = new Chart(
+                                                            document.getElementById('studentBarChart'),
+                                                            config
+                                                        );
+                                                    </script>
+                                                </div>
+                                            </div>
+                                        </div>
 
 
                                         <!-- Members per School Year -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                                 <p>Members per School Year</p>
-                                                <div style="height: 150px; background-color: lightgray;">
-                                                    <!-- BAR GRAPH FOR NUMBERS OF YEAR LEVEL -->
+                                                <div style="height: 150px; background-color: transparent;">
+                                                
                                                 </div>
                                             </div>
                                         </div>
+
+
+
+
                                     </div>
                                 </div>
 
