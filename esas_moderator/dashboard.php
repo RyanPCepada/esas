@@ -565,37 +565,44 @@ try {
                                                         $stmtCounts = $pdo->prepare($sql);
                                                         $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
                                                         $stmtCounts->execute();
-                                                    
+
                                                         // Fetch the results into an associative array
                                                         $yearData = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
                                                         
                                                         // Initialize arrays for years and counts
                                                         $years = ['1', '2', '3', '4']; // Ensure all years are included
                                                         $counts = [0, 0, 0, 0]; // Initialize with zeros
-                                                    
+
                                                         // Populate the counts array based on fetched data
                                                         foreach ($yearData as $row) {
                                                             $year = (int)$row['year']; // Ensure $year is an integer
                                                             $count = (int)$row['count']; // Ensure $count is an integer
-                                                    
+
                                                             // Check if $year is within the valid range
                                                             if ($year >= 1 && $year <= 4) {
                                                                 $counts[$year - 1] = $count;
                                                             }
                                                         }
+
+                                                        // SQL Query to get total student count
+                                                        $sqlTotal = "SELECT COUNT(*) AS total_count FROM tbl_students";
+                                                        $stmtTotal = $pdo->query($sqlTotal);
+                                                        $totalCount = $stmtTotal->fetchColumn();
+
                                                     } catch (PDOException $e) {
                                                         echo "Error: " . $e->getMessage();
                                                     }
-                                                    
                                                     ?>
 
                                                     <!-- Include Chart.js -->
                                                     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+                                                    <canvas id="studentBarChart"></canvas>
                                                     <script>
                                                         // PHP arrays passed into JavaScript
                                                         const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
                                                         const dataCounts = <?php echo json_encode($counts); ?>;
+                                                        const totalCount = <?php echo $totalCount; ?>;
 
                                                         // Data for the chart
                                                         const data = {
@@ -614,12 +621,12 @@ try {
                                                                 scales: {
                                                                     y: {
                                                                         beginAtZero: true,
-                                                                        max: 15 // Set the maximum value to 30
+                                                                        suggestedMax: totalCount // Set the maximum value to the total student count
                                                                     }
                                                                 },
                                                                 plugins: {
                                                                     legend: {
-                                                                        display: false // Remove the "Number of Students" label
+                                                                        display: false // Remove the legend
                                                                     }
                                                                 }
                                                             }
