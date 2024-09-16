@@ -390,10 +390,6 @@ try {
                                                 </div>
                                                 <?php
                                                 try {
-                                                    // Connect to the database
-                                                    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-                                                    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
                                                     // Get the current academic year based on today's date
                                                     $currentYear = date('Y');
                                                     $currentSY = $currentYear . '-' . ($currentYear + 1);
@@ -525,9 +521,6 @@ try {
                                                     </div>
                                                     <?php
                                                     try {
-                                                        $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-                                                        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
                                                         // SQL Query to fetch year level counts
                                                         $sql = "SELECT s.year, COUNT(DISTINCT s.student_id) AS count
                                                                 FROM tbl_students s
@@ -612,15 +605,6 @@ try {
                                                 </div>
                                             </div>
                                         </div>
-
-
-
-
-
-
-
-
-
 
 
                                         <!-- Student Gender -->
