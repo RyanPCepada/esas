@@ -292,7 +292,7 @@ try {
 
                                             $stmt_students->execute();
                                             $total_students = $stmt_students->fetchColumn();
-                                            echo "<h3>$total_students</h3>";
+                                            echo "<h3>$total_students <small>club_id # $club_id</small></h3>";
                                         } catch (PDOException $e) {
                                             echo "Error: " . $e->getMessage();
                                         }
@@ -306,19 +306,36 @@ try {
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
+                                        // Get the selected club_id from the URL, if available
+                                        $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+
                                         try {
-                                            // Fetch total pending student registrations for clubs managed by this moderator
-                                            $stmt_pending = $pdo->prepare("
-                                                SELECT COUNT(tr.student_id) AS total_pending 
-                                                FROM tbl_registration tr
-                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id
-                                                JOIN tbl_moderators tm ON tc.club_id = tm.club_id
-                                                WHERE tr.status = 'pending' AND tm.moderator_id = :moderator_id
-                                            ");
+                                            // Prepare the SQL query
+                                            $sql = "
+                                                SELECT COUNT(tr.registration_id) AS total_pending 
+                                            FROM tbl_registration tr
+                                            JOIN tbl_clubs tc ON tr.club_id = tc.club_id
+                                            JOIN tbl_clubs_and_moderators tcm ON tc.club_id = tcm.club_id
+                                            WHERE tr.status = 'pending' 
+                                            AND tcm.moderator_id = :moderator_id
+                                            ";
+
+                                            // Add condition for club_id if it's set
+                                            if ($club_id) {
+                                                $sql .= " AND tr.club_id = :club_id";
+                                            }
+
+                                            $stmt_pending = $pdo->prepare($sql);
                                             $stmt_pending->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+
+                                            // Bind club_id parameter if it's set
+                                            if ($club_id) {
+                                                $stmt_pending->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                            }
+
                                             $stmt_pending->execute();
                                             $total_pending = $stmt_pending->fetchColumn();
-                                            echo "<h3>$total_pending</h3>";
+                                            echo "<h3>$total_pending <small>club_id # $club_id</small></h3>";
                                         } catch (PDOException $e) {
                                             echo "Error: " . $e->getMessage();
                                         }
@@ -326,6 +343,7 @@ try {
                                         <p>Total Pending Approval</p>
                                     </div>
                                 </div>
+
 
                                 <!-- Card for LEAVE REQUESTS (you can modify this query as needed) -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
@@ -346,18 +364,35 @@ try {
                                     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <p>Students per Department</p>
                                         <div style="height: 365px; background-color: transparent;">
-                                            <?php
+                                        <?php
                                             try {
-                                                // Fetch the count of registered students per department for the clubs managed by the current moderator
-                                                $stmt = $pdo->prepare("
+                                                // Get the selected club_id from the URL, if available
+                                                $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+
+                                                // Prepare the SQL query
+                                                $sql = "
                                                     SELECT ts.department, COUNT(tr.student_id) AS member_count
                                                     FROM tbl_students ts
                                                     JOIN tbl_registration tr ON ts.student_id = tr.student_id
                                                     JOIN tbl_clubs_and_moderators cm ON tr.club_id = cm.club_id
                                                     WHERE cm.moderator_id = :moderator_id AND tr.status = 'active'
-                                                    GROUP BY ts.department
-                                                ");
+                                                ";
+
+                                                // Add condition for club_id if it's set
+                                                if ($club_id) {
+                                                    $sql .= " AND tr.club_id = :club_id";
+                                                }
+
+                                                $sql .= " GROUP BY ts.department";
+
+                                                $stmt = $pdo->prepare($sql);
                                                 $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+
+                                                // Bind club_id parameter if it's set
+                                                if ($club_id) {
+                                                    $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                }
+
                                                 $stmt->execute();
                                                 $department_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             } catch (PDOException $e) {
@@ -378,7 +413,7 @@ try {
                                             // Calculate percentage for each department
                                             $percentages = [];
                                             foreach ($counts as $count) {
-                                                $percentages[] = round(($count / $total_members) * 100);
+                                                $percentages[] = $total_members > 0 ? round(($count / $total_members) * 100) : 0;
                                             }
 
                                             // Combine percentages and department names
