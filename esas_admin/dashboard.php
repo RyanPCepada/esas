@@ -786,19 +786,26 @@ try {
                                         <!-- Student Gender -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                            <p>Student Gender</p>
+                                                <p>Student Gender</p>
                                                 <div style="height: 150px; position: relative;">
                                                     <?php
                                                     try {
-                                                        // Prepare the SQL statement to get gender counts filtered by club and moderator
+                                                        // Get the selected month from the URL parameter or default to the current month
+                                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
+
+                                                        // SQL Query to fetch gender counts, aggregated up to the selected month
                                                         $sqlCounts = "
                                                             SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
                                                             FROM tbl_students s
                                                             JOIN tbl_registration r ON s.student_id = r.student_id
-                                                            WHERE r.status = 'active'
+                                                            WHERE r.status = 'active' 
+                                                            AND MONTH(r.dateApproved) <= :selectedMonth
+                                                            AND YEAR(r.dateApproved) = YEAR(CURDATE()) 
                                                             GROUP BY s.gender
                                                         ";
+
                                                         $stmtCounts = $pdo->prepare($sqlCounts);
+                                                        $stmtCounts->bindParam(':selectedMonth', $selectedMonth, PDO::PARAM_INT);
                                                         $stmtCounts->execute();
                                                         $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
 
@@ -815,7 +822,7 @@ try {
                                                             }
                                                         }
 
-                                                        // Prepare the SQL statement to get total student count
+                                                        // Prepare the SQL statement to get the total number of students
                                                         $sqlTotal = "SELECT COUNT(*) AS total_count FROM tbl_students";
                                                         $stmtTotal = $pdo->query($sqlTotal);
                                                         $totalCount = $stmtTotal->fetchColumn();
@@ -830,57 +837,69 @@ try {
                                                     }
                                                     ?>
                                                     <canvas id="studentGenderChart" style="width: 100%; height: 100%;"></canvas>
+                                                    <p id="noDataMessageGender" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
                                                     <script>
                                                         document.addEventListener('DOMContentLoaded', function() {
                                                             const ctx = document.getElementById('studentGenderChart').getContext('2d');
+                                                            const noDataMessageGender = document.getElementById('noDataMessageGender');
 
                                                             // Data from PHP
                                                             const labels = <?php echo json_encode($labels); ?>;
                                                             const dataCounts = <?php echo json_encode($data); ?>;
                                                             const totalCount = <?php echo $totalCount; ?>;
 
-                                                            // Data for the chart
-                                                            const data = {
-                                                                labels: labels,
-                                                                datasets: [{
-                                                                    data: dataCounts,
-                                                                    backgroundColor: ['#3498db', '#e74c3c'], // Male: blue, Female: red
-                                                                    borderColor: ['#2980b9', '#c0392b'],
-                                                                    borderWidth: 1
-                                                                }]
-                                                            };
+                                                            // Check if there is no data to display
+                                                            const hasDataGender = dataCounts.some(count => count > 0);
 
-                                                            // Configurations for the chart
-                                                            const config = {
-                                                                type: 'bar',
-                                                                data: data,
-                                                                options: {
-                                                                    indexAxis: 'y', // Horizontal bar chart
-                                                                    scales: {
-                                                                        x: {
-                                                                            beginAtZero: true,
-                                                                            suggestedMax: totalCount // Set the maximum value to the total student count
+                                                            if (!hasDataGender) {
+                                                                // Hide the chart and show the "No Data" message
+                                                                ctx.canvas.style.display = 'none';
+                                                                noDataMessageGender.style.display = 'block';
+                                                            } else {
+                                                                // Data for the chart
+                                                                const data = {
+                                                                    labels: labels,
+                                                                    datasets: [{
+                                                                        data: dataCounts,
+                                                                        backgroundColor: ['#3498db', '#e74c3c'], // Male: blue, Female: red
+                                                                        borderColor: ['#2980b9', '#c0392b'],
+                                                                        borderWidth: 1
+                                                                    }]
+                                                                };
+
+                                                                // Configurations for the chart
+                                                                const config = {
+                                                                    type: 'bar',
+                                                                    data: data,
+                                                                    options: {
+                                                                        indexAxis: 'y', // Horizontal bar chart
+                                                                        scales: {
+                                                                            x: {
+                                                                                beginAtZero: true,
+                                                                                suggestedMax: totalCount // Set the maximum value to the total student count
+                                                                            },
+                                                                            y: {
+                                                                                // Automatically handled by Chart.js for labels
+                                                                            }
                                                                         },
-                                                                        y: {
-                                                                            // Automatically handled by Chart.js for labels
-                                                                        }
-                                                                    },
-                                                                    plugins: {
-                                                                        legend: {
-                                                                            display: false // Hide the legend
+                                                                        plugins: {
+                                                                            legend: {
+                                                                                display: false // Hide the legend
+                                                                            }
                                                                         }
                                                                     }
-                                                                }
-                                                            };
+                                                                };
 
-                                                            // Render the chart
-                                                            new Chart(ctx, config);
+                                                                // Render the chart
+                                                                new Chart(ctx, config);
+                                                            }
                                                         });
                                                     </script>
-
                                                 </div>
                                             </div>
                                         </div>
+
+
                                     </div>
                                 </div>
 
