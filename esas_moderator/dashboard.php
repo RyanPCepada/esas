@@ -914,7 +914,10 @@ try {
                                                         echo 'Error: ' . $e->getMessage();
                                                     }
                                                     ?>
+
                                                     <canvas id="studentGenderChart" style="width: 100%; height: 100%;"></canvas>
+                                                    <p id="noDataMessageGender" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;">No data available to display</p>
+
                                                     <script>
                                                         document.addEventListener('DOMContentLoaded', function() {
                                                             const ctx = document.getElementById('studentGenderChart').getContext('2d');
@@ -924,45 +927,56 @@ try {
                                                             const dataCounts = <?php echo json_encode($data); ?>;
                                                             const peakLimit = <?php echo $peakLimit; ?>;
 
-                                                            // Data for the chart
-                                                            const data = {
-                                                                labels: labels,
-                                                                datasets: [{
-                                                                    data: dataCounts,
-                                                                    backgroundColor: ['#3498db', '#e74c3c'], // Male: blue, Female: red
-                                                                    borderColor: ['#2980b9', '#c0392b'],
-                                                                    borderWidth: 1
-                                                                }]
-                                                            };
+                                                            // Check if there is no data to display
+                                                            const hasDataGender = dataCounts.some(count => count > 0);
 
-                                                            // Configurations for the chart
-                                                            const config = {
-                                                                type: 'bar',
-                                                                data: data,
-                                                                options: {
-                                                                    indexAxis: 'y', // Horizontal bar chart
-                                                                    scales: {
-                                                                        x: {
-                                                                            beginAtZero: true,
-                                                                            max: peakLimit // Set the maximum value to the nearest higher multiple of 5
+                                                            // Show or hide the "No Data" message based on data availability
+                                                            const studentGenderChartElement = document.getElementById('studentGenderChart');
+                                                            const noDataMessageGender = document.getElementById('noDataMessageGender');
+
+                                                            if (!hasDataGender) {
+                                                                studentGenderChartElement.style.display = 'none';  // Hide the chart
+                                                                noDataMessageGender.style.display = 'block';  // Show "No data available" message
+                                                            } else {
+                                                                // Data for the chart
+                                                                const data = {
+                                                                    labels: labels,
+                                                                    datasets: [{
+                                                                        data: dataCounts,
+                                                                        backgroundColor: ['#3498db', '#e74c3c'], // Male: blue, Female: red
+                                                                        borderColor: ['#2980b9', '#c0392b'],
+                                                                        borderWidth: 1
+                                                                    }]
+                                                                };
+
+                                                                // Configurations for the chart
+                                                                const config = {
+                                                                    type: 'bar',
+                                                                    data: data,
+                                                                    options: {
+                                                                        indexAxis: 'y', // Horizontal bar chart
+                                                                        scales: {
+                                                                            x: {
+                                                                                beginAtZero: true,
+                                                                                max: peakLimit // Set the maximum value to the nearest higher multiple of 5
+                                                                            },
+                                                                            y: {
+                                                                                // Automatically handled by Chart.js for labels
+                                                                            }
                                                                         },
-                                                                        y: {
-                                                                            // Automatically handled by Chart.js for labels
-                                                                        }
-                                                                    },
-                                                                    plugins: {
-                                                                        legend: {
-                                                                            display: false // Hide the legend
+                                                                        plugins: {
+                                                                            legend: {
+                                                                                display: false // Hide the legend
+                                                                            }
                                                                         }
                                                                     }
-                                                                }
-                                                            };
+                                                                };
 
-                                                            // Render the chart
-                                                            new Chart(ctx, config);
+                                                                // Render the chart
+                                                                new Chart(ctx, config);
+                                                            }
                                                         });
                                                     </script>
-
                                                 </div>
                                             </div>
                                         </div>
