@@ -618,24 +618,30 @@ try {
                                                     $currentYear = date('Y');
                                                     $currentSY = $currentYear . '-' . ($currentYear + 1);
 
-                                                    // Get the selected club_id from the URL, if available
+                                                    // Get the selected club_id and month from the URL, if available
                                                     $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                    $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Assuming 'school_year' is used for month
 
                                                     // SQL query to fetch the count of members per academic year
                                                     $sql = "
                                                         SELECT academicYear, COALESCE(memberCount, 0) AS memberCount
-                                                            FROM (
-                                                                SELECT CONCAT(YEAR(r.dateApproved), '-', YEAR(r.dateApproved) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
-                                                                FROM tbl_students s
-                                                                JOIN tbl_registration r ON s.student_id = r.student_id
-                                                                JOIN tbl_clubs c ON r.club_id = c.club_id
-                                                                JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
-                                                                WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
-
+                                                        FROM (
+                                                            SELECT CONCAT(YEAR(r.dateApproved), '-', YEAR(r.dateApproved) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
+                                                            FROM tbl_students s
+                                                            JOIN tbl_registration r ON s.student_id = r.student_id
+                                                            JOIN tbl_clubs c ON r.club_id = c.club_id
+                                                            JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                                                            WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
                                                     ";
+
                                                     // Add condition for club_id if it's set
                                                     if ($club_id) {
                                                         $sql .= " AND r.club_id = :club_id";
+                                                    }
+
+                                                    // Add condition for month if it's set
+                                                    if ($selectedMonth) {
+                                                        $sql .= " AND MONTH(r.dateApproved) = :month";
                                                     }
 
                                                     $sql .= "
@@ -658,6 +664,11 @@ try {
                                                     // Bind club_id parameter if it's set
                                                     if ($club_id) {
                                                         $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                    }
+
+                                                    // Bind month parameter if it's set
+                                                    if ($selectedMonth) {
+                                                        $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
                                                     }
 
                                                     $stmt->execute();
@@ -757,7 +768,6 @@ try {
                                                 </script>
                                             </div>
                                         </div>
-
 
                                     </div>
 
