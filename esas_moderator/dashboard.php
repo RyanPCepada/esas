@@ -839,24 +839,38 @@ try {
                                         <!-- Student Gender -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                            <p>Student Gender</p>
+                                                <p>Student Gender</p>
                                                 <div style="height: 150px; position: relative;">
                                                     <?php
                                                     try {
+                                                        // Get the selected club_id from the URL, if available
+                                                        $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+
                                                         // Prepare the SQL statement to get gender counts filtered by club and moderator
                                                         $sqlCounts = "
-
                                                             SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
                                                             FROM tbl_students s
                                                             JOIN tbl_registration r ON s.student_id = r.student_id
                                                             JOIN tbl_clubs c ON r.club_id = c.club_id
                                                             JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                                                             WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
-                                                            GROUP BY s.gender
                                                         ";
+
+                                                        // Add condition for club_id if it's set
+                                                        if ($club_id) {
+                                                            $sqlCounts .= " AND r.club_id = :club_id";
+                                                        }
+
+                                                        $sqlCounts .= " GROUP BY s.gender";
 
                                                         $stmtCounts = $pdo->prepare($sqlCounts);
                                                         $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+
+                                                        // Bind club_id parameter if it's set
+                                                        if ($club_id) {
+                                                            $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                        }
+
                                                         $stmtCounts->execute();
                                                         $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
 
@@ -873,10 +887,18 @@ try {
                                                             }
                                                         }
 
-                                                        // Prepare the SQL statement to get total student count
-                                                        $sqlTotal = "SELECT COUNT(*) AS total_count FROM tbl_students";
+                                                        // Prepare the SQL statement to get the total student count in the system
+                                                        $sqlTotal = "SELECT COUNT(DISTINCT student_id) AS total_count FROM tbl_students";
                                                         $stmtTotal = $pdo->query($sqlTotal);
                                                         $totalCount = $stmtTotal->fetchColumn();
+
+                                                        // Function to round up to the nearest multiple of 5
+                                                        function roundUpToNearest5($num) {
+                                                            return $num > 0 ? ceil($num / 5) * 5 : 5;
+                                                        }
+
+                                                        // Calculate the peak limit
+                                                        $peakLimit = roundUpToNearest5($totalCount);
 
                                                         // Prepare the data for JavaScript
                                                         $labels = array_keys($genderCounts);
@@ -895,7 +917,7 @@ try {
                                                             // Data from PHP
                                                             const labels = <?php echo json_encode($labels); ?>;
                                                             const dataCounts = <?php echo json_encode($data); ?>;
-                                                            const totalCount = <?php echo $totalCount; ?>;
+                                                            const peakLimit = <?php echo $peakLimit; ?>;
 
                                                             // Data for the chart
                                                             const data = {
@@ -917,7 +939,7 @@ try {
                                                                     scales: {
                                                                         x: {
                                                                             beginAtZero: true,
-                                                                            suggestedMax: totalCount // Set the maximum value to the total student count
+                                                                            max: peakLimit // Set the maximum value to the nearest higher multiple of 5
                                                                         },
                                                                         y: {
                                                                             // Automatically handled by Chart.js for labels
@@ -939,9 +961,6 @@ try {
                                                 </div>
                                             </div>
                                         </div>
-
-
-
 
                                     </div>
                                 </div>
