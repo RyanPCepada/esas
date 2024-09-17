@@ -74,6 +74,27 @@ try {
         }
         
         
+
+        .icon-style {
+            position: absolute;
+            font-size: 18px;
+            width: 8%;
+            background-color: #4682B4; /*steel blue*/
+            background-color: #89CFF0; /*baby blue*/
+            color: white;
+            /* color: #6A5ACD; slate blue */
+            border-radius: 50%;
+            align-self: end;
+        }
+
+        @media (max-width: 768px) {
+            .col-auto {
+                width: auto;
+            }
+            .icon-style {
+                width: 6% !important;
+            }
+        }
         
 
         @keyframes waveIn {
@@ -133,7 +154,7 @@ try {
                     </li>
                     <li class="nav-item">
                         <a href="../esas_admin/moderators.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
-                            <i class="fa fa-universal-access"></i> Moderators
+                            <i class="fa fa-user-shield"></i> Moderators
                         </a>
                     </li>
                     <li class="nav-item">
@@ -232,6 +253,7 @@ try {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
+                                        <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
                                         <p>Total Clubs</p>
                                     </div>
                                 </div>
@@ -250,6 +272,7 @@ try {
                                             echo "Error: " . htmlspecialchars($e->getMessage());
                                         }
                                         ?>
+                                        <i class="fas fa-user-shield mt-2 me-2 p-2 icon-style"></i>
                                         <p>Total Moderators</p>
                                     </div>
                                 </div>
@@ -268,6 +291,7 @@ try {
                                                 echo "Error: " . htmlspecialchars($e->getMessage());
                                             }
                                         ?>
+                                        <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
                                         <p>Total Students</p>
                                     </div>
                                 </div>
@@ -286,6 +310,7 @@ try {
                                             echo "Error: " . htmlspecialchars($e->getMessage());
                                         }
                                         ?>
+                                        <i class="fas fa-door-open mt-2 me-2 p-2 icon-style"></i>
                                         <p>Total Club Requests</p>
                                     </div>
                                 </div>
