@@ -75,28 +75,6 @@ try {
         
         
 
-        .icon-style {
-            position: absolute;
-            font-size: 18px;
-            width: 8%;
-            background-color: #4682B4; /*steel blue*/
-            background-color: #89CFF0; /*baby blue*/
-            color: white;
-            /* color: #6A5ACD; slate blue */
-            border-radius: 50%;
-            align-self: end;
-        }
-
-        @media (max-width: 768px) {
-            .col-auto {
-                width: auto;
-            }
-            .icon-style {
-                width: 6% !important;
-            }
-        }
-        
-
         @keyframes waveIn {
             0% {
                 opacity: 0;
@@ -116,6 +94,29 @@ try {
             /* Ensure your card styles are here */
         }
 
+        
+
+        .icon-style {
+            position: absolute;
+            font-size: 18px;
+            width: 8%;
+            background-color: #4682B4; /*steel blue*/
+            background-color: #89CFF0; /* baby blue */
+            background-color: #70B9E6; /*darker baby blue*/
+            color: white;
+            /* color: #6A5ACD; slate blue */
+            border-radius: 50%;
+            align-self: end;
+        }
+
+        @media (max-width: 768px) {
+            .col-auto {
+                width: auto;
+            }
+            .icon-style {
+                width: 6% !important;
+            }
+        }
 
     </style>
 </head>

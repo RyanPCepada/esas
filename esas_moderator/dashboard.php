@@ -101,7 +101,8 @@ try {
             font-size: 18px;
             width: 8%;
             background-color: #4682B4; /*steel blue*/
-            background-color: #89CFF0; /*baby blue*/
+            background-color: #89CFF0; /* baby blue */
+            background-color: #70B9E6; /*darker baby blue*/
             color: white;
             /* color: #6A5ACD; slate blue */
             border-radius: 50%;
