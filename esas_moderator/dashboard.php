@@ -356,7 +356,7 @@ try {
 
                                             // Add condition for the selected month, if applicable
                                             if ($selectedMonth) {
-                                                $sql .= " AND MONTH(tr.dateModified) <= :month";
+                                                $sql .= " AND MONTH(tr.dateApproved) <= :month";
                                                 $params['month'] = $selectedMonth;
                                             }
 
@@ -603,7 +603,7 @@ try {
                                                     $sql = "
                                                         SELECT academicYear, COALESCE(memberCount, 0) AS memberCount
                                                             FROM (
-                                                                SELECT CONCAT(YEAR(r.dateModified), '-', YEAR(r.dateModified) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
+                                                                SELECT CONCAT(YEAR(r.dateApproved), '-', YEAR(r.dateApproved) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
                                                                 FROM tbl_students s
                                                                 JOIN tbl_registration r ON s.student_id = r.student_id
                                                                 JOIN tbl_clubs c ON r.club_id = c.club_id
@@ -622,7 +622,7 @@ try {
                                                             SELECT '2023-2024' AS academicYear, 0 AS memberCount
                                                             WHERE NOT EXISTS (
                                                                 SELECT 1 FROM tbl_registration
-                                                                WHERE CONCAT(YEAR(dateModified), '-', YEAR(dateModified) + 1) = '2023-2024'
+                                                                WHERE CONCAT(YEAR(dateApproved), '-', YEAR(dateApproved) + 1) = '2023-2024'
                                                             )
                                                         ) AS yearlyData
                                                         WHERE academicYear = '2023-2024' OR academicYear = '$currentSY'
