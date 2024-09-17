@@ -160,44 +160,57 @@ try {
                 <div class="row g-0 h-100">
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
                         <div class="row align-items-center mb-2">
-                            <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
-                                <div class="col-auto">
-                                    <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                                        <?php 
-                                        // Get the current date
-                                        $currentDate = new DateTime();
+                        <label for="schoolYearDropdown" class="col-auto col-form-label">Month:</label>
+<div class="col-auto">
+    <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+        <?php
+        // Define months
+        $months = [
+            '01' => 'January',
+            '02' => 'February',
+            '03' => 'March',
+            '04' => 'April',
+            '05' => 'May',
+            '06' => 'June',
+            '07' => 'July',
+            '08' => 'August',
+            '09' => 'September',
+            '10' => 'October',
+            '11' => 'November',
+            '12' => 'December'
+        ];
 
-                                        // Calculate school years based on current date
-                                        $schoolYears = [];
-                                        for ($i = 0; $i < 5; $i++) {
-                                            $startYear = $currentDate->format('Y') - $i;
-                                            $endYear = $startYear + 1;
-                                            $schoolYears[] = "{$startYear}-{$endYear}";
-                                        }
+        // Get the current month
+        $currentMonth = date('m');
 
-                                        // Prepare and execute the SQL query
-                                        $sql = "
-                                            SELECT DISTINCT 
-                                                CONCAT(YEAR(dateAdded), '-', YEAR(dateAdded) + 1) AS schoolYear
-                                            FROM tbl_clubs
-                                            WHERE dateAdded IS NOT NULL
-                                            AND YEAR(dateAdded) BETWEEN YEAR(DATE_SUB(NOW(), INTERVAL 5 YEAR)) AND YEAR(NOW())
-                                        ";
+        // Output month options
+        foreach ($months as $key => $month) {
+            echo "<option value=\"" . htmlspecialchars($key) . "\"";
+            // Check if $_GET['school_year'] is set, otherwise default to the current month
+            if ((isset($_GET['school_year']) && $_GET['school_year'] == $key) || (!isset($_GET['school_year']) && $key == $currentMonth)) {
+                echo " selected";
+            }
+            echo ">" . htmlspecialchars($month) . "</option>";
+        }
+        ?>
+    </select>
+</div>
 
-                                        $stmt = $pdo->prepare($sql);
-                                        $stmt->execute();
-                                        $activeSchoolYears = $stmt->fetchAll(PDO::FETCH_COLUMN);
+<script>
+    function filterDashboard() {
+        var club_id = document.getElementById('clubDropdown').value;
+        var school_year = document.getElementById('schoolYearDropdown').value;
+        var queryParams = new URLSearchParams(window.location.search);
 
-                                        // Determine which school years to display
-                                        $displaySchoolYears = array_intersect($schoolYears, $activeSchoolYears);
+        // Update the club_id and school_year parameters in the URL
+        queryParams.set('club_id', club_id);
+        queryParams.set('school_year', school_year);
 
-                                        // Output school year options
-                                        foreach ($displaySchoolYears as $schoolYear) {
-                                            echo "<option value=\"" . htmlspecialchars($schoolYear) . "\">" . htmlspecialchars($schoolYear) . "</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
+        // Navigate to the updated URL
+        window.location.search = queryParams.toString();
+    }
+</script>
+
 
                         </div>
 
