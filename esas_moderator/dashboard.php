@@ -214,10 +214,14 @@ try {
                                         '12' => 'December'
                                     ];
 
+                                    // Get the current month
+                                    $currentMonth = date('m');
+
                                     // Output month options
                                     foreach ($months as $key => $month) {
                                         echo "<option value=\"" . htmlspecialchars($key) . "\"";
-                                        if (isset($_GET['school_year']) && $_GET['school_year'] == $key) {
+                                        // Check if $_GET['school_year'] is set, otherwise default to the current month
+                                        if ((isset($_GET['school_year']) && $_GET['school_year'] == $key) || (!isset($_GET['school_year']) && $key == $currentMonth)) {
                                             echo " selected";
                                         }
                                         echo ">" . htmlspecialchars($month) . "</option>";
@@ -225,6 +229,7 @@ try {
                                     ?>
                                 </select>
                             </div>
+
 
                             <!-- Display selected club name or default club name -->
                             <div class="clubname-display text-center" style="width: 540px;">
@@ -262,7 +267,6 @@ try {
                             }
                         </script>
 
-
 <!--HERE-->
 
                         <!-- THE MAIN PAGE START -->
@@ -271,57 +275,55 @@ try {
                             <!-- UPPER CARDS START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 <!-- Card for TOTAL MODERATORS CLUBS -->
-<div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-        <?php
-        try {
-            // Get the selected club_id and school_year (month) from the URL
-            $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
-            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
-            
-            // SQL query to count total clubs associated with the moderator and filtered by club_id and date range
-            $sql = "
-                SELECT COUNT(DISTINCT cm.club_id) AS total_clubs 
-                FROM tbl_clubs_and_moderators cm
-                JOIN tbl_clubs c ON cm.club_id = c.club_id
-                WHERE cm.moderator_id = :moderator_id
-            ";
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <?php
+                                        try {
+                                            // Get the selected club_id and school_year (month) from the URL
+                                            $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
+                                            
+                                            // Base SQL query to count total clubs associated with the moderator
+                                            $sql = "
+                                                SELECT COUNT(DISTINCT cm.club_id) AS total_clubs 
+                                                FROM tbl_clubs_and_moderators cm
+                                                JOIN tbl_clubs c ON cm.club_id = c.club_id
+                                                WHERE cm.moderator_id = :moderator_id
+                                            ";
 
-            // Add filtering conditions if club or month are selected
-            $conditions = [];
-            $params = ['moderator_id' => $moderator_id];
-            
-            if ($selectedClubId) {
-                $conditions[] = "c.club_id = :club_id";
-                $params['club_id'] = $selectedClubId;
-            }
+                                            // Parameters for the query
+                                            $params = ['moderator_id' => $moderator_id];
 
-            // If a month is selected, count clubs added on or before the selected month
-            if ($selectedMonth) {
-                $conditions[] = "MONTH(c.dateAdded) <= :month";
-                $params['month'] = $selectedMonth;
-            }
-            
-            // Append the conditions to the SQL query if there are any
-            if (!empty($conditions)) {
-                $sql .= " AND " . implode(" AND ", $conditions);
-            }
+                                            // Add condition for the selected month, if applicable
+                                            if ($selectedMonth) {
+                                                $sql .= " AND MONTH(c.dateAdded) <= :month";
+                                                $params['month'] = $selectedMonth;
+                                            }
 
-            // Prepare and execute the query
-            $stmt_clubs = $pdo->prepare($sql);
-            $stmt_clubs->execute($params);
+                                            // Do not filter by club_id when counting total clubs unless it's specifically required
+                                            // So if you only want the total number of clubs, exclude this condition unless you need to filter
+                                            // by a specific club later in other logic
+                                            if ($selectedClubId && isset($_GET['filter_by_club'])) {
+                                                // Use this filter only if you have a specific filter flag in the logic
+                                                $sql .= " AND c.club_id = :club_id";
+                                                $params['club_id'] = $selectedClubId;
+                                            }
 
-            // Fetch the total number of clubs
-            $total_clubs = $stmt_clubs->fetchColumn();
-            echo "<h3>$total_clubs</h3>";
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
-        }
-        ?>
-        <i class="fas fa-university mt-2 me-2 p-2 bg-grey" style="position: absolute; font-size: 24px; color: white; width: 10%; border-radius: 50%; align-self: end;"></i>
-        <p>Total Clubs</p>
-    </div>
-</div>
+                                            // Prepare and execute the query
+                                            $stmt_clubs = $pdo->prepare($sql);
+                                            $stmt_clubs->execute($params);
+
+                                            // Fetch the total number of clubs
+                                            $total_clubs = $stmt_clubs->fetchColumn();
+                                            echo "<h3>$total_clubs</h3>";
+                                        } catch (PDOException $e) {
+                                            echo "Error: " . $e->getMessage();
+                                        }
+                                        ?>
+                                        <i class="fas fa-university mt-2 me-2 p-2 bg-grey" style="position: absolute; font-size: 24px; color: white; width: 10%; border-radius: 50%; align-self: end;"></i>
+                                        <p>Total Clubs</p>
+                                    </div>
+                                </div>
 
 
                                 <!-- Card for TOTAL STUDENTS -->
