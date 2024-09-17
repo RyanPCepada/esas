@@ -555,15 +555,15 @@ try {
                                                     // SQL query to fetch the count of members per academic year
                                                     $sql = "
                                                         SELECT academicYear, COALESCE(memberCount, 0) AS memberCount
-                                                        FROM (
-                                                            SELECT CONCAT(YEAR(r.dateModified), '-', YEAR(r.dateModified) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
-                                                            FROM tbl_students s
-                                                            JOIN tbl_registration r ON s.student_id = r.student_id
-                                                            JOIN tbl_clubs c ON r.club_id = c.club_id
-                                                            JOIN tbl_moderators m ON c.club_id = m.club_id
-                                                            WHERE r.status = 'active' AND m.moderator_id = :moderator_id
-                                                    ";
+                                                            FROM (
+                                                                SELECT CONCAT(YEAR(r.dateModified), '-', YEAR(r.dateModified) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
+                                                                FROM tbl_students s
+                                                                JOIN tbl_registration r ON s.student_id = r.student_id
+                                                                JOIN tbl_clubs c ON r.club_id = c.club_id
+                                                                JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                                                                WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
 
+                                                    ";
                                                     // Add condition for club_id if it's set
                                                     if ($club_id) {
                                                         $sql .= " AND r.club_id = :club_id";
