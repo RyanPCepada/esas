@@ -164,7 +164,6 @@ try {
                             <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
                             <div class="col-auto">
                                 <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                                    <!-- <option value="" disabled>Select a Club</option> -->
                                     <?php
                                     // Prepare the SQL query to fetch clubs managed by the current moderator
                                     $sql = "
@@ -182,8 +181,8 @@ try {
                                     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                                     // Set the first club as default if no club is selected
-                                    $defaultClubId = $clubs[0]['club_id'] ?? null;  // Default to the first club if available
-                                    $defaultClubName = $clubs[0]['clubName'] ?? 'Club not available'; // Default club name
+                                    $defaultClubId = $clubs[0]['club_id'] ?? null;
+                                    $defaultClubName = $clubs[0]['clubName'] ?? 'Club not available';
 
                                     // Generate the dropdown options
                                     foreach ($clubs as $club): ?>
@@ -195,47 +194,33 @@ try {
                                 </select>
                             </div>
 
-                            <script>
-                                function filterDashboard() {
-                                    var club_id = document.getElementById('clubDropdown').value;
-                                    window.location.href = '?club_id=' + club_id; // Add club_id to the URL
-                                }
-                            </script>
-
-                            <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
+                            <label for="schoolYearDropdown" class="col-auto col-form-label">Month:</label>
                             <div class="col-auto">
                                 <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                                    <?php 
-                                    // Get the current date
-                                    $currentDate = new DateTime();
+                                    <?php
+                                    // Define months
+                                    $months = [
+                                        '01' => 'January',
+                                        '02' => 'February',
+                                        '03' => 'March',
+                                        '04' => 'April',
+                                        '05' => 'May',
+                                        '06' => 'June',
+                                        '07' => 'July',
+                                        '08' => 'August',
+                                        '09' => 'September',
+                                        '10' => 'October',
+                                        '11' => 'November',
+                                        '12' => 'December'
+                                    ];
 
-                                    // Calculate school years based on current date
-                                    $schoolYears = [];
-                                    for ($i = 0; $i < 5; $i++) {
-                                        $startYear = $currentDate->format('Y') - $i;
-                                        $endYear = $startYear + 1;
-                                        $schoolYears[] = "{$startYear}-{$endYear}";
-                                    }
-
-                                    // Prepare and execute the SQL query
-                                    $sql = "
-                                        SELECT DISTINCT 
-                                            CONCAT(YEAR(dateAdded), '-', YEAR(dateAdded) + 1) AS schoolYear
-                                        FROM tbl_clubs
-                                        WHERE dateAdded IS NOT NULL
-                                        AND YEAR(dateAdded) BETWEEN YEAR(DATE_SUB(NOW(), INTERVAL 5 YEAR)) AND YEAR(NOW())
-                                    ";
-
-                                    $stmt = $pdo->prepare($sql);
-                                    $stmt->execute();
-                                    $activeSchoolYears = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-                                    // Determine which school years to display
-                                    $displaySchoolYears = array_intersect($schoolYears, $activeSchoolYears);
-
-                                    // Output school year options
-                                    foreach ($displaySchoolYears as $schoolYear) {
-                                        echo "<option value=\"" . htmlspecialchars($schoolYear) . "\">" . htmlspecialchars($schoolYear) . "</option>";
+                                    // Output month options
+                                    foreach ($months as $key => $month) {
+                                        echo "<option value=\"" . htmlspecialchars($key) . "\"";
+                                        if (isset($_GET['school_year']) && $_GET['school_year'] == $key) {
+                                            echo " selected";
+                                        }
+                                        echo ">" . htmlspecialchars($month) . "</option>";
                                     }
                                     ?>
                                 </select>
@@ -262,6 +247,23 @@ try {
                             </div>
                         </div>
 
+                        <script>
+                            function filterDashboard() {
+                                var club_id = document.getElementById('clubDropdown').value;
+                                var school_year = document.getElementById('schoolYearDropdown').value;
+                                var queryParams = new URLSearchParams(window.location.search);
+
+                                // Update the club_id and school_year parameters in the URL
+                                queryParams.set('club_id', club_id);
+                                queryParams.set('school_year', school_year);
+
+                                // Navigate to the updated URL
+                                window.location.search = queryParams.toString();
+                            }
+                        </script>
+
+
+<!--HERE-->
 
                         <!-- THE MAIN PAGE START -->
                         <div class="card p-2">
@@ -269,28 +271,58 @@ try {
                             <!-- UPPER CARDS START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 <!-- Card for TOTAL MODERATORS CLUBS -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <?php
-                                        try {
-                                            // Fetch total clubs associated with the moderator using tbl_club_and_moderators
-                                            $stmt_clubs = $pdo->prepare("
-                                                SELECT COUNT(DISTINCT club_id) AS total_clubs 
-                                                FROM tbl_clubs_and_moderators 
-                                                WHERE moderator_id = :moderator_id
-                                            ");
-                                            $stmt_clubs->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                                            $stmt_clubs->execute();
-                                            $total_clubs = $stmt_clubs->fetchColumn();
-                                            echo "<h3>$total_clubs</h3>";
-                                        } catch (PDOException $e) {
-                                            echo "Error: " . $e->getMessage();
-                                        }
-                                        ?>
-                                        <i class="fas fa-university mt-2 me-2 p-2 bg-grey" style="position: absolute; font-size: 24px; color: white; width: 10%; border-radius: 50%; align-self: end;"></i>
-                                        <p>Total Clubs</p>
-                                    </div>
-                                </div>
+<div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+        <?php
+        try {
+            // Get the selected club_id and school_year (month) from the URL
+            $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
+            
+            // SQL query to count total clubs associated with the moderator and filtered by club_id and date range
+            $sql = "
+                SELECT COUNT(DISTINCT cm.club_id) AS total_clubs 
+                FROM tbl_clubs_and_moderators cm
+                JOIN tbl_clubs c ON cm.club_id = c.club_id
+                WHERE cm.moderator_id = :moderator_id
+            ";
+
+            // Add filtering conditions if club or month are selected
+            $conditions = [];
+            $params = ['moderator_id' => $moderator_id];
+            
+            if ($selectedClubId) {
+                $conditions[] = "c.club_id = :club_id";
+                $params['club_id'] = $selectedClubId;
+            }
+
+            // If a month is selected, count clubs added on or before the selected month
+            if ($selectedMonth) {
+                $conditions[] = "MONTH(c.dateAdded) <= :month";
+                $params['month'] = $selectedMonth;
+            }
+            
+            // Append the conditions to the SQL query if there are any
+            if (!empty($conditions)) {
+                $sql .= " AND " . implode(" AND ", $conditions);
+            }
+
+            // Prepare and execute the query
+            $stmt_clubs = $pdo->prepare($sql);
+            $stmt_clubs->execute($params);
+
+            // Fetch the total number of clubs
+            $total_clubs = $stmt_clubs->fetchColumn();
+            echo "<h3>$total_clubs</h3>";
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+        ?>
+        <i class="fas fa-university mt-2 me-2 p-2 bg-grey" style="position: absolute; font-size: 24px; color: white; width: 10%; border-radius: 50%; align-self: end;"></i>
+        <p>Total Clubs</p>
+    </div>
+</div>
+
 
                                 <!-- Card for TOTAL STUDENTS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
