@@ -181,58 +181,54 @@ try {
                 <div class="row g-0 h-100">
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
                         <div class="row align-items-center mb-2">
-                        <label for="schoolYearDropdown" class="col-auto col-form-label">Month:</label>
-<div class="col-auto">
-    <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-        <?php
-        // Define months
-        $months = [
-            '01' => 'January',
-            '02' => 'February',
-            '03' => 'March',
-            '04' => 'April',
-            '05' => 'May',
-            '06' => 'June',
-            '07' => 'July',
-            '08' => 'August',
-            '09' => 'September',
-            '10' => 'October',
-            '11' => 'November',
-            '12' => 'December'
-        ];
+                            <label for="schoolYearDropdown" class="col-auto col-form-label">Month:</label>
+                            <div class="col-auto">
+                                <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                                    <?php
+                                    // Define months
+                                    $months = [
+                                        '01' => 'January',
+                                        '02' => 'February',
+                                        '03' => 'March',
+                                        '04' => 'April',
+                                        '05' => 'May',
+                                        '06' => 'June',
+                                        '07' => 'July',
+                                        '08' => 'August',
+                                        '09' => 'September',
+                                        '10' => 'October',
+                                        '11' => 'November',
+                                        '12' => 'December'
+                                    ];
 
-        // Get the current month
-        $currentMonth = date('m');
+                                    // Get the current month
+                                    $currentMonth = date('m');
 
-        // Output month options
-        foreach ($months as $key => $month) {
-            echo "<option value=\"" . htmlspecialchars($key) . "\"";
-            // Check if $_GET['school_year'] is set, otherwise default to the current month
-            if ((isset($_GET['school_year']) && $_GET['school_year'] == $key) || (!isset($_GET['school_year']) && $key == $currentMonth)) {
-                echo " selected";
-            }
-            echo ">" . htmlspecialchars($month) . "</option>";
-        }
-        ?>
-    </select>
-</div>
+                                    // Output month options
+                                    foreach ($months as $key => $month) {
+                                        echo "<option value=\"" . htmlspecialchars($key) . "\"";
+                                        // Check if $_GET['school_year'] is set, otherwise default to the current month
+                                        if ((isset($_GET['school_year']) && $_GET['school_year'] == $key) || (!isset($_GET['school_year']) && $key == $currentMonth)) {
+                                            echo " selected";
+                                        }
+                                        echo ">" . htmlspecialchars($month) . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
 
-<script>
-    function filterDashboard() {
-        var club_id = document.getElementById('clubDropdown').value;
-        var school_year = document.getElementById('schoolYearDropdown').value;
-        var queryParams = new URLSearchParams(window.location.search);
+                            <script>
+                                function filterDashboard() {
+                                    var school_year = document.getElementById('schoolYearDropdown').value;
+                                    var queryParams = new URLSearchParams(window.location.search);
 
-        // Update the club_id and school_year parameters in the URL
-        queryParams.set('club_id', club_id);
-        queryParams.set('school_year', school_year);
+                                    // Update the school_year parameter in the URL
+                                    queryParams.set('school_year', school_year);
 
-        // Navigate to the updated URL
-        window.location.search = queryParams.toString();
-    }
-</script>
-
-
+                                    // Navigate to the updated URL
+                                    window.location.search = queryParams.toString();
+                                }
+                            </script>
                         </div>
 
                         <!-- THE MAIN PAGE START -->
@@ -244,19 +240,39 @@ try {
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
-                                            // Fetch total clubs in tbl_clubs
-                                            $stmt_clubs = $pdo->prepare("SELECT COUNT(*) AS total_clubs FROM tbl_clubs");
+                                            // Get the selected month from the URL
+                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+
+                                            // Base SQL query to count total clubs
+                                            $sql = "SELECT COUNT(*) AS total_clubs FROM tbl_clubs";
+
+                                            // Add condition for the selected month if applicable
+                                            if ($selectedMonth) {
+                                                // Ensure clubs are counted if they were created or approved up to the selected month
+                                                $sql .= " WHERE MONTH(dateAdded) <= :month";
+                                            }
+
+                                            // Prepare and execute the query
+                                            $stmt_clubs = $pdo->prepare($sql);
+
+                                            if ($selectedMonth) {
+                                                $stmt_clubs->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                            }
+
                                             $stmt_clubs->execute();
+
+                                            // Fetch the total number of clubs
                                             $total_clubs = $stmt_clubs->fetchColumn();
-                                            echo "<h3>$total_clubs</h3>";
+                                            echo "<h3>" . htmlspecialchars($total_clubs) . "</h3>";
                                         } catch (PDOException $e) {
-                                            echo "Error: " . $e->getMessage();
+                                            echo "Error: " . htmlspecialchars($e->getMessage());
                                         }
                                         ?>
                                         <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
                                         <p>Total Clubs</p>
                                     </div>
                                 </div>
+
 
                                 <!-- Card for TOTAL MODERATORS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
@@ -281,15 +297,37 @@ try {
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
-                                            try {
-                                                // Fetch total distinct students from tbl_registration
-                                                $stmt_students = $pdo->prepare("SELECT COUNT(DISTINCT student_id) AS total_students FROM tbl_registration WHERE status = 'active'");
-                                                $stmt_students->execute();
-                                                $total_students = $stmt_students->fetchColumn();
-                                                echo "<h3>" . htmlspecialchars($total_students) . "</h3>";
-                                            } catch (PDOException $e) {
-                                                echo "Error: " . htmlspecialchars($e->getMessage());
+                                        try {
+                                            // Get the selected month from the URL
+                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+
+                                            // Base SQL query to count total active students up to the selected month
+                                            $sql = "
+                                                SELECT COUNT(DISTINCT student_id) AS total_students 
+                                                FROM tbl_registration 
+                                                WHERE status = 'active'
+                                                AND MONTH(dateApproved) <= :month
+                                                AND YEAR(dateApproved) = YEAR(CURDATE())"; // Assuming we're filtering within the current year
+
+                                            // Prepare and execute the query
+                                            $stmt_students = $pdo->prepare($sql);
+                                            
+                                            if ($selectedMonth) {
+                                                $stmt_students->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                            } else {
+                                                // Default to current month if no month is selected
+                                                $currentMonth = date('m');
+                                                $stmt_students->bindParam(':month', $currentMonth, PDO::PARAM_INT);
                                             }
+                                            
+                                            $stmt_students->execute();
+
+                                            // Fetch the total number of students
+                                            $total_students = $stmt_students->fetchColumn();
+                                            echo "<h3>" . htmlspecialchars($total_students) . "</h3>";
+                                        } catch (PDOException $e) {
+                                            echo "Error: " . htmlspecialchars($e->getMessage());
+                                        }
                                         ?>
                                         <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
                                         <p>Total Students</p>
