@@ -265,6 +265,7 @@ try {
 
                         <!-- THE MAIN PAGE START -->
                         <div class="card p-2">
+
                             <!-- UPPER CARDS START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 <!-- Card for TOTAL MODERATORS CLUBS -->
@@ -286,6 +287,7 @@ try {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
+                                        <i class="fas fa-university mt-2 me-2 p-2 bg-grey" style="position: absolute; font-size: 24px; color: white; width: 10%; border-radius: 50%; align-self: end;"></i>
                                         <p>Total Clubs</p>
                                     </div>
                                 </div>
@@ -328,6 +330,7 @@ try {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
+                                        <i class="fas fa-users mt-2 me-2 p-2 bg-grey" style="position: absolute; font-size: 24px; color: white; width: 10%; border-radius: 50%; align-self: end;"></i>
                                         <p>Total Students</p>
                                     </div>
                                 </div>
@@ -371,6 +374,7 @@ try {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
+                                        <i class="fas fa-hourglass-half mt-2 me-2 p-2 bg-grey" style="position: absolute; font-size: 24px; color: white; width: 10%; border-radius: 50%; align-self: end;"></i>
                                         <p>Total Pending Approvals</p>
                                     </div>
                                 </div>
@@ -380,6 +384,7 @@ try {
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <h3>0</h3>
+                                        <i class="fas fa-door-open mt-2 me-2 p-2 bg-grey" style="position: absolute; font-size: 24px; color: white; width: 10%; border-radius: 50%; align-self: end;"></i>
                                         <p>Leave Requests</p>
                                     </div>
                                 </div>
