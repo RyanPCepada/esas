@@ -382,34 +382,41 @@ try {
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
-                                        // Get the selected club_id from the URL, if available
-                                        $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                        // Get the selected club_id and school_year (month) from the URL
+                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
                                         try {
-                                            // Prepare the SQL query
+                                            // Base SQL query to count total pending registrations for clubs handled by the moderator
                                             $sql = "
                                                 SELECT COUNT(tr.registration_id) AS total_pending 
-                                            FROM tbl_registration tr
-                                            JOIN tbl_clubs tc ON tr.club_id = tc.club_id
-                                            JOIN tbl_clubs_and_moderators tcm ON tc.club_id = tcm.club_id
-                                            WHERE tr.status = 'pending' 
-                                            AND tcm.moderator_id = :moderator_id
+                                                FROM tbl_registration tr
+                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id
+                                                JOIN tbl_clubs_and_moderators tcm ON tc.club_id = tcm.club_id
+                                                WHERE tr.status = 'pending' 
+                                                AND tcm.moderator_id = :moderator_id
                                             ";
 
-                                            // Add condition for club_id if it's set
-                                            if ($club_id) {
+                                            // Parameters for the query
+                                            $params = ['moderator_id' => $moderator_id];
+
+                                            // Add condition for the selected club, if applicable
+                                            if ($selectedClubId) {
                                                 $sql .= " AND tr.club_id = :club_id";
+                                                $params['club_id'] = $selectedClubId;
                                             }
 
+                                            // Add condition for the selected month, if applicable
+                                            if ($selectedMonth) {
+                                                $sql .= " AND MONTH(tr.dateApplied) <= :month"; // Assuming dateApplied is used for filtering
+                                                $params['month'] = $selectedMonth;
+                                            }
+
+                                            // Prepare and execute the query
                                             $stmt_pending = $pdo->prepare($sql);
-                                            $stmt_pending->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                            $stmt_pending->execute($params);
 
-                                            // Bind club_id parameter if it's set
-                                            if ($club_id) {
-                                                $stmt_pending->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-                                            }
-
-                                            $stmt_pending->execute();
+                                            // Fetch the total number of pending approvals
                                             $total_pending = $stmt_pending->fetchColumn();
                                             echo "<h3>$total_pending</h3>";
                                         } catch (PDOException $e) {
@@ -420,6 +427,7 @@ try {
                                         <p>Total Pending Approvals</p>
                                     </div>
                                 </div>
+
 
 
                                 <!-- Card for LEAVE REQUESTS (you can modify this query as needed) -->
@@ -444,21 +452,29 @@ try {
                                         <div style="height: 365px; background-color: transparent;">
                                             <?php
                                             try {
-                                                // Get the selected club_id from the URL, if available
+                                                // Get the selected club_id and month from the URL
                                                 $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
                                                 // Prepare the SQL query
                                                 $sql = "
                                                     SELECT ts.department, COUNT(tr.student_id) AS member_count
                                                     FROM tbl_students ts
                                                     JOIN tbl_registration tr ON ts.student_id = tr.student_id
-                                                    JOIN tbl_clubs_and_moderators cm ON tr.club_id = cm.club_id
-                                                    WHERE cm.moderator_id = :moderator_id AND tr.status = 'active'
+                                                    JOIN tbl_clubs tc ON tr.club_id = tc.club_id
+                                                    JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id
+                                                    WHERE cm.moderator_id = :moderator_id 
+                                                    AND tr.status = 'active'
                                                 ";
 
                                                 // Add condition for club_id if it's set
                                                 if ($club_id) {
                                                     $sql .= " AND tr.club_id = :club_id";
+                                                }
+
+                                                // Add condition for the selected month, if applicable
+                                                if ($selectedMonth) {
+                                                    $sql .= " AND MONTH(tr.dateApproved) <= :month";
                                                 }
 
                                                 $sql .= " GROUP BY ts.department";
@@ -469,6 +485,11 @@ try {
                                                 // Bind club_id parameter if it's set
                                                 if ($club_id) {
                                                     $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                }
+
+                                                // Bind month parameter if it's set
+                                                if ($selectedMonth) {
+                                                    $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
                                                 }
 
                                                 $stmt->execute();
@@ -573,6 +594,7 @@ try {
                                     </div>
                                 </div>
                                 <!-- PIE CHART END -->
+
 
 
 
