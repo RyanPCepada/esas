@@ -523,7 +523,7 @@ try {
                                             ?>
                                             <!-- Canvas for the pie chart -->
                                             <canvas id="pieChart" style="height: 100%;"></canvas>
-                                            <p id="noDataMessage" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 35%;">No data available to display</p>
+                                            <p id="noDataMessage" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 35%;"><em>No students.</em></p>
 
                                             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                                             <script>
@@ -610,7 +610,7 @@ try {
                                                 <div style="height: 100%; width: 100%; background-color: transparent;">
                                                     <canvas id="registryPerSYChart"></canvas>
                                                 </div>
-                                                <p id="noDataMessageSY" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;">No data available to display</p>
+                                                <p id="noDataMessageSY" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;"><em>No students.</em></p>
 
                                                 <?php
                                                 try {
@@ -788,7 +788,7 @@ try {
                                                     <div>
                                                         <canvas id="studentBarChart"></canvas>
                                                     </div>
-                                                    <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;">No data available to display</p>
+                                                    <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
                                                     
                                                     <?php
                                                     // Get the selected club_id and school_year (month) from the URL
@@ -1013,7 +1013,7 @@ try {
                                                     ?>
 
                                                     <canvas id="studentGenderChart" style="width: 100%; height: 100%;"></canvas>
-                                                    <p id="noDataMessageGender" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;">No data available to display</p>
+                                                    <p id="noDataMessageGender" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
 
                                                     <script>
                                                         document.addEventListener('DOMContentLoaded', function() {
