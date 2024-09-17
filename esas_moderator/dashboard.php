@@ -330,34 +330,41 @@ try {
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
-                                        // Get the selected club_id from the URL, if available
-                                        $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                        // Get the selected club_id and school_year (month) from the URL
+                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
                                         try {
-                                            // Prepare the SQL query
+                                            // Base SQL query to count total active students for clubs handled by the moderator
                                             $sql = "
                                                 SELECT COUNT(DISTINCT tr.student_id) AS total_students 
-                                            FROM tbl_registration tr 
-                                            JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
-                                            JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id 
-                                            WHERE cm.moderator_id = :moderator_id 
-                                            AND tr.status = 'active'
+                                                FROM tbl_registration tr 
+                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
+                                                JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id 
+                                                WHERE cm.moderator_id = :moderator_id 
+                                                AND tr.status = 'active'
                                             ";
 
-                                            // Add condition for club_id if it's set
-                                            if ($club_id) {
+                                            // Parameters for the query
+                                            $params = ['moderator_id' => $moderator_id];
+
+                                            // Add condition for the selected club, if applicable
+                                            if ($selectedClubId) {
                                                 $sql .= " AND tr.club_id = :club_id";
+                                                $params['club_id'] = $selectedClubId;
                                             }
 
+                                            // Add condition for the selected month, if applicable
+                                            if ($selectedMonth) {
+                                                $sql .= " AND MONTH(tr.dateModified) <= :month";
+                                                $params['month'] = $selectedMonth;
+                                            }
+
+                                            // Prepare and execute the query
                                             $stmt_students = $pdo->prepare($sql);
-                                            $stmt_students->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                            $stmt_students->execute($params);
 
-                                            // Bind club_id parameter if it's set
-                                            if ($club_id) {
-                                                $stmt_students->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-                                            }
-
-                                            $stmt_students->execute();
+                                            // Fetch the total number of students
                                             $total_students = $stmt_students->fetchColumn();
                                             echo "<h3>$total_students</h3>";
                                         } catch (PDOException $e) {
@@ -368,6 +375,7 @@ try {
                                         <p>Total Students</p>
                                     </div>
                                 </div>
+
 
 
                                 <!-- Card for TOTAL PENDING -->
