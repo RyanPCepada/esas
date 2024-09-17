@@ -265,22 +265,23 @@ try {
                                 }
                                 ?>
                             </div>
+
+                            <script>
+                                function filterDashboard() {
+                                    var club_id = document.getElementById('clubDropdown').value;
+                                    var school_year = document.getElementById('schoolYearDropdown').value;
+                                    var queryParams = new URLSearchParams(window.location.search);
+
+                                    // Update the club_id and school_year parameters in the URL
+                                    queryParams.set('club_id', club_id);
+                                    queryParams.set('school_year', school_year);
+
+                                    // Navigate to the updated URL
+                                    window.location.search = queryParams.toString();
+                                }
+                            </script>
+
                         </div>
-
-                        <script>
-                            function filterDashboard() {
-                                var club_id = document.getElementById('clubDropdown').value;
-                                var school_year = document.getElementById('schoolYearDropdown').value;
-                                var queryParams = new URLSearchParams(window.location.search);
-
-                                // Update the club_id and school_year parameters in the URL
-                                queryParams.set('club_id', club_id);
-                                queryParams.set('school_year', school_year);
-
-                                // Navigate to the updated URL
-                                window.location.search = queryParams.toString();
-                            }
-                        </script>
 
 
                         <!-- THE MAIN PAGE START -->

@@ -388,7 +388,7 @@ try {
                                             echo "Error: " . htmlspecialchars($e->getMessage());
                                         }
                                         ?>
-                                        <i class="fas fa-door-open mt-2 me-2 p-2 icon-style"></i>
+                                        <i class="fas fa-envelope mt-2 me-2 p-2 icon-style"></i>
                                         <p>Total Club Requests</p>
                                     </div>
                                 </div>
