@@ -791,11 +791,12 @@ try {
                                                     <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;">No data available to display</p>
                                                     
                                                     <?php
-                                                    // Get the selected club_id from the URL, if available
+                                                    // Get the selected club_id and school_year (month) from the URL
                                                     $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                    $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
                                                     try {
-                                                        // SQL Query to fetch year level counts, filtered by moderator and club_id
+                                                        // SQL Query to fetch year level counts, filtered by moderator, club_id, and dateApproved
                                                         $sql = "
                                                         SELECT s.year, COUNT(DISTINCT s.student_id) AS count
                                                         FROM tbl_students s
@@ -810,6 +811,11 @@ try {
                                                             $sql .= " AND r.club_id = :club_id";
                                                         }
 
+                                                        // Add condition for dateApproved month if it's set
+                                                        if ($selectedMonth) {
+                                                            $sql .= " AND MONTH(r.dateApproved) <= :month";
+                                                        }
+
                                                         $sql .= " GROUP BY s.year";
 
                                                         $stmtCounts = $pdo->prepare($sql);
@@ -818,6 +824,11 @@ try {
                                                         // Bind club_id parameter if it's set
                                                         if ($club_id) {
                                                             $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                        }
+
+                                                        // Bind month parameter if it's set
+                                                        if ($selectedMonth) {
+                                                            $stmtCounts->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
                                                         }
 
                                                         $stmtCounts->execute();
@@ -914,6 +925,7 @@ try {
                                                 </div>
                                             </div>
                                         </div>
+
 
                                         <!-- Student Gender -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
