@@ -934,10 +934,11 @@ try {
                                                 <div style="height: 150px; position: relative;">
                                                     <?php
                                                     try {
-                                                        // Get the selected club_id from the URL, if available
+                                                        // Get the selected club_id and month (school_year) from the URL
                                                         $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
-                                                        // Prepare the SQL statement to get gender counts filtered by club and moderator
+                                                        // Prepare the SQL statement to get gender counts filtered by club, moderator, and date
                                                         $sqlCounts = "
                                                             SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
                                                             FROM tbl_students s
@@ -952,6 +953,11 @@ try {
                                                             $sqlCounts .= " AND r.club_id = :club_id";
                                                         }
 
+                                                        // Add condition for the selected month, if applicable
+                                                        if ($selectedMonth) {
+                                                            $sqlCounts .= " AND MONTH(r.dateApproved) <= :month";
+                                                        }
+
                                                         $sqlCounts .= " GROUP BY s.gender";
 
                                                         $stmtCounts = $pdo->prepare($sqlCounts);
@@ -960,6 +966,11 @@ try {
                                                         // Bind club_id parameter if it's set
                                                         if ($club_id) {
                                                             $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                        }
+
+                                                        // Bind month parameter if it's set
+                                                        if ($selectedMonth) {
+                                                            $stmtCounts->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
                                                         }
 
                                                         $stmtCounts->execute();
@@ -1067,7 +1078,6 @@ try {
                                             </div>
                                         </div>
 
-                                    </div>
                                 </div>
 
 
