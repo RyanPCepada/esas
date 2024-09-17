@@ -538,6 +538,8 @@ try {
                                 <!-- OTHER CHARTS -->
                                 <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
+
+                                    
                                         <!-- Registry per SY -->
                                         <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
@@ -545,32 +547,65 @@ try {
                                                 <div style="height: 100%; width: 100%; background-color: transparent;">
                                                     <canvas id="registryPerSYChart"></canvas>
                                                 </div>
+                                                <p id="noDataMessageSY" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;"><em>No students.</em></p>
+
                                                 <?php
                                                 try {
                                                     // Get the current academic year based on today's date
                                                     $currentYear = date('Y');
                                                     $currentSY = $currentYear . '-' . ($currentYear + 1);
 
-                                                    // SQL query to fetch the count of members per academic year including the placeholder year
+                                                    // Get the selected club_id and month from the URL, if available
+                                                    $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                    $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Assuming 'school_year' is used for month
+
+                                                    // SQL query to fetch the count of members per academic year
                                                     $sql = "
                                                         SELECT academicYear, COALESCE(memberCount, 0) AS memberCount
                                                         FROM (
-                                                            SELECT CONCAT(YEAR(dateModified), '-', YEAR(dateModified) + 1) AS academicYear, COUNT(DISTINCT student_id) AS memberCount
-                                                            FROM tbl_registration
-                                                            WHERE status = 'active'
+                                                            SELECT CONCAT(YEAR(r.dateApproved), '-', YEAR(r.dateApproved) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
+                                                            FROM tbl_students s
+                                                            JOIN tbl_registration r ON s.student_id = r.student_id
+                                                            JOIN tbl_clubs c ON r.club_id = c.club_id
+                                                            WHERE r.status = 'active'
+                                                    ";
+
+                                                    // Add condition for club_id if it's set
+                                                    if ($club_id) {
+                                                        $sql .= " AND r.club_id = :club_id";
+                                                    }
+
+                                                    // Add condition for month if it's set
+                                                    if ($selectedMonth) {
+                                                        $sql .= " AND MONTH(r.dateApproved) = :month";
+                                                    }
+
+                                                    $sql .= "
                                                             GROUP BY academicYear
                                                             UNION ALL
                                                             SELECT '2023-2024' AS academicYear, 0 AS memberCount
                                                             WHERE NOT EXISTS (
                                                                 SELECT 1 FROM tbl_registration
-                                                                WHERE CONCAT(YEAR(dateModified), '-', YEAR(dateModified) + 1) = '2023-2024'
+                                                                WHERE CONCAT(YEAR(dateApproved), '-', YEAR(dateApproved) + 1) = '2023-2024'
                                                             )
                                                         ) AS yearlyData
                                                         WHERE academicYear = '2023-2024' OR academicYear = '$currentSY'
                                                         ORDER BY academicYear
                                                     ";
 
+                                                    // Prepare the statement
                                                     $stmt = $pdo->prepare($sql);
+
+                                                    // Bind club_id parameter if it's set
+                                                    if ($club_id) {
+                                                        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                    }
+
+                                                    // Bind month parameter if it's set
+                                                    if ($selectedMonth) {
+                                                        $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                                    }
+
                                                     $stmt->execute();
                                                     $registryPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -584,7 +619,7 @@ try {
                                                         $memberCountsPerSY[] = $row['memberCount'];  // Number of members for each year
                                                     }
 
-                                                    // Fetch the total number of students
+                                                    // Fetch the total number of students for the max value
                                                     $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
                                                     $totalStudentsStmt->execute();
                                                     $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
@@ -611,54 +646,65 @@ try {
                                                     const memberCountsPerSY = <?php echo json_encode($memberCountsPerSY); ?>;
                                                     const maxMemberCount = <?php echo $maxMemberCount; ?>;
 
-                                                    // Data for the chart
-                                                    const registryPerSYData = {
-                                                        labels: academicYears,
-                                                        datasets: [{
-                                                            label: 'Registry per SY',
-                                                            data: memberCountsPerSY,
-                                                            fill: true,
-                                                            borderColor: 'rgba(75, 192, 192, 1)',
-                                                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                                            tension: 0.1
-                                                        }]
-                                                    };
+                                                    // Check if there is no data to display
+                                                    const hasDataSY = memberCountsPerSY.some(count => count > 0);
 
-                                                    // Configuration for the chart
-                                                    const registryPerSYConfig = {
-                                                        type: 'line',
-                                                        data: registryPerSYData,
-                                                        options: {
-                                                            scales: {
-                                                                x: {
-                                                                    ticks: {
-                                                                        maxRotation: 45, // Rotate x-axis labels for better readability
-                                                                        autoSkip: true // Automatically skip labels if too many
+                                                    // Show or hide the "No Data" message based on data availability
+                                                    const registryPerSYChartElement = document.getElementById('registryPerSYChart');
+                                                    const noDataMessageSY = document.getElementById('noDataMessageSY');
+
+                                                    if (!hasDataSY) {
+                                                        registryPerSYChartElement.style.display = 'none';
+                                                        noDataMessageSY.style.display = 'block';
+                                                    } else {
+                                                        // Data for the chart
+                                                        const registryPerSYData = {
+                                                            labels: academicYears,
+                                                            datasets: [{
+                                                                label: 'Registry per SY',
+                                                                data: memberCountsPerSY,
+                                                                fill: true,
+                                                                borderColor: 'rgba(75, 192, 192, 1)',
+                                                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                                tension: 0.1
+                                                            }]
+                                                        };
+
+                                                        // Configuration for the chart
+                                                        const registryPerSYConfig = {
+                                                            type: 'line',
+                                                            data: registryPerSYData,
+                                                            options: {
+                                                                scales: {
+                                                                    x: {
+                                                                        ticks: {
+                                                                            maxRotation: 45, // Rotate x-axis labels for better readability
+                                                                            autoSkip: true // Automatically skip labels if too many
+                                                                        }
+                                                                    },
+                                                                    y: {
+                                                                        beginAtZero: true,
+                                                                        max: maxMemberCount // Adjust max count dynamically to even number
                                                                     }
                                                                 },
-                                                                y: {
-                                                                    beginAtZero: true,
-                                                                    max: maxMemberCount // Adjust max count dynamically to even number
-                                                                }
-                                                            },
-                                                            plugins: {
-                                                                legend: {
-                                                                    display: false // Disable the legend to remove label
-                                                                }
-                                                            },
-                                                            responsive: true,
-                                                            maintainAspectRatio: false // Allow chart to fill container width
-                                                        }
-                                                    };
+                                                                plugins: {
+                                                                    legend: {
+                                                                        display: false // Disable the legend to remove label
+                                                                    }
+                                                                },
+                                                                responsive: true,
+                                                                maintainAspectRatio: false // Allow chart to fill container width
+                                                            }
+                                                        };
 
-                                                    // Render the chart
-                                                    const registryPerSYChart = new Chart(
-                                                        document.getElementById('registryPerSYChart'),
-                                                        registryPerSYConfig
-                                                    );
+                                                        // Render the chart
+                                                        const registryPerSYChart = new Chart(registryPerSYChartElement, registryPerSYConfig);
+                                                    }
                                                 </script>
                                             </div>
                                         </div>
+
+
                                     </div>
 
 
