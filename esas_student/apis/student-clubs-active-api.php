@@ -16,12 +16,13 @@ switch ($method) {
 
             // Query to fetch the clubs associated with the student
             $stmt = $pdo->prepare('
-                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, r.dateAdded, r.dateModified,
+                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, r.dateApplied, r.dateModified,
                        GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderators,
                        GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS profilePics
                 FROM tbl_registration r
                 JOIN tbl_clubs c ON r.club_id = c.club_id
-                LEFT JOIN tbl_moderators m ON c.club_id = m.club_id
+                LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
                 WHERE r.student_id = ? AND r.status = "active"
                 GROUP BY c.club_id
             ');
@@ -30,7 +31,7 @@ switch ($method) {
 
             // Fetch member counts and format moderators for each club
             foreach ($result as &$club) {
-                // Replace dateAdded with dateModified
+                // Replace dateApplied with dateModified
                 $club['dateModified'] = (new DateTime($club['dateModified']))->format('F j, Y'); // Format the date
                 $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_registration WHERE club_id = ?');
                 $stmt_count->execute([$club['club_id']]);
