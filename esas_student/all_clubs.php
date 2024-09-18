@@ -108,7 +108,7 @@ try {
             height: 188px; */
             border: solid 3px transparent;
             border: none;
-            border-radius: 15px;
+            border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 5px 10px rgba(0, 0, 0, .5);
             margin: 10px auto;
@@ -220,16 +220,6 @@ try {
 
 
 
-
-        
-        
-        .card-body { 
-            width: 100%;
-            /* max-width: 600px; */
-            margin: 0 auto;
-            padding: 50px;
-        }
-
         /* Default for larger screens (6 cards per row) */
         .sbo-officers-row, .csg-officers-row {
             flex: 0 0 16.66%; /* 100% / 6 = 16.66% width per card */
@@ -238,9 +228,8 @@ try {
 
         /* Media query for mobile screens (2 cards per row) */
         @media (max-width: 768px) {
-            .sbo-officers-row, .csg-officers-row {
-                flex: 0 0 50%; /* 100% / 2 = 50% width per card */
-                max-width: 50%;
+            .officers-link {
+                margin-left: 0px !important;
             }
         }
 
@@ -296,8 +285,15 @@ try {
             <div class="col-12 col-md-10 bg-lgrey auto-scroll">
                 <div class="row g-0 h-100">
 
-                    <a href="../esas_student/officers/csg_officers.php">The CSG Officers</a>
-                    <a href="../esas_student/officers/sbo_officers.php">The SBO Officers</a>
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start mt-2 ms-2 me-1 me-sm-2">
+                        <h2 class="text-muted">Student Club Organizations</h2>
+                        <div class="officers-link mt-0 mt-sm-0 me-1 me-sm-4">
+                            <a href="../esas_student/officers/csg_officers.php" class="d-inline-block">The CSG Officers</a>
+                            <a href="../esas_student/officers/sbo_officers.php" class="ms-2 d-inline-block">The SBO Officers</a>
+                        </div>
+                    </div>
+
+
 
                     
                     <div id="divpr_requesdetails" class="table-responsive px-0">
@@ -305,7 +301,6 @@ try {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row mainbar g-0 h-100">
-                                        <h2 class="text-muted mt-0">Student Club Organizations</h2>
                                         <div class="row g-2 mt-0" id="allClubsContainer">
                                             <!-- Club cards will be dynamically added here -->
                                         </div>
