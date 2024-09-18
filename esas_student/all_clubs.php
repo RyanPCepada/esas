@@ -176,10 +176,12 @@ try {
                 margin-left: 0px;
             }
             .card-body {
-                padding: 10px !important; 
+                padding: 0px !important; 
                 max-width: 100%; 
             }
             .card-img-only-all {
+                width: 315px;
+                height: 177px;
                 margin: 10px auto;
             }
         }
@@ -288,8 +290,10 @@ try {
                     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start mt-2 ms-2 me-1 me-sm-2">
                         <h2 class="text-muted">Student Club Organizations</h2>
                         <div class="officers-link mt-0 mt-sm-0 me-1 me-sm-4">
-                            <a href="../esas_student/officers/csg_officers.php" class="d-inline-block">The CSG Officers</a>
-                            <a href="../esas_student/officers/sbo_officers.php" class="ms-2 d-inline-block">The SBO Officers</a>
+                            <a href="../esas_student/officers/csg_officers.php" class="d-inline-block">
+                                <i class="fas fa-user-tie"></i> CSG Officers</a>
+                            <a href="../esas_student/officers/sbo_officers.php" class="ms-2 d-inline-block">
+                                <i class="fas fa-user-tie"></i> SBO Officers</a>
                         </div>
                     </div>
 
