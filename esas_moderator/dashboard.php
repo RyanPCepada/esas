@@ -96,6 +96,26 @@ try {
             /* Ensure your card styles are here */
         }
 
+        .icon-style {
+            position: absolute;
+            font-size: 18px;
+            width: 8%;
+            background-color: #4682B4; /*steel blue*/
+            background-color: #89CFF0; /*baby blue*/
+            color: white;
+            /* color: #6A5ACD; slate blue */
+            border-radius: 50%;
+            align-self: end;
+        }
+
+        @media (max-width: 768px) {
+            .col-auto {
+                width: auto;
+            }
+            .icon-style {
+                width: 6% !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -148,18 +168,19 @@ try {
             <!-- LEFT SIDEBAR END -->
 
 
-            
+            <!--HERE-->
             
             <!-- MAINPAGE BAR -->
             <div class="col-12 col-md-10 bg-lgrey auto-scroll">
                 <div class="row g-0 h-100">
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
+                        
                         <div class="row align-items-center mb-2">
                             <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
                             <div class="col-auto">
                                 <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
                                     <?php
-                                    // Prepare the SQL query
+                                    // Prepare the SQL query to fetch clubs managed by the current moderator
                                     $sql = "
                                         SELECT c.club_id, c.clubName 
                                         FROM tbl_clubs c
@@ -174,57 +195,97 @@ try {
                                     // Fetch the results
                                     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+                                    // Set the first club as default if no club is selected
+                                    $defaultClubId = $clubs[0]['club_id'] ?? null;
+                                    $defaultClubName = $clubs[0]['clubName'] ?? 'Club not available';
+
                                     // Generate the dropdown options
                                     foreach ($clubs as $club): ?>
-                                        <option value="<?php echo htmlspecialchars($club['club_id']); ?>">
+                                        <option value="<?php echo htmlspecialchars($club['club_id']); ?>"
+                                            <?php if (isset($_GET['club_id']) && $_GET['club_id'] == $club['club_id']) echo 'selected'; ?>>
                                             <?php echo htmlspecialchars($club['clubName']); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
-                                <div class="col-auto">
-                                    <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                                        <?php 
-                                        // Get the current date
-                                        $currentDate = new DateTime();
 
-                                        // Calculate school years based on current date
-                                        $schoolYears = [];
-                                        for ($i = 0; $i < 5; $i++) {
-                                            $startYear = $currentDate->format('Y') - $i;
-                                            $endYear = $startYear + 1;
-                                            $schoolYears[] = "{$startYear}-{$endYear}";
+                            <label for="schoolYearDropdown" class="col-auto col-form-label">Month:</label>
+                            <div class="col-auto">
+                                <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                                    <?php
+                                    // Define months
+                                    $months = [
+                                        '01' => 'January',
+                                        '02' => 'February',
+                                        '03' => 'March',
+                                        '04' => 'April',
+                                        '05' => 'May',
+                                        '06' => 'June',
+                                        '07' => 'July',
+                                        '08' => 'August',
+                                        '09' => 'September',
+                                        '10' => 'October',
+                                        '11' => 'November',
+                                        '12' => 'December'
+                                    ];
+
+                                    // Get the current month
+                                    $currentMonth = date('m');
+
+                                    // Output month options
+                                    foreach ($months as $key => $month) {
+                                        echo "<option value=\"" . htmlspecialchars($key) . "\"";
+                                        // Check if $_GET['school_year'] is set, otherwise default to the current month
+                                        if ((isset($_GET['school_year']) && $_GET['school_year'] == $key) || (!isset($_GET['school_year']) && $key == $currentMonth)) {
+                                            echo " selected";
                                         }
+                                        echo ">" . htmlspecialchars($month) . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
 
-                                        // Prepare and execute the SQL query
-                                        $sql = "
-                                            SELECT DISTINCT 
-                                                CONCAT(YEAR(dateAdded), '-', YEAR(dateAdded) + 1) AS schoolYear
-                                            FROM tbl_clubs
-                                            WHERE dateAdded IS NOT NULL
-                                            AND YEAR(dateAdded) BETWEEN YEAR(DATE_SUB(NOW(), INTERVAL 5 YEAR)) AND YEAR(NOW())
-                                        ";
 
-                                        $stmt = $pdo->prepare($sql);
-                                        $stmt->execute();
-                                        $activeSchoolYears = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                            <!-- Display selected club name or default club name -->
+                            <div class="clubname-display text-center" style="width: 540px;">
+                                <?php
+                                // Check if a club is selected via the URL
+                                $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId;
 
-                                        // Determine which school years to display
-                                        $displaySchoolYears = array_intersect($schoolYears, $activeSchoolYears);
+                                // Fetch and display the selected club name
+                                $sql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
+                                $stmt = $pdo->prepare($sql);
+                                $stmt->execute(['club_id' => $club_id]);
+                                $club = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                                        // Output school year options
-                                        foreach ($displaySchoolYears as $schoolYear) {
-                                            echo "<option value=\"" . htmlspecialchars($schoolYear) . "\">" . htmlspecialchars($schoolYear) . "</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-
+                                if ($club) {
+                                    echo "<h5 class='text-muted mt-1 ms-3'>" . htmlspecialchars($club['clubName']) . "</h5>";
+                                } else {
+                                    echo "<p>Club not found.</p>";
+                                }
+                                ?>
+                            </div>
                         </div>
+
+                        <script>
+                            function filterDashboard() {
+                                var club_id = document.getElementById('clubDropdown').value;
+                                var school_year = document.getElementById('schoolYearDropdown').value;
+                                var queryParams = new URLSearchParams(window.location.search);
+
+                                // Update the club_id and school_year parameters in the URL
+                                queryParams.set('club_id', club_id);
+                                queryParams.set('school_year', school_year);
+
+                                // Navigate to the updated URL
+                                window.location.search = queryParams.toString();
+                            }
+                        </script>
+
 
                         <!-- THE MAIN PAGE START -->
                         <div class="card p-2">
+
                             <!-- UPPER CARDS START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 <!-- Card for TOTAL MODERATORS CLUBS -->
@@ -232,78 +293,162 @@ try {
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
-                                            // Fetch total clubs associated with the moderator using tbl_club_and_moderators
-                                            $stmt_clubs = $pdo->prepare("
-                                                SELECT COUNT(DISTINCT club_id) AS total_clubs 
-                                                FROM tbl_clubs_and_moderators 
-                                                WHERE moderator_id = :moderator_id
-                                            ");
-                                            $stmt_clubs->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                                            $stmt_clubs->execute();
+                                            // Get the selected club_id and school_year (month) from the URL
+                                            $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
+                                            
+                                            // Base SQL query to count total clubs associated with the moderator
+                                            $sql = "
+                                                SELECT COUNT(DISTINCT cm.club_id) AS total_clubs 
+                                                FROM tbl_clubs_and_moderators cm
+                                                JOIN tbl_clubs c ON cm.club_id = c.club_id
+                                                WHERE cm.moderator_id = :moderator_id
+                                            ";
+
+                                            // Parameters for the query
+                                            $params = ['moderator_id' => $moderator_id];
+
+                                            // Add condition for the selected month, if applicable
+                                            if ($selectedMonth) {
+                                                $sql .= " AND MONTH(c.dateAdded) <= :month";
+                                                $params['month'] = $selectedMonth;
+                                            }
+
+                                            // Do not filter by club_id when counting total clubs unless it's specifically required
+                                            // So if you only want the total number of clubs, exclude this condition unless you need to filter
+                                            // by a specific club later in other logic
+                                            if ($selectedClubId && isset($_GET['filter_by_club'])) {
+                                                // Use this filter only if you have a specific filter flag in the logic
+                                                $sql .= " AND c.club_id = :club_id";
+                                                $params['club_id'] = $selectedClubId;
+                                            }
+
+                                            // Prepare and execute the query
+                                            $stmt_clubs = $pdo->prepare($sql);
+                                            $stmt_clubs->execute($params);
+
+                                            // Fetch the total number of clubs
                                             $total_clubs = $stmt_clubs->fetchColumn();
                                             echo "<h3>$total_clubs</h3>";
                                         } catch (PDOException $e) {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
+                                        <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
                                         <p>Total Clubs</p>
                                     </div>
                                 </div>
+
 
                                 <!-- Card for TOTAL STUDENTS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
+                                        // Get the selected club_id and school_year (month) from the URL
+                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
+
                                         try {
-                                            // Fetch total distinct students who registered under clubs managed by this moderator
-                                            $stmt_students = $pdo->prepare("
+                                            // Base SQL query to count total active students for clubs handled by the moderator
+                                            $sql = "
                                                 SELECT COUNT(DISTINCT tr.student_id) AS total_students 
                                                 FROM tbl_registration tr 
                                                 JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
-                                                JOIN tbl_moderators tm ON tc.club_id = tm.club_id 
-                                                WHERE tm.moderator_id = :moderator_id AND tr.status = 'active'
-                                            ");
-                                            $stmt_students->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                                            $stmt_students->execute();
+                                                JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id 
+                                                WHERE cm.moderator_id = :moderator_id 
+                                                AND tr.status = 'active'
+                                            ";
+
+                                            // Parameters for the query
+                                            $params = ['moderator_id' => $moderator_id];
+
+                                            // Add condition for the selected club, if applicable
+                                            if ($selectedClubId) {
+                                                $sql .= " AND tr.club_id = :club_id";
+                                                $params['club_id'] = $selectedClubId;
+                                            }
+
+                                            // Add condition for the selected month, if applicable
+                                            if ($selectedMonth) {
+                                                $sql .= " AND MONTH(tr.dateApproved) <= :month";
+                                                $params['month'] = $selectedMonth;
+                                            }
+
+                                            // Prepare and execute the query
+                                            $stmt_students = $pdo->prepare($sql);
+                                            $stmt_students->execute($params);
+
+                                            // Fetch the total number of students
                                             $total_students = $stmt_students->fetchColumn();
                                             echo "<h3>$total_students</h3>";
                                         } catch (PDOException $e) {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
+                                        <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
                                         <p>Total Students</p>
                                     </div>
                                 </div>
+
+
 
                                 <!-- Card for TOTAL PENDING -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
+                                        // Get the selected club_id and school_year (month) from the URL
+                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
+
                                         try {
-                                            // Fetch total pending student registrations for clubs managed by this moderator
-                                            $stmt_pending = $pdo->prepare("
-                                                SELECT COUNT(tr.student_id) AS total_pending 
+                                            // Base SQL query to count total pending registrations for clubs handled by the moderator
+                                            $sql = "
+                                                SELECT COUNT(tr.registration_id) AS total_pending 
                                                 FROM tbl_registration tr
                                                 JOIN tbl_clubs tc ON tr.club_id = tc.club_id
-                                                JOIN tbl_moderators tm ON tc.club_id = tm.club_id
-                                                WHERE tr.status = 'pending' AND tm.moderator_id = :moderator_id
-                                            ");
-                                            $stmt_pending->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                                            $stmt_pending->execute();
+                                                JOIN tbl_clubs_and_moderators tcm ON tc.club_id = tcm.club_id
+                                                WHERE tr.status = 'pending' 
+                                                AND tcm.moderator_id = :moderator_id
+                                            ";
+
+                                            // Parameters for the query
+                                            $params = ['moderator_id' => $moderator_id];
+
+                                            // Add condition for the selected club, if applicable
+                                            if ($selectedClubId) {
+                                                $sql .= " AND tr.club_id = :club_id";
+                                                $params['club_id'] = $selectedClubId;
+                                            }
+
+                                            // Add condition for the selected month, if applicable
+                                            if ($selectedMonth) {
+                                                $sql .= " AND MONTH(tr.dateApplied) <= :month"; // Assuming dateApplied is used for filtering
+                                                $params['month'] = $selectedMonth;
+                                            }
+
+                                            // Prepare and execute the query
+                                            $stmt_pending = $pdo->prepare($sql);
+                                            $stmt_pending->execute($params);
+
+                                            // Fetch the total number of pending approvals
                                             $total_pending = $stmt_pending->fetchColumn();
                                             echo "<h3>$total_pending</h3>";
                                         } catch (PDOException $e) {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
-                                        <p>Total Pending Approval</p>
+                                        <i class="fas fa-hourglass-half mt-2 me-2 p-2 icon-style"></i>
+                                        <p>Total Pending Approvals</p>
                                     </div>
                                 </div>
+
+
 
                                 <!-- Card for LEAVE REQUESTS (you can modify this query as needed) -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <h3>0</h3>
+                                        <i class="fas fa-door-open mt-2 me-2 p-2 icon-style"></i>
                                         <p>Leave Requests</p>
                                     </div>
                                 </div>
@@ -321,16 +466,46 @@ try {
                                         <div style="height: 365px; background-color: transparent;">
                                             <?php
                                             try {
-                                                // Fetch the count of registered students per department for the clubs managed by the current moderator
-                                                $stmt = $pdo->prepare("
+                                                // Get the selected club_id and month from the URL
+                                                $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
+
+                                                // Prepare the SQL query
+                                                $sql = "
                                                     SELECT ts.department, COUNT(tr.student_id) AS member_count
                                                     FROM tbl_students ts
                                                     JOIN tbl_registration tr ON ts.student_id = tr.student_id
-                                                    JOIN tbl_clubs_and_moderators cm ON tr.club_id = cm.club_id
-                                                    WHERE cm.moderator_id = :moderator_id AND tr.status = 'active'
-                                                    GROUP BY ts.department
-                                                ");
+                                                    JOIN tbl_clubs tc ON tr.club_id = tc.club_id
+                                                    JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id
+                                                    WHERE cm.moderator_id = :moderator_id 
+                                                    AND tr.status = 'active'
+                                                ";
+
+                                                // Add condition for club_id if it's set
+                                                if ($club_id) {
+                                                    $sql .= " AND tr.club_id = :club_id";
+                                                }
+
+                                                // Add condition for the selected month, if applicable
+                                                if ($selectedMonth) {
+                                                    $sql .= " AND MONTH(tr.dateApproved) <= :month";
+                                                }
+
+                                                $sql .= " GROUP BY ts.department";
+
+                                                $stmt = $pdo->prepare($sql);
                                                 $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+
+                                                // Bind club_id parameter if it's set
+                                                if ($club_id) {
+                                                    $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                }
+
+                                                // Bind month parameter if it's set
+                                                if ($selectedMonth) {
+                                                    $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                                }
+
                                                 $stmt->execute();
                                                 $department_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             } catch (PDOException $e) {
@@ -351,7 +526,7 @@ try {
                                             // Calculate percentage for each department
                                             $percentages = [];
                                             foreach ($counts as $count) {
-                                                $percentages[] = round(($count / $total_members) * 100);
+                                                $percentages[] = $total_members > 0 ? round(($count / $total_members) * 100) : 0;
                                             }
 
                                             // Combine percentages and department names
@@ -362,65 +537,78 @@ try {
                                             ?>
                                             <!-- Canvas for the pie chart -->
                                             <canvas id="pieChart" style="height: 100%;"></canvas>
+                                            <p id="noDataMessage" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 35%;"><em>No students.</em></p>
+
                                             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                                             <script>
                                                 // Fetching data from PHP arrays
                                                 const labelsWithPercentages = <?php echo json_encode($labels_with_percentages); ?>;
                                                 const counts = <?php echo json_encode($counts); ?>;
 
-                                                // Render Pie Chart using Chart.js
                                                 const ctx = document.getElementById('pieChart').getContext('2d');
-                                                const pieChart = new Chart(ctx, {
-                                                    type: 'pie',
-                                                    data: {
-                                                        labels: labelsWithPercentages,  // Department names with percentages
-                                                        datasets: [{
-                                                            label: 'Members per Department',
-                                                            data: counts,  // Member count per department
-                                                            backgroundColor: [
-                                                                'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
-                                                                'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
-                                                                'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
-                                                                'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
-                                                                'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
-                                                                'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
-                                                            ],
-                                                            borderColor: [
-                                                                'rgba(65, 105, 225, 1)',     // Royal Blue border
-                                                                'rgba(255, 105, 180, 1)',     // Hot Pink border
-                                                                'rgba(255, 215, 0, 1)',       // Gold border
-                                                                'rgba(0, 255, 255, 1)',       // Cyan border
-                                                                'rgba(255, 165, 0, 1)',       // Orange border
-                                                                'rgba(0, 255, 0, 1)'          // Lime Green border
-                                                            ],
-                                                            borderWidth: 1
-                                                        }]
-                                                    },
-                                                    options: {
-                                                        responsive: true,
-                                                        plugins: {
-                                                            legend: {
-                                                                position: 'top',
-                                                                labels: {
-                                                                    boxWidth: 20,  // Set square shape
-                                                                    padding: 20    // Add spacing between labels and box
-                                                                }
-                                                            },
-                                                            tooltip: {
-                                                                callbacks: {
-                                                                    label: function(tooltipItem) {
-                                                                        return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
+                                                const noDataMessage = document.getElementById('noDataMessage');
+                                                
+                                                // Check if there's any data to display
+                                                if (counts.length === 0 || labelsWithPercentages.length === 0) {
+                                                    // No data, hide the canvas and show the message
+                                                    document.getElementById('pieChart').style.display = 'none';
+                                                    noDataMessage.style.display = 'block';
+                                                } else {
+                                                    // Render Pie Chart using Chart.js
+                                                    const pieChart = new Chart(ctx, {
+                                                        type: 'pie',
+                                                        data: {
+                                                            labels: labelsWithPercentages,  // Department names with percentages
+                                                            datasets: [{
+                                                                label: 'Members per Department',
+                                                                data: counts,  // Member count per department
+                                                                backgroundColor: [
+                                                                    'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
+                                                                    'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
+                                                                    'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
+                                                                    'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
+                                                                    'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
+                                                                    'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
+                                                                ],
+                                                                borderColor: [
+                                                                    'rgba(65, 105, 225, 1)',     // Royal Blue border
+                                                                    'rgba(255, 105, 180, 1)',     // Hot Pink border
+                                                                    'rgba(255, 215, 0, 1)',       // Gold border
+                                                                    'rgba(0, 255, 255, 1)',       // Cyan border
+                                                                    'rgba(255, 165, 0, 1)',       // Orange border
+                                                                    'rgba(0, 255, 0, 1)'          // Lime Green border
+                                                                ],
+                                                                borderWidth: 1
+                                                            }]
+                                                        },
+                                                        options: {
+                                                            responsive: true,
+                                                            plugins: {
+                                                                legend: {
+                                                                    position: 'top',
+                                                                    labels: {
+                                                                        boxWidth: 20,  // Set square shape
+                                                                        padding: 20    // Add spacing between labels and box
+                                                                    }
+                                                                },
+                                                                tooltip: {
+                                                                    callbacks: {
+                                                                        label: function(tooltipItem) {
+                                                                            return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
+                                                                        }
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                    }
-                                                });
+                                                    });
+                                                }
                                             </script>
+
                                         </div>
                                     </div>
                                 </div>
                                 <!-- PIE CHART END -->
+
 
 
 
@@ -436,36 +624,67 @@ try {
                                                 <div style="height: 100%; width: 100%; background-color: transparent;">
                                                     <canvas id="registryPerSYChart"></canvas>
                                                 </div>
+                                                <p id="noDataMessageSY" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;"><em>No students.</em></p>
+
                                                 <?php
                                                 try {
                                                     // Get the current academic year based on today's date
                                                     $currentYear = date('Y');
                                                     $currentSY = $currentYear . '-' . ($currentYear + 1);
 
-                                                    // SQL query to fetch the count of members per academic year including the placeholder year
+                                                    // Get the selected club_id and month from the URL, if available
+                                                    $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                    $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Assuming 'school_year' is used for month
+
+                                                    // SQL query to fetch the count of members per academic year
                                                     $sql = "
                                                         SELECT academicYear, COALESCE(memberCount, 0) AS memberCount
                                                         FROM (
-                                                            SELECT CONCAT(YEAR(r.dateModified), '-', YEAR(r.dateModified) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
+                                                            SELECT CONCAT(YEAR(r.dateApproved), '-', YEAR(r.dateApproved) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
                                                             FROM tbl_students s
                                                             JOIN tbl_registration r ON s.student_id = r.student_id
                                                             JOIN tbl_clubs c ON r.club_id = c.club_id
-                                                            JOIN tbl_moderators m ON c.club_id = m.club_id
-                                                            WHERE r.status = 'active' AND m.moderator_id = :moderator_id
+                                                            JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                                                            WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
+                                                    ";
+
+                                                    // Add condition for club_id if it's set
+                                                    if ($club_id) {
+                                                        $sql .= " AND r.club_id = :club_id";
+                                                    }
+
+                                                    // Add condition for month if it's set
+                                                    if ($selectedMonth) {
+                                                        $sql .= " AND MONTH(r.dateApproved) = :month";
+                                                    }
+
+                                                    $sql .= "
                                                             GROUP BY academicYear
                                                             UNION ALL
                                                             SELECT '2023-2024' AS academicYear, 0 AS memberCount
                                                             WHERE NOT EXISTS (
                                                                 SELECT 1 FROM tbl_registration
-                                                                WHERE CONCAT(YEAR(dateModified), '-', YEAR(dateModified) + 1) = '2023-2024'
+                                                                WHERE CONCAT(YEAR(dateApproved), '-', YEAR(dateApproved) + 1) = '2023-2024'
                                                             )
                                                         ) AS yearlyData
                                                         WHERE academicYear = '2023-2024' OR academicYear = '$currentSY'
                                                         ORDER BY academicYear
                                                     ";
 
+                                                    // Prepare the statement
                                                     $stmt = $pdo->prepare($sql);
                                                     $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+
+                                                    // Bind club_id parameter if it's set
+                                                    if ($club_id) {
+                                                        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                    }
+
+                                                    // Bind month parameter if it's set
+                                                    if ($selectedMonth) {
+                                                        $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                                    }
+
                                                     $stmt->execute();
                                                     $registryPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -506,51 +725,60 @@ try {
                                                     const memberCountsPerSY = <?php echo json_encode($memberCountsPerSY); ?>;
                                                     const maxMemberCount = <?php echo $maxMemberCount; ?>;
 
-                                                    // Data for the chart
-                                                    const registryPerSYData = {
-                                                        labels: academicYears,
-                                                        datasets: [{
-                                                            label: 'Registry per SY',
-                                                            data: memberCountsPerSY,
-                                                            fill: true,
-                                                            borderColor: 'rgba(75, 192, 192, 1)',
-                                                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                                            tension: 0.1
-                                                        }]
-                                                    };
+                                                    // Check if there is no data to display
+                                                    const hasDataSY = memberCountsPerSY.some(count => count > 0);
 
-                                                    // Configuration for the chart
-                                                    const registryPerSYConfig = {
-                                                        type: 'line',
-                                                        data: registryPerSYData,
-                                                        options: {
-                                                            scales: {
-                                                                x: {
-                                                                    ticks: {
-                                                                        maxRotation: 45, // Rotate x-axis labels for better readability
-                                                                        autoSkip: true // Automatically skip labels if too many
+                                                    // Show or hide the "No Data" message based on data availability
+                                                    const registryPerSYChartElement = document.getElementById('registryPerSYChart');
+                                                    const noDataMessageSY = document.getElementById('noDataMessageSY');
+
+                                                    if (!hasDataSY) {
+                                                        registryPerSYChartElement.style.display = 'none';
+                                                        noDataMessageSY.style.display = 'block';
+                                                    } else {
+                                                        // Data for the chart
+                                                        const registryPerSYData = {
+                                                            labels: academicYears,
+                                                            datasets: [{
+                                                                label: 'Registry per SY',
+                                                                data: memberCountsPerSY,
+                                                                fill: true,
+                                                                borderColor: 'rgba(75, 192, 192, 1)',
+                                                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                                tension: 0.1
+                                                            }]
+                                                        };
+
+                                                        // Configuration for the chart
+                                                        const registryPerSYConfig = {
+                                                            type: 'line',
+                                                            data: registryPerSYData,
+                                                            options: {
+                                                                scales: {
+                                                                    x: {
+                                                                        ticks: {
+                                                                            maxRotation: 45, // Rotate x-axis labels for better readability
+                                                                            autoSkip: true // Automatically skip labels if too many
+                                                                        }
+                                                                    },
+                                                                    y: {
+                                                                        beginAtZero: true,
+                                                                        max: maxMemberCount // Adjust max count dynamically to even number
                                                                     }
                                                                 },
-                                                                y: {
-                                                                    beginAtZero: true,
-                                                                    max: maxMemberCount // Adjust max count dynamically to even number
-                                                                }
-                                                            },
-                                                            plugins: {
-                                                                legend: {
-                                                                    display: false // Disable the legend to remove label
-                                                                }
-                                                            },
-                                                            responsive: true,
-                                                            maintainAspectRatio: false // Allow chart to fill container width
-                                                        }
-                                                    };
+                                                                plugins: {
+                                                                    legend: {
+                                                                        display: false // Disable the legend to remove label
+                                                                    }
+                                                                },
+                                                                responsive: true,
+                                                                maintainAspectRatio: false // Allow chart to fill container width
+                                                            }
+                                                        };
 
-                                                    // Render the chart
-                                                    const registryPerSYChart = new Chart(
-                                                        document.getElementById('registryPerSYChart'),
-                                                        registryPerSYConfig
-                                                    );
+                                                        // Render the chart
+                                                        const registryPerSYChart = new Chart(registryPerSYChartElement, registryPerSYConfig);
+                                                    }
                                                 </script>
                                             </div>
                                         </div>
@@ -574,24 +802,54 @@ try {
                                                     <div>
                                                         <canvas id="studentBarChart"></canvas>
                                                     </div>
+                                                    <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
+                                                    
                                                     <?php
+                                                    // Get the selected club_id and school_year (month) from the URL
+                                                    $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                    $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
+
                                                     try {
-                                                        // SQL Query to fetch year level counts, filtered by moderator and using DISTINCT for students
-                                                        $sql = "SELECT s.year, COUNT(DISTINCT s.student_id) AS count
-                                                                FROM tbl_students s
-                                                                JOIN tbl_registration r ON s.student_id = r.student_id
-                                                                JOIN tbl_clubs c ON r.club_id = c.club_id
-                                                                JOIN tbl_moderators m ON c.club_id = m.club_id
-                                                                WHERE r.status = 'active' AND m.moderator_id = :moderator_id
-                                                                GROUP BY s.year";
-                                                        
+                                                        // SQL Query to fetch year level counts, filtered by moderator, club_id, and dateApproved
+                                                        $sql = "
+                                                        SELECT s.year, COUNT(DISTINCT s.student_id) AS count
+                                                        FROM tbl_students s
+                                                        JOIN tbl_registration r ON s.student_id = r.student_id
+                                                        JOIN tbl_clubs_and_moderators cm ON r.club_id = cm.club_id
+                                                        WHERE r.status = 'active'
+                                                        AND cm.moderator_id = :moderator_id
+                                                        ";
+
+                                                        // Add condition for club_id if it's set
+                                                        if ($club_id) {
+                                                            $sql .= " AND r.club_id = :club_id";
+                                                        }
+
+                                                        // Add condition for dateApproved month if it's set
+                                                        if ($selectedMonth) {
+                                                            $sql .= " AND MONTH(r.dateApproved) <= :month";
+                                                        }
+
+                                                        $sql .= " GROUP BY s.year";
+
                                                         $stmtCounts = $pdo->prepare($sql);
                                                         $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+
+                                                        // Bind club_id parameter if it's set
+                                                        if ($club_id) {
+                                                            $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                        }
+
+                                                        // Bind month parameter if it's set
+                                                        if ($selectedMonth) {
+                                                            $stmtCounts->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                                        }
+
                                                         $stmtCounts->execute();
 
                                                         // Fetch the results into an associative array
                                                         $yearData = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
-                                                        
+
                                                         // Initialize arrays for years and counts
                                                         $years = ['1', '2', '3', '4']; // Ensure all years are included
                                                         $counts = [0, 0, 0, 0]; // Initialize with zeros
@@ -607,10 +865,15 @@ try {
                                                             }
                                                         }
 
-                                                        // SQL Query to get total student count
-                                                        $sqlTotal = "SELECT COUNT(*) AS total_count FROM tbl_students";
-                                                        $stmtTotal = $pdo->query($sqlTotal);
-                                                        $totalCount = $stmtTotal->fetchColumn();
+                                                        // SQL Query to get the total student count from tbl_students
+                                                        $sqlTotalStudents = "
+                                                        SELECT COUNT(DISTINCT student_id) AS total_student_count
+                                                        FROM tbl_students
+                                                        ";
+
+                                                        $stmtTotalStudents = $pdo->prepare($sqlTotalStudents);
+                                                        $stmtTotalStudents->execute();
+                                                        $totalStudentCount = $stmtTotalStudents->fetchColumn();
 
                                                     } catch (PDOException $e) {
                                                         echo "Error: " . $e->getMessage();
@@ -620,72 +883,110 @@ try {
                                                     <!-- Include Chart.js -->
                                                     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-                                                    <canvas id="studentBarChart"></canvas>
                                                     <script>
                                                         // PHP arrays passed into JavaScript
                                                         const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
                                                         const dataCounts = <?php echo json_encode($counts); ?>;
-                                                        const totalCount = <?php echo $totalCount; ?>;
+                                                        const totalStudentCount = <?php echo $totalStudentCount; ?>; // Get the total student count
 
-                                                        // Data for the chart
-                                                        const data = {
-                                                            labels: labels,
-                                                            datasets: [{
-                                                                data: dataCounts, // Dynamic data from PHP
-                                                                backgroundColor: ['blue', 'orange', 'green', 'red'], // Colors for bars
-                                                            }]
-                                                        };
+                                                        // Check if there is no data to display
+                                                        const hasDataYearLevels = dataCounts.some(count => count > 0);
 
-                                                        // Configurations for the chart
-                                                        const config = {
-                                                            type: 'bar',
-                                                            data: data,
-                                                            options: {
-                                                                scales: {
-                                                                    y: {
-                                                                        beginAtZero: true,
-                                                                        suggestedMax: totalCount // Set the maximum value to the total student count
-                                                                    }
-                                                                },
-                                                                plugins: {
-                                                                    legend: {
-                                                                        display: false // Remove the legend
+                                                        // Show or hide the "No Data" message based on data availability
+                                                        const studentBarChartElement = document.getElementById('studentBarChart');
+                                                        const noDataMessageYearLevels = document.getElementById('noDataMessageYearLevels');
+
+                                                        if (!hasDataYearLevels) {
+                                                            studentBarChartElement.style.display = 'none';
+                                                            noDataMessageYearLevels.style.display = 'block';
+                                                        } else {
+                                                            // Data for the chart
+                                                            const data = {
+                                                                labels: labels,
+                                                                datasets: [{
+                                                                    data: dataCounts, // Dynamic data from PHP
+                                                                    backgroundColor: ['blue', 'orange', 'green', 'red'], // Colors for bars
+                                                                }]
+                                                            };
+
+                                                            // Configurations for the chart with total student count as the peak limit
+                                                            const config = {
+                                                                type: 'bar',
+                                                                data: data,
+                                                                options: {
+                                                                    scales: {
+                                                                        y: {
+                                                                            beginAtZero: true,
+                                                                            suggestedMax: totalStudentCount // Set the total student count as the maximum y-axis value
+                                                                        }
+                                                                    },
+                                                                    plugins: {
+                                                                        legend: {
+                                                                            display: false // Remove the legend
+                                                                        }
                                                                     }
                                                                 }
-                                                            }
-                                                        };
+                                                            };
 
-                                                        // Render the chart
-                                                        const studentBarChart = new Chart(
-                                                            document.getElementById('studentBarChart'),
-                                                            config
-                                                        );
+                                                            // Render the chart
+                                                            const studentBarChart = new Chart(
+                                                                studentBarChartElement,
+                                                                config
+                                                            );
+                                                        }
                                                     </script>
+
                                                 </div>
                                             </div>
                                         </div>
 
+
                                         <!-- Student Gender -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                            <p>Student Gender</p>
+                                                <p>Student Gender</p>
                                                 <div style="height: 150px; position: relative;">
                                                     <?php
                                                     try {
-                                                        // Prepare the SQL statement to get gender counts filtered by club and moderator
-                                                        $sqlCounts = "
+                                                        // Get the selected club_id and month (school_year) from the URL
+                                                        $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
+                                                        // Prepare the SQL statement to get gender counts filtered by club, moderator, and date
+                                                        $sqlCounts = "
                                                             SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
                                                             FROM tbl_students s
                                                             JOIN tbl_registration r ON s.student_id = r.student_id
                                                             JOIN tbl_clubs c ON r.club_id = c.club_id
                                                             JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                                                             WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
-                                                            GROUP BY s.gender
                                                         ";
+
+                                                        // Add condition for club_id if it's set
+                                                        if ($club_id) {
+                                                            $sqlCounts .= " AND r.club_id = :club_id";
+                                                        }
+
+                                                        // Add condition for the selected month, if applicable
+                                                        if ($selectedMonth) {
+                                                            $sqlCounts .= " AND MONTH(r.dateApproved) <= :month";
+                                                        }
+
+                                                        $sqlCounts .= " GROUP BY s.gender";
 
                                                         $stmtCounts = $pdo->prepare($sqlCounts);
                                                         $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+
+                                                        // Bind club_id parameter if it's set
+                                                        if ($club_id) {
+                                                            $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                        }
+
+                                                        // Bind month parameter if it's set
+                                                        if ($selectedMonth) {
+                                                            $stmtCounts->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                                        }
+
                                                         $stmtCounts->execute();
                                                         $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
 
@@ -702,10 +1003,18 @@ try {
                                                             }
                                                         }
 
-                                                        // Prepare the SQL statement to get total student count
-                                                        $sqlTotal = "SELECT COUNT(*) AS total_count FROM tbl_students";
+                                                        // Prepare the SQL statement to get the total student count in the system
+                                                        $sqlTotal = "SELECT COUNT(DISTINCT student_id) AS total_count FROM tbl_students";
                                                         $stmtTotal = $pdo->query($sqlTotal);
                                                         $totalCount = $stmtTotal->fetchColumn();
+
+                                                        // Function to round up to the nearest multiple of 5
+                                                        function roundUpToNearest5($num) {
+                                                            return $num > 0 ? ceil($num / 5) * 5 : 5;
+                                                        }
+
+                                                        // Calculate the peak limit
+                                                        $peakLimit = roundUpToNearest5($totalCount);
 
                                                         // Prepare the data for JavaScript
                                                         $labels = array_keys($genderCounts);
@@ -716,7 +1025,10 @@ try {
                                                         echo 'Error: ' . $e->getMessage();
                                                     }
                                                     ?>
+
                                                     <canvas id="studentGenderChart" style="width: 100%; height: 100%;"></canvas>
+                                                    <p id="noDataMessageGender" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
+
                                                     <script>
                                                         document.addEventListener('DOMContentLoaded', function() {
                                                             const ctx = document.getElementById('studentGenderChart').getContext('2d');
@@ -724,55 +1036,62 @@ try {
                                                             // Data from PHP
                                                             const labels = <?php echo json_encode($labels); ?>;
                                                             const dataCounts = <?php echo json_encode($data); ?>;
-                                                            const totalCount = <?php echo $totalCount; ?>;
+                                                            const peakLimit = <?php echo $peakLimit; ?>;
 
-                                                            // Data for the chart
-                                                            const data = {
-                                                                labels: labels,
-                                                                datasets: [{
-                                                                    data: dataCounts,
-                                                                    backgroundColor: ['#3498db', '#e74c3c'], // Male: blue, Female: red
-                                                                    borderColor: ['#2980b9', '#c0392b'],
-                                                                    borderWidth: 1
-                                                                }]
-                                                            };
+                                                            // Check if there is no data to display
+                                                            const hasDataGender = dataCounts.some(count => count > 0);
 
-                                                            // Configurations for the chart
-                                                            const config = {
-                                                                type: 'bar',
-                                                                data: data,
-                                                                options: {
-                                                                    indexAxis: 'y', // Horizontal bar chart
-                                                                    scales: {
-                                                                        x: {
-                                                                            beginAtZero: true,
-                                                                            suggestedMax: totalCount // Set the maximum value to the total student count
+                                                            // Show or hide the "No Data" message based on data availability
+                                                            const studentGenderChartElement = document.getElementById('studentGenderChart');
+                                                            const noDataMessageGender = document.getElementById('noDataMessageGender');
+
+                                                            if (!hasDataGender) {
+                                                                studentGenderChartElement.style.display = 'none';  // Hide the chart
+                                                                noDataMessageGender.style.display = 'block';  // Show "No data available" message
+                                                            } else {
+                                                                // Data for the chart
+                                                                const data = {
+                                                                    labels: labels,
+                                                                    datasets: [{
+                                                                        data: dataCounts,
+                                                                        backgroundColor: ['#3498db', '#e74c3c'], // Male: blue, Female: red
+                                                                        borderColor: ['#2980b9', '#c0392b'],
+                                                                        borderWidth: 1
+                                                                    }]
+                                                                };
+
+                                                                // Configurations for the chart
+                                                                const config = {
+                                                                    type: 'bar',
+                                                                    data: data,
+                                                                    options: {
+                                                                        indexAxis: 'y', // Horizontal bar chart
+                                                                        scales: {
+                                                                            x: {
+                                                                                beginAtZero: true,
+                                                                                max: peakLimit // Set the maximum value to the nearest higher multiple of 5
+                                                                            },
+                                                                            y: {
+                                                                                // Automatically handled by Chart.js for labels
+                                                                            }
                                                                         },
-                                                                        y: {
-                                                                            // Automatically handled by Chart.js for labels
-                                                                        }
-                                                                    },
-                                                                    plugins: {
-                                                                        legend: {
-                                                                            display: false // Hide the legend
+                                                                        plugins: {
+                                                                            legend: {
+                                                                                display: false // Hide the legend
+                                                                            }
                                                                         }
                                                                     }
-                                                                }
-                                                            };
+                                                                };
 
-                                                            // Render the chart
-                                                            new Chart(ctx, config);
+                                                                // Render the chart
+                                                                new Chart(ctx, config);
+                                                            }
                                                         });
                                                     </script>
-
                                                 </div>
                                             </div>
                                         </div>
 
-
-
-
-                                    </div>
                                 </div>
 
 
