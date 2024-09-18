@@ -14,10 +14,14 @@ switch ($method) {
             // Read operation (fetch a single club by club_id)
             $club_id = $_GET['club_id'];
             $stmt = $pdo->prepare('
-                SELECT c.*, m.firstName AS moderatorFirstName, m.profilePic AS moderatorProfilePic
+                SELECT c.*, 
+                       GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderatorFirstName,
+                       GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS moderatorProfilePic
                 FROM tbl_clubs c
-                LEFT JOIN tbl_moderators m ON c.club_id = m.club_id
+                LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
                 WHERE c.club_id = ?
+                GROUP BY c.club_id
             ');
             $stmt->execute([$club_id]);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -51,7 +55,8 @@ switch ($method) {
                        GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderators,
                        GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS profilePics
                 FROM tbl_clubs c
-                LEFT JOIN tbl_moderators m ON c.club_id = m.club_id
+                LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
                 GROUP BY c.club_id
             ');
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
