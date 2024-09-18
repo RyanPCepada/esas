@@ -176,6 +176,11 @@ try {
             animation-play-state: paused; /* Start with the animation paused */
         }
 
+        #dashboard-btn {
+            border-radius: 5px;
+            margin: 5px;
+        }
+
         .card {
             padding: 0px;
         }
@@ -313,9 +318,13 @@ try {
             <div class="overlay-text">
                 <div class="d-flex align-items-center">
                     <h4><?php echo htmlspecialchars($clubName); ?></h4>
-                </div>
-            </div>
+                </div>            </div>
             <hr>
+            <div class="row-dashboard text-end">
+                <button class="btn btn-primary" type="button" id="dashboard-btn">
+                <i class="fas fa-chart-bar"></i>See Dashboard</button>
+                <i class="fas fa-ellipsis-v ellipsis" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+            </div>
             <div class="post_list">
                 <div class="row">
                     <div class="col-12 mb-3">
