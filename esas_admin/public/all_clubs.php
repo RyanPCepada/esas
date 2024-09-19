@@ -74,20 +74,33 @@ try {
         }
         
         
+        
+        .club-cover-photo {
+            opacity: 0;
+            transform: translateY(-10px); /* Start from below */
+            animation: slideIn 0.6s forwards; /* Apply animation */
+        }
 
-        @keyframes waveIn {
-            0% {
+        @keyframes slideIn {
+            from {
                 opacity: 0;
-                transform: translateY(5px) scale(0.95); /* Adjusted Y translation */
+                transform: translateX(-10px); /* Start from below */
             }
-            50% {
-                opacity: 0.5;
-                transform: translateY(-2px) scale(1.05); /* Peak of the wave, adjusted */
-            }
-            100% {
+            to {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0); /* End at normal position */
             }
+        }
+
+        /* Optional: Adjust the delay for each card */
+        .club-cover-photo:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .club-cover-photo:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+        .club-cover-photo:nth-child(3) {
+            animation-delay: 0.2s;
         }
 
         .card {
@@ -249,7 +262,12 @@ try {
                                                 </tr>
                                             </thead>
                                         </table>
+
+                                        <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
+                                            <em>No results found.</em>
+                                        </div>
                                         ';
+
 
                                         // Populate the rows using the row template
                                         while ($row = $result->fetch()) {
@@ -274,8 +292,8 @@ try {
                                             <div class="row ms-0 mb-3 p-3 club-row" style="' . $rowStyle . '">
                                                 <!-- Club Cover Photo and Details -->
                                                 <div class="col-md-4">
-                                                    <div class="club-cover-photo" style="text-align: center;">
-                                                        <img src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
+                                                    <div style="text-align: center;">
+                                                        <img class="club-cover-photo" src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
                                                             alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
                                                             style="width: 100%; max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
                                                         <div>
@@ -324,6 +342,7 @@ try {
                                     const searchInput = document.getElementById('clubSearch');
                                     const clubRows = document.querySelectorAll('.club-row');
                                     const rowCountDisplay = document.getElementById('rowCountDisplay');
+                                    const noResultsMessage = document.getElementById('noResultsMessage');
                                     const totalRows = clubRows.length; // Total number of rows
 
                                     // Initial display of total rows
@@ -398,6 +417,9 @@ try {
 
                                         // Update the row count display
                                         rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
+
+                                        // Show or hide "No results found" message
+                                        noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
                                     });
 
                                     // Function to highlight matching text
