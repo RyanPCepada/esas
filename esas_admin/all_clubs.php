@@ -214,16 +214,16 @@ try {
                                     if ($totalRows > 0) {
                                         echo '
                                         <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
-    <thead>
-        <tr>
-            <th> <input id="clubSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"></th>
-            <th class="text-center" colspan="8">
-                <h6 id="rowCountDisplay">Showing <?php echo $totalRows; ?> / <?php echo $totalRows; ?> Records</h6>
-            </th>
-        </tr>
-    </thead>
-</table>
-';
+                                            <thead>
+                                                <tr>
+                                                    <th> <input id="clubSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"></th>
+                                                    <th class="text-center" colspan="8">
+                                                        <h6 id="rowCountDisplay">Showing ' . $totalRows . ' / ' . $totalRows . ' Records</h6>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        ';
 
                                         // Populate the rows using the row template
                                         while ($row = $result->fetch()) {
@@ -256,7 +256,7 @@ try {
                                                         <h7 class="text-muted mt-3">' . $moderatorLabel . '</h7>
                                                         <div>' . $moderatorList . '</div>
                                                         <hr class="m-1">
-                                                        <div>' . htmlspecialchars($row['member_count']) . ' ' . $memberText . '</div>
+                                                        <div class="member-count">' . htmlspecialchars($row['member_count']) . ' ' . $memberText . '</div>
                                                     </div>
                                                 </div>
                                                 <!-- Club Information -->
@@ -304,15 +304,21 @@ try {
                                             const clubNameElement = row.querySelector('h4');
                                             const moderatorNames = row.querySelectorAll('h6');
                                             const clubInfoElement = row.querySelector('.col-md-7');
+                                            const memberCountElement = row.querySelector('.member-count');
+
                                             const clubName = clubNameElement.textContent.toLowerCase();
                                             const clubInfo = clubInfoElement.textContent.toLowerCase();
+                                            const memberCount = memberCountElement.textContent.toLowerCase();
+
                                             let moderatorMatch = false;
                                             let clubInfoMatch = false;
+                                            let memberCountMatch = false;
 
                                             // Remove previous highlights
                                             resetHighlight(clubNameElement);
                                             moderatorNames.forEach(resetHighlight);
                                             resetHighlight(clubInfoElement);
+                                            resetHighlight(memberCountElement);
 
                                             // Check if any moderator matches the search term
                                             moderatorNames.forEach(function (moderator) {
@@ -329,8 +335,14 @@ try {
                                                 highlightText(clubInfoElement, searchTerm);
                                             }
 
+                                            // Check if the member count matches the search term
+                                            if (memberCount.includes(searchTerm)) {
+                                                memberCountMatch = true;
+                                                highlightText(memberCountElement, searchTerm);
+                                            }
+
                                             // Check if the club name, any moderator, or the information matches
-                                            if (clubName.includes(searchTerm) || moderatorMatch || clubInfoMatch) {
+                                            if (clubName.includes(searchTerm) || moderatorMatch || clubInfoMatch || memberCountMatch) {
                                                 row.style.display = ''; // Show the row
                                                 visibleRowCount++; // Increment visible row count
                                                 if (clubName.includes(searchTerm)) {
@@ -345,28 +357,27 @@ try {
                                         rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
                                     });
 
+                                    // Function to highlight matching text
                                     function highlightText(element, term) {
                                         const innerHTML = element.innerHTML;
-                                        const index = innerHTML.toLowerCase().indexOf(term);
+                                        const regex = new RegExp(`(${term})`, 'gi'); // Create a regex to match all occurrences of the term
+                                        const highlightedHTML = innerHTML.replace(regex, '<span style="background-color: lightblue; color: #0033cc;">$1</span>');
 
-                                        if (index >= 0) {
-                                            element.innerHTML = innerHTML.substring(0, index) +
-                                                '<span style="background-color: lightblue; color: #0033cc;">' +
-                                                innerHTML.substring(index, index + term.length) +
-                                                '</span>' +
-                                                innerHTML.substring(index + term.length);
-                                        }
+                                        element.innerHTML = highlightedHTML; // Replace the content with highlighted text
                                     }
 
+                                    // Function to reset highlight (removing the span tag)
                                     function resetHighlight(element) {
-                                        element.innerHTML = element.textContent; // Reset to plain text
+                                        const innerHTML = element.innerHTML;
+                                        const regex = /<span style="background-color: lightblue; color: #0033cc;">(.*?)<\/span>/gi;
+                                        const resetHTML = innerHTML.replace(regex, '$1');
+
+                                        element.innerHTML = resetHTML; // Replace the content with the original text
                                     }
                                 });
                             </script>
-
                         </div>
                         <!-- THE MAIN PAGE END -->
-
 
 
                     </div>
