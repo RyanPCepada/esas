@@ -102,7 +102,7 @@ try {
                 <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
                     <ul class="nav nav-pills flex-column mb-auto">
                         <li>
-                            <a href="../esas_moderator/dashboard.php" class="nav-link left-sidebar text-dark" id="all-clubs">
+                            <a href="../esas_moderator/dashboard.php" class="nav-link left-sidebar text-dark" id="dashboard">
                                 <i class="fas fa-chart-line"></i> Dashboard
                             </a>
                         </li>
@@ -112,7 +112,7 @@ try {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="../esas_moderator/students.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                            <a href="../esas_moderator/students.php" class="nav-link left-sidebar text-dark" id="students">
                                 <i class="fas fa-users"></i> Students
                             </a>
                         </li>

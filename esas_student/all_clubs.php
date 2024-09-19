@@ -262,12 +262,12 @@ try {
                 <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
                     <ul class="nav nav-pills flex-column mb-auto">
                         <li>
-                            <a href="../esas_student/all_clubs.php" class="nav-link left-sidebar text-dark active" id="all-clubs">
+                            <a href="../esas_student/all_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="all-clubs">
                                 <i class="fas fa-university"></i> All Clubs
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                            <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark" id="my-clubs">
                                 <i class="fas fa-user"></i> My Clubs
                             </a>
                         </li>

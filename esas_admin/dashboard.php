@@ -144,22 +144,22 @@ try {
             <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li>
-                        <a href="../esas_admin/dashboard.php" class="nav-link left-sidebar text-dark active" id="all-clubs">
+                        <a href="../esas_admin/dashboard.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="all-clubs">
                             <i class="fas fa-chart-line"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_admin/all_clubs.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                        <a href="../esas_admin/all_clubs.php" class="nav-link left-sidebar text-dark" id="my-clubs">
                             <i class="fas fa-university"></i> All Clubs
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_admin/moderators.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                        <a href="../esas_admin/moderators.php" class="nav-link left-sidebar text-dark" id="my-clubs">
                             <i class="fa fa-user-shield"></i> Moderators
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_admin/students.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                        <a href="../esas_admin/students.php" class="nav-link left-sidebar text-dark" id="my-clubs">
                             <i class="fas fa-users"></i> Students
                         </a>
                     </li>
