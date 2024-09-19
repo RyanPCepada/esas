@@ -183,107 +183,182 @@ try {
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
 
                         <!-- THE MAIN PAGE START -->
-<div class="card p-2">
+                        <div class="card p-2">
 
-<!-- ALL CLUB CARDS START -->
-<div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+                            <!-- ALL CLUB CARDS START -->
+                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
 
-    <?php
-    // Include config file
-    require_once "../config.php";
+                                <?php
+                                // Include config file
+                                require_once "../config.php";
 
-    // SQL query to fetch all clubs with related information, moderators, member count, and actions
-    $sql = "SELECT 
-                c.club_id,
-                c.clubName, 
-                c.information, 
-                c.coverPhoto, 
-                GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.lastName) SEPARATOR '|||') AS moderators,
-                (SELECT COUNT(DISTINCT r.student_id) FROM tbl_registration r WHERE r.club_id = c.club_id AND r.status = 'active') AS member_count,
-                c.dateAdded
-            FROM tbl_clubs c
-            LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
-            LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
-            GROUP BY c.club_id
-            ORDER BY c.dateAdded ASC";
+                                // SQL query to fetch all clubs with related information, moderators, member count, and actions
+                                $sql = "SELECT 
+                                            c.club_id,
+                                            c.clubName, 
+                                            c.information, 
+                                            c.coverPhoto, 
+                                            GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.lastName) SEPARATOR '|||') AS moderators,
+                                            (SELECT COUNT(DISTINCT r.student_id) FROM tbl_registration r WHERE r.club_id = c.club_id AND r.status = 'active') AS member_count,
+                                            c.dateAdded
+                                        FROM tbl_clubs c
+                                        LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                                        LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
+                                        GROUP BY c.club_id
+                                        ORDER BY c.dateAdded ASC";
 
-    if ($result = $pdo->query($sql)) {
-        $totalRows = $result->rowCount();
-        $rowCount = 0; // To keep track of row number for striping
+                                if ($result = $pdo->query($sql)) {
+                                    $totalRows = $result->rowCount();
+                                    $rowCount = 0; // To keep track of row number for striping
 
-        if ($totalRows > 0) {
-            echo '
-            <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
-                <thead>
-                    <tr>
-                        <th> <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"></th>
-                        <th class="text-center" colspan="8"><h6>Showing ' . $totalRows . ' / ' . $totalRows . ' Records</h6></th>
-                    </tr>
-                </thead>
-            </table>';
+                                    if ($totalRows > 0) {
+                                        echo '
+                                        <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
+                                            <thead>
+                                                <tr>
+                                                    <th> <input id="clubSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"></th>
+                                                    <th class="text-center" colspan="8"><h6>Showing ' . $totalRows . ' / ' . $totalRows . ' Records</h6></th>
+                                                </tr>
+                                            </thead>
+                                        </table>';
 
-            // Populate the rows using the row template
-            while ($row = $result->fetch()) {
-                $formattedDate = date('F j, Y', strtotime($row['dateAdded']));
-                $moderators = explode('|||', $row['moderators']);
-                $moderatorCount = count($moderators);
+                                        // Populate the rows using the row template
+                                        while ($row = $result->fetch()) {
+                                            $formattedDate = date('F j, Y', strtotime($row['dateAdded']));
+                                            $moderators = explode('|||', $row['moderators']);
+                                            $moderatorCount = count($moderators);
 
-                // Generate moderator list
-                $moderatorList = '';
-                foreach ($moderators as $moderator) {
-                    $moderatorList .= '<div><h6>' . htmlspecialchars($moderator) . '</h6></div>';
+                                            // Generate moderator list
+                                            $moderatorList = '';
+                                            foreach ($moderators as $moderator) {
+                                                $moderatorList .= '<div><h6>' . htmlspecialchars($moderator) . '</h6></div>';
+                                            }
+
+                                            $moderatorLabel = ($moderatorCount == 1) ? 'Moderator:' : 'Moderators:';
+                                            $memberText = ($row['member_count'] == 1) ? 'member' : 'members';
+
+                                            // Alternate row colors
+                                            $rowStyle = ($rowCount % 2 == 0) ? 'background-color: #f2f2f2;' : 'background-color: #ffffff;';
+                                            $rowCount++;
+
+                                            echo '
+                                            <div class="row ms-0 mb-3 p-3 club-row" style="' . $rowStyle . '">
+                                                <!-- Club Cover Photo and Details -->
+                                                <div class="col-md-4">
+                                                    <div class="club-cover-photo" style="text-align: center;">
+                                                        <img src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
+                                                            alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
+                                                            style="width: 100%; max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
+                                                        <div><h4 class="text-muted mt-3">' . htmlspecialchars($row['clubName']) . '</h4></div>
+                                                        <h7 class="text-muted mt-3">' . $moderatorLabel . '</h7>
+                                                        <div>' . $moderatorList . '</div>
+                                                        <hr class="m-1">
+                                                        <div>' . htmlspecialchars($row['member_count']) . ' ' . $memberText . '</div>
+                                                    </div>
+                                                </div>
+                                                <!-- Club Information -->
+                                                <div class="col-md-7">
+                                                    <div>' . htmlspecialchars($row['information']) . '</div>
+                                                </div>
+                                                <!-- Actions -->
+                                                <div class="col-md-1">
+                                                    <a href="../public/inventory/student_read.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                    <a href="../public/inventory/student_update.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
+                                                    <a href="../public/inventory/student_delete.php?club_id=' . htmlspecialchars($row['club_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                                </div>
+                                            </div>';
+                                        }
+
+                                        // Free result set
+                                        unset($result);
+                                    } else {
+                                        echo '<div class="alert alert-danger"><em>No clubs were found.</em></div>';
+                                    }
+                                } else {
+                                    echo "Oops! Something went wrong. Please try again later.";
+                                }
+                                ?>
+
+                            </div>
+                            <!-- ALL CLUB CARDS END -->
+
+                            <script>
+// Wait for the DOM to load
+document.addEventListener('DOMContentLoaded', function () {
+    // Get the search input and all club rows
+    const searchInput = document.getElementById('clubSearch');
+    const clubRows = document.querySelectorAll('.club-row');
+
+    // Add an event listener to the search input
+    searchInput.addEventListener('input', function () {
+        const searchTerm = searchInput.value.toLowerCase();
+
+        // Loop through all the rows and show/hide them based on the search term
+        clubRows.forEach(function (row) {
+            const clubNameElement = row.querySelector('h4'); // Club Name in col-md-4
+            const moderatorNames = row.querySelectorAll('h6'); // Moderators in col-md-4
+            const clubInfoElement = row.querySelector('.col-md-7'); // Club Information in col-md-7
+            const clubName = clubNameElement.textContent.toLowerCase();
+            const clubInfo = clubInfoElement.textContent.toLowerCase();
+            let moderatorMatch = false;
+            let clubInfoMatch = false;
+
+            // Remove previous highlights
+            resetHighlight(clubNameElement);
+            moderatorNames.forEach(resetHighlight);
+            resetHighlight(clubInfoElement);
+
+            // Check if any moderator matches the search term
+            moderatorNames.forEach(function (moderator) {
+                const moderatorText = moderator.textContent.toLowerCase();
+                if (moderatorText.includes(searchTerm)) {
+                    moderatorMatch = true;
+                    highlightText(moderator, searchTerm); // Highlight matching moderator text
                 }
+            });
 
-                $moderatorLabel = ($moderatorCount == 1) ? 'Moderator:' : 'Moderators:';
-                $memberText = ($row['member_count'] == 1) ? 'member' : 'members';
-
-                // Alternate row colors
-                $rowStyle = ($rowCount % 2 == 0) ? 'background-color: #f2f2f2;' : 'background-color: #ffffff;';
-                $rowCount++;
-
-                echo '
-                <div class="row ms-0 mb-3 p-3" style="' . $rowStyle . '">
-                    <!-- Club Cover Photo and Details -->
-                    <div class="col-md-4">
-                        <div class="club-cover-photo" style="text-align: center;">
-                            <img src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
-                                alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
-                                style="width: 100%; max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
-                            <div><h4 class="text-muted mt-3">' . htmlspecialchars($row['clubName']) . '</h4></div>
-                            <h7 class="text-muted mt-3">' . $moderatorLabel . '</h7>
-                            <div>' . $moderatorList . '</div>
-                            <hr class="m-1">
-                            <div>' . htmlspecialchars($row['member_count']) . ' ' . $memberText . '</div>
-                        </div>
-                    </div>
-                    <!-- Club Information -->
-                    <div class="col-md-7">
-                        <div>' . htmlspecialchars($row['information']) . '</div>
-                    </div>
-                    <!-- Actions -->
-                    <div class="col-md-1">
-                        <a href="../public/inventory/student_read.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                        <a href="../public/inventory/student_update.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                        <a href="../public/inventory/student_delete.php?club_id=' . htmlspecialchars($row['club_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
-                    </div>
-                </div>';
+            // Check if the club information matches the search term
+            if (clubInfo.includes(searchTerm)) {
+                clubInfoMatch = true;
+                highlightText(clubInfoElement, searchTerm); // Highlight matching club information text
             }
 
-            // Free result set
-            unset($result);
-        } else {
-            echo '<div class="alert alert-danger"><em>No clubs were found.</em></div>';
+            // Check if the club name, any moderator, or the information matches
+            if (clubName.includes(searchTerm) || moderatorMatch || clubInfoMatch) {
+                row.style.display = ''; // Show the row
+                if (clubName.includes(searchTerm)) {
+                    highlightText(clubNameElement, searchTerm); // Highlight matching club name text
+                }
+            } else {
+                row.style.display = 'none'; // Hide the row
+            }
+        });
+    });
+
+    // Function to highlight matching text
+    function highlightText(element, term) {
+        const innerHTML = element.innerHTML;
+        const index = innerHTML.toLowerCase().indexOf(term);
+
+        if (index >= 0) {
+            element.innerHTML = innerHTML.substring(0, index) + 
+                '<span style="background-color: lightblue; color: #0033cc;">' + 
+                innerHTML.substring(index, index + term.length) + 
+                '</span>' + 
+                innerHTML.substring(index + term.length);
         }
-    } else {
-        echo "Oops! Something went wrong. Please try again later.";
     }
-    ?>
 
-</div>
-<!-- ALL CLUB CARDS END -->
+    // Function to reset highlight (removing the span tag)
+    function resetHighlight(element) {
+        element.innerHTML = element.textContent; // Reset to plain text
+    }
+});
+</script>
 
-</div>
-<!-- THE MAIN PAGE END -->
+
+                        </div>
+                        <!-- THE MAIN PAGE END -->
 
 
 
