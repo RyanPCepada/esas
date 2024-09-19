@@ -109,6 +109,12 @@ try {
             align-self: end;
         }
 
+
+        .col-md-7 {
+            text-align: justify;
+            text-indent: 30px;
+        }
+
         @media (max-width: 768px) {
             .col-auto {
                 width: auto;
