@@ -1,6 +1,6 @@
 <?php 
 session_start();
-require_once "../config.php";  // Assuming this file holds your PDO connection
+require_once "../../config.php";  // Assuming this file holds your PDO connection
 
 if (!isset($_SESSION['admin_id'])) {
     echo "Admin ID is not set in the session.";
@@ -48,11 +48,11 @@ try {
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>eSAS - Dashboard</title>
-    <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
-    <script src="../assets/js/all.js" crossorigin="anonymous"></script>
-    <script src="../assets/js/jquery-3.6.0.js"></script>
-    <link href="../assets/css/styles.css" rel="stylesheet" />
-    <link href="../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
+    <script src="../../assets/js/jquery-3.6.0.js"></script>
+    <link href="../../assets/css/styles.css" rel="stylesheet" />
+    <link href="../../assets/img/nbsclogo.png" rel="icon">
     <style>
         .nav-link.active {
           color: white !important;
@@ -134,7 +134,7 @@ try {
                 </button>
                 <div class="navbar-collapse collapse hide" id="main_nav">
                     <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
-                        <?php include 'nav/nav_main.php' ?>
+                        <?php include '../nav/nav_main.php' ?>
                     </div>
                 </div>
             </nav>
@@ -144,27 +144,27 @@ try {
             <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li>
-                        <a href="../esas_admin/dashboard.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="all-clubs">
+                        <a href="../../esas_admin/public/dashboard.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="all-clubs">
                             <i class="fas fa-chart-line"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_admin/all_clubs.php" class="nav-link left-sidebar text-dark" id="my-clubs">
+                        <a href="../../esas_admin/public/all_clubs.php" class="nav-link left-sidebar text-dark" id="my-clubs">
                             <i class="fas fa-university"></i> All Clubs
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_admin/moderators.php" class="nav-link left-sidebar text-dark" id="my-clubs">
+                        <a href="../../esas_admin/public/moderators.php" class="nav-link left-sidebar text-dark" id="my-clubs">
                             <i class="fa fa-user-shield"></i> Moderators
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_admin/students.php" class="nav-link left-sidebar text-dark" id="my-clubs">
+                        <a href="../../esas_admin/public/students.php" class="nav-link left-sidebar text-dark" id="my-clubs">
                             <i class="fas fa-users"></i> Students
                         </a>
                     </li>
                     <li>
-                        <a href="../esas_admin/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
+                        <a href="../../esas_admin/public/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
                             <i class="fas fa-envelope"></i> Club Requests
                         </a>
                     </li>
@@ -965,9 +965,9 @@ try {
     </div>
 
     <!-- <?php include 'assets/components/modals.php' ?> -->
-    <script src="../assets/js/jquery.dataTables.min.js"></script>
-    <script src="../assets/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/global_script.js"></script>
+    <script src="../../assets/js/jquery.dataTables.min.js"></script>
+    <script src="../../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/global_script.js"></script>
 
 
 

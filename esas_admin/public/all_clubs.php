@@ -1,6 +1,6 @@
 <?php 
 session_start();
-require_once "../config.php";  // Assuming this file holds your PDO connection
+require_once "../../config.php";  // Assuming this file holds your PDO connection
 
 if (!isset($_SESSION['admin_id'])) {
     echo "Admin ID is not set in the session.";
@@ -48,11 +48,11 @@ try {
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>eSAS - Dashboard</title>
-    <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
-    <script src="../assets/js/all.js" crossorigin="anonymous"></script>
-    <script src="../assets/js/jquery-3.6.0.js"></script>
-    <link href="../assets/css/styles.css" rel="stylesheet" />
-    <link href="../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
+    <script src="../../assets/js/jquery-3.6.0.js"></script>
+    <link href="../../assets/css/styles.css" rel="stylesheet" />
+    <link href="../../assets/img/nbsclogo.png" rel="icon">
     <style>
         .nav-link.active {
           color: white !important;
@@ -147,7 +147,7 @@ try {
                 </button>
                 <div class="navbar-collapse collapse hide" id="main_nav">
                     <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
-                        <?php include 'nav/nav_main.php' ?>
+                        <?php include '../nav/nav_main.php' ?>
                     </div>
                 </div>
             </nav>
@@ -157,27 +157,27 @@ try {
             <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li>
-                        <a href="../esas_admin/dashboard.php" class="nav-link left-sidebar text-dark" id="dashboard">
+                        <a href="../../esas_admin/public/dashboard.php" class="nav-link left-sidebar text-dark" id="dashboard">
                             <i class="fas fa-chart-line"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_admin/all_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="all-clubs">
+                        <a href="../../esas_admin/public/all_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="all-clubs">
                             <i class="fas fa-university"></i> All Clubs
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_admin/moderators.php" class="nav-link left-sidebar text-dark" id="moderators">
+                        <a href="../esas_admin/public/moderators.php" class="nav-link left-sidebar text-dark" id="moderators">
                             <i class="fa fa-user-shield"></i> Moderators
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_admin/students.php" class="nav-link left-sidebar text-dark" aria-current="page" id="students">
+                        <a href="../../esas_admin/public/students.php" class="nav-link left-sidebar text-dark" aria-current="page" id="students">
                             <i class="fas fa-users"></i> Students
                         </a>
                     </li>
                     <li>
-                        <a href="../esas_admin/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
+                        <a href="../../esas_admin/public/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
                             <i class="fas fa-envelope"></i> Club Requests
                         </a>
                     </li>
@@ -201,9 +201,13 @@ try {
                             <!-- ALL CLUB CARDS START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
 
+                                <div class="mt-1 mb-3 clearfix">
+                                    <a href="../public/crud/all_clubs/club_create.php" class="btn btn-danger pull-right"><i class="fa fa-plus"></i>Add New Club</a>
+                                </div>
+
                                 <?php
                                 // Include config file
-                                require_once "../config.php";
+                                require_once "../../config.php";
 
                                 // SQL query to fetch all clubs with related information, moderators, member count, and actions
                                 $sql = "SELECT 
@@ -266,7 +270,7 @@ try {
                                                             alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
                                                             style="width: 100%; max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
                                                         <div>
-                                                            <h4 class="text-muted mt-2">' . htmlspecialchars($row['clubName']) . '</h4>
+                                                            <h4 class="text-muted mt-3">' . htmlspecialchars($row['clubName']) . '</h4>
                                                         </div>
                                                         <h6 class="text-muted mt-2">' . $moderatorLabel . '</h6>
                                                         <div>' . $moderatorList . '</div>
@@ -283,9 +287,9 @@ try {
                                                 </div>
                                                 <!-- Actions -->
                                                 <div class="col-md-1 text-center">
-                                                    <a href="../public/inventory/student_read.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                    <a href="../public/inventory/student_update.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                    <a href="../public/inventory/student_delete.php?club_id=' . htmlspecialchars($row['club_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                                    <a href="../public/crud/all_clubs/club_read.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                    <a href="../public/crud/all_clubs/club_update.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
+                                                    <a href="../public/crud/all_clubs/club_delete.php?club_id=' . htmlspecialchars($row['club_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
                                                 </div>
                                             </div>';
 
