@@ -226,6 +226,20 @@ try {
                                     <a href="../public/crud/all_clubs/club_create.php" class="btn btn-danger pull-right">
                                         <i class="fa fa-plus"></i>Add New Club</a>
                                 </div>
+                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
+                                    <thead>
+                                        <tr>
+                                            <th> <input id="clubSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"></th>
+                                            <th class="text-center" colspan="8">
+                                                <h6 id="rowCountDisplay">Showing ' . $totalRows . ' / ' . $totalRows . ' Records</h6>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+
+                                <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
+                                    <em>No results found.</em>
+                                </div>
 
                                 <?php
                                 // Include config file
@@ -252,20 +266,6 @@ try {
 
                                     if ($totalRows > 0) {
                                         echo '
-                                        <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
-                                            <thead>
-                                                <tr>
-                                                    <th> <input id="clubSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"></th>
-                                                    <th class="text-center" colspan="8">
-                                                        <h6 id="rowCountDisplay">Showing ' . $totalRows . ' / ' . $totalRows . ' Records</h6>
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-
-                                        <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
-                                            <em>No results found.</em>
-                                        </div>
                                         ';
 
 
