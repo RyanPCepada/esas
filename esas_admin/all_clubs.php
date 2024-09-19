@@ -214,13 +214,16 @@ try {
                                     if ($totalRows > 0) {
                                         echo '
                                         <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
-                                            <thead>
-                                                <tr>
-                                                    <th> <input id="clubSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"></th>
-                                                    <th class="text-center" colspan="8"><h6>Showing ' . $totalRows . ' / ' . $totalRows . ' Records</h6></th>
-                                                </tr>
-                                            </thead>
-                                        </table>';
+    <thead>
+        <tr>
+            <th> <input id="clubSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"></th>
+            <th class="text-center" colspan="8">
+                <h6 id="rowCountDisplay">Showing <?php echo $totalRows; ?> / <?php echo $totalRows; ?> Records</h6>
+            </th>
+        </tr>
+    </thead>
+</table>
+';
 
                                         // Populate the rows using the row template
                                         while ($row = $result->fetch()) {
@@ -283,79 +286,83 @@ try {
                             <!-- ALL CLUB CARDS END -->
 
                             <script>
-// Wait for the DOM to load
-document.addEventListener('DOMContentLoaded', function () {
-    // Get the search input and all club rows
-    const searchInput = document.getElementById('clubSearch');
-    const clubRows = document.querySelectorAll('.club-row');
+                                // Wait for the DOM to load
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const searchInput = document.getElementById('clubSearch');
+                                    const clubRows = document.querySelectorAll('.club-row');
+                                    const rowCountDisplay = document.getElementById('rowCountDisplay');
+                                    const totalRows = clubRows.length; // Total number of rows
 
-    // Add an event listener to the search input
-    searchInput.addEventListener('input', function () {
-        const searchTerm = searchInput.value.toLowerCase();
+                                    // Initial display of total rows
+                                    rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`;
 
-        // Loop through all the rows and show/hide them based on the search term
-        clubRows.forEach(function (row) {
-            const clubNameElement = row.querySelector('h4'); // Club Name in col-md-4
-            const moderatorNames = row.querySelectorAll('h6'); // Moderators in col-md-4
-            const clubInfoElement = row.querySelector('.col-md-7'); // Club Information in col-md-7
-            const clubName = clubNameElement.textContent.toLowerCase();
-            const clubInfo = clubInfoElement.textContent.toLowerCase();
-            let moderatorMatch = false;
-            let clubInfoMatch = false;
+                                    searchInput.addEventListener('input', function () {
+                                        const searchTerm = searchInput.value.toLowerCase();
+                                        let visibleRowCount = 0; // To track how many rows are visible
 
-            // Remove previous highlights
-            resetHighlight(clubNameElement);
-            moderatorNames.forEach(resetHighlight);
-            resetHighlight(clubInfoElement);
+                                        clubRows.forEach(function (row) {
+                                            const clubNameElement = row.querySelector('h4');
+                                            const moderatorNames = row.querySelectorAll('h6');
+                                            const clubInfoElement = row.querySelector('.col-md-7');
+                                            const clubName = clubNameElement.textContent.toLowerCase();
+                                            const clubInfo = clubInfoElement.textContent.toLowerCase();
+                                            let moderatorMatch = false;
+                                            let clubInfoMatch = false;
 
-            // Check if any moderator matches the search term
-            moderatorNames.forEach(function (moderator) {
-                const moderatorText = moderator.textContent.toLowerCase();
-                if (moderatorText.includes(searchTerm)) {
-                    moderatorMatch = true;
-                    highlightText(moderator, searchTerm); // Highlight matching moderator text
-                }
-            });
+                                            // Remove previous highlights
+                                            resetHighlight(clubNameElement);
+                                            moderatorNames.forEach(resetHighlight);
+                                            resetHighlight(clubInfoElement);
 
-            // Check if the club information matches the search term
-            if (clubInfo.includes(searchTerm)) {
-                clubInfoMatch = true;
-                highlightText(clubInfoElement, searchTerm); // Highlight matching club information text
-            }
+                                            // Check if any moderator matches the search term
+                                            moderatorNames.forEach(function (moderator) {
+                                                const moderatorText = moderator.textContent.toLowerCase();
+                                                if (moderatorText.includes(searchTerm)) {
+                                                    moderatorMatch = true;
+                                                    highlightText(moderator, searchTerm);
+                                                }
+                                            });
 
-            // Check if the club name, any moderator, or the information matches
-            if (clubName.includes(searchTerm) || moderatorMatch || clubInfoMatch) {
-                row.style.display = ''; // Show the row
-                if (clubName.includes(searchTerm)) {
-                    highlightText(clubNameElement, searchTerm); // Highlight matching club name text
-                }
-            } else {
-                row.style.display = 'none'; // Hide the row
-            }
-        });
-    });
+                                            // Check if the club information matches the search term
+                                            if (clubInfo.includes(searchTerm)) {
+                                                clubInfoMatch = true;
+                                                highlightText(clubInfoElement, searchTerm);
+                                            }
 
-    // Function to highlight matching text
-    function highlightText(element, term) {
-        const innerHTML = element.innerHTML;
-        const index = innerHTML.toLowerCase().indexOf(term);
+                                            // Check if the club name, any moderator, or the information matches
+                                            if (clubName.includes(searchTerm) || moderatorMatch || clubInfoMatch) {
+                                                row.style.display = ''; // Show the row
+                                                visibleRowCount++; // Increment visible row count
+                                                if (clubName.includes(searchTerm)) {
+                                                    highlightText(clubNameElement, searchTerm);
+                                                }
+                                            } else {
+                                                row.style.display = 'none'; // Hide the row
+                                            }
+                                        });
 
-        if (index >= 0) {
-            element.innerHTML = innerHTML.substring(0, index) + 
-                '<span style="background-color: lightblue; color: #0033cc;">' + 
-                innerHTML.substring(index, index + term.length) + 
-                '</span>' + 
-                innerHTML.substring(index + term.length);
-        }
-    }
+                                        // Update the row count display
+                                        rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
+                                    });
 
-    // Function to reset highlight (removing the span tag)
-    function resetHighlight(element) {
-        element.innerHTML = element.textContent; // Reset to plain text
-    }
-});
-</script>
+                                    function highlightText(element, term) {
+                                        const innerHTML = element.innerHTML;
+                                        const index = innerHTML.toLowerCase().indexOf(term);
 
+                                        if (index >= 0) {
+                                            element.innerHTML = innerHTML.substring(0, index) +
+                                                '<span style="background-color: lightblue; color: #0033cc;">' +
+                                                innerHTML.substring(index, index + term.length) +
+                                                '</span>' +
+                                                innerHTML.substring(index + term.length);
+                                        }
+                                    }
+
+                                    function resetHighlight(element) {
+                                        element.innerHTML = element.textContent; // Reset to plain text
+                                    }
+                                });
+                            </script>
 
                         </div>
                         <!-- THE MAIN PAGE END -->
