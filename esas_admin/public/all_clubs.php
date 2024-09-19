@@ -121,6 +121,15 @@ try {
         .club-row:hover {
             background-color: #e0e0e0;
         }
+        .moderator-list {
+            padding: 0;
+            margin: 0;
+        }
+
+        .moderator-list h6 {
+            margin-bottom: 0.5rem;
+            line-height: .8;
+        }
 
         @media (max-width: 768px) {
             .col-auto {
@@ -201,8 +210,9 @@ try {
                             <!-- ALL CLUB CARDS START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
 
-                                <div class="mt-1 mb-3 clearfix">
-                                    <a href="../public/crud/all_clubs/club_create.php" class="btn btn-danger pull-right"><i class="fa fa-plus"></i>Add New Club</a>
+                                <div class="mt-1 mb-3 clearfix text-end">
+                                    <a href="../public/crud/all_clubs/club_create.php" class="btn btn-danger pull-right">
+                                        <i class="fa fa-plus"></i>Add New Club</a>
                                 </div>
 
                                 <?php
@@ -247,20 +257,20 @@ try {
                                             $formattedDate = date('F j, Y', strtotime($row['dateAdded']));
                                             $moderators = explode('|||', $row['moderators']);
                                             $moderatorCount = count($moderators);
-
+                                        
                                             // Generate moderator list
                                             $moderatorList = '';
                                             foreach ($moderators as $moderator) {
-                                                $moderatorList .= '<div><h6>' . htmlspecialchars($moderator) . '</h6></div>';
+                                                $moderatorList .= '<h6>' . htmlspecialchars($moderator) . '</h6>';
                                             }
-
+                                        
                                             $moderatorLabel = ($moderatorCount == 1) ? 'Moderator:' : 'Moderators:';
                                             $memberText = ($row['member_count'] == 1) ? 'member' : 'members';
-
+                                        
                                             // Alternate row colors
                                             $rowStyle = ($rowCount % 2 == 0) ? 'background-color: #f2f2f2;' : 'background-color: #ffffff;';
                                             $rowCount++;
-
+                                        
                                             echo '
                                             <div class="row ms-0 mb-3 p-3 club-row" style="' . $rowStyle . '">
                                                 <!-- Club Cover Photo and Details -->
@@ -272,8 +282,8 @@ try {
                                                         <div>
                                                             <h4 class="text-muted mt-3">' . htmlspecialchars($row['clubName']) . '</h4>
                                                         </div>
-                                                        <h6 class="text-muted mt-2">' . $moderatorLabel . '</h6>
-                                                        <div>' . $moderatorList . '</div>
+                                                        <h6 class="text-muted mt-2 mb-2">' . $moderatorLabel . '</h6>
+                                                        <div class="moderator-list">' . $moderatorList . '</div>
                                                         <hr class="m-1">
                                                         <div class="d-flex justify-content-between align-items-center">
                                                             <h7 class="text-muted mb-0">Created ' . htmlspecialchars($formattedDate) . '</h7>
@@ -292,8 +302,9 @@ try {
                                                     <a href="../public/crud/all_clubs/club_delete.php?club_id=' . htmlspecialchars($row['club_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
                                                 </div>
                                             </div>';
-
                                         }
+                                        
+                                        
 
                                         // Free result set
                                         unset($result);
