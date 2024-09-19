@@ -258,36 +258,36 @@ try {
                                             $rowCount++;
 
                                             echo '
-    <div class="row ms-0 mb-3 p-3 club-row" style="' . $rowStyle . '">
-        <!-- Club Cover Photo and Details -->
-        <div class="col-md-4">
-            <div class="club-cover-photo" style="text-align: center;">
-                <img src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
-                    alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
-                    style="width: 100%; max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
-                <div>
-                    <h4 class="text-muted mt-2">' . htmlspecialchars($row['clubName']) . '</h4>
-                </div>
-                <h6 class="text-muted mt-2">' . $moderatorLabel . '</h6>
-                <div>' . $moderatorList . '</div>
-                <hr class="m-1">
-        <div class="d-flex justify-content-between align-items-center">
-            <h7 class="text-muted mb-0">Created ' . htmlspecialchars($formattedDate) . '</h7>
-            <div class="member-count">' . htmlspecialchars($row['member_count']) . ' ' . $memberText . '</div>
-        </div>
-            </div>
-        </div>
-        <!-- Club Information -->
-        <div class="col-md-7">
-            <div>' . htmlspecialchars($row['information']) . '</div>
-        </div>
-        <!-- Actions -->
-        <div class="col-md-1 text-center">
-            <a href="../public/inventory/student_read.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-            <a href="../public/inventory/student_update.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-            <a href="../public/inventory/student_delete.php?club_id=' . htmlspecialchars($row['club_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
-        </div>
-    </div>';
+                                            <div class="row ms-0 mb-3 p-3 club-row" style="' . $rowStyle . '">
+                                                <!-- Club Cover Photo and Details -->
+                                                <div class="col-md-4">
+                                                    <div class="club-cover-photo" style="text-align: center;">
+                                                        <img src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
+                                                            alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
+                                                            style="width: 100%; max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
+                                                        <div>
+                                                            <h4 class="text-muted mt-2">' . htmlspecialchars($row['clubName']) . '</h4>
+                                                        </div>
+                                                        <h6 class="text-muted mt-2">' . $moderatorLabel . '</h6>
+                                                        <div>' . $moderatorList . '</div>
+                                                        <hr class="m-1">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <h7 class="text-muted mb-0">Created ' . htmlspecialchars($formattedDate) . '</h7>
+                                                            <div class="member-count">' . htmlspecialchars($row['member_count']) . ' ' . $memberText . '</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Club Information -->
+                                                <div class="col-md-7">
+                                                    <div>' . htmlspecialchars($row['information']) . '</div>
+                                                </div>
+                                                <!-- Actions -->
+                                                <div class="col-md-1 text-center">
+                                                    <a href="../public/inventory/student_read.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                    <a href="../public/inventory/student_update.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
+                                                    <a href="../public/inventory/student_delete.php?club_id=' . htmlspecialchars($row['club_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                                </div>
+                                            </div>';
 
                                         }
 
