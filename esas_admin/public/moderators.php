@@ -124,7 +124,7 @@ try {
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../../esas_admin/public/students.php" class="nav-link left-sidebar text-dark" aria-current="page" id="students">
+                        <a href="../../esas_admin/public/students.php" class="nav-link left-sidebar text-dark" id="students">
                             <i class="fas fa-users"></i> Students
                         </a>
                     </li>
@@ -168,143 +168,185 @@ try {
                                     </thead>
                                 </table>
 
-                                <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
-                                    <em>No results found.</em>
-                                </div>
-
                                 <?php
-                                // Include config file
-                                require_once "../../config.php";
+                                    // Include config file
+                                    require_once "../../config.php";
 
-                                // SQL query to fetch all moderators with related club information
-                                $sql = "SELECT 
-                                            m.moderator_id,
-                                            m.firstName,
-                                            m.middleName,
-                                            m.lastName,
-                                            m.age,
-                                            m.birthday,
-                                            m.gender,
-                                            m.email,
-                                            m.phoneNumber,
-                                            m.department,
-                                            m.profession,
-                                            m.profilePic,
-                                            m.dateAdded AS moderator_dateAdded,
-                                            GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
-                                        FROM tbl_moderators m
-                                        LEFT JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
-                                        LEFT JOIN tbl_clubs c ON cm.club_id = c.club_id
-                                        GROUP BY m.moderator_id
-                                        ORDER BY m.moderator_id ASC";
+                                    // SQL query to fetch all moderators with related club information
+                                    $sql = "SELECT 
+                                                m.moderator_id,
+                                                m.firstName,
+                                                m.middleName,
+                                                m.lastName,
+                                                m.age,
+                                                m.birthday,
+                                                m.gender,
+                                                m.email,
+                                                m.phoneNumber,
+                                                m.department,
+                                                m.profession,
+                                                m.profilePic,
+                                                m.dateAdded AS moderator_dateAdded,
+                                                GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
+                                            FROM tbl_moderators m
+                                            LEFT JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
+                                            LEFT JOIN tbl_clubs c ON cm.club_id = c.club_id
+                                            GROUP BY m.moderator_id
+                                            ORDER BY m.moderator_id ASC";
 
-                                if ($result = $pdo->query($sql)) {
-                                    $totalRows = $result->rowCount();
-                                    $rowCount = 0;
+                                    if ($result = $pdo->query($sql)) {
+                                        $totalRows = $result->rowCount();
+                                        $rowCount = 0;
 
-                                    if ($totalRows > 0) {
-                                        echo '
-                                        <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
-                                            <thead>
-                                                <tr>
-                                                    <th>Profile</th>
-                                                    <th>Name</th>
-                                                    <th>Club</th>
-                                                    <th>Gender</th>
-                                                    <th>Age</th>
-                                                    <th>Email</th>
-                                                    <th>Phone</th>
-                                                    <th>Profession</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>';
+                                        if ($totalRows > 0) {
+                                            echo '
+                                            <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Profile</th>
+                                                        <th>Name</th>
+                                                        <th>Club</th>
+                                                        <th>Gender</th>
+                                                        <th>Age</th>
+                                                        <th>Email</th>
+                                                        <th>Phone</th>
+                                                        <th>Profession</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>';
 
-                                        while ($row = $result->fetch()) {
-                                            $formattedDate = date('F j, Y', strtotime($row['moderator_dateAdded']));
-                                            $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
-                                            $clubNames = htmlspecialchars($row['clubNames']);
-                                            $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
-                                            $gender = htmlspecialchars($row['gender']);
-                                            $age = htmlspecialchars($row['age']);
-                                            $email = htmlspecialchars($row['email']);
-                                            $phoneNumber = htmlspecialchars($row['phoneNumber']);
-                                            $profession = htmlspecialchars($row['profession']);
-                                            $department = htmlspecialchars($row['department']);
-                                            
-                                            $rowCount++;
+                                            while ($row = $result->fetch()) {
+                                                $formattedDate = date('F j, Y', strtotime($row['moderator_dateAdded']));
+                                                $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
+                                                $clubNames = htmlspecialchars($row['clubNames']);
+                                                $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
+                                                $gender = htmlspecialchars($row['gender']);
+                                                $age = htmlspecialchars($row['age']);
+                                                $email = htmlspecialchars($row['email']);
+                                                $phoneNumber = htmlspecialchars($row['phoneNumber']);
+                                                $profession = htmlspecialchars($row['profession']);
+                                                $department = htmlspecialchars($row['department']);
+
+                                                $rowCount++;
+
+                                                echo '
+                                                <tr class="moderator-row">
+                                                    <td class="text-center">
+                                                        <img class="moderator-profile-pic" src="/esas/esas_moderator/images/' . $profilePic . '" 
+                                                            alt="' . $fullName . ' profile picture" 
+                                                            style="width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
+                                                    </td>
+                                                    <td class="moderator-name">' . $fullName . '</td>
+                                                    <td class="moderator-club">' . $clubNames . '</td>
+                                                    <td class="moderator-gender">' . $gender . '</td>
+                                                    <td class="moderator-age">' . $age . '</td>
+                                                    <td class="moderator-email">' . $email . '</td>
+                                                    <td class="moderator-phone">' . $phoneNumber . '</td>
+                                                    <td class="moderator-profession">' . $profession . ' at ' . $department . '</td>
+                                                    <td class="text-center">
+                                                        <a href="../public/crud/moderators/moderator_read.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                        <a href="../public/crud/moderators/moderator_update.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
+                                                        <a href="../public/crud/moderators/moderator_delete.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                                    </td>
+                                                </tr>';
+                                            }
 
                                             echo '
-                                            <tr class="moderator-row">
-                                                <td class="text-center">
-                                                    <img class="moderator-profile-pic" src="/esas/esas_moderator/images/' . $profilePic . '" 
-                                                        alt="' . $fullName . ' profile picture" 
-                                                        style="width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
-                                                </td>
-                                                <td>' . $fullName . '</td>
-                                                <td>' . $clubNames . '</td>
-                                                <td>' . $gender . '</td>
-                                                <td>' . $age . '</td>
-                                                <td>' . $email . '</td>
-                                                <td>' . $phoneNumber . '</td>
-                                                <td>' . $profession . ' at ' . $department . '</td>
-                                                <td class="text-center">
-                                                    <a href="../public/crud/moderators/moderator_read.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                    <a href="../public/crud/moderators/moderator_update.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                    <a href="../public/crud/moderators/moderator_delete.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
-                                                </td>
-                                            </tr>';
+                                                </tbody>
+                                            </table>';
+                                        } else {
+                                            echo '<div class="alert alert-danger"><em>No moderators were found.</em></div>';
                                         }
-
-                                        echo '
-                                            </tbody>
-                                        </table>';
                                     } else {
-                                        echo '<div class="alert alert-danger"><em>No moderators were found.</em></div>';
+                                        echo "Oops! Something went wrong. Please try again later.";
                                     }
-                                } else {
-                                    echo "Oops! Something went wrong. Please try again later.";
-                                }
-                                ?>
+                                    ?>
+
                             </div>
                             <!-- ALL MODERATOR TABLE END -->
+                             
+
+                            <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
+                                <em>No results found.</em>
+                            </div>
 
 
                             <script>
-                                // Wait for the DOM to load
                                 document.addEventListener('DOMContentLoaded', function () {
                                     const searchInput = document.getElementById('moderatorSearch');
                                     const moderatorRows = document.querySelectorAll('.moderator-row');
                                     const rowCountDisplay = document.getElementById('rowCountDisplay');
                                     const noResultsMessage = document.getElementById('noResultsMessage');
-                                    const totalRows = moderatorRows.length; // Total number of rows
+                                    const totalRows = moderatorRows.length;
 
-                                    // Initial display of total rows
                                     rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`;
 
                                     searchInput.addEventListener('input', function () {
-                                        const searchTerm = searchInput.value.toLowerCase();
-                                        let visibleRowCount = 0; // To track how many rows are visible
+                                        const searchTerm = searchInput.value.trim().toLowerCase();
+                                        let visibleRowCount = 0;
 
                                         moderatorRows.forEach(function (row) {
-                                            const rowText = row.textContent.toLowerCase();
-                                            if (rowText.includes(searchTerm)) {
-                                                row.style.display = ''; // Show the row
-                                                visibleRowCount++; // Increment visible row count
+                                            let rowContainsTerm = false;
+                                            const cells = row.querySelectorAll('td');
+
+                                            cells.forEach(function (cell) {
+                                                // Reset cell content and apply highlight
+                                                cell.innerHTML = removeHighlight(cell.innerHTML);
+                                                if (highlightText(cell, searchTerm)) {
+                                                    rowContainsTerm = true;
+                                                }
+                                            });
+
+                                            if (rowContainsTerm) {
+                                                row.style.display = '';
+                                                visibleRowCount++;
                                             } else {
-                                                row.style.display = 'none'; // Hide the row
+                                                row.style.display = 'none';
                                             }
                                         });
 
-                                        // Update the row count display
                                         rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
-
-                                        // Show or hide "No results found" message
                                         noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
                                     });
+
+                                    function highlightText(cell, term) {
+                                        const textNodes = getTextNodes(cell);
+                                        let found = false;
+
+                                        textNodes.forEach(node => {
+                                            const text = node.textContent;
+                                            if (text.toLowerCase().includes(term)) {
+                                                const regex = new RegExp(`(${term})`, 'gi');
+                                                const highlightedText = text.replace(regex, '<span style="background-color: lightblue; color: #0033cc;">$1</span>');
+                                                const span = document.createElement('span');
+                                                span.innerHTML = highlightedText;
+                                                node.replaceWith(span);
+                                                found = true;
+                                            }
+                                        });
+
+                                        return found;
+                                    }
+
+                                    function getTextNodes(element) {
+                                        let textNodes = [];
+                                        function recurse(node) {
+                                            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
+                                                textNodes.push(node);
+                                            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                                                node.childNodes.forEach(recurse);
+                                            }
+                                        }
+                                        recurse(element);
+                                        return textNodes;
+                                    }
+
+                                    function removeHighlight(html) {
+                                        return html.replace(/<span[^>]*style="[^"]*background-color:[^"]*"[^>]*>(.*?)<\/span>/gi, '$1');
+                                    }
                                 });
                             </script>
-
                         </div>
                         <!-- THE MAIN PAGE END -->
 
