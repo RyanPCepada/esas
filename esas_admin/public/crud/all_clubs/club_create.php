@@ -180,7 +180,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="form-group">
                         <label>Add Moderator</label>
                         <select name="moderator" class="form-control">
-                            <option value="">Select from existing Moderators</option>
+                            <option value="">-- Select from existing Moderators --</option>
+                            <option value="TBA">TBA</option>
                             <?php foreach ($moderators as $moderator): ?>
                                 <option value="<?php echo htmlspecialchars($moderator['moderator_id']); ?>">
                                     <?php echo htmlspecialchars($moderator['moderator_name']); ?>
