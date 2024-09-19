@@ -123,11 +123,10 @@ try {
         }
         .moderator-list {
             padding: 0;
-            margin: 0;
+            margin-bottom: 10px;
         }
 
         .moderator-list h6 {
-            margin-bottom: 0.5rem;
             line-height: .8;
         }
 
@@ -286,7 +285,7 @@ try {
                                                         <div class="moderator-list">' . $moderatorList . '</div>
                                                         <hr class="m-1">
                                                         <div class="d-flex justify-content-between align-items-center">
-                                                            <h7 class="text-muted mb-0">Created ' . htmlspecialchars($formattedDate) . '</h7>
+                                                            <h7 class="text-muted mb-0">Created <span class="creation-date">' . htmlspecialchars($formattedDate) . '</span></h7>
                                                             <div class="member-count">' . htmlspecialchars($row['member_count']) . ' ' . $memberText . '</div>
                                                         </div>
                                                     </div>
@@ -339,20 +338,24 @@ try {
                                             const moderatorNames = row.querySelectorAll('h6');
                                             const clubInfoElement = row.querySelector('.col-md-7');
                                             const memberCountElement = row.querySelector('.member-count');
+                                            const creationDateElement = row.querySelector('.creation-date');
 
                                             const clubName = clubNameElement.textContent.toLowerCase();
                                             const clubInfo = clubInfoElement.textContent.toLowerCase();
                                             const memberCount = memberCountElement.textContent.toLowerCase();
+                                            const creationDate = creationDateElement.textContent.toLowerCase();
 
                                             let moderatorMatch = false;
                                             let clubInfoMatch = false;
                                             let memberCountMatch = false;
+                                            let creationDateMatch = false;
 
                                             // Remove previous highlights
                                             resetHighlight(clubNameElement);
                                             moderatorNames.forEach(resetHighlight);
                                             resetHighlight(clubInfoElement);
                                             resetHighlight(memberCountElement);
+                                            resetHighlight(creationDateElement);
 
                                             // Check if any moderator matches the search term
                                             moderatorNames.forEach(function (moderator) {
@@ -375,8 +378,14 @@ try {
                                                 highlightText(memberCountElement, searchTerm);
                                             }
 
+                                            // Check if the creation date matches the search term
+                                            if (creationDate.includes(searchTerm)) {
+                                                creationDateMatch = true;
+                                                highlightText(creationDateElement, searchTerm);
+                                            }
+
                                             // Check if the club name, any moderator, or the information matches
-                                            if (clubName.includes(searchTerm) || moderatorMatch || clubInfoMatch || memberCountMatch) {
+                                            if (clubName.includes(searchTerm) || moderatorMatch || clubInfoMatch || memberCountMatch || creationDateMatch) {
                                                 row.style.display = ''; // Show the row
                                                 visibleRowCount++; // Increment visible row count
                                                 if (clubName.includes(searchTerm)) {
