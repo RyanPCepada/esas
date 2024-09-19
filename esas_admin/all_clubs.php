@@ -365,22 +365,23 @@ try {
 
                                     // Function to highlight matching text
                                     function highlightText(element, term) {
-                                        const innerHTML = element.innerHTML;
+                                        const text = element.textContent;
                                         const regex = new RegExp(`(${term})`, 'gi'); // Create a regex to match all occurrences of the term
-                                        const highlightedHTML = innerHTML.replace(regex, '<span style="background-color: lightblue; color: #0033cc;">$1</span>');
+                                        const highlightedHTML = text.replace(regex, '<span style="background-color: lightblue; color: #0033cc;">$1</span>');
 
                                         element.innerHTML = highlightedHTML; // Replace the content with highlighted text
                                     }
 
                                     // Function to reset highlight (removing the span tag)
                                     function resetHighlight(element) {
-                                        const innerHTML = element.innerHTML;
+                                        const html = element.innerHTML;
                                         const regex = /<span style="background-color: lightblue; color: #0033cc;">(.*?)<\/span>/gi;
-                                        const resetHTML = innerHTML.replace(regex, '$1');
+                                        const resetHTML = html.replace(regex, '$1');
 
                                         element.innerHTML = resetHTML; // Replace the content with the original text
                                     }
                                 });
+
                             </script>
                         </div>
                         <!-- THE MAIN PAGE END -->
