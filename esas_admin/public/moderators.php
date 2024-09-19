@@ -73,75 +73,6 @@ try {
             padding: 50px;
         }
         
-        
-        
-        .club-cover-photo {
-            opacity: 0;
-            transform: translateY(-10px); /* Start from below */
-            animation: slideIn 0.6s forwards; /* Apply animation */
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-10px); /* Start from below */
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0); /* End at normal position */
-            }
-        }
-
-        /* Optional: Adjust the delay for each card */
-        .club-cover-photo:nth-child(1) {
-            animation-delay: 0s;
-        }
-        .club-cover-photo:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-        .club-cover-photo:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-
-        .card {
-            /* Ensure your card styles are here */
-        }
-
-        
-
-        .icon-style {
-            position: absolute;
-            font-size: 18px;
-            width: 8%;
-            background-color: #4682B4; /*steel blue*/
-            background-color: #89CFF0; /* baby blue */
-            background-color: #70B9E6; /*darker baby blue*/
-            color: white;
-            /* color: #6A5ACD; slate blue */
-            border-radius: 50%;
-            align-self: end;
-        }
-
-
-        .col-md-7 {
-            text-align: justify;
-            text-indent: 30px;
-        }
-        .club-row {
-            transition: background-color 0.3s ease;
-        }
-
-        .club-row:hover {
-            background-color: #e0e0e0;
-        }
-        .moderator-list {
-            padding: 0;
-            margin-bottom: 10px;
-        }
-
-        .moderator-list h6 {
-            line-height: .8;
-        }
 
         @media (max-width: 768px) {
             .col-auto {
@@ -183,12 +114,12 @@ try {
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../../esas_admin/public/all_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="all-clubs">
+                        <a href="../../esas_admin/public/all_clubs.php" class="nav-link left-sidebar text-dark" id="all-clubs">
                             <i class="fas fa-university"></i> All Clubs
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../../esas_admin/public/moderators.php" class="nav-link left-sidebar text-dark" id="moderators">
+                        <a href="../esas_admin/public/moderators.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="moderators">
                             <i class="fa fa-user-shield"></i> Moderators
                         </a>
                     </li>
@@ -222,36 +153,10 @@ try {
                             <!-- ALL CLUB CARDS START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
 
-                                <div class="mt-1 mb-3 clearfix text-end">
-                                    <a href="../public/crud/all_clubs/club_create.php" class="btn btn-danger pull-right">
-                                        <i class="fa fa-plus"></i>Add New Club</a>
-                                </div>
-
-                                <?php
-                                // Include config file
-                                require_once "../../config.php";
-
-                                // SQL query to fetch all clubs with related information, moderators, member count, and actions
-                                $sql = "SELECT 
-                                            c.club_id,
-                                            c.clubName, 
-                                            c.information, 
-                                            c.coverPhoto, 
-                                            GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.lastName) SEPARATOR '|||') AS moderators,
-                                            (SELECT COUNT(DISTINCT r.student_id) FROM tbl_registration r WHERE r.club_id = c.club_id AND r.status = 'active') AS member_count,
-                                            c.dateAdded
-                                        FROM tbl_clubs c
-                                        LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
-                                        LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
-                                        GROUP BY c.club_id
-                                        ORDER BY c.dateAdded ASC";
-
-                                if ($result = $pdo->query($sql)) {
-                                    $totalRows = $result->rowCount();
-                                    $rowCount = 0; // To keep track of row number for striping
-
-                                    if ($totalRows > 0) {
-                                        echo '
+    <div class="mt-1 mb-3 clearfix text-end">
+        <a href="../public/crud/moderators/moderator_create.php" class="btn btn-danger pull-right">
+            <i class="fa fa-plus"></i>Add New Moderator</a>
+    </div>
                                         <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
                                             <thead>
                                                 <tr>
@@ -266,74 +171,92 @@ try {
                                         <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
                                             <em>No results found.</em>
                                         </div>
-                                        ';
 
+    <?php
+    // Include config file
+    require_once "../../config.php";
 
-                                        // Populate the rows using the row template
-                                        while ($row = $result->fetch()) {
-                                            $formattedDate = date('F j, Y', strtotime($row['dateAdded']));
-                                            $moderators = explode('|||', $row['moderators']);
-                                            $moderatorCount = count($moderators);
-                                        
-                                            // Generate moderator list
-                                            $moderatorList = '';
-                                            foreach ($moderators as $moderator) {
-                                                $moderatorList .= '<h6>' . htmlspecialchars($moderator) . '</h6>';
-                                            }
-                                        
-                                            $moderatorLabel = ($moderatorCount == 1) ? 'Moderator:' : 'Moderators:';
-                                            $memberText = ($row['member_count'] == 1) ? 'member' : 'members';
-                                        
-                                            // Alternate row colors
-                                            $rowStyle = ($rowCount % 2 == 0) ? 'background-color: #f2f2f2;' : 'background-color: #ffffff;';
-                                            $rowCount++;
-                                        
-                                            echo '
-                                            <div class="row ms-0 mb-3 p-3 club-row" style="' . $rowStyle . '">
-                                                <!-- Club Cover Photo and Details -->
-                                                <div class="col-md-4">
-                                                    <div style="text-align: center;">
-                                                        <img class="club-cover-photo" src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
-                                                            alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
-                                                            style="width: 100%; max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
-                                                        <div>
-                                                            <h4 class="text-muted mt-3">' . htmlspecialchars($row['clubName']) . '</h4>
-                                                        </div>
-                                                        <h6 class="text-muted mt-2 mb-2">' . $moderatorLabel . '</h6>
-                                                        <div class="moderator-list">' . $moderatorList . '</div>
-                                                        <hr class="m-1">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <h7 class="text-muted mb-0">Created <span class="creation-date">' . htmlspecialchars($formattedDate) . '</span></h7>
-                                                            <div class="member-count">' . htmlspecialchars($row['member_count']) . ' ' . $memberText . '</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <!-- Club Information -->
-                                                <div class="col-md-7">
-                                                    <div>' . htmlspecialchars($row['information']) . '</div>
-                                                </div>
-                                                <!-- Actions -->
-                                                <div class="col-md-1 text-center">
-                                                    <a href="../public/crud/all_clubs/club_read.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                    <a href="../public/crud/all_clubs/club_update.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                    <a href="../public/crud/all_clubs/club_delete.php?club_id=' . htmlspecialchars($row['club_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
-                                                </div>
-                                            </div>';
-                                        }
-                                        
-                                        
+    // SQL query to fetch all moderators with related club information
+    $sql = "SELECT 
+                m.moderator_id,
+                m.firstName,
+                m.middleName,
+                m.lastName,
+                m.age,
+                m.birthday,
+                m.gender,
+                m.email,
+                m.phoneNumber,
+                m.department,
+                m.position,
+                m.profilePic,
+                m.dateAdded AS moderator_dateAdded,
+                c.clubName
+            FROM tbl_moderators m
+            LEFT JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
+            LEFT JOIN tbl_clubs c ON cm.club_id = c.club_id
+            ORDER BY m.dateAdded ASC";
 
-                                        // Free result set
-                                        unset($result);
-                                    } else {
-                                        echo '<div class="alert alert-danger"><em>No clubs were found.</em></div>';
-                                    }
-                                } else {
-                                    echo "Oops! Something went wrong. Please try again later.";
-                                }
-                                ?>
+    if ($result = $pdo->query($sql)) {
+        $totalRows = $result->rowCount();
+        $rowCount = 0;
 
+        if ($totalRows > 0) {
+            echo '<div class="row">';
+
+            while ($row = $result->fetch()) {
+                $formattedDate = date('F j, Y', strtotime($row['moderator_dateAdded']));
+                $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
+                $clubName = htmlspecialchars($row['clubName']);
+                $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
+                $gender = htmlspecialchars($row['gender']);
+                $age = htmlspecialchars($row['age']);
+                $email = htmlspecialchars($row['email']);
+                $phoneNumber = htmlspecialchars($row['phoneNumber']);
+                $position = htmlspecialchars($row['position']);
+                $department = htmlspecialchars($row['department']);
+
+                // Alternate row colors
+                $rowStyle = ($rowCount % 2 == 0) ? 'background-color: #f2f2f2;' : 'background-color: #ffffff;';
+                $rowCount++;
+
+                echo '
+                <div class="col-md-4 mb-3">
+                    <div class="card" style="' . $rowStyle . '">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <img class="moderator-profile-pic" src="/esas/esas_admin/images/' . $profilePic . '" 
+                                     alt="' . $fullName . ' profile picture" 
+                                     style="width: 100%; max-width: 150px; height: auto; border-radius: 50%; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
+                                <h5 class="mt-3">' . $fullName . '</h5>
+                                <p>' . $position . ' at ' . $department . '</p>
+                                <p>Gender: ' . $gender . ', Age: ' . $age . '</p>
+                                <p>Email: ' . $email . '</p>
+                                <p>Phone: ' . $phoneNumber . '</p>
+                                <hr>
+                                <h6>Club: ' . $clubName . '</h6>
+                                <p class="text-muted">Joined on ' . $formattedDate . '</p>
                             </div>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="../public/crud/moderators/moderator_read.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                            <a href="../public/crud/moderators/moderator_update.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
+                            <a href="../public/crud/moderators/moderator_delete.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                        </div>
+                    </div>
+                </div>';
+            }
+
+            echo '</div>';
+        } else {
+            echo '<div class="alert alert-danger"><em>No moderators were found.</em></div>';
+        }
+    } else {
+        echo "Oops! Something went wrong. Please try again later.";
+    }
+    ?>
+</div>
+
                             <!-- ALL CLUB CARDS END -->
 
                             <script>
