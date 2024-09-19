@@ -1,6 +1,6 @@
 <?php 
 session_start();
-require_once "../config.php";  // Assuming this file holds your PDO connection
+require_once "../../config.php";  // Assuming this file holds your PDO connection
 
 if (!isset($_SESSION['moderator_id'])) {
     echo "Moderator ID is not set in the session.";
@@ -52,11 +52,11 @@ try {
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>eSAS - Dashboard</title>
-    <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
-    <script src="../assets/js/all.js" crossorigin="anonymous"></script>
-    <script src="../assets/js/jquery-3.6.0.js"></script>
-    <link href="../assets/css/styles.css" rel="stylesheet" />
-    <link href="../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
+    <script src="../../assets/js/jquery-3.6.0.js"></script>
+    <link href="../../assets/css/styles.css" rel="stylesheet" />
+    <link href="../../assets/img/nbsclogo.png" rel="icon">
     <style>
         .nav-link.active {
           color: white !important;
@@ -125,7 +125,7 @@ try {
         <div class="row g-0 h-100">
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
-                    <img src="../assets/img/SAS_LOGO.png" style="height: 0.3in;">
+                    <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
                     eSAS - Moderator</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
@@ -133,7 +133,7 @@ try {
                 </button>
                 <div class="navbar-collapse collapse hide" id="main_nav">
                     <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
-                        <?php include 'nav/nav_main.php' ?>
+                        <?php include '../nav/nav_main.php' ?>
                     </div>
                 </div>
             </nav>
@@ -143,22 +143,22 @@ try {
             <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li>
-                        <a href="../esas_moderator/dashboard.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="dashboard">
+                        <a href="../../esas_moderator/public/dashboard.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="dashboard">
                             <i class="fas fa-chart-line"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_moderator/my_clubs.php" class="nav-link left-sidebar text-dark" id="my-clubs">
+                        <a href="../../esas_moderator/public/my_clubs.php" class="nav-link left-sidebar text-dark" id="my-clubs">
                             <i class="fas fa-university"></i> My Clubs
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_moderator/students.php" class="nav-link left-sidebar text-dark" id="students">
+                        <a href="../../esas_moderator/public/students.php" class="nav-link left-sidebar text-dark" id="students">
                             <i class="fas fa-users"></i> Students
                         </a>
                     </li>
                     <li>
-                        <a href="../esas_moderator/pending_approvals.php" class="nav-link left-sidebar text-dark" id="pending-approvals">
+                        <a href="../../esas_moderator/public/pending_approvals.php" class="nav-link left-sidebar text-dark" id="pending-approvals">
                             <i class="fas fa-hourglass-half"></i> Pending Approvals
                         </a>
                     </li>
@@ -1111,9 +1111,9 @@ try {
     </div>
 
     <!-- <?php include 'assets/components/modals.php' ?> -->
-    <script src="../assets/js/jquery.dataTables.min.js"></script>
-    <script src="../assets/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/global_script.js"></script>
+    <script src="../../assets/js/jquery.dataTables.min.js"></script>
+    <script src="../../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/global_script.js"></script>
 
 
 
