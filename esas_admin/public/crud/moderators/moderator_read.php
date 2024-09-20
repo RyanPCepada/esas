@@ -42,15 +42,15 @@ if (isset($_GET["moderator_id"]) && !empty(trim($_GET["moderator_id"]))) {
 
                 // Retrieve the details
                 $fullName = htmlspecialchars($row["firstName"] . " " . $row["middleName"] . " " . $row["lastName"]);
-                $age = htmlspecialchars($row["age"]);
-                $birthday = htmlspecialchars($row["birthday"]);
-                $gender = htmlspecialchars($row["gender"]);
-                $email = htmlspecialchars($row["email"]);
-                $phoneNumber = htmlspecialchars($row["phoneNumber"]);
-                $department = htmlspecialchars($row["department"]);
-                $profession = htmlspecialchars($row["profession"]);
-                $clubNames = htmlspecialchars($row["clubNames"]);
-                $profilePic = htmlspecialchars($row["profilePic"] ? $row["profilePic"] : "default-profile.jpg");
+                $age = !empty($row["age"]) ? htmlspecialchars($row["age"]) : 'None';
+                $birthday = !empty($row["birthday"]) ? htmlspecialchars($row["birthday"]) : 'None';
+                $gender = !empty($row["gender"]) ? htmlspecialchars($row["gender"]) : 'None';
+                $email = !empty($row["email"]) ? htmlspecialchars($row["email"]) : 'None';
+                $phoneNumber = !empty($row["phoneNumber"]) ? htmlspecialchars($row["phoneNumber"]) : 'None';
+                $department = !empty($row["department"]) ? htmlspecialchars($row["department"]) : 'None';
+                $profession = !empty($row["profession"]) ? htmlspecialchars($row["profession"]) : 'None';
+                $clubNames = !empty($row["clubNames"]) ? htmlspecialchars($row["clubNames"]) : 'None';
+                $profilePic = !empty($row["profilePic"]) ? htmlspecialchars($row["profilePic"]) : "default-profile.jpg";
             } else {
                 // Redirect if no record is found
                 header("location: error.php");
@@ -97,7 +97,8 @@ unset($pdo);
                                      class="img-fluid rounded-circle" style="width: 150px; height: 150px;">
                             </div>
                             <div class="col-md-9">
-                                <h4><?php echo $fullName; ?></h4>
+                                <h3 class="text-muted mb-3"><?php echo $fullName; ?></h3>
+                                <hr>
                                 <p><strong>Email: </strong><?php echo $email; ?></p>
                                 <p><strong>Phone Number: </strong><?php echo $phoneNumber; ?></p>
                                 <p><strong>Department: </strong><?php echo $department; ?></p>
@@ -112,7 +113,7 @@ unset($pdo);
                     <div class="card-footer">
                         <a href="moderator_update.php?moderator_id=<?php echo $moderator_id; ?>" class="btn btn-warning">Update</a>
                         <a href="moderator_delete.php?moderator_id=<?php echo $moderator_id; ?>" class="btn btn-danger">Delete</a>
-                        <a href="moderators_list.php" class="btn btn-secondary">Back to Moderators List</a>
+                        <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Moderators List</a>
                     </div>
                 </div>
             </div>
