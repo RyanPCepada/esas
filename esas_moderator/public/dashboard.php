@@ -347,7 +347,7 @@ try {
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         // Get the selected club_id and school_year (month) from the URL
-                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
                                         $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
                                         try {
@@ -367,7 +367,7 @@ try {
                                             // Add condition for the selected club, if applicable
                                             if ($selectedClubId) {
                                                 $sql .= " AND tr.club_id = :club_id";
-                                                $params['club_id'] = $selectedClubId;
+                                                $params['club_id'] = $selectedClubId; // Ensure this is set
                                             }
 
                                             // Add condition for the selected month, if applicable
@@ -394,12 +394,13 @@ try {
 
 
 
+
                                 <!-- Card for TOTAL PENDING -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         // Get the selected club_id and school_year (month) from the URL
-                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
                                         $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
                                         try {
