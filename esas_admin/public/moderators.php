@@ -176,17 +176,11 @@ try {
                                     $sql = "SELECT 
                                                 m.moderator_id,
                                                 m.firstName,
-                                                m.middleName,
                                                 m.lastName,
-                                                m.age,
-                                                m.birthday,
-                                                m.gender,
                                                 m.email,
                                                 m.phoneNumber,
                                                 m.department,
-                                                m.profession,
                                                 m.profilePic,
-                                                m.dateAdded AS moderator_dateAdded,
                                                 GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
                                             FROM tbl_moderators m
                                             LEFT JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
@@ -196,54 +190,43 @@ try {
 
                                     if ($result = $pdo->query($sql)) {
                                         $totalRows = $result->rowCount();
-                                        $rowCount = 0;
 
                                         if ($totalRows > 0) {
                                             echo '
                                             <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
                                                 <thead>
                                                     <tr>
-                                                        <th>Profile</th>
-                                                        <th>Name</th>
+                                                        <th></th>
+                                                        <th>Full Name</th>
                                                         <th>Club</th>
-                                                        <th>Gender</th>
-                                                        <th>Age</th>
                                                         <th>Email</th>
-                                                        <th>Phone</th>
-                                                        <th>Profession</th>
+                                                        <th>Phone Number</th>
+                                                        <th>Department</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>';
 
                                             while ($row = $result->fetch()) {
-                                                $formattedDate = date('F j, Y', strtotime($row['moderator_dateAdded']));
-                                                $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
+                                                $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['lastName']);
                                                 $clubNames = htmlspecialchars($row['clubNames']);
                                                 $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
-                                                $gender = htmlspecialchars($row['gender']);
-                                                $age = htmlspecialchars($row['age']);
                                                 $email = htmlspecialchars($row['email']);
                                                 $phoneNumber = htmlspecialchars($row['phoneNumber']);
-                                                $profession = htmlspecialchars($row['profession']);
                                                 $department = htmlspecialchars($row['department']);
-
-                                                $rowCount++;
 
                                                 echo '
                                                 <tr class="moderator-row">
                                                     <td class="text-center">
                                                         <img class="moderator-profile-pic" src="/esas/esas_moderator/images/' . $profilePic . '" 
                                                             alt="' . $fullName . ' profile picture" 
-                                                            style="width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
+                                                            style="width: 50px; height: 50px; border-radius: 50%;">
                                                     </td>
                                                     <td class="moderator-name">' . $fullName . '</td>
                                                     <td class="moderator-club">' . $clubNames . '</td>
-                                                    <td class="moderator-gender">' . $gender . '</td>
-                                                    <td class="moderator-age">' . $age . '</td>
                                                     <td class="moderator-email">' . $email . '</td>
                                                     <td class="moderator-phone">' . $phoneNumber . '</td>
-                                                    <td class="moderator-profession">' . $profession . ' at ' . $department . '</td>
+                                                    <td class="moderator-department">' . $department . '</td>
                                                     <td class="text-center">
                                                         <a href="../public/crud/moderators/moderator_read.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                                         <a href="../public/crud/moderators/moderator_update.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
@@ -262,6 +245,9 @@ try {
                                         echo "Oops! Something went wrong. Please try again later.";
                                     }
                                     ?>
+
+
+
 
                             </div>
                             <!-- ALL MODERATOR TABLE END -->

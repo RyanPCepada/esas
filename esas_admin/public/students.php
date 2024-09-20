@@ -166,99 +166,90 @@ try {
                                 </table>
 
                                 <?php
-                                // Include config file
-                                require_once "../../config.php";
+                                    // Include config file
+                                    require_once "../../config.php";
 
-                                // SQL query to fetch all students with their registered clubs and active status
-                                $sql = "SELECT 
-                                            s.student_id,
-                                            s.firstName,
-                                            s.middleName,
-                                            s.lastName,
-                                            s.age,
-                                            s.gender,
-                                            s.instiEmail,
-                                            s.phoneNumber,
-                                            s.department,
-                                            s.course,
-                                            s.year,
-                                            s.profilePic,
-                                            s.dateAdded AS student_dateAdded,
-                                            GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
-                                        FROM tbl_students s
-                                        LEFT JOIN tbl_registration r ON s.student_id = r.student_id
-                                        LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
-                                        WHERE r.status = 'active' -- Filter for active status
-                                        GROUP BY s.student_id
-                                        ORDER BY s.student_id ASC";
+                                    // SQL query to fetch all students with their registered clubs and active status
+                                    $sql = "SELECT 
+                                                s.student_id,
+                                                s.firstName,
+                                                s.middleName,
+                                                s.lastName,
+                                                s.instiEmail,
+                                                s.phoneNumber,
+                                                s.department,
+                                                s.course,
+                                                s.year,
+                                                s.profilePic,
+                                                GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
+                                            FROM tbl_students s
+                                            LEFT JOIN tbl_registration r ON s.student_id = r.student_id
+                                            LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
+                                            WHERE r.status = 'active' -- Filter for active status
+                                            GROUP BY s.student_id
+                                            ORDER BY s.student_id ASC";
 
-                                if ($result = $pdo->query($sql)) {
-                                    $totalRows = $result->rowCount();
-                                    $rowCount = 0;
+                                    if ($result = $pdo->query($sql)) {
+                                        $totalRows = $result->rowCount();
 
-                                    if ($totalRows > 0) {
-                                        echo '
-                                        <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
-                                            <thead>
-                                                <tr>
-                                                    <th>Profile</th>
-                                                    <th>Name</th>
-                                                    <th>Club</th>
-                                                    <th>Gender</th>
-                                                    <th>Age</th>
-                                                    <th>Email</th>
-                                                    <th>Phone</th>
-                                                    <th>Course</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>';
+                                        if ($totalRows > 0) {
+                                            echo '
+                                            <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                                                <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>Full Name</th>
+                                                        <th>Club</th>
+                                                        <th>Email</th>
+                                                        <th>Phone Number</th>
+                                                        <th>Department</th>
+                                                        <th>Course</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>';
 
-                                        while ($row = $result->fetch()) {
-                                            $formattedDate = date('F j, Y', strtotime($row['student_dateAdded']));
-                                            $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
-                                            $clubNames = htmlspecialchars($row['clubNames']);
-                                            $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
-                                            $gender = htmlspecialchars($row['gender']);
-                                            $age = htmlspecialchars($row['age']);
-                                            $email = htmlspecialchars($row['instiEmail']);
-                                            $phoneNumber = htmlspecialchars($row['phoneNumber']);
-                                            $course = htmlspecialchars($row['course']);
+                                            while ($row = $result->fetch()) {
+                                                $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
+                                                $clubNames = htmlspecialchars($row['clubNames']);
+                                                $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
+                                                $email = htmlspecialchars($row['instiEmail']);
+                                                $phoneNumber = htmlspecialchars($row['phoneNumber']);
+                                                $department = htmlspecialchars($row['department']);
+                                                $course = htmlspecialchars($row['course']);
 
-                                            $rowCount++;
+                                                echo '
+                                                <tr class="student-row">
+                                                    <td class="text-center">
+                                                        <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
+                                                            alt="' . $fullName . ' profile picture" 
+                                                            style="width: 50px; height: 50px; border-radius: 50%;">
+                                                    </td>
+                                                    <td>' . $fullName . '</td>
+                                                    <td>' . $clubNames . '</td>
+                                                    <td>' . $email . '</td>
+                                                    <td>' . $phoneNumber . '</td>
+                                                    <td>' . $department . '</td>
+                                                    <td>' . $course . '</td>
+                                                    <td class="text-center">
+                                                        <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                        <a href="../public/crud/students/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
+                                                        <a href="../public/crud/students/student_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                                    </td>
+                                                </tr>';
+                                            }
 
                                             echo '
-                                            <tr class="student-row">
-                                                <td class="text-center">
-                                                    <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
-                                                        alt="' . $fullName . ' profile picture" 
-                                                        style="width: 60px; height: 60px; border-radius: 50%;">
-                                                </td>
-                                                <td>' . $fullName . '</td>
-                                                <td>' . $clubNames . '</td>
-                                                <td>' . $gender . '</td>
-                                                <td>' . $age . '</td>
-                                                <td>' . $email . '</td>
-                                                <td>' . $phoneNumber . '</td>
-                                                <td>' . $course . '</td>
-                                                <td class="text-center">
-                                                    <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                    <a href="../public/crud/students/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                    <a href="../public/crud/students/student_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
-                                                </td>
-                                            </tr>';
+                                                </tbody>
+                                            </table>';
+                                        } else {
+                                            echo '<div class="alert alert-danger"><em>No students were found.</em></div>';
                                         }
-
-                                        echo '
-                                            </tbody>
-                                        </table>';
                                     } else {
-                                        echo '<div class="alert alert-danger"><em>No students were found.</em></div>';
+                                        echo "Oops! Something went wrong. Please try again later.";
                                     }
-                                } else {
-                                    echo "Oops! Something went wrong. Please try again later.";
-                                }
-                                ?>
+                                    ?>
+
                             </div>
                             <!-- ALL STUDENT TABLE END -->
 
