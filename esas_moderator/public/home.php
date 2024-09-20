@@ -307,7 +307,7 @@ unset($pdo);
 
             // Function to fetch and display posts
             function fetchPosts() {
-                fetch('/e-sas/esas-moderator/public/posts-api.php')
+                fetch('/esas/esas_moderator/apis/posts-api.php')
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
@@ -331,7 +331,7 @@ unset($pdo);
                                     <div class="col-md-12 mb-3">
                                         <div class="card" id="card_posts">
                                             <div class="card-header d-flex align-items-start">
-                                                <img src="/e-sas/esas-moderator/images/${post.profilePic}" alt="${post.fullName}" class="rounded-circle mr-3" width="50" height="50">
+                                                <img src="/esas/esas_moderator/images/${post.profilePic}" alt="${post.fullName}" class="rounded-circle mr-3" width="50" height="50">
                                                 <div>
                                                     <h5 class="card-title mb-1">${post.fullName}</h5>
                                                     <p class="text-muted mb-0">${formattedDate} @ ${formattedTime}</p>
