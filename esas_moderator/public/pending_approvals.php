@@ -174,118 +174,121 @@ try {
                 <div class="row g-0 h-100">
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
 
-                        <div class="row mb-2">
-                            <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
-                            <div class="col-auto">
-                                <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                                    <?php
-                                    // Prepare the SQL query to fetch clubs managed by the current moderator
-                                    $sql = "
-                                        SELECT c.club_id, c.clubName 
-                                        FROM tbl_clubs c
-                                        JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
-                                        WHERE cm.moderator_id = :moderator_id
-                                    ";
-
-                                    // Execute the query
-                                    $stmt = $pdo->prepare($sql);
-                                    $stmt->execute(['moderator_id' => $moderator_id]);
-
-                                    // Fetch the results
-                                    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                                    // Set the first club as default if no club is selected
-                                    $defaultClubId = $clubs[0]['club_id'] ?? null;
-                                    $defaultClubName = $clubs[0]['clubName'] ?? 'Club not available';
-
-                                    // Generate the dropdown options
-                                    foreach ($clubs as $club): ?>
-                                        <option value="<?php echo htmlspecialchars($club['club_id']); ?>"
-                                            <?php if (isset($_GET['club_id']) && $_GET['club_id'] == $club['club_id']) echo 'selected'; ?>>
-                                            <?php echo htmlspecialchars($club['clubName']); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <label for="schoolYearDropdown" class="col-auto col-form-label">Month:</label>
-                            <div class="col-auto">
-                                <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                                    <?php
-                                    // Define months
-                                    $months = [
-                                        '01' => 'January',
-                                        '02' => 'February',
-                                        '03' => 'March',
-                                        '04' => 'April',
-                                        '05' => 'May',
-                                        '06' => 'June',
-                                        '07' => 'July',
-                                        '08' => 'August',
-                                        '09' => 'September',
-                                        '10' => 'October',
-                                        '11' => 'November',
-                                        '12' => 'December'
-                                    ];
-
-                                    // Get the current month
-                                    $currentMonth = date('m');
-
-                                    // Output month options
-                                    foreach ($months as $key => $month) {
-                                        echo "<option value=\"" . htmlspecialchars($key) . "\"";
-                                        // Check if $_GET['school_year'] is set, otherwise default to the current month
-                                        if ((isset($_GET['school_year']) && $_GET['school_year'] == $key) || (!isset($_GET['school_year']) && $key == $currentMonth)) {
-                                            echo " selected";
-                                        }
-                                        echo ">" . htmlspecialchars($month) . "</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-
-
-                            <!-- Display selected club name or default club name -->
-                            <div class="clubname-display text-center" style="width: 540px;">
-                                <?php
-                                // Check if a club is selected via the URL
-                                $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId;
-
-                                // Fetch and display the selected club name
-                                $sql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
-                                $stmt = $pdo->prepare($sql);
-                                $stmt->execute(['club_id' => $club_id]);
-                                $club = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                                if ($club) {
-                                    echo "<h5 class='text-muted mt-1 ms-3'>" . htmlspecialchars($club['clubName']) . "</h5>";
-                                } else {
-                                    echo "<p>Club not found.</p>";
-                                }
-                                ?>
-                            </div>
-
-                            <script>
-                                function filterDashboard() {
-                                    var club_id = document.getElementById('clubDropdown').value;
-                                    var school_year = document.getElementById('schoolYearDropdown').value;
-                                    var queryParams = new URLSearchParams(window.location.search);
-
-                                    // Update the club_id and school_year parameters in the URL
-                                    queryParams.set('club_id', club_id);
-                                    queryParams.set('school_year', school_year);
-
-                                    // Navigate to the updated URL
-                                    window.location.search = queryParams.toString();
-                                }
-                            </script>
-
-                        </div>
+                        
 
 
                         
                         <!-- THE MAIN PAGE START -->
                         <div class="card p-2">
+
+                            <div class="row mb-2 p-2">
+                                <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
+                                <div class="col-auto">
+                                    <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                                        <?php
+                                        // Prepare the SQL query to fetch clubs managed by the current moderator
+                                        $sql = "
+                                            SELECT c.club_id, c.clubName 
+                                            FROM tbl_clubs c
+                                            JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                                            WHERE cm.moderator_id = :moderator_id
+                                        ";
+
+                                        // Execute the query
+                                        $stmt = $pdo->prepare($sql);
+                                        $stmt->execute(['moderator_id' => $moderator_id]);
+
+                                        // Fetch the results
+                                        $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                        // Set the first club as default if no club is selected
+                                        $defaultClubId = $clubs[0]['club_id'] ?? null;
+                                        $defaultClubName = $clubs[0]['clubName'] ?? 'Club not available';
+
+                                        // Generate the dropdown options
+                                        foreach ($clubs as $club): ?>
+                                            <option value="<?php echo htmlspecialchars($club['club_id']); ?>"
+                                                <?php if (isset($_GET['club_id']) && $_GET['club_id'] == $club['club_id']) echo 'selected'; ?>>
+                                                <?php echo htmlspecialchars($club['clubName']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <label for="schoolYearDropdown" class="col-auto col-form-label">Month:</label>
+                                <div class="col-auto">
+                                    <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                                        <?php
+                                        // Define months
+                                        $months = [
+                                            '01' => 'January',
+                                            '02' => 'February',
+                                            '03' => 'March',
+                                            '04' => 'April',
+                                            '05' => 'May',
+                                            '06' => 'June',
+                                            '07' => 'July',
+                                            '08' => 'August',
+                                            '09' => 'September',
+                                            '10' => 'October',
+                                            '11' => 'November',
+                                            '12' => 'December'
+                                        ];
+
+                                        // Get the current month
+                                        $currentMonth = date('m');
+
+                                        // Output month options
+                                        foreach ($months as $key => $month) {
+                                            echo "<option value=\"" . htmlspecialchars($key) . "\"";
+                                            // Check if $_GET['school_year'] is set, otherwise default to the current month
+                                            if ((isset($_GET['school_year']) && $_GET['school_year'] == $key) || (!isset($_GET['school_year']) && $key == $currentMonth)) {
+                                                echo " selected";
+                                            }
+                                            echo ">" . htmlspecialchars($month) . "</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
+
+                                <!-- Display selected club name or default club name -->
+                                <div class="clubname-display text-center" style="width: 540px;">
+                                    <?php
+                                    // Check if a club is selected via the URL
+                                    $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId;
+
+                                    // Fetch and display the selected club name
+                                    $sql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
+                                    $stmt = $pdo->prepare($sql);
+                                    $stmt->execute(['club_id' => $club_id]);
+                                    $club = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                                    if ($club) {
+                                        echo "<h5 class='text-muted mt-1 ms-3'>" . htmlspecialchars($club['clubName']) . "</h5>";
+                                    } else {
+                                        echo "<p>Club not found.</p>";
+                                    }
+                                    ?>
+                                </div>
+
+                                <script>
+                                    function filterDashboard() {
+    var club_id = document.getElementById('clubDropdown').value;
+    var school_year = document.getElementById('schoolYearDropdown').value;
+    var queryParams = new URLSearchParams(window.location.search);
+
+    // Update the club_id and school_year parameters in the URL
+    queryParams.set('club_id', club_id);
+    queryParams.set('school_year', school_year);
+
+    // Navigate to the updated URL
+    window.location.search = queryParams.toString();
+}
+
+                                </script>
+
+                            </div>
 
                             <!-- ALL STUDENT TABLE START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
@@ -303,90 +306,116 @@ try {
                                 </table>
 
                                 <?php
-// Include config file
-require_once "../../config.php";
+                                // Include config file
+                                require_once "../../config.php";
 
-// SQL query to fetch distinct students with their pending registrations
-$sql = "SELECT 
-            s.student_id,
-            s.firstName,
-            s.middleName,
-            s.lastName,
-            s.gender,
-            s.department,
-            s.course,
-            s.profilePic,
-            MIN(r.dateApplied) AS dateApplied  -- Use MIN to get the earliest application date
-        FROM tbl_students s
-        LEFT JOIN tbl_registration r ON s.student_id = r.student_id
-        WHERE r.status = 'pending' -- Filter for pending status
-        GROUP BY s.student_id  -- Group by student ID for distinct entries
-        ORDER BY s.student_id ASC";
+                                // Get club_id and selected month from the URL
+                                $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
+                                $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
 
-if ($result = $pdo->query($sql)) {
-    $totalRows = $result->rowCount();
+                                // SQL query to fetch distinct students with their pending registrations
+                                $sql = "SELECT 
+                                            s.student_id,
+                                            s.firstName,
+                                            s.middleName,
+                                            s.lastName,
+                                            s.gender,
+                                            s.department,
+                                            s.course,
+                                            s.profilePic,
+                                            MIN(r.dateApplied) AS dateApplied
+                                        FROM tbl_students s
+                                        LEFT JOIN tbl_registration r ON s.student_id = r.student_id
+                                        LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
+                                        WHERE r.status = 'pending'";
 
-    if ($totalRows > 0) {
-        echo '
-        <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
-            <thead>
-                <tr>
-                    <th>Profile</th>
-                    <th>Student ID</th>
-                    <th>Fullname</th>
-                    <th>Gender</th>
-                    <th>Department</th>
-                    <th>Course</th>
-                    <th>Date Applied</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>';
+                                // Add filtering by club_id if provided
+                                if ($selectedClubId) {
+                                    $sql .= " AND c.club_id = :club_id";
+                                }
 
-        while ($row = $result->fetch()) {
-            $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
-            $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
-            $gender = htmlspecialchars($row['gender']);
-            $department = htmlspecialchars($row['department']);
-            $course = htmlspecialchars($row['course']);
-            $dateApplied = htmlspecialchars(date('F j, Y', strtotime($row['dateApplied']))); // Format date
+                                // This condition accumulates students from the start of the selected month to the current month
+                                if ($selectedMonth) {
+                                    $sql .= " AND MONTH(r.dateApplied) <= :selectedMonth";
+                                }
 
-            echo '
-            <tr class="student-row">
-                <td class="text-center">
-                    <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
-                        alt="' . $fullName . ' profile picture" 
-                        style="width: 60px; height: 60px; border-radius: 50%;">
-                </td>
-                <td>' . htmlspecialchars($row['student_id']) . '</td>
-                <td>' . $fullName . '</td>
-                <td>' . $gender . '</td>
-                <td>' . $department . '</td>
-                <td>' . $course . '</td>
-                <td>' . $dateApplied . '</td>
-                <td class="text-center">
-                    <a href="../public/crud/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                    <a href="../public/crud/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                    <a href="../public/crud/student_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
-                </td>
-            </tr>';
-        }
+                                $sql .= " GROUP BY s.student_id
+                                        ORDER BY MIN(r.dateApplied) ASC"; // Order by the earliest date applied
 
-        echo '
-            </tbody>
-        </table>';
-    } else {
-        echo '<div class="alert alert-danger"><em>No students found in pending status.</em></div>';
-    }
-} else {
-    echo "Oops! Something went wrong. Please try again later.";
-}
-?>
+                                $stmt = $pdo->prepare($sql);
+
+                                // Bind parameters
+                                $params = [];
+                                if ($selectedClubId) {
+                                    $params['club_id'] = $selectedClubId;
+                                }
+                                if ($selectedMonth) {
+                                    $params['selectedMonth'] = $selectedMonth;
+                                }
+
+                                // Execute the SQL statement
+                                $stmt->execute($params);
+
+                                $totalRows = $stmt->rowCount(); // Get the total rows from the prepared statement
+
+                                if ($totalRows > 0) {
+                                    echo '
+                                    <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                                        <thead>
+                                            <tr>
+                                                <th>Profile</th>
+                                                <th>Student ID</th>
+                                                <th>Full Name</th>
+                                                <th>Gender</th>
+                                                <th>Department</th>
+                                                <th>Course</th>
+                                                <th>Date Applied</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>';
+
+                                    while ($row = $stmt->fetch()) {
+                                        $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
+                                        $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
+                                        $gender = htmlspecialchars($row['gender']);
+                                        $department = htmlspecialchars($row['department']);
+                                        $course = htmlspecialchars($row['course']);
+                                        $dateApplied = htmlspecialchars(date('F j, Y', strtotime($row['dateApplied']))); // Format date
+
+                                        echo '
+                                        <tr class="student-row">
+                                            <td class="text-center">
+                                                <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
+                                                    alt="' . $fullName . ' profile picture" 
+                                                    style="width: 50px; height: 50px; border-radius: 50%;">
+                                            </td>
+                                            <td>' . htmlspecialchars($row['student_id']) . '</td>
+                                            <td>' . $fullName . '</td>
+                                            <td>' . $gender . '</td>
+                                            <td>' . $department . '</td>
+                                            <td>' . $course . '</td>
+                                            <td>' . $dateApplied . '</td>
+                                            <td class="text-center">
+                                                <a href="../public/crud/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                <a href="../public/crud/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
+                                                <a href="../public/crud/student_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                            </td>
+                                        </tr>';
+                                    }
+
+                                    echo '
+                                        </tbody>
+                                    </table>';
+                                } else {
+                                    echo '<p style="font-size: 16px; color: red;"><em>No students.</em></p>';
+                                }
+                                ?>
 
                             </div>
                             <!-- ALL STUDENT TABLE END -->
 
-                            <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
+                            <div id="noResultsMessage" class="alert p-2 ps-3" style="display: none;">
                                 <em>No results found.</em>
                             </div>
 
