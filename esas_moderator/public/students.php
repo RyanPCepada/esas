@@ -175,7 +175,7 @@ try {
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
 
 
-                        <div class="row align-items-center mb-2">
+                        <div class="row mb-2">
                             <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
                             <div class="col-auto">
                                 <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
@@ -209,45 +209,9 @@ try {
                                 </select>
                             </div>
 
-                            <label for="schoolYearDropdown" class="col-auto col-form-label">Month:</label>
-                            <div class="col-auto">
-                                <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                                    <?php
-                                    // Define months
-                                    $months = [
-                                        '01' => 'January',
-                                        '02' => 'February',
-                                        '03' => 'March',
-                                        '04' => 'April',
-                                        '05' => 'May',
-                                        '06' => 'June',
-                                        '07' => 'July',
-                                        '08' => 'August',
-                                        '09' => 'September',
-                                        '10' => 'October',
-                                        '11' => 'November',
-                                        '12' => 'December'
-                                    ];
-
-                                    // Get the current month
-                                    $currentMonth = date('m');
-
-                                    // Output month options
-                                    foreach ($months as $key => $month) {
-                                        echo "<option value=\"" . htmlspecialchars($key) . "\"";
-                                        // Check if $_GET['school_year'] is set, otherwise default to the current month
-                                        if ((isset($_GET['school_year']) && $_GET['school_year'] == $key) || (!isset($_GET['school_year']) && $key == $currentMonth)) {
-                                            echo " selected";
-                                        }
-                                        echo ">" . htmlspecialchars($month) . "</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-
 
                             <!-- Display selected club name or default club name -->
-                            <div class="clubname-display text-center" style="width: 540px;">
+                            <div class="clubname-display text-center" style="width: 77%;">
                                 <?php
                                 // Check if a club is selected via the URL
                                 $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId;
@@ -269,12 +233,10 @@ try {
                             <script>
                                 function filterDashboard() {
                                     var club_id = document.getElementById('clubDropdown').value;
-                                    var school_year = document.getElementById('schoolYearDropdown').value;
                                     var queryParams = new URLSearchParams(window.location.search);
 
                                     // Update the club_id and school_year parameters in the URL
                                     queryParams.set('club_id', club_id);
-                                    queryParams.set('school_year', school_year);
 
                                     // Navigate to the updated URL
                                     window.location.search = queryParams.toString();
@@ -359,8 +321,7 @@ try {
                                         <thead>
                                             <tr>
                                                 <th>Profile</th>
-                                                <th>Name</th>
-                                                <th>Club</th>
+                                                <th>Full Name</th>
                                                 <th>Gender</th>
                                                 <th>Age</th>
                                                 <th>Email</th>
@@ -374,7 +335,6 @@ try {
                                     foreach ($result as $row) {
                                         $formattedDate = date('F j, Y', strtotime($row['student_dateAdded']));
                                         $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
-                                        $clubNames = htmlspecialchars($row['clubNames']);
                                         $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
                                         $gender = htmlspecialchars($row['gender']);
                                         $age = htmlspecialchars($row['age']);
@@ -392,7 +352,6 @@ try {
                                                     style="width: 60px; height: 60px; border-radius: 50%;">
                                             </td>
                                             <td>' . $fullName . '</td>
-                                            <td>' . $clubNames . '</td>
                                             <td>' . $gender . '</td>
                                             <td>' . $age . '</td>
                                             <td>' . $email . '</td>
