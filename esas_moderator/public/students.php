@@ -147,7 +147,7 @@ try {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="../../esas_moderator/public/my_clubs.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                            <a href="../../esas_moderator/public/my_clubs.php" class="nav-link left-sidebar text-dark" id="my-clubs">
                                 <i class="fas fa-university"></i> My Clubs
                             </a>
                         </li>
