@@ -259,7 +259,7 @@ try {
                                                 <td class="text-center">
                                                     <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
                                                         alt="' . $fullName . ' profile picture" 
-                                                        style="width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
+                                                        style="width: 60px; height: 60px; border-radius: 50%;">
                                                 </td>
                                                 <td>' . $fullName . '</td>
                                                 <td>' . $clubNames . '</td>
