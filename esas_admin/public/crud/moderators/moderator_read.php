@@ -1,11 +1,133 @@
-<?php   
+<?php
+// Include config file
+require_once "../../../../config.php";
 
+// Check if the moderator_id parameter exists
+if (isset($_GET["moderator_id"]) && !empty(trim($_GET["moderator_id"]))) {
+    // Get the moderator_id from the query string
+    $moderator_id = trim($_GET["moderator_id"]);
 
+    // Prepare the SQL query to fetch moderator details and associated clubs
+    $sql = "SELECT 
+                m.moderator_id,
+                m.firstName,
+                m.middleName,
+                m.lastName,
+                m.age,
+                m.birthday,
+                m.gender,
+                m.email,
+                m.phoneNumber,
+                m.department,
+                m.profession,
+                m.profilePic,
+                GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
+            FROM tbl_moderators m
+            LEFT JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
+            LEFT JOIN tbl_clubs c ON cm.club_id = c.club_id
+            WHERE m.moderator_id = :moderator_id
+            GROUP BY m.moderator_id";
+
+    // Prepare the statement
+    if ($stmt = $pdo->prepare($sql)) {
+        // Bind the parameter
+        $stmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT);
+
+        // Execute the prepared statement
+        if ($stmt->execute()) {
+            // Check if the moderator was found
+            if ($stmt->rowCount() == 1) {
+                // Fetch the row data
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                // Retrieve the details
+                $fullName = htmlspecialchars($row["firstName"] . " " . $row["middleName"] . " " . $row["lastName"]);
+                $age = htmlspecialchars($row["age"]);
+                $birthday = htmlspecialchars($row["birthday"]);
+                $gender = htmlspecialchars($row["gender"]);
+                $email = htmlspecialchars($row["email"]);
+                $phoneNumber = htmlspecialchars($row["phoneNumber"]);
+                $department = htmlspecialchars($row["department"]);
+                $profession = htmlspecialchars($row["profession"]);
+                $clubNames = htmlspecialchars($row["clubNames"]);
+                $profilePic = htmlspecialchars($row["profilePic"] ? $row["profilePic"] : "default-profile.jpg");
+            } else {
+                // Redirect if no record is found
+                header("location: error.php");
+                exit();
+            }
+        } else {
+            echo "Oops! Something went wrong. Please try again later.";
+        }
+    }
+
+    // Close statement
+    unset($stmt);
+} else {
+    // Redirect if the moderator_id parameter is missing
+    header("location: error.php");
+    exit();
+}
+
+// Close connection
+unset($pdo);
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderator Details</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Moderator Profile</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 text-center">
+                                <img src="/esas/esas_moderator/images/<?php echo $profilePic; ?>" 
+                                     alt="<?php echo $fullName; ?> Profile Picture" 
+                                     class="img-fluid rounded-circle" style="width: 150px; height: 150px;">
+                            </div>
+                            <div class="col-md-9">
+                                <h4><?php echo $fullName; ?></h4>
+                                <p><strong>Email: </strong><?php echo $email; ?></p>
+                                <p><strong>Phone Number: </strong><?php echo $phoneNumber; ?></p>
+                                <p><strong>Department: </strong><?php echo $department; ?></p>
+                                <p><strong>Profession: </strong><?php echo $profession; ?></p>
+                                <p><strong>Gender: </strong><?php echo $gender; ?></p>
+                                <p><strong>Age: </strong><?php echo $age; ?></p>
+                                <p><strong>Birthday: </strong><?php echo $birthday; ?></p>
+                                <p><strong>Clubs: </strong><?php echo $clubNames; ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="moderator_update.php?moderator_id=<?php echo $moderator_id; ?>" class="btn btn-warning">Update</a>
+                        <a href="moderator_delete.php?moderator_id=<?php echo $moderator_id; ?>" class="btn btn-danger">Delete</a>
+                        <a href="moderators_list.php" class="btn btn-secondary">Back to Moderators List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
 
 
-<tr class="moderator-row">
+
+<!-- <tr class="moderator-row">
     <td class="text-center">
         <img class="moderator-profile-pic" src="/esas/esas_moderator/images/' . $profilePic . '" 
             alt="' . $fullName . ' profile picture" 
@@ -21,4 +143,4 @@
         <a href="../public/crud/moderators/moderator_update.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
         <a href="../public/crud/moderators/moderator_delete.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
     </td>
-</tr>
+</tr> -->

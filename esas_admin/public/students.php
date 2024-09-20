@@ -152,6 +152,14 @@ try {
 
                             <!-- ALL STUDENT TABLE START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+                                
+                                <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
+                                    <h4 class="text-muted mb-0">Students Record</h4>
+                                    <a href="../public/crud/students/student_create.php" class="btn btn-danger disabled" style="visibility: hidden;">
+                                        <i class="fa fa-plus"></i> Add New Student
+                                    </a>
+                                </div>
+                            
                                 <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
                                     <thead>
                                         <tr>

@@ -153,10 +153,13 @@ try {
                             <!-- ALL MODERATOR TABLE START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
 
-                                <div class="mt-1 mb-3 clearfix text-end">
-                                    <a href="../public/crud/moderators/moderator_create.php" class="btn btn-danger pull-right">
-                                        <i class="fa fa-plus"></i> Add New Moderator</a>
+                                <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
+                                    <h4 class="text-muted mb-0">Moderators Record</h4>
+                                    <a href="../public/crud/moderators/moderator_create.php" class="btn btn-danger">
+                                        <i class="fa fa-plus"></i> Add New Moderator
+                                    </a>
                                 </div>
+
                                 <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
                                     <thead>
                                         <tr>
