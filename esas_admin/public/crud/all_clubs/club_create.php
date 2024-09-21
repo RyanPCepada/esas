@@ -188,7 +188,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="form-group">
                         <label>Add Moderator</label>
                         <select name="moderator" id="moderatorSelect" class="form-control">
-                            <!-- <option value="">-- Select from existing Moderators --</option> -->
+                            <option value="">-- Select from existing Moderators or add new --</option>
                             <optgroup label="">
                                 <?php foreach ($moderators as $moderator): ?>
                                     <option value="<?php echo htmlspecialchars($moderator['moderator_id']); ?>">
@@ -197,7 +197,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <?php endforeach; ?>
                             </optgroup>
                             <optgroup label=" ">
-                                <option value="add_new_moderator">+ Add New Moderator</option> <!-- Option to trigger modal -->
+                                <option value="add_new_moderator" style="font-weight: bold;">+ Add New Moderator</option>
                             </optgroup>
                         </select>
                     </div>
