@@ -1,16 +1,11 @@
 <?php
-// Include config file
 require_once "../../../../config.php";
 
-// Define variables and initialize with empty values
 $clubName = $information = $coverPhoto = "";
 $clubName_err = $information_err = $coverPhoto_err = "";
-$moderators = []; // Array to store moderators
-
-// Define a default cover photo filename
+$moderators = [];
 define('COVERPHOTO_DEFAULT', 'COVERPHOTO_DEFAULT.png');
 
-// Fetch moderators from the database
 $moderatorQuery = "SELECT moderator_id, CONCAT(firstName, ' ', lastName) AS moderator_name FROM tbl_moderators";
 if ($stmt = $pdo->prepare($moderatorQuery)) {
     if ($stmt->execute()) {
@@ -18,9 +13,31 @@ if ($stmt = $pdo->prepare($moderatorQuery)) {
     }
 }
 
-// Processing form data when form is submitted
+if (isset($_POST['action']) && $_POST['action'] == 'add_moderator') {
+    $firstName = trim($_POST['firstName']);
+    $middleInitial = trim($_POST['middleInitial']);
+    $lastName = trim($_POST['lastName']);
+    $email = trim($_POST['email']);
+    $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
+
+    $sql2 = "INSERT INTO tbl_moderators (firstName, middleName, lastName, email, password, dateAdded) 
+             VALUES (:firstName, :middleInitial, :lastName, :email, :password, NOW())";
+    if ($stmt2 = $pdo->prepare($sql2)) {
+        $stmt2->bindParam(":firstName", $firstName);
+        $stmt2->bindParam(":middleInitial", $middleInitial);
+        $stmt2->bindParam(":lastName", $lastName);
+        $stmt2->bindParam(":email", $email);
+        $stmt2->bindParam(":password", $password);
+
+        if ($stmt2->execute()) {
+            $newModeratorId = $pdo->lastInsertId();
+            echo json_encode(['success' => true, 'moderatorId' => $newModeratorId, 'fullName' => "$firstName $middleInitial. $lastName"]);
+            exit();
+        }
+    }
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validate clubName
     $input_clubName = trim($_POST["clubName"]);
     if (empty($input_clubName)) {
         $clubName_err = "Please enter a club name.";
@@ -28,7 +45,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $clubName = $input_clubName;
     }
 
-    // Validate information
     $input_information = trim($_POST["information"]);
     if (empty($input_information)) {
         $information_err = "Please enter club information.";
@@ -36,32 +52,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $information = $input_information;
     }
 
-    // Validate and handle cover photo upload
     if (isset($_FILES['coverPhoto']) && $_FILES['coverPhoto']['name']) {
         $coverPhotoName = $_FILES['coverPhoto']['name'];
         $coverPhotoSize = $_FILES['coverPhoto']['size'];
         $coverPhotoTmpName = $_FILES['coverPhoto']['tmp_name'];
 
-        // Add image validation logic here
         $validImageExtensions = ['jpg', 'jpeg', 'png'];
         $imageExtension = pathinfo($coverPhotoName, PATHINFO_EXTENSION);
         $imageExtension = strtolower($imageExtension);
 
         if (!in_array($imageExtension, $validImageExtensions)) {
             $coverPhoto_err = "Invalid image extension. Only JPG, JPEG, and PNG are allowed.";
-        } elseif ($coverPhotoSize > 5000000) { // Max size 5MB
+        } elseif ($coverPhotoSize > 5000000) {
             $coverPhoto_err = "Image size is too large (max 5MB).";
         } else {
-            // Generate a unique file name for the new image
             $newCoverPhotoName = 'club_' . uniqid() . '.' . $imageExtension;
-
-            // Save the image to your server
             $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas-admin/images/';
             $uploadPath = $uploadDir . $newCoverPhotoName;
 
-            // Ensure the directory exists
             if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true); // Create directory if it doesn't exist
+                mkdir($uploadDir, 0755, true);
             }
 
             if (!move_uploaded_file($coverPhotoTmpName, $uploadPath)) {
@@ -71,56 +81,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     } else {
-        // If no file was uploaded, use the default cover photo
         $coverPhoto = COVERPHOTO_DEFAULT;
     }
 
-    // Check input errors before inserting into database
     if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err)) {
-        // Prepare an insert statement
         $sql = "INSERT INTO tbl_clubs (clubName, information, coverPhoto, dateAdded) VALUES (:clubName, :information, :coverPhoto, NOW())";
-
         if ($stmt = $pdo->prepare($sql)) {
-            // Bind variables to the prepared statement as parameters
             $stmt->bindParam(":clubName", $clubName);
             $stmt->bindParam(":information", $information);
             $stmt->bindParam(":coverPhoto", $coverPhoto);
 
-            // Attempt to execute the prepared statement
             if ($stmt->execute()) {
-                // Get the last inserted club ID
                 $clubId = $pdo->lastInsertId();
-
-                // Get selected moderator from the form
                 $selectedModerator = $_POST["moderator"];
+                $newModeratorId = null;
 
-                // Insert the club-moderator relationship
-                if (!empty($selectedModerator)) {
-                    $sql2 = "INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id, dateAdded) VALUES (:clubId, :moderatorId, NOW())";
-                    if ($stmt2 = $pdo->prepare($sql2)) {
-                        $stmt2->bindParam(":clubId", $clubId);
-                        $stmt2->bindParam(":moderatorId", $selectedModerator);
-                        $stmt2->execute();
+                if ($selectedModerator == "add_new_moderator") {
+                    $newModeratorId = $_POST['newModeratorId'];
+                } else {
+                    $newModeratorId = $selectedModerator;
+                }
+
+                if (!empty($newModeratorId)) {
+                    $sql3 = "INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id, dateAdded) 
+                             VALUES (:clubId, :moderatorId, NOW())";
+                    if ($stmt3 = $pdo->prepare($sql3)) {
+                        $stmt3->bindParam(":clubId", $clubId);
+                        $stmt3->bindParam(":moderatorId", $newModeratorId);
+                        $stmt3->execute();
                     }
                 }
 
-                // Records created successfully. Redirect to landing page
                 header("location: ../../all_clubs.php");
                 exit();
             } else {
                 echo "Oops! Something went wrong. Please try again later.";
             }
         }
-
-        // Close statement
         unset($stmt);
     }
-
-    // Close connection
     unset($pdo);
 }
 ?>
-
 
 
 
@@ -179,16 +181,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                     <div class="form-group">
                         <label>Add Moderator</label>
-                        <select name="moderator" class="form-control">
+                        <select name="moderator" id="moderatorSelect" class="form-control">
                             <option value="">-- Select from existing Moderators --</option>
-                            <option value="TBA">TBA</option>
-                            <?php foreach ($moderators as $moderator): ?>
-                                <option value="<?php echo htmlspecialchars($moderator['moderator_id']); ?>">
-                                    <?php echo htmlspecialchars($moderator['moderator_name']); ?>
-                                </option>
-                            <?php endforeach; ?>
+                            <optgroup label="">
+                                <?php foreach ($moderators as $moderator): ?>
+                                    <option value="<?php echo htmlspecialchars($moderator['moderator_id']); ?>">
+                                        <?php echo htmlspecialchars($moderator['moderator_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                            <optgroup label=" ">
+                                <option value="add_new_moderator">+ Add New Moderator</option> <!-- Option to trigger modal -->
+                            </optgroup>
                         </select>
                     </div>
+
                     <input type="submit" class="btn btn-primary" value="Submit">
                     <a href="../../all_clubs.php" class="btn btn-secondary">Cancel</a>
                 </form>
@@ -196,6 +203,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </div>
+
+<!-- Add New Moderator Modal -->
+<div class="modal fade" id="addModeratorModal" tabindex="-1" role="dialog" aria-labelledby="addModeratorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModeratorModalLabel">Add New Moderator</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addModeratorForm">
+                    <div class="form-group">
+                        <label>First Name:</label>
+                        <input type="text" name="firstName" class="form-control underline-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Middle Initial:</label>
+                        <input type="text" name="middleInitial" maxlength="1" class="form-control underline-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name:</label>
+                        <input type="text" name="lastName" class="form-control underline-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" name="email" class="form-control underline-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Temporary Password:</label>
+                        <input type="password" name="password" class="form-control underline-input" required>
+                    </div>
+                    <input type="hidden" id="newModeratorId" name="newModeratorId" value="">
+                    <input type="submit" class="btn btn-primary" value="Add Moderator">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 
 
 <!-- Include jQuery -->
@@ -206,6 +257,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <!-- Include Cropper.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+
+<script>
+    document.getElementById("moderatorSelect").addEventListener("change", function() {
+        if (this.value === "add_new_moderator") {
+            $("#addModeratorModal").modal("show");
+        }
+    });
+
+    document.getElementById("addModeratorForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+        formData.append('action', 'add_moderator');
+
+        fetch("<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>", {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const select = document.getElementById("moderatorSelect");
+                const newOption = document.createElement("option");
+                newOption.value = data.moderatorId;
+                newOption.text = data.fullName;
+                select.appendChild(newOption);
+                select.value = data.moderatorId;
+
+                $("#addModeratorModal").modal("hide");
+                document.getElementById('newModeratorId').value = data.moderatorId;
+            } else {
+                alert("Error adding moderator.");
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+
+
+
+
 
 <script>
     let cropper;
