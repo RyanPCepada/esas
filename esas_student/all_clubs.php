@@ -184,7 +184,7 @@ try {
                 height: 177px;
                 margin: 5px auto;
             }
-            #clubFilter {
+            #departmentSelect {
                 width: 43% !important;
             }
             .table-striped {
@@ -433,48 +433,48 @@ try {
         }
 
         // Function to initialize search functionality
-function initializeSearch() {
-    const searchInput = document.getElementById('clubSearch');
-    const clubCards = document.querySelectorAll('.club-card');
-    const rowCountDisplay = document.getElementById('rowCountDisplay');
-    const noResultsMessage = document.getElementById('noResultsMessage');
+        function initializeSearch() {
+            const searchInput = document.getElementById('clubSearch');
+            const clubCards = document.querySelectorAll('.club-card');
+            const rowCountDisplay = document.getElementById('rowCountDisplay');
+            const noResultsMessage = document.getElementById('noResultsMessage');
 
-    searchInput.addEventListener('input', function() {
-        const searchTerm = searchInput.value.trim().toLowerCase();
-        let visibleClubCount = 0;
+            searchInput.addEventListener('input', function() {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                let visibleClubCount = 0;
 
-        clubCards.forEach(card => {
-            const clubNameElement = card.querySelector('.club-name');
-            const originalClubName = card.getAttribute('data-club-name');
-            const originalClubNameLower = originalClubName.toLowerCase();
+                clubCards.forEach(card => {
+                    const clubNameElement = card.querySelector('.club-name');
+                    const originalClubName = card.getAttribute('data-club-name');
+                    const originalClubNameLower = originalClubName.toLowerCase();
 
-            if (searchTerm === '') {
-                clubNameElement.innerHTML = originalClubName; // Reset the name if search is empty
-                card.style.display = '';
-                visibleClubCount++; // Count visible cards
-            } else {
-                if (originalClubNameLower.includes(searchTerm)) {
-                    card.style.display = '';
-                    visibleClubCount++;
-                    highlightText(clubNameElement, searchTerm); // Highlight the matching text
+                    if (searchTerm === '') {
+                        clubNameElement.innerHTML = originalClubName; // Reset the name if search is empty
+                        card.style.display = '';
+                        visibleClubCount++; // Count visible cards
+                    } else {
+                        if (originalClubNameLower.includes(searchTerm)) {
+                            card.style.display = '';
+                            visibleClubCount++;
+                            highlightText(clubNameElement, searchTerm); // Highlight the matching text
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+
+                // Update the row count to reflect the visible clubs
+                const totalRows = clubCards.length; // Total number of cards available
+                rowCountDisplay.textContent = `Showing ${visibleClubCount} / ${totalRows} Records`;
+
+                // Show or hide the noResultsMessage
+                if (visibleClubCount === 0 && searchTerm !== '') {
+                    noResultsMessage.style.display = 'block'; // Show message
                 } else {
-                    card.style.display = 'none';
+                    noResultsMessage.style.display = 'none'; // Hide message
                 }
-            }
-        });
-
-        // Update the row count to reflect the visible clubs
-        const totalRows = clubCards.length; // Total number of cards available
-        rowCountDisplay.textContent = `Showing ${visibleClubCount} / ${totalRows} Records`;
-
-        // Show or hide the noResultsMessage
-        if (visibleClubCount === 0 && searchTerm !== '') {
-            noResultsMessage.style.display = 'block'; // Show message
-        } else {
-            noResultsMessage.style.display = 'none'; // Hide message
-        }
-    });
-}
+            });
+        }   
 
         // Fetch all clubs on page load
         window.onload = function() {
