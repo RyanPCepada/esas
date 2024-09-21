@@ -295,7 +295,7 @@ try {
                                             <div class="row ms-0 mb-3 p-3 club-row" style="' . $rowStyle . '">
                                                 <!-- Club Cover Photo and Details -->
                                                 <div class="col-md-4">
-                                                    <div style="text-align: center;">
+                                                    <div style="text-align: start;">
                                                         <img class="club-cover-photo" src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
                                                             alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
                                                             style="width: 100%; max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">

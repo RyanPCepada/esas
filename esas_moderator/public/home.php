@@ -372,7 +372,7 @@ unset($pdo);
             // Function to fetch and display comments for a post
             function fetchComments(postId) {
                 console.log(`Fetching comments for post ID: ${postId}`); // Debug log
-                fetch(`/e-sas/esas-moderator/public/comments-api.php?post_id=${postId}`)
+                fetch(`/esas/esas_moderator/apis/comments-api.php?post_id=${postId}`)
                     .then(response => response.json())
                     .then(data => {
                         console.log('Fetched comments:', data); // Debug log
@@ -383,7 +383,7 @@ unset($pdo);
                                 const [date, time] = comment.dateAdded.split(' ');
                                 return `
                                     <div class="comment d-flex align-items-start mb-2">
-                                        <img src="/e-sas/esas-student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
+                                        <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
                                         <div>
                                             <p class="mb-1"><strong>${comment.student_name}</strong>: ${comment.comment}</p>
                                             <p class="text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
