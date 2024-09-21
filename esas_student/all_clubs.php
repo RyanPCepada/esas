@@ -70,7 +70,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Sample Template</title>
+    <title>eSAS - All Clubs</title>
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../assets/js/jquery-3.6.0.js"></script>
@@ -241,6 +241,8 @@ try {
             }
         }
 
+
+        
     </style>
 </head>
 <body>
@@ -290,58 +292,52 @@ try {
 
             
             <!-- MAINPAGE BAR -->
-            <div class="col-12 col-md-10 bg-lgrey auto-scroll">
-                <div class="row g-0 h-100">
+<div class="col-12 col-md-10 bg-lgrey auto-scroll">
+    <div class="row g-0 h-100">
+        <div id="divpr_requesdetails" class="table-responsive px-0">
+            <div class="row g-0 p-4 px-2 pt-2 h-100">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start mt-2 ms-2 me-1 mb-1 me-sm-2">
+                            <h3 class="text-muted">Student Club Organizations</h3>
+                            <div class="officers-link mt-0 mt-sm-0 me-1 me-sm-4">
+                                <a href="../esas_student/officers/csg_officers.php" class="d-inline-block">
+                                    <i class="fas fa-user-tie"></i> CSG Officers</a>
+                                <a href="../esas_student/officers/sbo_officers.php" class="ms-2 d-inline-block">
+                                    <i class="fas fa-user-tie"></i> SBO Officers</a>
+                            </div>
+                        </div>
 
-
-
-
-                    
-                    <div id="divpr_requesdetails" class="table-responsive px-0">
-                        <div class="row g-0 p-4 px-2 pt-2 h-100">
-                            <div class="card">
-                                <div class="card-body">
-                                    
-                                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start mt-2 ms-2 me-1 mb-1 me-sm-2">
-                                        <h3 class="text-muted">Student Club Organizations</h3>
-                                        <div class="officers-link mt-0 mt-sm-0 me-1 me-sm-4">
-                                            <a href="../esas_student/officers/csg_officers.php" class="d-inline-block">
-                                                <i class="fas fa-user-tie"></i> CSG Officers</a>
-                                            <a href="../esas_student/officers/sbo_officers.php" class="ms-2 d-inline-block">
-                                                <i class="fas fa-user-tie"></i> SBO Officers</a>
+                        <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                            <thead>
+                                <tr>
+                                    <th colspan="9">
+                                        <div class="row">
+                                            <div class="col-12 col-md-8">
+                                                <input id="clubSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                                            </div>
+                                            <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
+                                                <h6 id="rowCountDisplay">Showing 0 / 0 Clubs</h6>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
 
-                                    <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
-    <thead>
-        <tr>
-            <th colspan="9">
-                <div class="row">
-                    <div class="col-12 col-md-8">
-                        <input id="moderatorSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                    </div>
-                    <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
-                        <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6>
-                    </div>
-                </div>
-            </th>
-        </tr>
-    </thead>
-</table>
-
-                                    <div class="row mainbar g-0 h-100">
-                                        <div class="row g-2 mt-0" id="allClubsContainer">
-                                            <!-- Club cards will be dynamically added here -->
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="row mainbar g-0">
+                            <div class="row g-2 mt-0" id="allClubsContainer">
+                                <!-- Club cards will be dynamically added here -->
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
-            <!-- MAINPAGE BAR END -->
+        </div>
+    </div>
+</div>
+<!-- MAINPAGE BAR END -->
+
 
         </div>
     </div>
@@ -371,13 +367,17 @@ try {
                 return response.json();
             })
             .then(data => {
-                // $('#post-26').html(data)
                 const allClubsContainer = document.getElementById('allClubsContainer');
+                const rowCountDisplay = document.getElementById('rowCountDisplay');
+                const totalRows = data.length;
+
+                rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Clubs`;
+
                 if (data && data.length > 0) {
                     data.forEach(club => {
                         const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
                         const cardHTML = `
-                            <div class="col-md-4 card-container">
+                            <div class="col-md-4 card-container club-card" data-club-name="${club.clubName}">
                                 <div class="card card-img-only-all">
                                     <small data-toggle="tooltip" title="${memberText}">
                                         <i class="fa fa-user mr-1"></i>${club.membersCount}
@@ -385,10 +385,7 @@ try {
                                     <a href="/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
                                         <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
                                         <div class="overlay-text">
-                                            <h4>${club.clubName}</h4>
-                                            <!--<div class="moderators-container">
-                                                ${club.formattedModerators}
-                                            </div>-->
+                                            <h4 class="club-name">${club.clubName}</h4>
                                         </div>
                                     </a>
                                 </div>
@@ -399,6 +396,49 @@ try {
                 } else {
                     allClubsContainer.innerHTML = '<p>No clubs found.</p>';
                 }
+
+                // Add search functionality
+                const searchInput = document.getElementById('clubSearch');
+                const clubCards = document.querySelectorAll('.club-card');
+                
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = searchInput.value.trim().toLowerCase();
+                    let visibleClubCount = 0;
+
+                    clubCards.forEach(card => {
+                        const clubNameElement = card.querySelector('.club-name');
+                        const originalClubName = card.getAttribute('data-club-name'); // Keep original case
+                        const originalClubNameLower = originalClubName.toLowerCase(); // Lowercase for comparison
+                        
+                        if (searchTerm === '') {
+                            clubNameElement.innerHTML = originalClubName; // Restore original name
+                            card.style.display = '';
+                        } else {
+                            if (originalClubNameLower.includes(searchTerm)) {
+                                card.style.display = '';
+                                visibleClubCount++;
+                                highlightText(clubNameElement, searchTerm);
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        }
+                    });
+
+                    // Update the row count
+                    if (searchTerm === '') {
+                        rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`; // Reset to original count
+                    } else {
+                        rowCountDisplay.textContent = `Showing ${visibleClubCount} / ${totalRows} Records`;
+                    }
+                });
+
+
+                // Highlight matching text
+                function highlightText(element, term) {
+                    const originalText = element.textContent;
+                    const regex = new RegExp(`(${term})`, 'gi');
+                    element.innerHTML = originalText.replace(regex, `<span style="background-color: rgba(173, 216, 230, 0.5); border-radius: 10%;">$1</span>`);
+                }
             })
             .catch(error => {
                 console.error('Error fetching clubs:', error);
@@ -406,88 +446,87 @@ try {
                 allClubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
             });
 
-
     </script>
 
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Cache the elements
-        const allClubsLink = document.getElementById('all-clubs');
-        const myClubsLink = document.getElementById('my-clubs');
-        const clubRequestsLink = document.getElementById('club-requests');
-        const officersDiv = document.querySelector('.officers-div');
-        const csgCards = document.querySelectorAll('.card-csg-officer'); // CSG officer cards
-        const sboCards = document.querySelectorAll('.card-sbo-officer'); // SBO officer cards
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cache the elements
+            const allClubsLink = document.getElementById('all-clubs');
+            const myClubsLink = document.getElementById('my-clubs');
+            const clubRequestsLink = document.getElementById('club-requests');
+            const officersDiv = document.querySelector('.officers-div');
+            const csgCards = document.querySelectorAll('.card-csg-officer'); // CSG officer cards
+            const sboCards = document.querySelectorAll('.card-sbo-officer'); // SBO officer cards
 
-        function animateCards(cards) {
-            // Apply the animation waveIn dynamically for a group of cards
-            cards.forEach((card, index) => {
-                // Reset styles
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px) scale(0.95)';
-                card.style.transition = 'none'; // Disable transition for reset
+            function animateCards(cards) {
+                // Apply the animation waveIn dynamically for a group of cards
+                cards.forEach((card, index) => {
+                    // Reset styles
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px) scale(0.95)';
+                    card.style.transition = 'none'; // Disable transition for reset
 
-                // Trigger a reflow to apply reset styles
-                void card.offsetWidth;
+                    // Trigger a reflow to apply reset styles
+                    void card.offsetWidth;
 
-                // Re-enable transitions
-                card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                    // Re-enable transitions
+                    card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
 
-                // Apply animation with a delay (wave effect)
-                setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0) scale(1)';
-                    card.style.animation = `waveIn 0.6s ease-out forwards`;
-                }, index * 100); // Delay per card to create the wave effect
-            });
-        }
-
-        function updateVisibility() {
-            if (allClubsLink.classList.contains('active')) {
-                officersDiv.style.display = 'block'; // Show officers div
-
-                // Trigger animations for CSG and SBO cards at the same time but separately
-                animateCards(csgCards);  // Animate CSG officers
-                animateCards(sboCards);  // Animate SBO officers
-            } else {
-                officersDiv.style.display = 'none'; // Hide officers div
+                    // Apply animation with a delay (wave effect)
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0) scale(1)';
+                        card.style.animation = `waveIn 0.6s ease-out forwards`;
+                    }, index * 100); // Delay per card to create the wave effect
+                });
             }
-        }
 
-        // Add keyframes dynamically
-        const styleSheet = document.createElement('style');
-        styleSheet.type = 'text/css';
-        styleSheet.innerHTML = `
-            @keyframes waveIn {
-                0% {
-                    opacity: 0;
-                    transform: translateY(20px) scale(0.95);
-                }
-                50% {
-                    opacity: 0.5;
-                    transform: translateY(-10px) scale(1.05); /* Peak of the wave */
-                }
-                100% {
-                    opacity: 1;
-                    transform: translateY(0) scale(1);
+            function updateVisibility() {
+                if (allClubsLink.classList.contains('active')) {
+                    officersDiv.style.display = 'block'; // Show officers div
+
+                    // Trigger animations for CSG and SBO cards at the same time but separately
+                    animateCards(csgCards);  // Animate CSG officers
+                    animateCards(sboCards);  // Animate SBO officers
+                } else {
+                    officersDiv.style.display = 'none'; // Hide officers div
                 }
             }
-        `;
-        document.head.appendChild(styleSheet);
 
-        // Initial visibility setup
-        updateVisibility();
-    });
+            // Add keyframes dynamically
+            const styleSheet = document.createElement('style');
+            styleSheet.type = 'text/css';
+            styleSheet.innerHTML = `
+                @keyframes waveIn {
+                    0% {
+                        opacity: 0;
+                        transform: translateY(20px) scale(0.95);
+                    }
+                    50% {
+                        opacity: 0.5;
+                        transform: translateY(-10px) scale(1.05); /* Peak of the wave */
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: translateY(0) scale(1);
+                    }
+                }
+            `;
+            document.head.appendChild(styleSheet);
 
-
-    $(document).ready(function() {
-        $('.delprreq').click(function(e) {
-            e.stopPropagation();
+            // Initial visibility setup
+            updateVisibility();
         });
-        // let value= $("classname").val()
-    });
-</script>
+
+
+        $(document).ready(function() {
+            $('.delprreq').click(function(e) {
+                e.stopPropagation();
+            });
+            // let value= $("classname").val()
+        });
+    </script>
 
 </body>
 </html>
