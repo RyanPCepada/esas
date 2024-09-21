@@ -1,22 +1,22 @@
 <?php 
 session_start();
-require_once "../config.php";  // Assuming this file holds your PDO connection
+require_once "../../config.php";  // Assuming this file holds your PDO connection
 
-if (!isset($_SESSION['admin_id'])) {
-    echo "Admin ID is not set in the session.";
+if (!isset($_SESSION['moderator_id'])) {
+    echo "Moderator ID is not set in the session.";
     exit;
 }
 
-$admin_id = $_SESSION['admin_id']; // Get admin ID from session
+$moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 
 try {
     // Use the existing PDO instance from config.php
     global $pdo;
 
     // Prepare and execute the SQL statement
-    $sql = "SELECT email FROM tbl_admin WHERE admin_id = :admin_id";
+    $sql = "SELECT firstName, middleName, lastName FROM tbl_moderators WHERE moderator_id = :moderator_id";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':admin_id', $admin_id, PDO::PARAM_INT);
+    $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
     $stmt->execute();
     
     // Fetch the result
@@ -24,10 +24,12 @@ try {
 
     // Check if a result was found
     if ($result) {
-        $email = strtoupper($result['email']);
+        $firstName = strtoupper($result['firstName']);
+        $middleName = strtoupper($result['middleName']);
+        $lastName = strtoupper($result['lastName']);
     } else {
         // Handle the case where no data is found
-        $email = "UNKNOWN";
+        $firstName = $middleName = $lastName = "UNKNOWN";
     }
 
 } catch (PDOException $e) {
@@ -35,8 +37,10 @@ try {
     die("Database error: " . $e->getMessage());
 }
 
-?>
 
+
+
+?>
 
 
 <!DOCTYPE html>
@@ -48,11 +52,11 @@ try {
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>eSAS - Dashboard</title>
-    <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
-    <script src="../assets/js/all.js" crossorigin="anonymous"></script>
-    <script src="../assets/js/jquery-3.6.0.js"></script>
-    <link href="../assets/css/styles.css" rel="stylesheet" />
-    <link href="../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
+    <script src="../../assets/js/jquery-3.6.0.js"></script>
+    <link href="../../assets/css/styles.css" rel="stylesheet" />
+    <link href="../../assets/img/nbsclogo.png" rel="icon">
     <style>
         .nav-link.active {
           color: white !important;
@@ -73,8 +77,6 @@ try {
             padding: 50px;
         }
         
-        
-
         @keyframes waveIn {
             0% {
                 opacity: 0;
@@ -93,8 +95,6 @@ try {
         .card {
             /* Ensure your card styles are here */
         }
-
-        
 
         .icon-style {
             position: absolute;
@@ -117,7 +117,6 @@ try {
                 width: 6% !important;
             }
         }
-
     </style>
 </head>
 <body>
@@ -126,15 +125,15 @@ try {
         <div class="row g-0 h-100">
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
-                    <img src="../assets/img/SAS_LOGO.png" style="height: 0.3in;">
-                    eSAS - Admin</a>
+                    <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
+                    eSAS - Moderator</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse hide" id="main_nav">
                     <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
-                        <?php include 'nav/nav_main.php' ?>
+                        <?php include '../nav/nav_main.php' ?>
                     </div>
                 </div>
             </nav>
@@ -144,28 +143,23 @@ try {
             <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li>
-                        <a href="../esas_admin/dashboard.php" class="nav-link left-sidebar text-dark active" id="all-clubs">
+                        <a href="../../esas_moderator/public/dashboard.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="dashboard">
                             <i class="fas fa-chart-line"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_admin/all_clubs.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
-                            <i class="fas fa-university"></i> All Clubs
+                        <a href="../../esas_moderator/public/my_clubs.php" class="nav-link left-sidebar text-dark" id="my-clubs">
+                            <i class="fas fa-university"></i> My Clubs
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="../esas_admin/moderators.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
-                            <i class="fa fa-user-shield"></i> Moderators
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="../esas_admin/students.php" class="nav-link left-sidebar text-dark" aria-current="page" id="my-clubs">
+                        <a href="../../esas_moderator/public/students.php" class="nav-link left-sidebar text-dark" id="students">
                             <i class="fas fa-users"></i> Students
                         </a>
                     </li>
                     <li>
-                        <a href="../esas_admin/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
-                            <i class="fas fa-envelope"></i> Club Requests
+                        <a href="../../esas_moderator/public/pending_approvals.php" class="nav-link left-sidebar text-dark" id="pending-approvals">
+                            <i class="fas fa-hourglass-half"></i> Pending Approvals
                         </a>
                     </li>
                 </ul>
@@ -175,98 +169,172 @@ try {
             <!-- LEFT SIDEBAR END -->
 
 
-            
+            <!--HERE-->
             
             <!-- MAINPAGE BAR -->
             <div class="col-12 col-md-10 bg-lgrey auto-scroll">
                 <div class="row g-0 h-100">
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
-                        <div class="row align-items-center mb-2">
-                            <label for="schoolYearDropdown" class="col-auto col-form-label">Month:</label>
-                            <div class="col-auto">
-                                <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
-                                    <?php
-                                    // Define months
-                                    $months = [
-                                        '01' => 'January',
-                                        '02' => 'February',
-                                        '03' => 'March',
-                                        '04' => 'April',
-                                        '05' => 'May',
-                                        '06' => 'June',
-                                        '07' => 'July',
-                                        '08' => 'August',
-                                        '09' => 'September',
-                                        '10' => 'October',
-                                        '11' => 'November',
-                                        '12' => 'December'
-                                    ];
+                        
 
-                                    // Get the current month
-                                    $currentMonth = date('m');
-
-                                    // Output month options
-                                    foreach ($months as $key => $month) {
-                                        echo "<option value=\"" . htmlspecialchars($key) . "\"";
-                                        // Check if $_GET['school_year'] is set, otherwise default to the current month
-                                        if ((isset($_GET['school_year']) && $_GET['school_year'] == $key) || (!isset($_GET['school_year']) && $key == $currentMonth)) {
-                                            echo " selected";
-                                        }
-                                        echo ">" . htmlspecialchars($month) . "</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-
-                            <script>
-                                function filterDashboard() {
-                                    var school_year = document.getElementById('schoolYearDropdown').value;
-                                    var queryParams = new URLSearchParams(window.location.search);
-
-                                    // Update the school_year parameter in the URL
-                                    queryParams.set('school_year', school_year);
-
-                                    // Navigate to the updated URL
-                                    window.location.search = queryParams.toString();
-                                }
-                            </script>
-                        </div>
 
                         <!-- THE MAIN PAGE START -->
                         <div class="card p-2">
+
+                            <div class="row mb-2 p-2">
+                                <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
+                                <div class="col-auto">
+                                    <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                                        <?php
+                                        // Prepare the SQL query to fetch clubs managed by the current moderator
+                                        $sql = "
+                                            SELECT c.club_id, c.clubName 
+                                            FROM tbl_clubs c
+                                            JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                                            WHERE cm.moderator_id = :moderator_id
+                                        ";
+
+                                        // Execute the query
+                                        $stmt = $pdo->prepare($sql);
+                                        $stmt->execute(['moderator_id' => $moderator_id]);
+
+                                        // Fetch the results
+                                        $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                        // Set the first club as default if no club is selected
+                                        $defaultClubId = $clubs[0]['club_id'] ?? null;
+                                        $defaultClubName = $clubs[0]['clubName'] ?? 'Club not available';
+
+                                        // Generate the dropdown options
+                                        foreach ($clubs as $club): ?>
+                                            <option value="<?php echo htmlspecialchars($club['club_id']); ?>"
+                                                <?php if (isset($_GET['club_id']) && $_GET['club_id'] == $club['club_id']) echo 'selected'; ?>>
+                                                <?php echo htmlspecialchars($club['clubName']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <label for="schoolYearDropdown" class="col-auto col-form-label">Month:</label>
+                                <div class="col-auto">
+                                    <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                                        <?php
+                                        // Define months
+                                        $months = [
+                                            '01' => 'January',
+                                            '02' => 'February',
+                                            '03' => 'March',
+                                            '04' => 'April',
+                                            '05' => 'May',
+                                            '06' => 'June',
+                                            '07' => 'July',
+                                            '08' => 'August',
+                                            '09' => 'September',
+                                            '10' => 'October',
+                                            '11' => 'November',
+                                            '12' => 'December'
+                                        ];
+
+                                        // Get the current month
+                                        $currentMonth = date('m');
+
+                                        // Output month options
+                                        foreach ($months as $key => $month) {
+                                            echo "<option value=\"" . htmlspecialchars($key) . "\"";
+                                            // Check if $_GET['school_year'] is set, otherwise default to the current month
+                                            if ((isset($_GET['school_year']) && $_GET['school_year'] == $key) || (!isset($_GET['school_year']) && $key == $currentMonth)) {
+                                                echo " selected";
+                                            }
+                                            echo ">" . htmlspecialchars($month) . "</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
+
+                                <!-- Display selected club name or default club name -->
+                                <div class="clubname-display text-center" style="width: 540px;">
+                                    <?php
+                                    // Check if a club is selected via the URL
+                                    $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId;
+
+                                    // Fetch and display the selected club name
+                                    $sql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
+                                    $stmt = $pdo->prepare($sql);
+                                    $stmt->execute(['club_id' => $club_id]);
+                                    $club = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                                    if ($club) {
+                                        echo "<h5 class='text-muted mt-1 ms-3'>" . htmlspecialchars($club['clubName']) . "</h5>";
+                                    } else {
+                                        echo "<p>Club not found.</p>";
+                                    }
+                                    ?>
+                                </div>
+
+                                <script>
+                                    function filterDashboard() {
+                                        var club_id = document.getElementById('clubDropdown').value;
+                                        var school_year = document.getElementById('schoolYearDropdown').value;
+                                        var queryParams = new URLSearchParams(window.location.search);
+
+                                        // Update the club_id and school_year parameters in the URL
+                                        queryParams.set('club_id', club_id);
+                                        queryParams.set('school_year', school_year);
+
+                                        // Navigate to the updated URL
+                                        window.location.search = queryParams.toString();
+                                    }
+                                </script>
+
+                            </div>
+
                             <!-- UPPER CARDS START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
-                                <!-- Card for TOTAL CLUBS -->
+                                <!-- Card for TOTAL MODERATORS CLUBS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
-                                            // Get the selected month from the URL
-                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                            // Get the selected club_id and school_year (month) from the URL
+                                            $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
+                                            
+                                            // Base SQL query to count total clubs associated with the moderator
+                                            $sql = "
+                                                SELECT COUNT(DISTINCT cm.club_id) AS total_clubs 
+                                                FROM tbl_clubs_and_moderators cm
+                                                JOIN tbl_clubs c ON cm.club_id = c.club_id
+                                                WHERE cm.moderator_id = :moderator_id
+                                            ";
 
-                                            // Base SQL query to count total clubs
-                                            $sql = "SELECT COUNT(*) AS total_clubs FROM tbl_clubs";
+                                            // Parameters for the query
+                                            $params = ['moderator_id' => $moderator_id];
 
-                                            // Add condition for the selected month if applicable
+                                            // Add condition for the selected month, if applicable
                                             if ($selectedMonth) {
-                                                // Ensure clubs are counted if they were created or approved up to the selected month
-                                                $sql .= " WHERE MONTH(dateAdded) <= :month";
+                                                $sql .= " AND MONTH(c.dateAdded) <= :month";
+                                                $params['month'] = $selectedMonth;
+                                            }
+
+                                            // Do not filter by club_id when counting total clubs unless it's specifically required
+                                            // So if you only want the total number of clubs, exclude this condition unless you need to filter
+                                            // by a specific club later in other logic
+                                            if ($selectedClubId && isset($_GET['filter_by_club'])) {
+                                                // Use this filter only if you have a specific filter flag in the logic
+                                                $sql .= " AND c.club_id = :club_id";
+                                                $params['club_id'] = $selectedClubId;
                                             }
 
                                             // Prepare and execute the query
                                             $stmt_clubs = $pdo->prepare($sql);
-
-                                            if ($selectedMonth) {
-                                                $stmt_clubs->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-                                            }
-
-                                            $stmt_clubs->execute();
+                                            $stmt_clubs->execute($params);
 
                                             // Fetch the total number of clubs
                                             $total_clubs = $stmt_clubs->fetchColumn();
-                                            echo "<h3>" . htmlspecialchars($total_clubs) . "</h3>";
+                                            echo "<h3>$total_clubs</h3>";
                                         } catch (PDOException $e) {
-                                            echo "Error: " . htmlspecialchars($e->getMessage());
+                                            echo "Error: " . $e->getMessage();
                                         }
                                         ?>
                                         <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
@@ -275,78 +343,49 @@ try {
                                 </div>
 
 
-                                <!-- Card for TOTAL MODERATORS -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <?php
-                                        try {
-                                            // Get the selected month from the URL
-                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
-
-                                            // Base SQL query to count total moderators
-                                            $sql = "SELECT COUNT(*) AS total_moderators FROM tbl_moderators";
-
-                                            // Add condition for the selected month, if applicable
-                                            if ($selectedMonth) {
-                                                $sql .= " WHERE MONTH(dateAdded) <= :month";
-                                            }
-
-                                            // Prepare and execute the query
-                                            $stmt_moderators = $pdo->prepare($sql);
-
-                                            if ($selectedMonth) {
-                                                $stmt_moderators->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-                                            }
-                                            
-                                            $stmt_moderators->execute();
-
-                                            // Fetch the total number of moderators
-                                            $total_moderators = $stmt_moderators->fetchColumn();
-                                            echo "<h3>" . htmlspecialchars($total_moderators) . "</h3>";
-                                        } catch (PDOException $e) {
-                                            echo "Error: " . htmlspecialchars($e->getMessage());
-                                        }
-                                        ?>
-                                        <i class="fas fa-user-shield mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Moderators</p>
-                                    </div>
-                                </div>
-
-
                                 <!-- Card for TOTAL STUDENTS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
-                                        try {
-                                            // Get the selected month from the URL
-                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                        // Get the selected club_id and school_year (month) from the URL
+                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
+                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
-                                            // Base SQL query to count total active students up to the selected month
+                                        try {
+                                            // Base SQL query to count total active students for clubs handled by the moderator
                                             $sql = "
-                                                SELECT COUNT(DISTINCT student_id) AS total_students 
-                                                FROM tbl_registration 
-                                                WHERE status = 'active'
-                                                AND MONTH(dateApproved) <= :month
-                                                AND YEAR(dateApproved) = YEAR(CURDATE())"; // Assuming we're filtering within the current year
+                                                SELECT COUNT(DISTINCT tr.student_id) AS total_students 
+                                                FROM tbl_registration tr 
+                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
+                                                JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id 
+                                                WHERE cm.moderator_id = :moderator_id 
+                                                AND tr.status = 'active'
+                                            ";
+
+                                            // Parameters for the query
+                                            $params = ['moderator_id' => $moderator_id];
+
+                                            // Add condition for the selected club, if applicable
+                                            if ($selectedClubId) {
+                                                $sql .= " AND tr.club_id = :club_id";
+                                                $params['club_id'] = $selectedClubId; // Ensure this is set
+                                            }
+
+                                            // Add condition for the selected month, if applicable
+                                            if ($selectedMonth) {
+                                                $sql .= " AND MONTH(tr.dateApproved) <= :month";
+                                                $params['month'] = $selectedMonth;
+                                            }
 
                                             // Prepare and execute the query
                                             $stmt_students = $pdo->prepare($sql);
-                                            
-                                            if ($selectedMonth) {
-                                                $stmt_students->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-                                            } else {
-                                                // Default to current month if no month is selected
-                                                $currentMonth = date('m');
-                                                $stmt_students->bindParam(':month', $currentMonth, PDO::PARAM_INT);
-                                            }
-                                            
-                                            $stmt_students->execute();
+                                            $stmt_students->execute($params);
 
                                             // Fetch the total number of students
                                             $total_students = $stmt_students->fetchColumn();
-                                            echo "<h3>" . htmlspecialchars($total_students) . "</h3>";
+                                            echo "<h3>$total_students</h3>";
                                         } catch (PDOException $e) {
-                                            echo "Error: " . htmlspecialchars($e->getMessage());
+                                            echo "Error: " . $e->getMessage();
                                         }
                                         ?>
                                         <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
@@ -354,48 +393,72 @@ try {
                                     </div>
                                 </div>
 
-                                <!-- Card for CLUB REQUESTS -->
+
+
+
+                                <!-- Card for TOTAL PENDING -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
-                                        try {
-                                            // Get the selected month from the URL
-                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                        // Get the selected club_id and school_year (month) from the URL
+                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
+                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
-                                            // Base SQL query to count total club requests
+                                        try {
+                                            // Base SQL query to count total pending registrations for clubs handled by the moderator
                                             $sql = "
-                                                SELECT COUNT(request_id) AS total_requests 
-                                                FROM tbl_club_requests
+                                                SELECT COUNT(tr.registration_id) AS total_pending 
+                                                FROM tbl_registration tr
+                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id
+                                                JOIN tbl_clubs_and_moderators tcm ON tc.club_id = tcm.club_id
+                                                WHERE tr.status = 'pending' 
+                                                AND tcm.moderator_id = :moderator_id
                                             ";
+
+                                            // Parameters for the query
+                                            $params = ['moderator_id' => $moderator_id];
+
+                                            // Add condition for the selected club, if applicable
+                                            if ($selectedClubId) {
+                                                $sql .= " AND tr.club_id = :club_id";
+                                                $params['club_id'] = $selectedClubId;
+                                            }
 
                                             // Add condition for the selected month, if applicable
                                             if ($selectedMonth) {
-                                                $sql .= " WHERE MONTH(dateRequested) <= :month";
+                                                $sql .= " AND MONTH(tr.dateApplied) <= :month"; // Assuming dateApplied is used for filtering
+                                                $params['month'] = $selectedMonth;
                                             }
 
                                             // Prepare and execute the query
-                                            $stmt_requests = $pdo->prepare($sql);
+                                            $stmt_pending = $pdo->prepare($sql);
+                                            $stmt_pending->execute($params);
 
-                                            if ($selectedMonth) {
-                                                $stmt_requests->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-                                            }
-                                            
-                                            $stmt_requests->execute();
-
-                                            // Fetch the total number of requests
-                                            $total_requests = $stmt_requests->fetchColumn();
-                                            echo "<h3>" . htmlspecialchars($total_requests) . "</h3>";
+                                            // Fetch the total number of pending approvals
+                                            $total_pending = $stmt_pending->fetchColumn();
+                                            echo "<h3>$total_pending</h3>";
                                         } catch (PDOException $e) {
-                                            echo "Error: " . htmlspecialchars($e->getMessage());
+                                            echo "Error: " . $e->getMessage();
                                         }
                                         ?>
-                                        <i class="fas fa-envelope mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Club Requests</p>
+                                        <i class="fas fa-hourglass-half mt-2 me-2 p-2 icon-style"></i>
+                                        <p>Total Pending Approvals</p>
                                     </div>
                                 </div>
 
+
+
+                                <!-- Card for LEAVE REQUESTS (you can modify this query as needed) -->
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <h3>0</h3>
+                                        <i class="fas fa-door-open mt-2 me-2 p-2 icon-style"></i>
+                                        <p>Leave Requests</p>
+                                    </div>
+                                </div>
                             </div>
                             <!-- UPPER CARDS END -->
+
 
                             <!-- CHARTS AND DIAGRAMS START -->
                             <div class="row card-row2 col-12" style="border: 1px solid transparent; margin: 0;">
@@ -403,62 +466,77 @@ try {
                                 <!-- PIE CHART -->
                                 <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <p>Registered Students per Club</p>
+                                        <p>Students per Department</p>
                                         <div style="height: 365px; background-color: transparent;">
                                             <?php
                                             try {
-                                                // Get the selected month from the URL
-                                                $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                                // Get the selected club_id and month from the URL
+                                                $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
                                                 // Prepare the SQL query
                                                 $sql = "
-                                                    SELECT tc.clubName, COUNT(DISTINCT tr.student_id) AS member_count
-                                                    FROM tbl_registration tr
+                                                    SELECT ts.department, COUNT(tr.student_id) AS member_count
+                                                    FROM tbl_students ts
+                                                    JOIN tbl_registration tr ON ts.student_id = tr.student_id
                                                     JOIN tbl_clubs tc ON tr.club_id = tc.club_id
-                                                    WHERE tr.status = 'active'
+                                                    JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id
+                                                    WHERE cm.moderator_id = :moderator_id 
+                                                    AND tr.status = 'active'
                                                 ";
+
+                                                // Add condition for club_id if it's set
+                                                if ($club_id) {
+                                                    $sql .= " AND tr.club_id = :club_id";
+                                                }
 
                                                 // Add condition for the selected month, if applicable
                                                 if ($selectedMonth) {
                                                     $sql .= " AND MONTH(tr.dateApproved) <= :month";
                                                 }
 
-                                                $sql .= " GROUP BY tc.club_id";
+                                                $sql .= " GROUP BY ts.department";
 
-                                                // Prepare and execute the query
                                                 $stmt = $pdo->prepare($sql);
+                                                $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
 
+                                                // Bind club_id parameter if it's set
+                                                if ($club_id) {
+                                                    $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                }
+
+                                                // Bind month parameter if it's set
                                                 if ($selectedMonth) {
                                                     $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
                                                 }
 
                                                 $stmt->execute();
-                                                $club_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                $department_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             } catch (PDOException $e) {
-                                                echo "Error: " . htmlspecialchars($e->getMessage());
+                                                echo "Error: " . $e->getMessage();
                                             }
 
                                             // Prepare data for the pie chart
-                                            $clubs = [];
+                                            $departments = [];
                                             $counts = [];
-                                            $total_students = 0;
+                                            $total_members = 0;
 
-                                            foreach ($club_data as $row) {
-                                                $clubs[] = $row['clubName'];
+                                            foreach ($department_data as $row) {
+                                                $departments[] = $row['department'];
                                                 $counts[] = $row['member_count'];
-                                                $total_students += $row['member_count'];
+                                                $total_members += $row['member_count'];
                                             }
 
-                                            // Calculate percentage for each club
+                                            // Calculate percentage for each department
                                             $percentages = [];
                                             foreach ($counts as $count) {
-                                                $percentages[] = $total_students > 0 ? round(($count / $total_students) * 100) : 0;
+                                                $percentages[] = $total_members > 0 ? round(($count / $total_members) * 100) : 0;
                                             }
 
-                                            // Combine percentages and club names
+                                            // Combine percentages and department names
                                             $labels_with_percentages = [];
-                                            foreach ($clubs as $index => $club) {
-                                                $labels_with_percentages[] = $percentages[$index] . '% ' . $club;
+                                            foreach ($departments as $index => $department) {
+                                                $labels_with_percentages[] = $percentages[$index] . '% ' . $department;
                                             }
                                             ?>
                                             <!-- Canvas for the pie chart -->
@@ -484,17 +562,17 @@ try {
                                                     const pieChart = new Chart(ctx, {
                                                         type: 'pie',
                                                         data: {
-                                                            labels: labelsWithPercentages,  // Club names with percentages
+                                                            labels: labelsWithPercentages,  // Department names with percentages
                                                             datasets: [{
-                                                                label: 'Registered Students per Club',
-                                                                data: counts,  // Member count per club
+                                                                label: 'Members per Department',
+                                                                data: counts,  // Member count per department
                                                                 backgroundColor: [
                                                                     'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
-                                                                    'rgba(255, 105, 180, 0.8)',   // Hot Pink
-                                                                    'rgba(255, 215, 0, 0.8)',     // Gold
-                                                                    'rgba(0, 255, 255, 0.8)',     // Cyan
-                                                                    'rgba(255, 165, 0, 0.8)',     // Orange
-                                                                    'rgba(0, 255, 0, 0.8)'        // Lime Green
+                                                                    'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
+                                                                    'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
+                                                                    'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
+                                                                    'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
+                                                                    'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
                                                                 ],
                                                                 borderColor: [
                                                                     'rgba(65, 105, 225, 1)',     // Royal Blue border
@@ -513,8 +591,8 @@ try {
                                                                 legend: {
                                                                     position: 'top',
                                                                     labels: {
-                                                                        usePointStyle: true, // Use custom point style
-                                                                        pointStyle: 'rect',  // Set point style to square
+                                                                        boxWidth: 20,  // Set square shape
+                                                                        padding: 20    // Add spacing between labels and box
                                                                     }
                                                                 },
                                                                 tooltip: {
@@ -529,6 +607,7 @@ try {
                                                     });
                                                 }
                                             </script>
+
                                         </div>
                                     </div>
                                 </div>
@@ -536,11 +615,12 @@ try {
 
 
 
+
+
                                 <!-- OTHER CHARTS -->
                                 <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
-
-                                    
+                                        
                                         <!-- Registry per SY -->
                                         <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
@@ -568,7 +648,8 @@ try {
                                                             FROM tbl_students s
                                                             JOIN tbl_registration r ON s.student_id = r.student_id
                                                             JOIN tbl_clubs c ON r.club_id = c.club_id
-                                                            WHERE r.status = 'active'
+                                                            JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                                                            WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
                                                     ";
 
                                                     // Add condition for club_id if it's set
@@ -596,6 +677,7 @@ try {
 
                                                     // Prepare the statement
                                                     $stmt = $pdo->prepare($sql);
+                                                    $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
 
                                                     // Bind club_id parameter if it's set
                                                     if ($club_id) {
@@ -705,7 +787,6 @@ try {
                                             </div>
                                         </div>
 
-
                                     </div>
 
 
@@ -715,7 +796,9 @@ try {
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
 
 
-                                        <!-- Year Level Count -->
+
+                                    
+                                        <!-- Year Level Numbers -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                                 <p>Year Level Count</p>
@@ -726,26 +809,50 @@ try {
                                                     <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
                                                     
                                                     <?php
-                                                    try {
-                                                        // Get the selected month from the URL parameter or default to the current month
-                                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
+                                                    // Get the selected club_id and school_year (month) from the URL
+                                                    $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                    $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
-                                                        // SQL Query to fetch year level counts, aggregated up to the selected month
+                                                    try {
+                                                        // SQL Query to fetch year level counts, filtered by moderator, club_id, and dateApproved
                                                         $sql = "
-                                                            SELECT s.year, COUNT(DISTINCT s.student_id) AS count
-                                                            FROM tbl_students s
-                                                            JOIN tbl_registration r ON s.student_id = r.student_id
-                                                            WHERE r.status = 'active'
-                                                            AND MONTH(r.dateApproved) <= :selectedMonth
-                                                            GROUP BY s.year
+                                                        SELECT s.year, COUNT(DISTINCT s.student_id) AS count
+                                                        FROM tbl_students s
+                                                        JOIN tbl_registration r ON s.student_id = r.student_id
+                                                        JOIN tbl_clubs_and_moderators cm ON r.club_id = cm.club_id
+                                                        WHERE r.status = 'active'
+                                                        AND cm.moderator_id = :moderator_id
                                                         ";
 
-                                                        $stmt = $pdo->prepare($sql);
-                                                        $stmt->bindParam(':selectedMonth', $selectedMonth, PDO::PARAM_INT);
-                                                        $stmt->execute();
-                                                        
+                                                        // Add condition for club_id if it's set
+                                                        if ($club_id) {
+                                                            $sql .= " AND r.club_id = :club_id";
+                                                        }
+
+                                                        // Add condition for dateApproved month if it's set
+                                                        if ($selectedMonth) {
+                                                            $sql .= " AND MONTH(r.dateApproved) <= :month";
+                                                        }
+
+                                                        $sql .= " GROUP BY s.year";
+
+                                                        $stmtCounts = $pdo->prepare($sql);
+                                                        $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+
+                                                        // Bind club_id parameter if it's set
+                                                        if ($club_id) {
+                                                            $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                        }
+
+                                                        // Bind month parameter if it's set
+                                                        if ($selectedMonth) {
+                                                            $stmtCounts->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                                        }
+
+                                                        $stmtCounts->execute();
+
                                                         // Fetch the results into an associative array
-                                                        $yearData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                        $yearData = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
 
                                                         // Initialize arrays for years and counts
                                                         $years = ['1', '2', '3', '4']; // Ensure all years are included
@@ -758,15 +865,19 @@ try {
 
                                                             // Check if $year is within the valid range
                                                             if ($year >= 1 && $year <= 4) {
-                                                                $counts[$year - 1] += $count; // Sum counts for each year
+                                                                $counts[$year - 1] = $count;
                                                             }
                                                         }
 
-                                                        // SQL Query to get the total number of students
-                                                        $sqlTotalStudents = "SELECT COUNT(DISTINCT student_id) AS total_student_count FROM tbl_students";
+                                                        // SQL Query to get the total student count from tbl_students
+                                                        $sqlTotalStudents = "
+                                                        SELECT COUNT(DISTINCT student_id) AS total_student_count
+                                                        FROM tbl_students
+                                                        ";
+
                                                         $stmtTotalStudents = $pdo->prepare($sqlTotalStudents);
                                                         $stmtTotalStudents->execute();
-                                                        $totalStudentCount = (int)$stmtTotalStudents->fetchColumn();
+                                                        $totalStudentCount = $stmtTotalStudents->fetchColumn();
 
                                                     } catch (PDOException $e) {
                                                         echo "Error: " . $e->getMessage();
@@ -822,13 +933,17 @@ try {
                                                             };
 
                                                             // Render the chart
-                                                            new Chart(studentBarChartElement, config);
+                                                            const studentBarChart = new Chart(
+                                                                studentBarChartElement,
+                                                                config
+                                                            );
                                                         }
                                                     </script>
 
                                                 </div>
                                             </div>
                                         </div>
+
 
                                         <!-- Student Gender -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
@@ -837,22 +952,45 @@ try {
                                                 <div style="height: 150px; position: relative;">
                                                     <?php
                                                     try {
-                                                        // Get the selected month from the URL parameter or default to the current month
-                                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
+                                                        // Get the selected club_id and month (school_year) from the URL
+                                                        $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Temporary use of "school_year" as month
 
-                                                        // SQL Query to fetch gender counts, aggregated up to the selected month
+                                                        // Prepare the SQL statement to get gender counts filtered by club, moderator, and date
                                                         $sqlCounts = "
                                                             SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
                                                             FROM tbl_students s
                                                             JOIN tbl_registration r ON s.student_id = r.student_id
-                                                            WHERE r.status = 'active' 
-                                                            AND MONTH(r.dateApproved) <= :selectedMonth
-                                                            AND YEAR(r.dateApproved) = YEAR(CURDATE()) 
-                                                            GROUP BY s.gender
+                                                            JOIN tbl_clubs c ON r.club_id = c.club_id
+                                                            JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                                                            WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
                                                         ";
 
+                                                        // Add condition for club_id if it's set
+                                                        if ($club_id) {
+                                                            $sqlCounts .= " AND r.club_id = :club_id";
+                                                        }
+
+                                                        // Add condition for the selected month, if applicable
+                                                        if ($selectedMonth) {
+                                                            $sqlCounts .= " AND MONTH(r.dateApproved) <= :month";
+                                                        }
+
+                                                        $sqlCounts .= " GROUP BY s.gender";
+
                                                         $stmtCounts = $pdo->prepare($sqlCounts);
-                                                        $stmtCounts->bindParam(':selectedMonth', $selectedMonth, PDO::PARAM_INT);
+                                                        $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+
+                                                        // Bind club_id parameter if it's set
+                                                        if ($club_id) {
+                                                            $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+                                                        }
+
+                                                        // Bind month parameter if it's set
+                                                        if ($selectedMonth) {
+                                                            $stmtCounts->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                                        }
+
                                                         $stmtCounts->execute();
                                                         $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
 
@@ -869,10 +1007,18 @@ try {
                                                             }
                                                         }
 
-                                                        // Prepare the SQL statement to get the total number of students
-                                                        $sqlTotal = "SELECT COUNT(*) AS total_count FROM tbl_students";
+                                                        // Prepare the SQL statement to get the total student count in the system
+                                                        $sqlTotal = "SELECT COUNT(DISTINCT student_id) AS total_count FROM tbl_students";
                                                         $stmtTotal = $pdo->query($sqlTotal);
                                                         $totalCount = $stmtTotal->fetchColumn();
+
+                                                        // Function to round up to the nearest multiple of 5
+                                                        function roundUpToNearest5($num) {
+                                                            return $num > 0 ? ceil($num / 5) * 5 : 5;
+                                                        }
+
+                                                        // Calculate the peak limit
+                                                        $peakLimit = roundUpToNearest5($totalCount);
 
                                                         // Prepare the data for JavaScript
                                                         $labels = array_keys($genderCounts);
@@ -883,25 +1029,29 @@ try {
                                                         echo 'Error: ' . $e->getMessage();
                                                     }
                                                     ?>
+
                                                     <canvas id="studentGenderChart" style="width: 100%; height: 100%;"></canvas>
                                                     <p id="noDataMessageGender" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
+
                                                     <script>
                                                         document.addEventListener('DOMContentLoaded', function() {
                                                             const ctx = document.getElementById('studentGenderChart').getContext('2d');
-                                                            const noDataMessageGender = document.getElementById('noDataMessageGender');
 
                                                             // Data from PHP
                                                             const labels = <?php echo json_encode($labels); ?>;
                                                             const dataCounts = <?php echo json_encode($data); ?>;
-                                                            const totalCount = <?php echo $totalCount; ?>;
+                                                            const peakLimit = <?php echo $peakLimit; ?>;
 
                                                             // Check if there is no data to display
                                                             const hasDataGender = dataCounts.some(count => count > 0);
 
+                                                            // Show or hide the "No Data" message based on data availability
+                                                            const studentGenderChartElement = document.getElementById('studentGenderChart');
+                                                            const noDataMessageGender = document.getElementById('noDataMessageGender');
+
                                                             if (!hasDataGender) {
-                                                                // Hide the chart and show the "No Data" message
-                                                                ctx.canvas.style.display = 'none';
-                                                                noDataMessageGender.style.display = 'block';
+                                                                studentGenderChartElement.style.display = 'none';  // Hide the chart
+                                                                noDataMessageGender.style.display = 'block';  // Show "No data available" message
                                                             } else {
                                                                 // Data for the chart
                                                                 const data = {
@@ -923,7 +1073,7 @@ try {
                                                                         scales: {
                                                                             x: {
                                                                                 beginAtZero: true,
-                                                                                suggestedMax: totalCount // Set the maximum value to the total student count
+                                                                                max: peakLimit // Set the maximum value to the nearest higher multiple of 5
                                                                             },
                                                                             y: {
                                                                                 // Automatically handled by Chart.js for labels
@@ -946,8 +1096,6 @@ try {
                                             </div>
                                         </div>
 
-
-                                    </div>
                                 </div>
 
 
@@ -965,9 +1113,9 @@ try {
     </div>
 
     <!-- <?php include 'assets/components/modals.php' ?> -->
-    <script src="../assets/js/jquery.dataTables.min.js"></script>
-    <script src="../assets/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/global_script.js"></script>
+    <script src="../../assets/js/jquery.dataTables.min.js"></script>
+    <script src="../../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/global_script.js"></script>
 
 
 
@@ -1028,42 +1176,43 @@ try {
     </script>
 
 
-    <script>
+
+<script>
 
 
-        // JavaScript to Animate Cards
-        document.addEventListener('DOMContentLoaded', function() {
-            function animateCards(cards) { 
-                cards.forEach((card, index) => {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(5px) scale(0.95)'; // Adjusted Y translation
-                    card.style.transition = 'none'; // Disable transition for reset
+    // JavaScript to Animate Cards
+    document.addEventListener('DOMContentLoaded', function() {
+        function animateCards(cards) { 
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(5px) scale(0.95)'; // Adjusted Y translation
+                card.style.transition = 'none'; // Disable transition for reset
 
-                    void card.offsetWidth; // Trigger reflow
+                void card.offsetWidth; // Trigger reflow
 
-                    card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-                    
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0) scale(1)';
-                        card.style.animation = `waveIn 0.6s ease-out forwards`;
-                    }, index * 100); // Staggered delay
-                });
-            }
-
-            // Select only the upper cards
-            const upperCards = document.querySelectorAll('.card-row1 .card');
-            animateCards(upperCards);
-        });
-
-
-        $(document).ready(function() {
-            $('.delprreq').click(function(e) {
-                e.stopPropagation();
+                card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0) scale(1)';
+                    card.style.animation = `waveIn 0.6s ease-out forwards`;
+                }, index * 100); // Staggered delay
             });
-            // let value= $("classname").val()
+        }
+
+        // Select only the upper cards
+        const upperCards = document.querySelectorAll('.card-row1 .card');
+        animateCards(upperCards);
+    });
+
+
+    $(document).ready(function() {
+        $('.delprreq').click(function(e) {
+            e.stopPropagation();
         });
-    </script>
+        // let value= $("classname").val()
+    });
+</script>
 
 </body>
 </html>
