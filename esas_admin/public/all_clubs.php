@@ -198,6 +198,11 @@ try {
                             <i class="fas fa-envelope"></i> Club Requests
                         </a>
                     </li>
+                    <li>
+                        <a href="../../esas_admin/public/reports.php" class="nav-link left-sidebar text-dark" id="reports">
+                            <i class="fas fa-file-alt"></i> Reports
+                        </a>
+                    </li>
                 </ul>
             </div>
 
