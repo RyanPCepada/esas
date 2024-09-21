@@ -254,7 +254,7 @@ try {
                                             c.clubName, 
                                             c.information, 
                                             c.coverPhoto, 
-                                            GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.lastName) SEPARATOR '|||') AS moderators,
+                                            GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.lastName, ':::', m.profilePic) SEPARATOR '|||') AS moderators,
                                             (SELECT COUNT(DISTINCT r.student_id) FROM tbl_registration r WHERE r.club_id = c.club_id AND r.status = 'active') AS member_count,
                                             c.dateAdded
                                         FROM tbl_clubs c
@@ -268,41 +268,48 @@ try {
                                     $rowCount = 0; // To keep track of row number for striping
 
                                     if ($totalRows > 0) {
-                                        echo '
-                                        ';
-
+                                        echo '';
 
                                         // Populate the rows using the row template
                                         while ($row = $result->fetch()) {
                                             $formattedDate = date('F j, Y', strtotime($row['dateAdded']));
-                                            $moderators = explode('|||', $row['moderators']);
-                                            $moderatorCount = count($moderators);
-                                        
-                                            // Generate moderator list
+                                            $moderatorData = explode('|||', $row['moderators']);
+                                            $moderatorCount = count($moderatorData);
+                                            
+                                            // Generate moderator list with profile pictures
                                             $moderatorList = '';
-                                            foreach ($moderators as $moderator) {
-                                                $moderatorList .= '<h6>' . htmlspecialchars($moderator) . '</h6>';
+                                            foreach ($moderatorData as $data) {
+                                                list($moderatorName, $profilePic) = explode(':::', $data);
+                                                $moderatorList .= '<div style="display: flex; align-items: center; margin-bottom: 3px;">
+                                                                    <img src="/esas/esas_moderator/images/' . htmlspecialchars($profilePic) . '" 
+                                                                        alt="' . htmlspecialchars($moderatorName) . ' profile picture" 
+                                                                        style="width: 40px; height: 40px; border-radius: 50%; margin-right: 8px;">
+                                                                    <h5>' . htmlspecialchars($moderatorName) . '</h5>
+                                                                </div>';
                                             }
-                                        
+                                            
                                             $moderatorLabel = ($moderatorCount == 1) ? 'Moderator:' : 'Moderators:';
                                             $memberText = ($row['member_count'] == 1) ? 'member' : 'members';
-                                        
+                                            
                                             // Alternate row colors
                                             $rowStyle = ($rowCount % 2 == 0) ? 'background-color: #f2f2f2;' : 'background-color: #ffffff;';
                                             $rowCount++;
-                                        
-                                            echo '
-                                            <div class="row ms-0 mb-3 p-3 club-row" style="' . $rowStyle . '">
-                                                <!-- Club Cover Photo and Details -->
-                                                <div class="col-md-4">
+                                            
+                                            echo '  
+                                            <div class="row ms-0 mb-3 p-4 club-row" style="' . $rowStyle . '">
+                                                <!-- Club Cover Photo -->
+                                                <div class="col-md-5">
                                                     <div style="text-align: start;">
                                                         <img class="club-cover-photo" src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
                                                             alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
-                                                            style="width: 100%; max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
-                                                        <div>
-                                                            <h4 class="text-muted mt-3">' . htmlspecialchars($row['clubName']) . '</h4>
-                                                        </div>
-                                                        <h6 class="text-muted mt-2 mb-2">' . $moderatorLabel . '</h6>
+                                                            style="width: 100%; max-width: 90%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
+                                                    </div>
+                                                </div>
+                                                <!-- Club Details -->
+                                                <div class="col-md-6">
+                                                    <div>
+                                                        <h2 class="text-muted mt-3">' . htmlspecialchars($row['clubName']) . '</h2>
+                                                        <h5 class="text-muted mt-2 mb-2">' . $moderatorLabel . '</h5>
                                                         <div class="moderator-list">' . $moderatorList . '</div>
                                                         <hr class="m-1">
                                                         <div class="d-flex justify-content-between align-items-center">
@@ -311,20 +318,15 @@ try {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <!-- Club Information -->
-                                                <div class="col-md-7">
-                                                    <div>' . htmlspecialchars($row['information']) . '</div>
-                                                </div>
                                                 <!-- Actions -->
                                                 <div class="col-md-1 text-center">
                                                     <a href="../public/crud/all_clubs/club_read.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                                     <a href="../public/crud/all_clubs/club_update.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
                                                     <a href="../public/crud/all_clubs/club_delete.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
                                                 </div>
-                                            </div>';
+                                            </div>
+                                            ';
                                         }
-                                        
-                                        
 
                                         // Free result set
                                         unset($result);
@@ -335,6 +337,7 @@ try {
                                     echo "Oops! Something went wrong. Please try again later.";
                                 }
                                 ?>
+
 
                             </div>
                             <!-- ALL CLUB CARDS END -->
@@ -356,66 +359,50 @@ try {
                                         let visibleRowCount = 0; // To track how many rows are visible
 
                                         clubRows.forEach(function (row) {
-                                            const clubNameElement = row.querySelector('h4');
-                                            const moderatorNames = row.querySelectorAll('h6');
-                                            const clubInfoElement = row.querySelector('.col-md-7');
+                                            const clubNameElement = row.querySelector('h2'); // Ensure this matches your club name element
+                                            const moderatorNames = row.querySelectorAll('h6'); // Moderator names
                                             const memberCountElement = row.querySelector('.member-count');
                                             const creationDateElement = row.querySelector('.creation-date');
 
                                             const clubName = clubNameElement.textContent.toLowerCase();
-                                            const clubInfo = clubInfoElement.textContent.toLowerCase();
                                             const memberCount = memberCountElement.textContent.toLowerCase();
                                             const creationDate = creationDateElement.textContent.toLowerCase();
 
-                                            let moderatorMatch = false;
-                                            let clubInfoMatch = false;
-                                            let memberCountMatch = false;
-                                            let creationDateMatch = false;
+                                            let matchFound = false; // To track if any match is found
 
                                             // Remove previous highlights
                                             resetHighlight(clubNameElement);
                                             moderatorNames.forEach(resetHighlight);
-                                            resetHighlight(clubInfoElement);
                                             resetHighlight(memberCountElement);
                                             resetHighlight(creationDateElement);
 
-                                            // Check if any moderator matches the search term
+                                            // Check for matches in club name, moderators, member count, and creation date
+                                            if (clubName.includes(searchTerm)) {
+                                                matchFound = true;
+                                                highlightText(clubNameElement, searchTerm);
+                                            }
+
                                             moderatorNames.forEach(function (moderator) {
                                                 const moderatorText = moderator.textContent.toLowerCase();
                                                 if (moderatorText.includes(searchTerm)) {
-                                                    moderatorMatch = true;
+                                                    matchFound = true;
                                                     highlightText(moderator, searchTerm);
                                                 }
                                             });
 
-                                            // Check if the club information matches the search term
-                                            if (clubInfo.includes(searchTerm)) {
-                                                clubInfoMatch = true;
-                                                highlightText(clubInfoElement, searchTerm);
-                                            }
-
-                                            // Check if the member count matches the search term
                                             if (memberCount.includes(searchTerm)) {
-                                                memberCountMatch = true;
+                                                matchFound = true;
                                                 highlightText(memberCountElement, searchTerm);
                                             }
 
-                                            // Check if the creation date matches the search term
                                             if (creationDate.includes(searchTerm)) {
-                                                creationDateMatch = true;
+                                                matchFound = true;
                                                 highlightText(creationDateElement, searchTerm);
                                             }
 
-                                            // Check if the club name, any moderator, or the information matches
-                                            if (clubName.includes(searchTerm) || moderatorMatch || clubInfoMatch || memberCountMatch || creationDateMatch) {
-                                                row.style.display = ''; // Show the row
-                                                visibleRowCount++; // Increment visible row count
-                                                if (clubName.includes(searchTerm)) {
-                                                    highlightText(clubNameElement, searchTerm);
-                                                }
-                                            } else {
-                                                row.style.display = 'none'; // Hide the row
-                                            }
+                                            // Show or hide the row based on matches
+                                            row.style.display = matchFound ? '' : 'none';
+                                            if (matchFound) visibleRowCount++;
                                         });
 
                                         // Update the row count display
@@ -430,7 +417,6 @@ try {
                                         const text = element.textContent;
                                         const regex = new RegExp(`(${term})`, 'gi'); // Create a regex to match all occurrences of the term
                                         const highlightedHTML = text.replace(regex, '<span style="background-color: lightblue; color: #0033cc;">$1</span>');
-
                                         element.innerHTML = highlightedHTML; // Replace the content with highlighted text
                                     }
 
@@ -439,7 +425,6 @@ try {
                                         const html = element.innerHTML;
                                         const regex = /<span style="background-color: lightblue; color: #0033cc;">(.*?)<\/span>/gi;
                                         const resetHTML = html.replace(regex, '$1');
-
                                         element.innerHTML = resetHTML; // Replace the content with the original text
                                     }
                                 });
