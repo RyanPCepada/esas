@@ -176,13 +176,13 @@ try {
                 margin-left: 0px;
             }
             .card-body {
-                padding: 0px !important; 
+                padding: 5px !important; 
                 max-width: 100%; 
             }
             .card-img-only-all {
                 width: 315px;
                 height: 177px;
-                margin: 10px auto;
+                margin: 5px auto;
             }
         }
 
@@ -295,15 +295,34 @@ try {
                         <div class="row g-0 p-4 px-2 pt-2 h-100">
                             <div class="card">
                                 <div class="card-body">
-                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start mt-2 ms-2 me-1 me-sm-2">
-                        <h2 class="text-muted">Student Club Organizations</h2>
-                        <div class="officers-link mt-0 mt-sm-0 me-1 me-sm-4">
-                            <a href="../esas_student/officers/csg_officers.php" class="d-inline-block">
-                                <i class="fas fa-user-tie"></i> CSG Officers</a>
-                            <a href="../esas_student/officers/sbo_officers.php" class="ms-2 d-inline-block">
-                                <i class="fas fa-user-tie"></i> SBO Officers</a>
-                        </div>
+                                    
+                                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start mt-2 ms-2 me-1 mb-1 me-sm-2">
+                                        <h3 class="text-muted">Student Club Organizations</h3>
+                                        <div class="officers-link mt-0 mt-sm-0 me-1 me-sm-4">
+                                            <a href="../esas_student/officers/csg_officers.php" class="d-inline-block">
+                                                <i class="fas fa-user-tie"></i> CSG Officers</a>
+                                            <a href="../esas_student/officers/sbo_officers.php" class="ms-2 d-inline-block">
+                                                <i class="fas fa-user-tie"></i> SBO Officers</a>
+                                        </div>
+                                    </div>
+
+                                    <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+    <thead>
+        <tr>
+            <th colspan="9">
+                <div class="row">
+                    <div class="col-12 col-md-8">
+                        <input id="moderatorSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
                     </div>
+                    <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
+                        <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6>
+                    </div>
+                </div>
+            </th>
+        </tr>
+    </thead>
+</table>
+
                                     <div class="row mainbar g-0 h-100">
                                         <div class="row g-2 mt-0" id="allClubsContainer">
                                             <!-- Club cards will be dynamically added here -->
