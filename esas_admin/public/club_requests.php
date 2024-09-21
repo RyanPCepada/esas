@@ -209,7 +209,7 @@ try {
                                                 <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
                                                     <thead>
                                                         <tr>
-                                                            <th>Profile Pic</th>
+                                                            <th></th>
                                                             <th>Full Name</th>
                                                             <th>Department</th>
                                                             <th>Course</th>
@@ -231,10 +231,10 @@ try {
 
                                                 echo '
                                                 <tr class="request-row">
-                                                    <td class="text-center">
+                                                    <td class="text-center p-1">
                                                         <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
                                                             alt="' . $studentName . ' profile picture" 
-                                                            style="width: 50px; height: 50px; border-radius: 50%;">
+                                                            style="width: 35px; height: 35px; border-radius: 50%;">
                                                     </td>
                                                     <td>' . $studentName . '</td>
                                                     <td>' . $department . '</td>
