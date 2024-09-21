@@ -202,57 +202,59 @@ try {
 
                                         if ($totalRows > 0) {
                                             echo '
-                                            <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
-                                                <thead>
-                                                    <tr>
-                                                        <th></th>
-                                                        <th>Full Name</th>
-                                                        <th>Department</th>
-                                                        <th>Course</th>
-                                                        <th>Club</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>';
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th>Full Name</th>
+                                                            <th>Department</th>
+                                                            <th>Course</th>
+                                                            <th>Club</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>';
 
-                                            while ($row = $result->fetch()) {
-                                                $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
-                                                $clubNames = htmlspecialchars($row['clubNames']);
-                                                $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
-                                                $email = htmlspecialchars($row['instiEmail']);
-                                                $phoneNumber = htmlspecialchars($row['phoneNumber']);
-                                                $department = htmlspecialchars($row['department']);
-                                                $course = htmlspecialchars($row['course']);
+                                                    while ($row = $result->fetch()) {
+                                                        $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
+                                                        $clubNames = htmlspecialchars($row['clubNames']);
+                                                        $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
+                                                        $email = htmlspecialchars($row['instiEmail']);
+                                                        $phoneNumber = htmlspecialchars($row['phoneNumber']);
+                                                        $department = htmlspecialchars($row['department']);
+                                                        $course = htmlspecialchars($row['course']);
 
-                                                echo '
-                                                <tr class="student-row">
-                                                    <td class="text-center">
-                                                        <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
-                                                            alt="' . $fullName . ' profile picture" 
-                                                            style="width: 50px; height: 50px; border-radius: 50%;">
-                                                    </td>
-                                                    <td>' . $fullName . '</td>
-                                                    <td>' . $department . '</td>
-                                                    <td>' . $course . '</td>
-                                                    <td>' . $clubNames . '</td>
-                                                    <td class="text-center">
-                                                        <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                        <a href="../public/crud/students/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                        <a href="../public/crud/students/student_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
-                                                    </td>
-                                                </tr>';
-                                            }
+                                                        echo '
+                                                        <tr class="student-row">
+                                                            <td class="text-center">
+                                                                <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
+                                                                    alt="' . $fullName . ' profile picture" 
+                                                                    style="width: 50px; height: 50px; border-radius: 50%;">
+                                                            </td>
+                                                            <td>' . $fullName . '</td>
+                                                            <td>' . $department . '</td>
+                                                            <td>' . $course . '</td>
+                                                            <td>' . $clubNames . '</td>
+                                                            <td class="text-center">
+                                                                <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                                <a href="../public/crud/students/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
+                                                                <a href="../public/crud/students/student_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                                            </td>
+                                                        </tr>';
+                                                    }
 
-                                            echo '
-                                                </tbody>
-                                            </table>';
+                                                    echo '
+                                                    </tbody>
+                                                </table>
+                                            </div>'; // End of table-responsive
                                         } else {
                                             echo '<div class="alert alert-danger"><em>No students were found.</em></div>';
                                         }
                                     } else {
                                         echo "Oops! Something went wrong. Please try again later.";
                                     }
-                                    ?>
+                                ?>
 
                             </div>
                             <!-- ALL STUDENT TABLE END -->
