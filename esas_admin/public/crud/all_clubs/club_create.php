@@ -5,6 +5,7 @@ $clubName = $information = $coverPhoto = "";
 $clubName_err = $information_err = $coverPhoto_err = "";
 $moderators = [];
 define('COVERPHOTO_DEFAULT', 'COVERPHOTO_DEFAULT.png');
+define('PROF_PIC_DEFAULT', 'PROF_PIC.png'); // Define the default profile picture
 
 $moderatorQuery = "SELECT moderator_id, CONCAT(firstName, ' ', lastName) AS moderator_name FROM tbl_moderators";
 if ($stmt = $pdo->prepare($moderatorQuery)) {
@@ -18,16 +19,20 @@ if (isset($_POST['action']) && $_POST['action'] == 'add_moderator') {
     $middleInitial = trim($_POST['middleInitial']);
     $lastName = trim($_POST['lastName']);
     $email = trim($_POST['email']);
-    $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
+    $password = trim($_POST['password']); // No hashing
 
-    $sql2 = "INSERT INTO tbl_moderators (firstName, middleName, lastName, email, password, dateAdded) 
-             VALUES (:firstName, :middleInitial, :lastName, :email, :password, NOW())";
+    // Set the profile picture to default
+    $profilePic = PROF_PIC_DEFAULT;
+
+    $sql2 = "INSERT INTO tbl_moderators (firstName, middleName, lastName, email, password, profilePic, dateAdded) 
+             VALUES (:firstName, :middleInitial, :lastName, :email, :password, :profilePic, NOW())";
     if ($stmt2 = $pdo->prepare($sql2)) {
         $stmt2->bindParam(":firstName", $firstName);
         $stmt2->bindParam(":middleInitial", $middleInitial);
         $stmt2->bindParam(":lastName", $lastName);
         $stmt2->bindParam(":email", $email);
-        $stmt2->bindParam(":password", $password);
+        $stmt2->bindParam(":password", $password); // No hashing
+        $stmt2->bindParam(":profilePic", $profilePic); // Bind the default profile picture
 
         if ($stmt2->execute()) {
             $newModeratorId = $pdo->lastInsertId();
@@ -58,8 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $coverPhotoTmpName = $_FILES['coverPhoto']['tmp_name'];
 
         $validImageExtensions = ['jpg', 'jpeg', 'png'];
-        $imageExtension = pathinfo($coverPhotoName, PATHINFO_EXTENSION);
-        $imageExtension = strtolower($imageExtension);
+        $imageExtension = strtolower(pathinfo($coverPhotoName, PATHINFO_EXTENSION));
 
         if (!in_array($imageExtension, $validImageExtensions)) {
             $coverPhoto_err = "Invalid image extension. Only JPG, JPEG, and PNG are allowed.";
@@ -123,6 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     unset($pdo);
 }
 ?>
+
 
 
 
