@@ -67,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $coverPhoto_err = "Image size is too large (max 5MB).";
         } else {
             $newCoverPhotoName = 'club_' . uniqid() . '.' . $imageExtension;
-            $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas-admin/images/';
+            $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_admin/images/';
             $uploadPath = $uploadDir . $newCoverPhotoName;
 
             if (!is_dir($uploadDir)) {

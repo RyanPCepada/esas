@@ -98,6 +98,7 @@ unset($pdo);
                                 <p><strong>Moderators: </strong><?php echo $moderatorNames; ?></p>
                             </div>
                         </div>
+                        <hr>
                         <div class="row p-2 mt-4">
                             <div class="col-md-12">
                                 <h5>Information:</h5>
