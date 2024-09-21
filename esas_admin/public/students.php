@@ -207,11 +207,9 @@ try {
                                                     <tr>
                                                         <th></th>
                                                         <th>Full Name</th>
-                                                        <th>Club</th>
-                                                        <th>Email</th>
-                                                        <th>Phone Number</th>
                                                         <th>Department</th>
                                                         <th>Course</th>
+                                                        <th>Club</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
@@ -234,11 +232,9 @@ try {
                                                             style="width: 50px; height: 50px; border-radius: 50%;">
                                                     </td>
                                                     <td>' . $fullName . '</td>
-                                                    <td>' . $clubNames . '</td>
-                                                    <td>' . $email . '</td>
-                                                    <td>' . $phoneNumber . '</td>
                                                     <td>' . $department . '</td>
                                                     <td>' . $course . '</td>
+                                                    <td>' . $clubNames . '</td>
                                                     <td class="text-center">
                                                         <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                                         <a href="../public/crud/students/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>

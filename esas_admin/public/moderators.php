@@ -202,8 +202,6 @@ try {
                                                         <th></th>
                                                         <th>Full Name</th>
                                                         <th>Club</th>
-                                                        <th>Email</th>
-                                                        <th>Phone Number</th>
                                                         <th>Department</th>
                                                         <th>Actions</th>
                                                     </tr>
@@ -227,8 +225,6 @@ try {
                                                     </td>
                                                     <td class="moderator-name">' . $fullName . '</td>
                                                     <td class="moderator-club">' . $clubNames . '</td>
-                                                    <td class="moderator-email">' . $email . '</td>
-                                                    <td class="moderator-phone">' . $phoneNumber . '</td>
                                                     <td class="moderator-department">' . $department . '</td>
                                                     <td class="text-center">
                                                         <a href="../public/crud/moderators/moderator_read.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
