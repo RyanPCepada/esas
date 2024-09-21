@@ -381,39 +381,4 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
 
 </body>
 
-
-<!-- <footer class="navbar-darkblue text-white mt-1 p-4 text-center">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5>Contact Us</h5>
-                    <ul class="list-unstyled">
-                        <li>Email: sas@nbsc.edu.ph</li>
-                        <li>Phone: 0927 669 0090</li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5>Follow Us</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="https://www.facebook.com/nbscstudentaffairsandservices" class="text-white"><i class="fa fa-facebook-square"></i> Facebook</a></li>
-                        <li><a href="#" class="text-white"><i class="fa fa-twitter-square"></i> Twitter</a></li>
-                        <li><a href="#" class="text-white"><i class="fa fa-instagram"></i> Instagram</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="http://nbsc.edu.ph" class="text-white">NBSC Website</a></li>
-                        <li><a href="https://nbsc.edu.ph/student-affairs-services/" class="text-white">SAS Website</a></li>
-                        <li><a href="#" class="text-white">About Us</a></li>
-                        <li><a href="#" class="text-white">Privacy Policy</a></li>
-                        <li><a href="#" class="text-white">Terms of Service</a></li>
-                    </ul>
-                </div>
-            </div>
-            <hr>
-            <p class="mb-0">© 2024 Student Organization Club Membership and Information System. All rights reserved.</p>
-        </div>
-    </footer> -->
-
 </html>

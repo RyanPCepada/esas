@@ -19,7 +19,7 @@
                     <a class="dropdown-item py-1">Library Resource</a>
                     <a class="dropdown-item py-1">Election Voting</a>
                     <a class="dropdown-item py-1" href="all_clubs.php">Club Registration</a>
-                    <a class="dropdown-item py-1" href="clubs_old_v2.php">Club Registration Old</a>
+                    <!-- <a class="dropdown-item py-1" href="clubs_old_v2.php">Club Registration Old</a> -->
                 </div>
                 <!-- <div>
                     <div class="dropdown-header py-0">Settings</div>
