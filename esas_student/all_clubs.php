@@ -287,6 +287,14 @@ try {
             <div class="col-12 col-md-10 bg-lgrey auto-scroll">
                 <div class="row g-0 h-100">
 
+
+
+
+                    
+                    <div id="divpr_requesdetails" class="table-responsive px-0">
+                        <div class="row g-0 p-4 px-2 pt-2 h-100">
+                            <div class="card">
+                                <div class="card-body">
                     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start mt-2 ms-2 me-1 me-sm-2">
                         <h2 class="text-muted">Student Club Organizations</h2>
                         <div class="officers-link mt-0 mt-sm-0 me-1 me-sm-4">
@@ -296,14 +304,6 @@ try {
                                 <i class="fas fa-user-tie"></i> SBO Officers</a>
                         </div>
                     </div>
-
-
-
-                    
-                    <div id="divpr_requesdetails" class="table-responsive px-0">
-                        <div class="row g-0 p-4 px-2 pt-2 h-100">
-                            <div class="card">
-                                <div class="card-body">
                                     <div class="row mainbar g-0 h-100">
                                         <div class="row g-2 mt-0" id="allClubsContainer">
                                             <!-- Club cards will be dynamically added here -->
