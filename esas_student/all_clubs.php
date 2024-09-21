@@ -97,7 +97,7 @@ try {
             width: 100%;
             /* max-width: 600px; */
             margin: 0 auto;
-            padding: 50px;
+            padding: 30px;
         }
         
         .card-img-only-all {
@@ -183,6 +183,12 @@ try {
                 width: 315px;
                 height: 177px;
                 margin: 5px auto;
+            }
+            .table-striped {
+                margin-top: 10px;
+            }
+            #allClubsContainer {
+                margin-top: -20px !important;
             }
         }
 

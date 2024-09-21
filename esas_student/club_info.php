@@ -284,7 +284,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
             <div class="clubname-and-coverphoto">
                 <div class="row">
                     <div class="col-12 col-md-4">
-                        <h2 class="mt-4" style="max-width: 100%;"><?php echo $clubName; ?></h2>
+                        <h2 class="text-muted mt-4" style="max-width: 100%;"><?php echo $clubName; ?></h2>
                         <p>Created: <?php echo $formattedDate; ?></p>
                         <hr>
                         <h5 class="mb-3"><?php echo $moderatorsLabel; ?></h5>
@@ -294,7 +294,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                         <!-- <hr> -->
                     </div>
                     <div class="col-12 col-md-8">
-                        <img class="club-info-coverphoto mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo" style="max-width: 100%; border-radius: 20px;">
+                        <img class="club-info-coverphoto mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo" style="max-width: 100%; border-radius: 10px;">
                     </div>
                 </div>
             </div>
