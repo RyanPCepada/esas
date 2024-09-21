@@ -338,7 +338,7 @@ try {
                     <!-- Posts will be dynamically inserted here -->
                 </div>
                 <div class="mt-2 text-center align-items-center justify-content-center">
-                    <a href="../esas_student/my_clubs.php" class="btn btn-secondary">Go Back</a>
+                    <a href="javascript:history.back();" class="btn btn-secondary">Go Back</a>
                 </div>
             </div>
         </div>

@@ -304,20 +304,11 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
             </div>
 
 
-            <!-- <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
-                <h4 class="mb-3">Join Us Now!</h4>
-                <p class="lead">If you want to be a part of us, register now and become a member of <?php echo htmlspecialchars($clubName); ?>.</p>
-                <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>)">Register Now</button>
-                <div class="mt-1">
-                    <a href="javascript:history.go(-1)" class="btn btn-transparent">Go Back</a>
-                </div>
-            </div> -->
-
             <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
                 <?php if ($status === 'active'): ?>
                     <div class="alert alert-info custom-alert" role="alert">
                         <p class="lead mb-0">You are already a member of this club.
-                            <a href="/esas/esas_student/home.php"> Go to Home</a>
+                            <a href="/esas/esas_student/home.php?club_id=<?php echo $club_id; ?>"> Go to Home</a>
                         </p>
                     </div>
                 <?php elseif ($status === 'pending' && $clubsCount >= 2): ?>
