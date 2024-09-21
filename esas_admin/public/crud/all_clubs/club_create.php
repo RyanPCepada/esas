@@ -179,10 +179,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <img id="coverPhotoPreview" src="#" alt="Cover Photo Preview" style="display: none;">
                         <input type="hidden" name="hiddenCoverPhoto" id="hiddenCoverPhoto" value="<?php echo htmlspecialchars($coverPhoto); ?>">
                     </div>
+                    <hr>
                     <div class="form-group">
                         <label>Add Moderator</label>
                         <select name="moderator" id="moderatorSelect" class="form-control">
-                            <option value="">-- Select from existing Moderators --</option>
+                            <!-- <option value="">-- Select from existing Moderators --</option> -->
                             <optgroup label="">
                                 <?php foreach ($moderators as $moderator): ?>
                                     <option value="<?php echo htmlspecialchars($moderator['moderator_id']); ?>">
