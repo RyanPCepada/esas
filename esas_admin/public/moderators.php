@@ -172,30 +172,31 @@ try {
                                 </table>
 
                                 <?php
-                                    // Include config file
-                                    require_once "../../config.php";
+                                // Include config file
+                                require_once "../../config.php";
 
-                                    // SQL query to fetch all moderators with related club information
-                                    $sql = "SELECT 
-                                                m.moderator_id,
-                                                m.firstName,
-                                                m.lastName,
-                                                m.email,
-                                                m.phoneNumber,
-                                                m.department,
-                                                m.profilePic,
-                                                GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
-                                            FROM tbl_moderators m
-                                            LEFT JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
-                                            LEFT JOIN tbl_clubs c ON cm.club_id = c.club_id
-                                            GROUP BY m.moderator_id
-                                            ORDER BY m.moderator_id ASC";
+                                // SQL query to fetch all moderators with related club information
+                                $sql = "SELECT 
+                                            m.moderator_id,
+                                            m.firstName,
+                                            m.lastName,
+                                            m.email,
+                                            m.phoneNumber,
+                                            m.department,
+                                            m.profilePic,
+                                            GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
+                                        FROM tbl_moderators m
+                                        LEFT JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
+                                        LEFT JOIN tbl_clubs c ON cm.club_id = c.club_id
+                                        GROUP BY m.moderator_id
+                                        ORDER BY m.moderator_id ASC";
 
-                                    if ($result = $pdo->query($sql)) {
-                                        $totalRows = $result->rowCount();
+                                if ($result = $pdo->query($sql)) {
+                                    $totalRows = $result->rowCount();
 
-                                        if ($totalRows > 0) {
-                                            echo '
+                                    if ($totalRows > 0) {
+                                        echo '
+                                        <div class="table-responsive">
                                             <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
                                                 <thead>
                                                     <tr>
@@ -208,45 +209,43 @@ try {
                                                 </thead>
                                                 <tbody>';
 
-                                            while ($row = $result->fetch()) {
-                                                $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['lastName']);
-                                                $clubNames = htmlspecialchars($row['clubNames']);
-                                                $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
-                                                $email = htmlspecialchars($row['email']);
-                                                $phoneNumber = htmlspecialchars($row['phoneNumber']);
-                                                $department = htmlspecialchars($row['department']);
+                                                while ($row = $result->fetch()) {
+                                                    $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['lastName']);
+                                                    $clubNames = htmlspecialchars($row['clubNames']);
+                                                    $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
+                                                    $email = htmlspecialchars($row['email']);
+                                                    $phoneNumber = htmlspecialchars($row['phoneNumber']);
+                                                    $department = htmlspecialchars($row['department']);
+
+                                                    echo '
+                                                    <tr class="moderator-row">
+                                                        <td class="text-center">
+                                                            <img class="moderator-profile-pic" src="/esas/esas_moderator/images/' . $profilePic . '" 
+                                                                alt="' . $fullName . ' profile picture" 
+                                                                style="width: 50px; height: 50px; border-radius: 50%;">
+                                                        </td>
+                                                        <td class="moderator-name">' . $fullName . '</td>
+                                                        <td class="moderator-club">' . $clubNames . '</td>
+                                                        <td class="moderator-department">' . $department . '</td>
+                                                        <td class="text-center">
+                                                            <a href="../public/crud/moderators/moderator_read.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                            <a href="../public/crud/moderators/moderator_update.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
+                                                            <a href="../public/crud/moderators/moderator_delete.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                                        </td>
+                                                    </tr>';
+                                                }
 
                                                 echo '
-                                                <tr class="moderator-row">
-                                                    <td class="text-center">
-                                                        <img class="moderator-profile-pic" src="/esas/esas_moderator/images/' . $profilePic . '" 
-                                                            alt="' . $fullName . ' profile picture" 
-                                                            style="width: 50px; height: 50px; border-radius: 50%;">
-                                                    </td>
-                                                    <td class="moderator-name">' . $fullName . '</td>
-                                                    <td class="moderator-club">' . $clubNames . '</td>
-                                                    <td class="moderator-department">' . $department . '</td>
-                                                    <td class="text-center">
-                                                        <a href="../public/crud/moderators/moderator_read.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                        <a href="../public/crud/moderators/moderator_update.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                        <a href="../public/crud/moderators/moderator_delete.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
-                                                    </td>
-                                                </tr>';
-                                            }
-
-                                            echo '
                                                 </tbody>
-                                            </table>';
-                                        } else {
-                                            echo '<div class="alert alert-danger"><em>No moderators were found.</em></div>';
-                                        }
+                                            </table>
+                                        </div>'; // End of table-responsive
                                     } else {
-                                        echo "Oops! Something went wrong. Please try again later.";
+                                        echo '<div class="alert alert-danger"><em>No moderators were found.</em></div>';
                                     }
-                                    ?>
-
-
-
+                                } else {
+                                    echo "Oops! Something went wrong. Please try again later.";
+                                }
+                            ?>
 
                             </div>
                             <!-- ALL MODERATOR TABLE END -->
