@@ -184,6 +184,9 @@ try {
                 height: 177px;
                 margin: 5px auto;
             }
+            #clubFilter {
+                width: 43% !important;
+            }
             .table-striped {
                 margin-top: 10px;
             }
@@ -292,51 +295,60 @@ try {
 
             
             <!-- MAINPAGE BAR -->
-<div class="col-12 col-md-10 bg-lgrey auto-scroll">
-    <div class="row g-0 h-100">
-        <div id="divpr_requesdetails" class="table-responsive px-0">
-            <div class="row g-0 p-4 px-2 pt-2 h-100">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start mt-2 ms-2 me-1 mb-1 me-sm-2">
-                            <h3 class="text-muted">Student Club Organizations</h3>
-                            <div class="officers-link mt-0 mt-sm-0 me-1 me-sm-4">
-                                <a href="../esas_student/officers/csg_officers.php" class="d-inline-block">
-                                    <i class="fas fa-user-tie"></i> CSG Officers</a>
-                                <a href="../esas_student/officers/sbo_officers.php" class="ms-2 d-inline-block">
-                                    <i class="fas fa-user-tie"></i> SBO Officers</a>
-                            </div>
-                        </div>
-
-                        <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
-                            <thead>
-                                <tr>
-                                    <th colspan="9">
-                                        <div class="row">
-                                            <div class="col-12 col-md-8">
-                                                <input id="clubSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                                            </div>
-                                            <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
-                                                <h6 id="rowCountDisplay">Showing 0 / 0 Clubs</h6>
-                                            </div>
+            <div class="col-12 col-md-10 bg-lgrey auto-scroll">
+                <div class="row g-0 h-100">
+                    <div id="divpr_requesdetails" class="table-responsive px-0">
+                        <div class="row g-0 p-4 px-2 pt-2 h-100">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start mt-2 ms-2 me-1 mb-1 me-sm-2">
+                                        <h3 class="text-muted">Student Club Organizations</h3>
+                                        <div class="officers-link mt-0 mt-sm-0 me-1 me-sm-4">
+                                            <a href="../esas_student/officers/csg_officers.php" class="d-inline-block">
+                                                <i class="fas fa-user-tie"></i> CSG Officers</a>
+                                            <a href="../esas_student/officers/sbo_officers.php" class="ms-2 d-inline-block">
+                                                <i class="fas fa-user-tie"></i> SBO Officers</a>
                                         </div>
-                                    </th>
-                                </tr>
-                            </thead>
-                        </table>
+                                    </div>
 
-                        <div class="row mainbar g-0">
-                            <div class="row g-2 mt-0" id="allClubsContainer">
-                                <!-- Club cards will be dynamically added here -->
+                                    <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="9">
+                                                    <div class="row">
+                                                        <div class="col-12 col-md-8 d-flex align-items-center">
+                                                            <select id="departmentSelect" class="form-select me-2" style="width: 20%;">
+                                                                <optgroup label="Club Recommendations">
+                                                                    <option value="" selected>For All</option>
+                                                                    <option value="TEP">For TEP</option>
+                                                                    <option value="BSBA">For BSBA</option>
+                                                                    <option value="CCS">For CCS</option>
+                                                                </optgroup>
+                                                            </select>
+                                                            <input id="clubSearch" class="form-control" type="search" placeholder="Search for clubs here..." aria-label="Search">
+                                                        </div>
+                                                        <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
+                                                            <h6 id="rowCountDisplay">Showing 0 / 0 Clubs</h6>
+                                                        </div>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+
+
+                                    <div class="row mainbar g-0">
+                                        <div class="row g-2 mt-0" id="allClubsContainer">
+                                            <!-- Club cards will be dynamically added here -->
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-<!-- MAINPAGE BAR END -->
+            <!-- MAINPAGE BAR END -->
 
 
         </div>
@@ -358,95 +370,129 @@ try {
             document.getElementById("tabLabel").innerText = label;
         }
 
-        // Fetch clubs data from API
-        fetch('/esas/esas_student/apis/clubs-api.php')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                const allClubsContainer = document.getElementById('allClubsContainer');
-                const rowCountDisplay = document.getElementById('rowCountDisplay');
-                const totalRows = data.length;
+        // Function to fetch clubs data
+        function fetchClubs(department = null) {
+            let url = '/esas/esas_student/apis/clubs-api.php';
+            if (department) {
+                url += `?department=${encodeURIComponent(department)}`;
+            }
 
-                rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Clubs`;
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const allClubsContainer = document.getElementById('allClubsContainer');
+                    const rowCountDisplay = document.getElementById('rowCountDisplay');
+                    const totalRows = data.length;
 
-                if (data && data.length > 0) {
-                    data.forEach(club => {
-                        const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
-                        const cardHTML = `
-                            <div class="col-md-4 card-container club-card" data-club-name="${club.clubName}">
-                                <div class="card card-img-only-all">
-                                    <small data-toggle="tooltip" title="${memberText}">
-                                        <i class="fa fa-user mr-1"></i>${club.membersCount}
-                                    </small>
-                                    <a href="/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
-                                        <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
-                                        <div class="overlay-text">
-                                            <h4 class="club-name">${club.clubName}</h4>
-                                        </div>
-                                    </a>
+                    // Update the row count display
+                    rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Clubs`;
+
+                    // Clear previous club cards
+                    allClubsContainer.innerHTML = '';
+
+                    if (totalRows > 0) {
+                        data.forEach(club => {
+                            const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
+                            const cardHTML = `
+                                <div class="col-md-4 card-container club-card" data-club-name="${club.clubName}">
+                                    <div class="card card-img-only-all">
+                                        <small data-toggle="tooltip" title="${memberText}">
+                                            <i class="fa fa-user mr-1"></i>${club.membersCount}
+                                        </small>
+                                        <a href="/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
+                                            <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
+                                            <div class="overlay-text">
+                                                <h4 class="club-name">${club.clubName}</h4>
+                                            </div>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                        `;
-                        allClubsContainer.innerHTML += cardHTML;
-                    });
-                } else {
-                    allClubsContainer.innerHTML = '<p>No clubs found.</p>';
-                }
-
-                // Add search functionality
-                const searchInput = document.getElementById('clubSearch');
-                const clubCards = document.querySelectorAll('.club-card');
-                
-                searchInput.addEventListener('input', function() {
-                    const searchTerm = searchInput.value.trim().toLowerCase();
-                    let visibleClubCount = 0;
-
-                    clubCards.forEach(card => {
-                        const clubNameElement = card.querySelector('.club-name');
-                        const originalClubName = card.getAttribute('data-club-name'); // Keep original case
-                        const originalClubNameLower = originalClubName.toLowerCase(); // Lowercase for comparison
-                        
-                        if (searchTerm === '') {
-                            clubNameElement.innerHTML = originalClubName; // Restore original name
-                            card.style.display = '';
-                        } else {
-                            if (originalClubNameLower.includes(searchTerm)) {
-                                card.style.display = '';
-                                visibleClubCount++;
-                                highlightText(clubNameElement, searchTerm);
-                            } else {
-                                card.style.display = 'none';
-                            }
-                        }
-                    });
-
-                    // Update the row count
-                    if (searchTerm === '') {
-                        rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`; // Reset to original count
+                            `;
+                            allClubsContainer.innerHTML += cardHTML;
+                        });
                     } else {
-                        rowCountDisplay.textContent = `Showing ${visibleClubCount} / ${totalRows} Records`;
+                        allClubsContainer.innerHTML = '<p>No clubs found.</p>';
+                    }
+
+                    // Reinitialize search functionality after clubs are loaded
+                    initializeSearch();
+                })
+                .catch(error => {
+                    console.error('Error fetching clubs:', error);
+                    const allClubsContainer = document.getElementById('allClubsContainer');
+                    allClubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
+                });
+        }
+
+        // Function to initialize search functionality
+        function initializeSearch() {
+            const searchInput = document.getElementById('clubSearch');
+            const clubCards = document.querySelectorAll('.club-card');
+            const rowCountDisplay = document.getElementById('rowCountDisplay');
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                let visibleClubCount = 0;
+
+                clubCards.forEach(card => {
+                    const clubNameElement = card.querySelector('.club-name');
+                    const originalClubName = card.getAttribute('data-club-name');
+                    const originalClubNameLower = originalClubName.toLowerCase();
+
+                    if (searchTerm === '') {
+                        clubNameElement.innerHTML = originalClubName; // Reset the name if search is empty
+                        card.style.display = '';
+                        visibleClubCount++; // Count visible cards
+                    } else {
+                        if (originalClubNameLower.includes(searchTerm)) {
+                            card.style.display = '';
+                            visibleClubCount++;
+                            highlightText(clubNameElement, searchTerm); // Highlight the matching text
+                        } else {
+                            card.style.display = 'none';
+                        }
                     }
                 });
 
-
-                // Highlight matching text
-                function highlightText(element, term) {
-                    const originalText = element.textContent;
-                    const regex = new RegExp(`(${term})`, 'gi');
-                    element.innerHTML = originalText.replace(regex, `<span style="background-color: rgba(173, 216, 230, 0.5); border-radius: 10%;">$1</span>`);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching clubs:', error);
-                const allClubsContainer = document.getElementById('allClubsContainer');
-                allClubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
+                // Update the row count to reflect the visible clubs
+                const totalRows = clubCards.length; // Total number of cards available
+                rowCountDisplay.textContent = `Showing ${visibleClubCount} / ${totalRows} Records`;
             });
+        }
 
+        // Fetch all clubs on page load
+        window.onload = function() {
+            const storedDepartment = localStorage.getItem('selectedDepartment');
+            fetchClubs(storedDepartment); // Fetch clubs based on stored department
+            if (storedDepartment) {
+                document.getElementById('departmentSelect').value = storedDepartment; // Set the dropdown value
+            } else {
+                fetchClubs(); // Default fetch all clubs
+            }
+        };
+
+        // Add department selection functionality
+        const departmentSelect = document.getElementById('departmentSelect');
+        departmentSelect.addEventListener('change', function() {
+            const selectedDepartment = this.value;
+            localStorage.setItem('selectedDepartment', selectedDepartment); // Store the selected department
+            fetchClubs(selectedDepartment); // Fetch clubs for the selected department
+        });
+
+        // Highlight matching text
+        function highlightText(element, term) {
+            const originalText = element.textContent;
+            const regex = new RegExp(`(${term})`, 'gi');
+            element.innerHTML = originalText.replace(regex, `<span style="background-color: rgba(173, 216, 230, 0.7); border-radius: 10%;">$1</span>`);
+        }
     </script>
+
+
 
 
     <script>

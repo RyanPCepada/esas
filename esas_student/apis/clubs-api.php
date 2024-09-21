@@ -48,6 +48,36 @@ switch ($method) {
                 http_response_code(404);
                 echo json_encode(['error' => 'Club not found']);
             }
+        } else if (isset($_GET['department'])) {
+            // Read operation (fetch clubs by department)
+            $department = $_GET['department'];
+            $stmt = $pdo->prepare('
+                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, c.dateAdded, c.dateModified,
+                       GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderators,
+                       GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS profilePics
+                FROM tbl_clubs c
+                INNER JOIN tbl_club_recommendations cr ON c.club_id = cr.club_id
+                LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
+                WHERE cr.department = ?
+                GROUP BY c.club_id
+            ');
+            $stmt->execute([$department]);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Fetch counts of students for the filtered clubs (only active members)
+            foreach ($result as &$club) {
+                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_registration WHERE club_id = ? AND status = \'active\'');
+                $stmt_count->execute([$club['club_id']]);
+                $club['membersCount'] = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
+
+                // Format the moderators
+                $moderatorNames = explode(", ", $club['moderators']);
+                $moderatorPics = explode(", ", $club['profilePics']);
+                $club['formattedModerators'] = formatModerators($moderatorNames, $moderatorPics);
+            }
+
+            echo json_encode($result);
         } else {
             // Read operation (fetch all clubs)
             $stmt = $pdo->query('
@@ -84,12 +114,7 @@ switch ($method) {
         break;
 }
 
-/**
- * Format the list of moderators with profile pictures
- * @param array $moderatorNames
- * @param array $moderatorPics
- * @return string
- */
+// Function to format moderators
 function formatModerators($moderatorNames, $moderatorPics) {
     $count = count($moderatorNames);
     $formattedNames = '';
@@ -103,7 +128,7 @@ function formatModerators($moderatorNames, $moderatorPics) {
         $last = array_pop($moderatorNames);
         $formattedNames = implode(', ', $moderatorNames) . ' & ' . $last;
     }
-    
+
     // Add profile pictures
     $picsHTML = '';
     foreach ($moderatorPics as $pic) {
@@ -111,8 +136,7 @@ function formatModerators($moderatorNames, $moderatorPics) {
             $picsHTML .= "<img src='/esas/esas_moderator/images/$pic' alt='Profile Pic' class='moderator-pic'>";
         }
     }
-    
+
     return "<div class='moderator-pics'>$picsHTML</div><div class='moderator-names'>$formattedNames</div>";
 }
-
 ?>
