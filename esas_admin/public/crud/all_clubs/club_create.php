@@ -181,7 +181,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <label>Cover Photo</label>
                         <input type="file" name="coverPhoto" id="coverPhoto" class="form-control-file <?php echo (!empty($coverPhoto_err)) ? 'is-invalid' : ''; ?>" onchange="previewImage()">
                         <span class="invalid-feedback"><?php echo $coverPhoto_err; ?></span>
-                        <img id="coverPhotoPreview" src="#" alt="Cover Photo Preview" style="display: none;">
+                        <img id="coverPhotoPreview" src="#" alt="" style="display: none;">
                         <input type="hidden" name="hiddenCoverPhoto" id="hiddenCoverPhoto" value="<?php echo htmlspecialchars($coverPhoto); ?>">
                     </div>
                     <hr>

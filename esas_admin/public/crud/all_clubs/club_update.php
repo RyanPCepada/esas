@@ -213,9 +213,9 @@ unset($pdo);
 
 
                         <div class="form-group"> 
-    <label>Change Moderators</label>
-    <?php if (!empty($currentModerators)): ?>
-        <div id="moderatorDropdowns">
+    <div id="moderatorDropdowns">
+        <?php if (!empty($currentModerators)): ?>
+            <label>Change Moderators</label>
             <?php foreach ($currentModerators as $moderator): ?>
                 <div class="d-flex align-items-center mb-2">
                     <select name="moderator[]" class="form-control mr-2" required>
@@ -232,10 +232,23 @@ unset($pdo);
                     </select>
                 </div>
             <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        <p>No moderators available for this club.</p>
-    <?php endif; ?>
+        <?php else: ?>
+            <p>No moderators currently associated with this club.</p>
+            <div class="d-flex align-items-center mb-2">
+                <select name="moderator[]" class="form-control mr-2" required>
+                    <option value="">-- Select Moderator --</option>
+                    <option value="none">None</option> <!-- Option to remove moderator -->
+                    <optgroup label="Existing Moderators">
+                        <?php foreach ($moderators as $existingModerator): ?>
+                            <option value="<?php echo htmlspecialchars($existingModerator['moderator_id']); ?>">
+                                <?php echo htmlspecialchars($existingModerator['moderator_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                </select>
+            </div>
+        <?php endif; ?>
+    </div>
 </div>
 
 
