@@ -186,12 +186,27 @@ try {
 </div>
 
 
-Report Title:
-<br>
-<div id="reportTitle"></div>
-<br>
-Description:
-<div id="reportDescription"></div>
+<style>
+    .label {
+        width: 110px;
+        text-align: left;
+        padding-left: 15px;
+        vertical-align: top;
+    }
+</style>
+
+<table>
+    <tr>
+        <td class="label"><strong>Report Title:</strong></td>
+        <td id="reportTitle"></td>
+    </tr>
+    <tr>
+        <td class="label"><strong>Description:</strong></td>
+        <td id="reportDescription"></td>
+    </tr>
+</table>
+
+
 
 <div id="reportContent">
     <!-- Dynamically generated table will be inserted here -->
