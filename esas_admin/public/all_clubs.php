@@ -308,7 +308,7 @@ try {
                                                         <div style="text-align: start;">
                                                             <img class="club-cover-photo" src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
                                                                 alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
-                                                                style="width: 100%; max-width: 90%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
+                                                                style="width: 100%; height: 225px; border-radius: 5px; object-fit: cover; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
                                                         </div>
                                                     </div>
                                                     <!-- Club Details -->

@@ -113,7 +113,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                         </div>
                     </div>
                 </div>
-                <div class="card-footer">
+                <div class="card-footer text-center">
                     <a href="student_update.php?student_id=<?php echo $student_id; ?>" class="btn btn-warning">Update</a>
                     <a href="student_delete.php?student_id=<?php echo $student_id; ?>" class="btn btn-danger">Delete</a>
                     <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Students List</a>

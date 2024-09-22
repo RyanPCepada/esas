@@ -179,92 +179,99 @@ try {
                                 </table>
 
                                 <?php
-                                    // Include config file
-                                    require_once "../../config.php";
+                                // Include config file
+                                require_once "../../config.php";
 
-                                    // SQL query to fetch all club requests for active students
-                                    $sql = "SELECT 
-                                                r.request_id,
-                                                r.clubName,
-                                                r.description,
-                                                r.activities,
-                                                r.status,
-                                                r.coverPhoto,
-                                                s.firstName,
-                                                s.middleName,
-                                                s.lastName,
-                                                s.instiEmail,
-                                                s.department,
-                                                s.course,  -- Added Course field
-                                                s.profilePic,
-                                                GROUP_CONCAT(DISTINCT r.clubName ORDER BY r.clubName ASC SEPARATOR ', ') AS clubNames
-                                            FROM tbl_club_requests r
-                                            JOIN tbl_students s ON r.student_id = s.student_id
-                                            LEFT JOIN tbl_registration reg ON s.student_id = reg.student_id
-                                            WHERE reg.status = 'active' -- Filter for active students
-                                            GROUP BY r.request_id
-                                            ORDER BY r.dateRequested DESC";
+                                // SQL query to fetch all club requests for active students
+                                $sql = "SELECT 
+                                            r.request_id,
+                                            r.clubName,
+                                            r.description,
+                                            r.activities,
+                                            r.status,
+                                            r.coverPhoto,
+                                            s.firstName,
+                                            s.middleName,
+                                            s.lastName,
+                                            s.instiEmail,
+                                            s.department,
+                                            s.course,  -- Added Course field
+                                            s.profilePic,
+                                            GROUP_CONCAT(DISTINCT r.clubName ORDER BY r.clubName ASC SEPARATOR ', ') AS clubNames
+                                        FROM tbl_club_requests r
+                                        JOIN tbl_students s ON r.student_id = s.student_id
+                                        LEFT JOIN tbl_registration reg ON s.student_id = reg.student_id
+                                        WHERE reg.status = 'active' -- Filter for active students
+                                        GROUP BY r.request_id
+                                        ORDER BY r.dateRequested DESC";
 
-                                    if ($result = $pdo->query($sql)) {
-                                        $totalRows = $result->rowCount();
+                                if ($result = $pdo->query($sql)) {
+                                    $totalRows = $result->rowCount();
 
-                                        if ($totalRows > 0) {
-                                            echo '
-                                            <div class="table-responsive">
-                                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
-                                                    <thead>
-                                                        <tr>
-                                                            <th></th>
-                                                            <th>Full Name</th>
-                                                            <th>Department</th>
-                                                            <th>Course</th>
-                                                            <th>Club</th>
-                                                            <th>Status</th>
-                                                            <th>Actions</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>';
+                                    if ($totalRows > 0) {
+                                        echo '
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Cover Photo</th> <!-- New Cover Photo Column -->
+                                                        <th>Club Name</th>
+                                                        <th>Request From</th>
+                                                        <th>Department</th>
+                                                        <th>Course</th>
+                                                        <th>Status</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>';
 
-                                            while ($row = $result->fetch()) {
-                                                $studentName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
-                                                $department = htmlspecialchars($row['department']);
-                                                $course = htmlspecialchars($row['course']);
-                                                $clubName = htmlspecialchars($row['clubName']);
-                                                $status = htmlspecialchars($row['status']);
-                                                $requestId = htmlspecialchars($row['request_id']);
-                                                $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
-
-                                                echo '
-                                                <tr class="request-row">
-                                                    <td class="text-center p-1">
-                                                        <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
-                                                            alt="' . $studentName . ' profile picture" 
-                                                            style="width: 35px; height: 35px; border-radius: 50%;">
-                                                    </td>
-                                                    <td>' . $studentName . '</td>
-                                                    <td>' . $department . '</td>
-                                                    <td>' . $course . '</td>  <!-- Course data -->
-                                                    <td>' . $clubName . '</td>  <!-- Club data -->
-                                                    <td>' . $status . '</td>
-                                                    <td class="text-center">
-                                                        <a href="../public/crud/requests/request_read.php?request_id=' . $requestId . '" class="mr-2" title="View Request" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                        <a href="../public/crud/requests/request_update.php?request_id=' . $requestId . '" class="mr-2" title="Update Request" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                        <a href="../public/crud/requests/request_delete.php?request_id=' . $requestId . '" class="text-danger" title="Delete Request" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
-                                                    </td>
-                                                </tr>';
-                                            }
+                                        while ($row = $result->fetch()) {
+                                            $studentName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
+                                            $department = htmlspecialchars($row['department']);
+                                            $course = htmlspecialchars($row['course']);
+                                            $clubName = htmlspecialchars($row['clubName']);
+                                            $status = htmlspecialchars($row['status']);
+                                            $requestId = htmlspecialchars($row['request_id']);
+                                            $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
+                                            $coverPhoto = htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-club.jpg'); // Use a default if no cover photo
 
                                             echo '
-                                            </tbody>
-                                            </table>
-                                            </div>'; // End of table-responsive
-                                        } else {
-                                            echo '<div class="alert alert-danger"><em>No club requests found.</em></div>';
+                                            <tr class="request-row">
+                                                <td class="text-center p-1">
+                                                    <img class="club-cover-photo" src="/esas/esas_student/images/' . $coverPhoto . '" 
+                                                        alt="' . $clubName . ' cover photo" 
+                                                        style="width: 55px; height: 35px; border-radius: 5%; object-fit: cover;">
+                                                </td>
+                                                <td>' . $clubName . '</td>  <!-- Club data -->
+                                                <td class="p-1">
+                                                    <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
+                                                        alt="' . $studentName . ' profile picture" 
+                                                        style="width: 35px; height: 35px; border-radius: 50%;">
+                                                    ' . $studentName . '
+                                                </td>
+                                                <td>' . $department . '</td>
+                                                <td>' . $course . '</td>  <!-- Course data -->
+                                                <td>' . $status . '</td>
+                                                <td class="text-center">
+                                                    <a href="../public/crud/club_requests/club_request_read.php?request_id=' . $requestId . '" class="mr-2" title="View Request" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                    <!--<a href="../public/crud/club_requests/club_request_update.php?request_id=' . $requestId . '" class="mr-2" title="Update Request" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>-->
+                                                    <a href="../public/crud/club_requests/club_request_delete.php?request_id=' . $requestId . '" class="text-danger" title="Delete Request" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                                </td>
+                                            </tr>';
                                         }
+
+                                        echo '
+                                        </tbody>
+                                        </table>
+                                        </div>'; // End of table-responsive
                                     } else {
-                                        echo "Oops! Something went wrong. Please try again later.";
+                                        echo '<div class="alert alert-danger"><em>No club requests found.</em></div>';
                                     }
+                                } else {
+                                    echo "Oops! Something went wrong. Please try again later.";
+                                }
                                 ?>
+
 
                             </div>
                             <!-- ALL STUDENT TABLE END -->

@@ -89,7 +89,8 @@ unset($pdo);
                             <div class="col-md-4 text-center">
                                 <img src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" 
                                      alt="<?php echo $clubName; ?> Cover Photo" 
-                                     class="img-fluid" style="width: 300px; height: auto; border-radius: 5px">
+                                     class="img-fluid" style="width: 300px; height: auto; border-radius: 5px; object-fit: cover;">
+                                     <!-- class="img-fluid" style="width: 300px; height: 171px; border-radius: 5px; object-fit: cover;"> -->
                             </div>
                             <div class="col-md-8">
                                 <h3 class="text-muted mb-3"><?php echo $clubName; ?></h3>
@@ -107,7 +108,7 @@ unset($pdo);
                         </div>
 
                     </div>
-                    <div class="card-footer">
+                    <div class="card-footer text-center">
                         <a href="club_update.php?club_id=<?php echo $club_id; ?>" class="btn btn-warning">Update</a>
                         <a href="club_delete.php?club_id=<?php echo $club_id; ?>" class="btn btn-danger">Delete</a>
                         <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Clubs List</a>
