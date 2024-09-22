@@ -253,6 +253,20 @@ function fetchReportData(reportType, startDate, endDate) {
     xhr.send(`reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`);
 }
 
+
+
+
+
+
+document.getElementById('printReport').addEventListener('click', function() {
+    const printContent = document.getElementById('reportContent').innerHTML;
+    const originalContent = document.body.innerHTML;
+
+    document.body.innerHTML = printContent;
+    window.print();
+    document.body.innerHTML = originalContent;
+});
+
     </script>
 
 
