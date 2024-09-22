@@ -225,7 +225,7 @@ try {
 
                                 <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
                                     <h4 class="text-muted mb-0">Clubs Record</h4>
-                                    <a href="../public/crud/all_clubs/club_create.php" class="btn btn-danger">
+                                    <a href="../public/crud/all_clubs/club_create.php" class="btn btn-primary">
                                         <i class="fa fa-plus"></i> Add New Club
                                     </a>
                                 </div>

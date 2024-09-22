@@ -192,17 +192,17 @@ unset($pdo);
                     <h2 class="mt-5">Update Club</h2>
                     <p>Please fill this form to update the club information.</p>
                     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . '?club_id=' . $clubId; ?>" method="post" enctype="multipart/form-data">
-                        <div class="form-group">
+                        <div class="form-group mb-2">
                             <label>Club Name</label>
                             <input type="text" name="clubName" class="form-control <?php echo (!empty($clubName_err)) ? 'is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($clubName); ?>">
                             <span class="invalid-feedback"><?php echo $clubName_err; ?></span>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-2">
                             <label>Information</label>
                             <textarea name="information" class="form-control <?php echo (!empty($information_err)) ? 'is-invalid' : ''; ?>" rows="5"><?php echo htmlspecialchars($information); ?></textarea>
                             <span class="invalid-feedback"><?php echo $information_err; ?></span>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-2">
                             <label>Cover Photo</label>
                             <input type="file" name="coverPhoto" id="coverPhoto" class="form-control-file <?php echo (!empty($coverPhoto_err)) ? 'is-invalid' : ''; ?>" onchange="previewImageUpdate()">
                             <span class="invalid-feedback"><?php echo $coverPhoto_err; ?></span>
@@ -212,7 +212,7 @@ unset($pdo);
 
 
 
-                        <div class="form-group"> 
+                        <div class="form-group mb-2"> 
     <div id="moderatorDropdowns">
         <?php if (!empty($currentModerators)): ?>
             <label>Change Moderators</label>

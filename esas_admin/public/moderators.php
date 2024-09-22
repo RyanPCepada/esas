@@ -160,9 +160,14 @@ try {
 
                                 <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
                                     <h4 class="text-muted mb-0">Moderators Record</h4>
-                                    <a href="../public/crud/moderators/moderator_create.php" class="btn btn-danger">
-                                        <i class="fa fa-plus"></i> Add New Moderator
-                                    </a>
+                                    <div>
+                                        <a href="../public/crud/moderators/moderator_create.php" class="btn btn-primary">
+                                            <i class="fa fa-plus"></i> Add New Moderator
+                                        </a>
+                                        <a href="../public/crud/moderators/moderator_assign.php" class="btn btn-warning">
+                                            <i class="fa fa-plus"></i> Assign Moderator
+                                        </a>
+                                    </div>
                                 </div>
 
                                 <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->

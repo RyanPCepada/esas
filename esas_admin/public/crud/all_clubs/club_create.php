@@ -167,17 +167,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <h2 class="mt-5">Add Club</h2>
                 <p>Please fill this form and submit to add a new club to the record.</p>
                 <form id="clubForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data" onsubmit="saveImageData()">
-                    <div class="form-group">
+                    <div class="form-group mb-2">
                         <label>Club Name</label>
                         <input type="text" name="clubName" class="form-control <?php echo (!empty($clubName_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $clubName; ?>">
                         <span class="invalid-feedback"><?php echo $clubName_err; ?></span>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-2">
                         <label>Information</label>
                         <textarea name="information" class="form-control <?php echo (!empty($information_err)) ? 'is-invalid' : ''; ?>"><?php echo $information; ?></textarea>
                         <span class="invalid-feedback"><?php echo $information_err; ?></span>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-2">
                         <label>Cover Photo</label>
                         <input type="file" name="coverPhoto" id="coverPhoto" class="form-control-file <?php echo (!empty($coverPhoto_err)) ? 'is-invalid' : ''; ?>" onchange="previewImage()">
                         <span class="invalid-feedback"><?php echo $coverPhoto_err; ?></span>
@@ -185,9 +185,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <input type="hidden" name="hiddenCoverPhoto" id="hiddenCoverPhoto" value="<?php echo htmlspecialchars($coverPhoto); ?>">
                     </div>
                     <hr>
-                    <div class="form-group">
+                    <div class="form-group mb-2">
                         <label>Add Moderator</label>
-                        <select name="moderator" id="moderatorSelect" class="form-control" required>
+                        <select name="moderator" id="moderatorSelect" class="form-control">
                             <option value="">-- Select From Existing Moderators or Add New --</option>
                             <optgroup label="">
                                 <?php foreach ($moderators as $moderator): ?>
@@ -222,23 +222,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="modal-body">
                 <form id="addModeratorForm">
-                    <div class="form-group">
+                    <div class="form-group mb-2">
                         <label>First Name:</label>
                         <input type="text" name="firstName" class="form-control underline-input" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-2">
                         <label>Middle Initial:</label>
                         <input type="text" name="middleInitial" maxlength="1" class="form-control underline-input" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-2">
                         <label>Last Name:</label>
                         <input type="text" name="lastName" class="form-control underline-input" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-2">
                         <label>Email:</label>
                         <input type="email" name="email" class="form-control underline-input" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-2">
                         <label>Temporary Password:</label>
                         <input type="password" name="password" class="form-control underline-input" required>
                     </div>
