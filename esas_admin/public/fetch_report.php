@@ -59,8 +59,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "</tr></thead><tbody>";
         foreach ($data as $row) {
             echo "<tr>";
-            foreach ($row as $value) {
-                echo "<td>$value</td>";
+            foreach ($row as $key => $value) {
+                // Check if the field is a date and format it as Month Day, Year
+                if (strpos($key, 'date') !== false || strpos($key, 'Added') !== false || strpos($key, 'Requested') !== false || strpos($key, 'Approved') !== false) {
+                    // Format date as Month Day, Year
+                    $formattedDate = date('F j, Y', strtotime($value));
+                    echo "<td>$formattedDate</td>";
+                } else {
+                    echo "<td>$value</td>";
+                }
             }
             echo "</tr>";
         }
