@@ -78,7 +78,7 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
                             <p>Are you sure you want to delete this moderator?</p>
                             <p>
                                 <input type="submit" value="Yes" class="btn btn-danger">
-                                <a href="javascript:window.history.back();" class="btn btn-secondary ml-2">No</a>
+                                <a href="javascript:window.history.back();" class="btn btn-secondary ml-1">No</a>
                             </p>
                         </div>
                     </form>
