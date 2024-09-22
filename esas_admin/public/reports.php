@@ -168,12 +168,18 @@ try {
                     <!-- Report Filters -->
 <div class="row mb-3">
     <div class="col-md-4">
-        <select id="statusFilter" class="form-control">
-            <option value="">All Statuses</option>
-            <option value="approved">Approved</option>
-            <option value="pending">Pending</option>
-            <option value="disapproved">Disapproved</option>
-        </select>
+    <select id="reportType" class="form-control">
+    <option value="">Select Report Type</option>
+    <option value="all_clubs">All Clubs Records</option>
+    <option value="all_moderators">All Moderators Records</option>
+    <option value="student_profiles">Student Profiles</option>
+    <option value="clubs_and_moderators_overview">Overview of Clubs and Moderators</option>
+    <option value="clubs_and_students_overview">Overview of Clubs and Students</option>
+    <option value="club_activity_summary">Club Activity Summary</option>
+    <option value="student_club_requests">Student Club Requests</option>
+    <option value="student_registration_status">Student Registration Status</option>
+</select>
+
     </div>
     <div class="col-md-4">
         <input type="text" id="startDate" class="form-control" placeholder="Start Date" onfocus="(this.type='date')">
@@ -185,6 +191,9 @@ try {
 <button id="generateReport" class="btn btn-primary">Generate Report</button>
 <button id="printReport" class="btn btn-secondary">Print Report</button>
 
+Report Title:
+<br>
+Description:
 <!-- Report Table -->
 <table class="table table-bordered" id="reportTable">
     <thead>
