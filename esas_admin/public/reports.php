@@ -188,7 +188,14 @@ try {
 
 Report Title:
 <br>
+<div id="reportTitle"></div>
+<br>
 Description:
+<div id="reportDescription"></div>
+
+<div id="reportContent">
+    <!-- Dynamically generated table will be inserted here -->
+</div>
 
 
 
@@ -226,7 +233,7 @@ Description:
 
 
     <script>
-        document.getElementById('generateReport').addEventListener('click', function() {
+document.getElementById('generateReport').addEventListener('click', function () {
     const reportType = document.getElementById('reportType').value;
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
@@ -236,15 +243,65 @@ Description:
         return;
     }
 
+    // Dynamically generate title and description
+    generateTitleAndDescription(reportType);
+
+    // Fetch and display report data
     fetchReportData(reportType, startDate, endDate);
 });
+
+function generateTitleAndDescription(reportType) {
+    let reportTitle = '';
+    let reportDescription = '';
+
+    switch (reportType) {
+        case 'all_clubs':
+            reportTitle = "All Clubs Records";
+            reportDescription = "This report provides a comprehensive overview of all registered clubs, including their names, cover photos, and dates of establishment.";
+            break;
+        case 'all_moderators':
+            reportTitle = "All Moderators Records";
+            reportDescription = "This report lists all moderators along with their personal details such as full name, gender, contact information, department, and the date they were assigned to their respective clubs.";
+            break;
+        case 'student_profiles':
+            reportTitle = "Student Profiles";
+            reportDescription = "This report contains detailed profiles of all students, including their student ID, full name, contact information, department, course, and academic year.";
+            break;
+        case 'clubs_and_moderators_overview':
+            reportTitle = "Overview of Clubs and Moderators";
+            reportDescription = "This report provides a summary of all clubs and their respective moderators, showcasing which moderators are assigned to which clubs.";
+            break;
+        case 'clubs_and_students_overview':
+            reportTitle = "Overview of Clubs and Students";
+            reportDescription = "This report gives an overview of club memberships, showing the number of students participating in each club along with relevant student information.";
+            break;
+        case 'club_activity_summary':
+            reportTitle = "Club Activity Summary";
+            reportDescription = "This report summarizes all the activities and goals of each club, highlighting their purpose and contributions within the institution.";
+            break;
+        case 'student_club_requests':
+            reportTitle = "Student Club Requests";
+            reportDescription = "This report lists the clubs proposed by students, including their goals, objectives, and activities they plan to undertake.";
+            break;
+        case 'student_registration_status':
+            reportTitle = "Student Registration Status";
+            reportDescription = "This report shows the current registration status of students for different clubs, including whether they have been approved, disapproved, or are still pending.";
+            break;
+        default:
+            reportTitle = "Report";
+            reportDescription = "This is a dynamically generated report.";
+    }
+
+    document.getElementById('reportTitle').innerText = reportTitle;
+    document.getElementById('reportDescription').innerText = reportDescription;
+}
 
 function fetchReportData(reportType, startDate, endDate) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'fetch_report.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-    xhr.onload = function() {
+    xhr.onload = function () {
         if (this.status === 200) {
             document.getElementById('reportContent').innerHTML = this.responseText;
         }
@@ -253,12 +310,7 @@ function fetchReportData(reportType, startDate, endDate) {
     xhr.send(`reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`);
 }
 
-
-
-
-
-
-document.getElementById('printReport').addEventListener('click', function() {
+document.getElementById('printReport').addEventListener('click', function () {
     const printContent = document.getElementById('reportContent').innerHTML;
     const originalContent = document.body.innerHTML;
 
@@ -266,8 +318,7 @@ document.getElementById('printReport').addEventListener('click', function() {
     window.print();
     document.body.innerHTML = originalContent;
 });
-
-    </script>
+</script>
 
 
 </body>

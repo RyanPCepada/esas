@@ -33,8 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'student_club_requests':
-            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS studentName, c.clubName, r.dateApplied, r.status FROM tbl_registration r JOIN tbl_students s ON r.student_id = s.student_id JOIN tbl_clubs c ON r.club_id = c.club_id";
-            break;
+            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS studentName, cr.clubName, cr.description, cr.activities, cr.dateRequested, cr.status FROM tbl_club_requests cr JOIN tbl_students s ON cr.student_id = s.student_id";
+            break;            
 
         case 'student_registration_status':
             $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS studentName, c.clubName, r.status, r.dateApproved FROM tbl_registration r JOIN tbl_students s ON r.student_id = s.student_id JOIN tbl_clubs c ON r.club_id = c.club_id";
