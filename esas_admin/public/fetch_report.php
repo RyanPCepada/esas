@@ -75,5 +75,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo "<p>No data found for the selected report.</p>";
     }
+
+    // Dynamically generate table
+if (!empty($data)) {
+    echo "<table class='table table-bordered'><thead><tr>";
+    foreach (array_keys($data[0]) as $column) {
+        echo "<th>" . ucfirst(str_replace('_', ' ', $column)) . "</th>";
+    }
+    echo "</tr></thead><tbody>";
+    foreach ($data as $row) {
+        echo "<tr>";
+        foreach ($row as $key => $value) {
+            // Check if the column is for coverPhoto or profilePic and display the image
+            if ($key === 'coverPhoto' || $key === 'profilePic') {
+                // Assuming images are stored in a specific directory (e.g., /images/)
+                $imagePath = '/esas/esas_admin/images/' . $value;
+                echo "<td><img src='$imagePath' alt='Image' style='width: 100px; height: 57px; object-fit: cover;'></td>";
+            } else {
+                // For other fields, just display the value
+                echo "<td>$value</td>";
+            }
+        }
+        echo "</tr>";
+    }
+    echo "</tbody></table>";
+} else {
+    echo "<p>No data found for the selected report.</p>";
+}
 }
 ?>
