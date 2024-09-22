@@ -23,6 +23,31 @@ if ($stmt = $pdo->prepare($clubQuery)) {
     }
 }
 
+if (isset($_POST['fetch_type'])) {
+    if ($_POST['fetch_type'] == 'assigned_clubs' && isset($_POST['moderator_id'])) {
+        // Fetch clubs assigned to the selected moderator
+        $moderator_id = $_POST['moderator_id'];
+        $sql = "SELECT club_id FROM tbl_clubs_and_moderators WHERE moderator_id = :moderator_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':moderator_id', $moderator_id);
+        $stmt->execute();
+        $assignedClubs = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        echo json_encode($assignedClubs);
+        exit();
+    } elseif ($_POST['fetch_type'] == 'assigned_moderators' && isset($_POST['club_id'])) {
+        // Fetch moderators assigned to the selected club
+        $club_id = $_POST['club_id'];
+        $sql = "SELECT moderator_id FROM tbl_clubs_and_moderators WHERE club_id = :club_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':club_id', $club_id);
+        $stmt->execute();
+        $assignedModerators = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        echo json_encode($assignedModerators);
+        exit();
+    }
+}
+
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($_POST["moderator"]) && !empty($_POST["club"])) {
         $selectedModeratorId = $_POST["moderator"];
@@ -72,43 +97,111 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
-<div class="wrapper">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <h2 class="mt-5">Assign Moderator</h2>
-                <p>Please fill this form to assign a new moderator.</p>
-                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                    <div class="form-group mb-2">
-                        <label>Select a Moderator</label>
-                        <select name="moderator" id="moderatorSelect" class="form-control">
-                            <option value="">-- Select From Existing Moderators --</option>
-                            <optgroup label="">
+    <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="mt-5">Assign Moderator</h2>
+                    <p>Please fill this form to assign a new moderator.</p>
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                        <div class="form-group mb-2">
+                            <label>Select a Moderator</label>
+                            <select name="moderator" id="moderatorSelect" class="form-control">
+                                <option value="">-- Select From Existing Moderators --</option>
                                 <?php foreach ($moderators as $moderator): ?>
                                     <option value="<?php echo htmlspecialchars($moderator['moderator_id']); ?>">
                                         <?php echo htmlspecialchars($moderator['moderator_name']); ?>
                                     </option>
                                 <?php endforeach; ?>
-                            </optgroup>
-                        </select>
-                    </div>
-                    <div class="form-group mb-2">
-                        <label>Assign to a Club</label>
-                        <select name="club" class="form-control">
-                            <option value="">-- Select From Existing Clubs --</option>
-                            <?php foreach ($clubs as $club): ?>
-                                <option value="<?php echo htmlspecialchars($club['club_id']); ?>">
-                                    <?php echo htmlspecialchars($club['clubName']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <input type="submit" class="btn btn-primary" value="Submit">
-                    <a href="../../moderators.php" class="btn btn-secondary">Cancel</a>
-                </form>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label>Assign to a Club</label>
+                            <select name="club" id="clubSelect" class="form-control">
+                                <option value="">-- Select From Existing Clubs --</option>
+                                <?php foreach ($clubs as $club): ?>
+                                    <option value="<?php echo htmlspecialchars($club['club_id']); ?>">
+                                        <?php echo htmlspecialchars($club['clubName']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <input type="submit" class="btn btn-primary" value="Submit">
+                        <a href="../../moderators.php" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+
+    <script>
+        document.getElementById('moderatorSelect').addEventListener('change', function () {
+            var moderatorId = this.value;
+            if (moderatorId !== "") {
+                fetchAssignedClubs(moderatorId);
+            }
+        });
+
+        document.getElementById('clubSelect').addEventListener('change', function () {
+            var clubId = this.value;
+            if (clubId !== "") {
+                fetchAssignedModerators(clubId);
+            }
+        });
+
+        function fetchAssignedClubs(moderatorId) {
+            fetch("", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "fetch_type=assigned_clubs&moderator_id=" + encodeURIComponent(moderatorId),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                var clubSelect = document.getElementById("clubSelect");
+                var options = clubSelect.getElementsByTagName("option");
+
+                // Convert all assigned clubs to strings for comparison
+                const assignedClubs = data.map(String);
+
+                for (var i = 0; i < options.length; i++) {
+                    if (assignedClubs.includes(options[i].value)) {
+                        options[i].disabled = true;
+                        options[i].text += " (Current)"; // Add "Current" to the option text
+                    } else {
+                        options[i].disabled = false;
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function fetchAssignedModerators(clubId) {
+            fetch("", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "fetch_type=assigned_moderators&club_id=" + encodeURIComponent(clubId),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                var moderatorSelect = document.getElementById("moderatorSelect");
+                var options = moderatorSelect.getElementsByTagName("option");
+
+                // Convert all assigned moderators to strings for comparison
+                const assignedModerators = data.map(String);
+
+                for (var i = 0; i < options.length; i++) {
+                    if (assignedModerators.includes(options[i].value)) {
+                        options[i].disabled = true;
+                        options[i].text += " (Current)"; // Add "Current" to the option text
+                    } else {
+                        options[i].disabled = false;
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+    </script>
 </body>
 </html>

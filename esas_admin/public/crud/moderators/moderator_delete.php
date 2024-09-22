@@ -26,7 +26,7 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
         $pdo->commit();
 
         // Redirect to landing page
-        header("location: ../../all_moderators.php");
+        header("location: ../../moderators.php");
         exit();
     } catch (Exception $e) {
         // Rollback transaction on error
