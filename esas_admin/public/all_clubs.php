@@ -246,98 +246,104 @@ try {
                                 </div>
 
                                 <?php
-                                // Include config file
-                                require_once "../../config.php";
+                                    // Include config file
+                                    require_once "../../config.php";
 
-                                // SQL query to fetch all clubs with related information, moderators, member count, and actions
-                                $sql = "SELECT 
-                                            c.club_id,
-                                            c.clubName, 
-                                            c.information, 
-                                            c.coverPhoto, 
-                                            GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.lastName, ':::', m.profilePic) SEPARATOR '|||') AS moderators,
-                                            (SELECT COUNT(DISTINCT r.student_id) FROM tbl_registration r WHERE r.club_id = c.club_id AND r.status = 'active') AS member_count,
-                                            c.dateAdded
-                                        FROM tbl_clubs c
-                                        LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
-                                        LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
-                                        GROUP BY c.club_id
-                                        ORDER BY c.dateAdded ASC";
+                                    // SQL query to fetch all clubs with related information, moderators, member count, and actions
+                                    $sql = "SELECT 
+                                                c.club_id,
+                                                c.clubName, 
+                                                c.information, 
+                                                c.coverPhoto, 
+                                                GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.lastName, ':::', m.profilePic) SEPARATOR '|||') AS moderators,
+                                                (SELECT COUNT(DISTINCT r.student_id) FROM tbl_registration r WHERE r.club_id = c.club_id AND r.status = 'active') AS member_count,
+                                                c.dateAdded
+                                            FROM tbl_clubs c
+                                            LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                                            LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
+                                            GROUP BY c.club_id
+                                            ORDER BY c.dateAdded ASC";
 
-                                if ($result = $pdo->query($sql)) {
-                                    $totalRows = $result->rowCount();
-                                    $rowCount = 0; // To keep track of row number for striping
+                                    if ($result = $pdo->query($sql)) {
+                                        $totalRows = $result->rowCount();
+                                        $rowCount = 0; // To keep track of row number for striping
 
-                                    if ($totalRows > 0) {
-                                        echo '';
+                                        if ($totalRows > 0) {
+                                            echo '';
 
-                                        // Populate the rows using the row template
-                                        while ($row = $result->fetch()) {
-                                            $formattedDate = date('F j, Y', strtotime($row['dateAdded']));
-                                            $moderatorData = explode('|||', $row['moderators']);
-                                            $moderatorCount = count($moderatorData);
-                                            
-                                            // Generate moderator list with profile pictures
-                                            $moderatorList = '';
-                                            foreach ($moderatorData as $data) {
-                                                list($moderatorName, $profilePic) = explode(':::', $data);
-                                                $moderatorList .= '<div style="display: flex; align-items: center; margin-bottom: 3px;">
-                                                                    <img src="/esas/esas_moderator/images/' . htmlspecialchars($profilePic) . '" 
-                                                                        alt="' . htmlspecialchars($moderatorName) . ' profile picture" 
-                                                                        style="width: 40px; height: 40px; border-radius: 50%; margin-right: 8px;">
-                                                                    <h5>' . htmlspecialchars($moderatorName) . '</h5>
-                                                                </div>';
-                                            }
-                                            
-                                            $moderatorLabel = ($moderatorCount == 1) ? 'Moderator:' : 'Moderators:';
-                                            $memberText = ($row['member_count'] == 1) ? 'member' : 'members';
-                                            
-                                            // Alternate row colors
-                                            $rowStyle = ($rowCount % 2 == 0) ? 'background-color: #f2f2f2;' : 'background-color: #ffffff;';
-                                            $rowCount++;
-                                            
-                                            echo '  
-                                            <div class="row ms-0 mb-3 p-4 club-row" style="' . $rowStyle . '">
-                                                <!-- Club Cover Photo -->
-                                                <div class="col-md-5">
-                                                    <div style="text-align: start;">
-                                                        <img class="club-cover-photo" src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
-                                                            alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
-                                                            style="width: 100%; max-width: 90%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
-                                                    </div>
-                                                </div>
-                                                <!-- Club Details -->
-                                                <div class="col-md-6">
-                                                    <div>
-                                                        <h2 class="text-muted mt-3">' . htmlspecialchars($row['clubName']) . '</h2>
-                                                        <h5 class="text-muted mt-2 mb-2">' . $moderatorLabel . '</h5>
-                                                        <div class="moderator-list">' . $moderatorList . '</div>
-                                                        <hr class="m-1">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <h7 class="text-muted mb-0">Created <span class="creation-date">' . htmlspecialchars($formattedDate) . '</span></h7>
-                                                            <div class="member-count">' . htmlspecialchars($row['member_count']) . ' ' . $memberText . '</div>
+                                            // Populate the rows using the row template
+                                            while ($row = $result->fetch()) {
+                                                $formattedDate = date('F j, Y', strtotime($row['dateAdded']));
+                                                $moderatorData = explode('|||', $row['moderators']);
+                                                $moderatorCount = count($moderatorData);
+                                                
+                                                // Generate moderator list with profile pictures or show "None" if no moderators found
+                                                $moderatorList = '';
+                                                if (!empty($row['moderators'])) {
+                                                    foreach ($moderatorData as $data) {
+                                                        list($moderatorName, $profilePic) = explode(':::', $data);
+                                                        $moderatorList .= '<div style="display: flex; align-items: center; margin-bottom: 3px;">
+                                                                            <img src="/esas/esas_moderator/images/' . htmlspecialchars($profilePic) . '" 
+                                                                                alt="' . htmlspecialchars($moderatorName) . ' profile picture" 
+                                                                                style="width: 40px; height: 40px; border-radius: 50%; margin-right: 8px;">
+                                                                            <h5>' . htmlspecialchars($moderatorName) . '</h5>
+                                                                        </div>';
+                                                    }
+                                                } else {
+                                                    // No moderators found, display None
+                                                    $moderatorList = '<h5 class="text-muted">None</h5>';
+                                                }
+                                                
+                                                $moderatorLabel = ($moderatorCount == 1 || $moderatorList == 'None') ? 'Moderator:' : 'Moderators:';
+                                                $memberText = ($row['member_count'] == 1) ? 'member' : 'members';
+                                                
+                                                // Alternate row colors
+                                                $rowStyle = ($rowCount % 2 == 0) ? 'background-color: #f2f2f2;' : 'background-color: #ffffff;';
+                                                $rowCount++;
+                                                
+                                                echo '  
+                                                <div class="row ms-0 mb-3 p-4 club-row" style="' . $rowStyle . '">
+                                                    <!-- Club Cover Photo -->
+                                                    <div class="col-md-5">
+                                                        <div style="text-align: start;">
+                                                            <img class="club-cover-photo" src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
+                                                                alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
+                                                                style="width: 100%; max-width: 90%; height: auto; border-radius: 5px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
                                                         </div>
                                                     </div>
+                                                    <!-- Club Details -->
+                                                    <div class="col-md-6">
+                                                        <div>
+                                                            <h2 class="text-muted mt-3">' . htmlspecialchars($row['clubName']) . '</h2>
+                                                            <h5 class="text-muted mt-2 mb-2">' . $moderatorLabel . '</h5>
+                                                            <div class="moderator-list">' . $moderatorList . '</div>
+                                                            <hr class="m-1">
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <h7 class="text-muted mb-0">Created <span class="creation-date">' . htmlspecialchars($formattedDate) . '</span></h7>
+                                                                <div class="member-count">' . htmlspecialchars($row['member_count']) . ' ' . $memberText . '</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Actions -->
+                                                    <div class="col-md-1 text-center">
+                                                        <a href="../public/crud/all_clubs/club_read.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                        <a href="../public/crud/all_clubs/club_update.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
+                                                        <a href="../public/crud/all_clubs/club_delete.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                                    </div>
                                                 </div>
-                                                <!-- Actions -->
-                                                <div class="col-md-1 text-center">
-                                                    <a href="../public/crud/all_clubs/club_read.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                    <a href="../public/crud/all_clubs/club_update.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                    <a href="../public/crud/all_clubs/club_delete.php?club_id=' . htmlspecialchars($row['club_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
-                                                </div>
-                                            </div>
-                                            ';
-                                        }
+                                                ';
+                                            }
 
-                                        // Free result set
-                                        unset($result);
+                                            // Free result set
+                                            unset($result);
+                                        } else {
+                                            echo '<div class="alert alert-danger"><em>No clubs were found.</em></div>';
+                                        }
                                     } else {
-                                        echo '<div class="alert alert-danger"><em>No clubs were found.</em></div>';
+                                        echo "Oops! Something went wrong. Please try again later.";
                                     }
-                                } else {
-                                    echo "Oops! Something went wrong. Please try again later.";
-                                }
                                 ?>
+
 
 
                             </div>
