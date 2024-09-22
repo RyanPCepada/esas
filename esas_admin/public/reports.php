@@ -190,6 +190,11 @@ Report Title:
 <br>
 Description:
 
+
+
+
+( DYNAMIC TABLE FOR REPORT GENERATION ACCORDING TO REPORT TYPE )
+
                 </div>
                 <!-- ALL STUDENT TABLE END -->
 
@@ -218,98 +223,35 @@ Description:
 
 
     <script>
-        function submitClubRequest() {
-            document.getElementById('clubRequestForm').submit();
+        document.getElementById('generateReport').addEventListener('click', function() {
+    const reportType = document.getElementById('reportType').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    if (!reportType) {
+        alert('Please select a report type.');
+        return;
+    }
+
+    fetchReportData(reportType, startDate, endDate);
+});
+
+function fetchReportData(reportType, startDate, endDate) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'fetch_report.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    xhr.onload = function() {
+        if (this.status === 200) {
+            document.getElementById('reportContent').innerHTML = this.responseText;
         }
+    };
 
-        function updateLabel(label) {
-            document.getElementById("tabLabel").innerText = label;
-        }
-
-        // Fetch clubs data from API
-        fetch('/esas/esas_moderator/apis/clubs-api.php')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // $('#post-26').html(data)
-                const allClubsContainer = document.getElementById('allClubsContainer');
-                if (data && data.length > 0) {
-                    data.forEach(club => {
-                        const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
-                        const cardHTML = `
-                            <div class="col-md-4 card-container">
-                                <div class="card card-img-only-all">
-                                    <small data-toggle="tooltip" title="${memberText}">
-                                        <i class="fa fa-user mr-1"></i>${club.membersCount}
-                                    </small>
-                                    <a href="/esas/esas_moderator/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
-                                        <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
-                                        <div class="overlay-text">
-                                            <h4>${club.clubName}</h4>
-                                            <!--<div class="moderators-container">
-                                                ${club.formattedModerators}
-                                            </div>-->
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                        `;
-                        allClubsContainer.innerHTML += cardHTML;
-                    });
-                } else {
-                    allClubsContainer.innerHTML = '<p>No clubs found.</p>';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching clubs:', error);
-                const allClubsContainer = document.getElementById('allClubsContainer');
-                allClubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
-            });
-
+    xhr.send(`reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`);
+}
 
     </script>
 
-
-    <script>
-
-
-        // JavaScript to Animate Cards
-        document.addEventListener('DOMContentLoaded', function() {
-            function animateCards(cards) { 
-                cards.forEach((card, index) => {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(5px) scale(0.95)'; // Adjusted Y translation
-                    card.style.transition = 'none'; // Disable transition for reset
-
-                    void card.offsetWidth; // Trigger reflow
-
-                    card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-                    
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0) scale(1)';
-                        card.style.animation = `waveIn 0.6s ease-out forwards`;
-                    }, index * 100); // Staggered delay
-                });
-            }
-
-            // Select only the upper cards
-            const upperCards = document.querySelectorAll('.card-row1 .card');
-            animateCards(upperCards);
-        });
-
-
-        $(document).ready(function() {
-            $('.delprreq').click(function(e) {
-                e.stopPropagation();
-            });
-            // let value= $("classname").val()
-        });
-    </script>
 
 </body>
 </html>
