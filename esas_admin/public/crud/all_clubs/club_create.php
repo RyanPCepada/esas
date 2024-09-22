@@ -5,7 +5,7 @@ $clubName = $information = $coverPhoto = "";
 $clubName_err = $information_err = $coverPhoto_err = "";
 $moderators = [];
 define('COVERPHOTO_DEFAULT', 'COVERPHOTO_DEFAULT.png');
-define('PROF_PIC_DEFAULT', 'PROF_PIC.png'); // Define the default profile picture
+define('PROF_PIC_DEFAULT', 'PROF_PIC.png');
 
 $moderatorQuery = "SELECT moderator_id, CONCAT(firstName, ' ', lastName) AS moderator_name FROM tbl_moderators";
 if ($stmt = $pdo->prepare($moderatorQuery)) {
@@ -188,7 +188,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="form-group">
                         <label>Add Moderator</label>
                         <select name="moderator" id="moderatorSelect" class="form-control" required>
-                            <option value="">-- Select from existing Moderators or add new --</option>
+                            <option value="">-- Select From Existing Moderators or Add New --</option>
                             <optgroup label="">
                                 <?php foreach ($moderators as $moderator): ?>
                                     <option value="<?php echo htmlspecialchars($moderator['moderator_id']); ?>">
