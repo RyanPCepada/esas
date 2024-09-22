@@ -209,7 +209,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="form-group">
                 <input type="hidden" name="moderator_id" value="<?php echo $moderator_id; ?>"/>
                 <input type="submit" class="btn btn-primary" value="Submit">
-                <a href="../moderators.php" class="btn btn-secondary ml-2">Cancel</a>
+                <a href="javascript:window.history.back();" class="btn btn-secondary ml-2">Cancel</a>
             </div>
         </form>
     </div>    
