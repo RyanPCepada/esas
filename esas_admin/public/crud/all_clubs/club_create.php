@@ -126,6 +126,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     unset($pdo);
 }
+$clubName = isset($_GET['clubName']) ? htmlspecialchars($_GET['clubName']) : '';
+$coverPhoto = isset($_GET['coverPhoto']) ? htmlspecialchars($_GET['coverPhoto']) : '';
 ?>
 
 
@@ -203,7 +205,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
 
                     <input type="submit" class="btn btn-primary" value="Submit">
-                    <a href="../../all_clubs.php" class="btn btn-secondary">Cancel</a>
+                    <a href="javascript:window.history.back();" class="btn btn-secondary">Cancel</a>
                 </form>
             </div>
         </div>

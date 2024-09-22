@@ -27,7 +27,7 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
                 $clubName = htmlspecialchars($row["clubName"] ?? ''); 
                 $description = htmlspecialchars($row["description"] ?? ''); 
                 $activities = htmlspecialchars($row["activities"] ?? ''); 
-                $status = htmlspecialchars($row["status"] ?? ''); 
+                $status = strtolower(htmlspecialchars($row["status"] ?? '')); // Convert status to lowercase
                 $coverPhoto = htmlspecialchars($row["coverPhoto"] ?: "default-cover.jpg"); 
                 $dateRequested = htmlspecialchars($row["dateRequested"] ?? ''); 
                 $dateModified = htmlspecialchars($row["dateModified"] ?? ''); 
@@ -46,7 +46,26 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
     header("location: error.php"); 
     exit(); 
 } 
-unset($pdo); 
+
+// Handle approval or disapproval
+if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprove'])) {
+    $newStatus = $_POST["action"] === 'approve' ? 'approved' : 'disapproved'; // Changed to lowercase
+    $updateSql = "UPDATE tbl_club_requests SET status = :status WHERE request_id = :request_id";
+
+    if ($updateStmt = $pdo->prepare($updateSql)) {
+        $updateStmt->bindParam(":status", $newStatus);
+        $updateStmt->bindParam(":request_id", $request_id, PDO::PARAM_INT);
+
+        if ($updateStmt->execute()) {
+            header("location: club_request_read.php?request_id=" . $request_id . "&status=" . strtolower($newStatus));
+            exit();
+        } else {
+            echo "Error updating the request. Please try again.";
+            exit();
+        }
+    }
+    unset($updateStmt);
+}
 
 ?>
 
@@ -72,7 +91,6 @@ unset($pdo);
                                 <img src="/esas/esas_student/images/<?php echo $coverPhoto; ?>" 
                                      alt="<?php echo $clubName; ?> Cover Photo" 
                                      class="img-fluid" style="width: 300px; height: auto; border-radius: 5px; object-fit: cover;">
-                                     <!-- class="img-fluid" style="width: 300px; height: 171px; border-radius: 5px; object-fit: cover;"> -->
                             </div>
                             <div class="col-md-9">
                                 <h4 class="text-muted mb-3"><?php echo $clubName; ?></h4>
@@ -88,8 +106,13 @@ unset($pdo);
 
                     <div class="card-footer text-center">
                         <?php if ($status === 'pending'): ?>
-                            <a href="approve_request.php?request_id=<?php echo $request_id; ?>" class="btn btn-success">Approve</a>
-                            <a href="disapprove_request.php?request_id=<?php echo $request_id; ?>" class="btn btn-danger">Disapprove</a>
+                            <form method="post">
+                                <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
+                                <button type="submit" name="action" value="disapprove" class="btn btn-danger">Disapprove</button>
+                                <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Requests List</a>
+                            </form>
+                        <?php elseif ($status === 'approved'): ?>
+                            <a href="../../crud/all_clubs/club_create.php?clubName=<?php echo urlencode($clubName); ?>&coverPhoto=<?php echo urlencode($coverPhoto); ?>" class="btn btn-success">Add to Clubs</a>
                             <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Requests List</a>
                         <?php else: ?>
                             <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Requests List</a>
