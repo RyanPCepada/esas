@@ -187,7 +187,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <hr>
                     <div class="form-group">
                         <label>Add Moderator</label>
-                        <select name="moderator" id="moderatorSelect" class="form-control">
+                        <select name="moderator" id="moderatorSelect" class="form-control" required>
                             <option value="">-- Select from existing Moderators or add new --</option>
                             <optgroup label="">
                                 <?php foreach ($moderators as $moderator): ?>
