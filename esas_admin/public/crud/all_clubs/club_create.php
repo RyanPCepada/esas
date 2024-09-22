@@ -164,7 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <h2 class="mt-5">Add Club</h2>
+                <h2 class="mt-5">Add New Club</h2>
                 <p>Please fill this form and submit to add a new club to the record.</p>
                 <form id="clubForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data" onsubmit="saveImageData()">
                     <div class="form-group mb-2">

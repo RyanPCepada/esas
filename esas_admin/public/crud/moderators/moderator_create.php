@@ -123,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <h2 class="mt-5">Add Moderator</h2>
+                <h2 class="mt-5">Add New Moderator</h2>
                 <p>Please fill this form to add a new moderator.</p>
                 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                     <div class="form-group mb-2">
