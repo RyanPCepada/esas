@@ -117,24 +117,30 @@ if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err)) {
         $stmt->bindParam(":clubId", $clubId);
 
         if ($stmt->execute()) {
-            // Clear current moderators for the club before re-adding
-            $deleteSql = "DELETE FROM tbl_clubs_and_moderators WHERE club_id = :clubId";
-            if ($deleteStmt = $pdo->prepare($deleteSql)) {
-                $deleteStmt->bindParam(":clubId", $clubId);
-                $deleteStmt->execute();
-            }
-
             // Handle moderator association
             if (!empty($_POST['moderator'])) { // Check if there are selected moderators
-                foreach ($_POST['moderator'] as $moderatorId) {
-                    // Associate the existing moderator with the club
-                    $sql2 = "INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id) VALUES (:clubId, :moderatorId)";
-                    if ($stmt2 = $pdo->prepare($sql2)) {
-                        $stmt2->bindParam(":clubId", $clubId);
-                        $stmt2->bindParam(":moderatorId", $moderatorId);
-                        if (!$stmt2->execute()) { // Check if the insertion was successful
-                            // Log or handle the error
-                            echo "Failed to associate moderator ID $moderatorId with club. Error: " . implode(", ", $stmt2->errorInfo());
+                foreach ($_POST['moderator'] as $index => $moderatorId) {
+                    if ($moderatorId === 'none') {
+                        // Get the current moderator ID for this dropdown
+                        $currentModeratorId = $currentModerators[$index]['moderator_id'];
+                        
+                        // Delete the specific moderator association
+                        $deleteSql = "DELETE FROM tbl_clubs_and_moderators WHERE club_id = :clubId AND moderator_id = :moderatorId";
+                        if ($deleteStmt = $pdo->prepare($deleteSql)) {
+                            $deleteStmt->bindParam(":clubId", $clubId);
+                            $deleteStmt->bindParam(":moderatorId", $currentModeratorId);
+                            $deleteStmt->execute();
+                        }
+                    } else {
+                        // Associate the existing moderator with the club
+                        $sql2 = "INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id) VALUES (:clubId, :moderatorId)";
+                        if ($stmt2 = $pdo->prepare($sql2)) {
+                            $stmt2->bindParam(":clubId", $clubId);
+                            $stmt2->bindParam(":moderatorId", $moderatorId);
+                            if (!$stmt2->execute()) { // Check if the insertion was successful
+                                // Log or handle the error
+                                echo "Failed to associate moderator ID $moderatorId with club. Error: " . implode(", ", $stmt2->errorInfo());
+                            }
                         }
                     }
                 }
@@ -149,6 +155,7 @@ if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err)) {
         }
     }
 }
+
 
 
     unset($stmt);
