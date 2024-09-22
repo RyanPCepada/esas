@@ -182,7 +182,7 @@ try {
 
 <div class="text-end">
 <button id="generateReport" class="btn btn-primary">Generate Report</button>
-<button id="printReport" class="btn btn-secondary">Print Report</button>
+<button id="printReport" class="btn btn-secondary"><i class="fas fa-print"></i> Print Report</button>
     </div>
 
 Report Title:
