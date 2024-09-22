@@ -182,7 +182,6 @@ try {
         <input type="text" id="endDate" class="form-control" placeholder="End Date" onfocus="(this.type='date')">
     </div>
 </div>
-<button id="generateReport" class="btn btn-primary">Generate Report</button>
 
 <!-- Report Table -->
 <table class="table table-bordered" id="reportTable">
