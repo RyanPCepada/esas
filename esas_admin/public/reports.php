@@ -193,7 +193,10 @@ Description:
 
 
 
-( DYNAMIC TABLE FOR REPORT GENERATION ACCORDING TO REPORT TYPE )
+<div id="reportContent">
+    <!-- Dynamically generated table will be inserted here -->
+</div>
+
 
                 </div>
                 <!-- ALL STUDENT TABLE END -->
