@@ -157,15 +157,6 @@ try {
 
                 <!-- ALL STUDENT TABLE START -->
                 <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
-                    
-                    <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
-                        <h4 class="text-muted mb-0">Reports</h4>
-                    </div>
-
-                    <!-- SAMPLE REPORTS HERE -->
-
-
-                    <!-- Report Filters -->
 <div class="row mb-3">
     <div class="col-md-4">
     <select id="reportType" class="form-control">
@@ -188,103 +179,15 @@ try {
         <input type="text" id="endDate" class="form-control" placeholder="End Date" onfocus="(this.type='date')">
     </div>
 </div>
+
+<div class="text-end">
 <button id="generateReport" class="btn btn-primary">Generate Report</button>
 <button id="printReport" class="btn btn-secondary">Print Report</button>
+    </div>
 
 Report Title:
 <br>
 Description:
-<!-- Report Table -->
-<table class="table table-bordered" id="reportTable">
-    <thead>
-        <tr>
-            <th>Request ID</th>
-            <th>Club Name</th>
-            <th>Description</th>
-            <th>Activities</th>
-            <th>Status</th>
-            <th>Date Requested</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Dynamically populated report data goes here -->
-    </tbody>
-</table>
-
-<script>
-document.getElementById('generateReport').onclick = function() {
-    const status = document.getElementById('statusFilter').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-
-    // Fetch report data based on filters
-    fetch(`fetch_report.php?status=${status}&startDate=${startDate}&endDate=${endDate}`)
-        .then(response => response.json())
-        .then(data => {
-            const tbody = document.querySelector('#reportTable tbody');
-            tbody.innerHTML = ''; // Clear previous results
-            data.forEach(item => {
-                const row = `<tr>
-                    <td>${item.request_id}</td>
-                    <td>${item.clubName}</td>
-                    <td>${item.description}</td>
-                    <td>${item.activities}</td>
-                    <td>${item.status}</td>
-                    <td>${item.dateRequested}</td>
-                </tr>`;
-                tbody.innerHTML += row;
-            });
-        });
-};
-</script>
-
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Request ID</th>
-                                <th>Club Name</th>
-                                <th>Description</th>
-                                <th>Activities</th>
-                                <th>Status</th>
-                                <th>Cover Photo</th>
-                                <th>Date Requested</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-
-                            // Fetch data from tbl_club_requests
-                            $sql = "SELECT request_id, clubName, description, activities, status, coverPhoto, dateRequested FROM tbl_club_requests";
-                            $stmt = $pdo->prepare($sql);
-                            $stmt->execute();
-                            $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                            if (count($requests) > 0):
-                                foreach ($requests as $request): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($request['request_id']); ?></td>
-                                        <td><?php echo htmlspecialchars($request['clubName']); ?></td>
-                                        <td><?php echo htmlspecialchars($request['description']); ?></td>
-                                        <td><?php echo htmlspecialchars($request['activities']); ?></td>
-                                        <td><?php echo htmlspecialchars($request['status']); ?></td>
-                                        <td>
-                                            <?php if (!empty($request['coverPhoto'])): ?>
-                                                <img src="/esas/esas_student/images/<?php echo htmlspecialchars($request['coverPhoto']); ?>" alt="Cover Photo" style="width: 100px;">
-                                            <?php else: ?>
-                                                No Image
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?php echo htmlspecialchars($request['dateRequested']); ?></td>
-                                    </tr>
-                                <?php endforeach; 
-                            else: ?>
-                                <tr>
-                                    <td colspan="7" class="text-center">No club requests found.</td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                    <!-- END SAMPLE REPORTS -->
 
                 </div>
                 <!-- ALL STUDENT TABLE END -->
