@@ -159,31 +159,32 @@ try {
                 <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
 <div class="row mb-3">
     <div class="col-md-4">
-    <select id="reportType" class="form-control">
-    <option value="">Select Report Type</option>
-    <option value="all_clubs">All Clubs Records</option>
-    <option value="all_moderators">All Moderators Records</option>
-    <option value="student_profiles">Student Profiles</option>
-    <option value="clubs_and_moderators_overview">Overview of Clubs and Moderators</option>
-    <option value="clubs_and_students_overview">Overview of Clubs and Students</option>
-    <option value="club_activity_summary">Club Activity Summary</option>
-    <option value="student_club_requests">Student Club Requests</option>
-    <option value="student_registration_status">Student Registration Status</option>
-</select>
+        <select id="reportType" class="form-control">
+        <option value="">Select Report Type</option>
+        <option value="all_clubs">All Clubs Records</option>
+        <option value="all_moderators">All Moderators Records</option>
+        <option value="student_profiles">Student Profiles</option>
+        <option value="clubs_and_moderators_overview">Overview of Clubs and Moderators</option>
+        <option value="clubs_and_students_overview">Overview of Clubs and Students</option>
+        <option value="club_activity_summary">Club Activity Summary</option>
+        <option value="student_club_requests">Student Club Requests</option>
+        <option value="student_registration_status">Student Registration Status</option>
+    </select>
 
     </div>
-    <div class="col-md-4">
+    <div class="col-md-2">
         <input type="text" id="startDate" class="form-control" placeholder="Start Date" onfocus="(this.type='date')">
     </div>
-    <div class="col-md-4">
+    <div class="col-md-2">
         <input type="text" id="endDate" class="form-control" placeholder="End Date" onfocus="(this.type='date')">
+    </div>
+    
+    <div class="text-end col-md-4">
+        <button id="generateReport" class="btn btn-primary">Generate Report</button>
+        <button id="printReport" class="btn btn-secondary"><i class="fas fa-print"></i> Print Report</button>
     </div>
 </div>
 
-<div class="text-end">
-<button id="generateReport" class="btn btn-primary">Generate Report</button>
-<button id="printReport" class="btn btn-secondary"><i class="fas fa-print"></i> Print Report</button>
-    </div>
 
 Report Title:
 <br>
