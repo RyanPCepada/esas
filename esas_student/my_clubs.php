@@ -202,7 +202,6 @@ try {
             border-radius: 50%;
             padding: 4px 4px;
             font-size: 12px;
-            font-weight: bold;
             display: inline-block;
             text-align: center;
             line-height: 1;
@@ -210,22 +209,19 @@ try {
         }
 
         .club-notification-badge {
-    position: absolute; /* Change to absolute for correct positioning */
-    top: 10px; /* Distance from the top */
-    right: 10px; /* Distance from the right */
-    min-width: 20px;
-    height: auto;
-    background-color: red;
-    color: white;
-    border-radius: 50%;
-    padding: 4px 4px;
-    font-size: 12px;
-    font-weight: bold;
-    display: inline-block;
-    text-align: center;
-    line-height: 1;
-    z-index: 1000;
-}
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
 
 
         .nav-link {
@@ -270,7 +266,7 @@ try {
                         <li class="nav-item">
                             <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="my-clubs">
                                 <i class="fas fa-user"></i> My Clubs
-                                <span id="notification-count" class="badge badge-danger notification-badge" style="display:none;">3</span>
+                                <span id="notification-count" class="notification-badge" style="display:none;">3</span>
                             </a>
                         </li>
 
@@ -404,76 +400,75 @@ try {
         }
 
         $(document).ready(function() {
-    let clubs = [];
+            let clubs = [];
 
-    function loadClubs(tab, containerId, dateLabel) {
-        $.ajax({
-            url: `/esas/esas_student/apis/student-clubs-${tab}-api.php`,
-            type: "GET",
-            success: function(response) {
-                const clubsContainer = document.getElementById(containerId);
-                if (response && response.length > 0) {
-                    clubs = response.map(club => club.club_id); // Populate clubs array
-                    clubsContainer.innerHTML = response.map(club => `
-                        <div class="col-md-4 card-container">
-                            <div class="card card-img-only">
-                                <span class="badge badge-danger club-notification-badge" id="club-notification-${club.club_id}" style="display:none;"></span>
-                                <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}` : `/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}`}">
-                                    <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
-                                    <div class="overlay-text">
-                                        <h4>${club.clubName}</h4>
+            function loadClubs(tab, containerId, dateLabel) {
+                $.ajax({
+                    url: `/esas/esas_student/apis/student-clubs-${tab}-api.php`,
+                    type: "GET",
+                    success: function(response) {
+                        const clubsContainer = document.getElementById(containerId);
+                        if (response && response.length > 0) {
+                            clubs = response.map(club => club.club_id); // Populate clubs array
+                            clubsContainer.innerHTML = response.map(club => `
+                                <div class="col-md-4 card-container"> 
+                                    <div class="card card-img-only">
+                                        <span class="club-notification-badge" id="club-notification-${club.club_id}" style="display:none;"></span>
+                                        <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}` : `/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}`}">
+                                            <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
+                                            <div class="overlay-text">
+                                                <h4>${club.clubName}</h4>
+                                            </div>
+                                        </a>
                                     </div>
-                                </a>
-                            </div>
-                        </div>
-                    `).join('');
-                    fetchNotificationCounts(); // Fetch notification counts after loading clubs
-                } else {
-                    clubsContainer.innerHTML = '<p>No clubs found.</p>';
-                }
-            },
-            error: function() {
-                const clubsContainer = document.getElementById(containerId);
-                clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
-            }
-        });
-    }
-
-    function fetchNotificationCounts() {
-        clubs.forEach(club_id => {
-            $.ajax({
-                url: `/esas/esas_student/apis/notifications/club-notifications-api.php?club_id=${club_id}`,
-                method: 'GET',
-                success: function(response) {
-                    const data = JSON.parse(response);
-                    if (data.unread_count > 0) {
-                        $(`#club-notification-${club_id}`).text(data.unread_count).show();
+                                </div>
+                            `).join('');
+                            fetchNotificationCounts(); // Fetch notification counts after loading clubs
+                        } else {
+                            clubsContainer.innerHTML = '<p>No clubs found.</p>';
+                        }
+                    },
+                    error: function() {
+                        const clubsContainer = document.getElementById(containerId);
+                        clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching notification count:', error);
-                }
+                });
+            }
+
+            function fetchNotificationCounts() {
+                clubs.forEach(club_id => {
+                    $.ajax({
+                        url: `/esas/esas_student/apis/notifications/club-notifications-api.php?club_id=${club_id}`,
+                        method: 'GET',
+                        success: function(response) {
+                            const data = JSON.parse(response);
+                            if (data.unread_count > 0) {
+                                $(`#club-notification-${club_id}`).text(data.unread_count).show();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching notification count:', error);
+                        }
+                    });
+                });
+            }
+
+            // Initial load for clubs and notifications
+            loadClubs('active', 'activeClubsContainer', 'Member since');
+
+            // Tab event listeners
+            $('#nav-activeclubs-tab').on('click', function() {
+                loadClubs('active', 'activeClubsContainer', 'Member since');
+            });
+
+            $('#nav-pendingclubs-tab').on('click', function() {
+                loadClubs('pending', 'pendingClubsContainer', 'Application date');
+            });
+
+            $('#nav-disapprovedclubs-tab').on('click', function() {
+                loadClubs('disapproved', 'disapprovedClubsContainer', 'Date disapproved');
             });
         });
-    }
-
-    // Initial load for clubs and notifications
-    loadClubs('active', 'activeClubsContainer', 'Member since');
-
-    // Tab event listeners
-    $('#nav-activeclubs-tab').on('click', function() {
-        loadClubs('active', 'activeClubsContainer', 'Member since');
-    });
-
-    $('#nav-pendingclubs-tab').on('click', function() {
-        loadClubs('pending', 'pendingClubsContainer', 'Application date');
-    });
-
-    $('#nav-disapprovedclubs-tab').on('click', function() {
-        loadClubs('disapproved', 'disapprovedClubsContainer', 'Date disapproved');
-    });
-});
-
 
     </script>
 
