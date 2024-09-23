@@ -189,6 +189,30 @@ try {
         .card-container:nth-child(3) {
             animation-delay: 0.2s;
         }
+
+
+        .notification-badge {
+            position: absolute;
+            min-width: 20px;
+            height: auto;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 4px 4px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+            line-height: 1;
+        }
+
+        .nav-link {
+            position: relative; /* This makes the span position relative to the button */
+        }
+
+        
     </style>
 </head>
 
@@ -224,46 +248,46 @@ try {
                             </a>
                         </li>
                         <li class="nav-item">
-    <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="my-clubs">
-        <i class="fas fa-user"></i> My Clubs
-        <span id="notification-count" class="badge badge-danger" style="display:none;"></span>
-    </a>
-</li>
+                            <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="my-clubs">
+                                <i class="fas fa-user"></i> My Clubs
+                                <span id="notification-count" class="badge badge-danger notification-badge" style="display:none;">3</span>
+                            </a>
+                        </li>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    // Fetch and display notification count
-    function fetchNotificationCount() {
-        $.ajax({
-            url: '/esas/esas_student/apis/notifications-api.php',
-            method: 'GET',
-            success: function(response) {
-                const data = JSON.parse(response);
-                if (data.unread_count > 0) {
-                    $('#notification-count').text(data.unread_count).show();
-                } else {
-                    $('#notification-count').hide();
-                }
-            }
-        });
-    }
+                        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                        <script>
+                            // Fetch and display notification count
+                            function fetchNotificationCount() {
+                                $.ajax({
+                                    url: '/esas/esas_student/apis/notifications-api.php',
+                                    method: 'GET',
+                                    success: function(response) {
+                                        const data = JSON.parse(response);
+                                        if (data.unread_count > 0) {
+                                            $('#notification-count').text(data.unread_count).show();
+                                        } else {
+                                            $('#notification-count').hide();
+                                        }
+                                    }
+                                });
+                            }
 
-    // Fetch notifications every 10 seconds
-    setInterval(fetchNotificationCount, 10000);
-    fetchNotificationCount();
+                            // Fetch notifications every 10 seconds
+                            setInterval(fetchNotificationCount, 10000);
+                            fetchNotificationCount();
 
-    // Mark notifications as read when "My Clubs" is clicked
-    $('#my-clubs').click(function() {
-        $.ajax({
-            url: '/esas/esas_student/apis/mark-notifications-read.php',
-            method: 'POST',
-            data: { student_id: <?php echo $_SESSION['student_id']; ?> },
-            success: function() {
-                $('#notification-count').hide(); // Hide the count after marking notifications as read
-            }
-        });
-    });
-</script>
+                            // Mark notifications as read when "My Clubs" is clicked
+                            $('#my-clubs').click(function() {
+                                $.ajax({
+                                    url: '/esas/esas_student/apis/mark-notifications-read.php',
+                                    method: 'POST',
+                                    data: { student_id: <?php echo $_SESSION['student_id']; ?> },
+                                    success: function() {
+                                        $('#notification-count').hide(); // Hide the count after marking notifications as read
+                                    }
+                                });
+                            });
+                        </script>
 
                         <li>
                             <a href="../esas_student/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
