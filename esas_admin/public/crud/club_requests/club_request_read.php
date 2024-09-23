@@ -12,8 +12,12 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
                 r.status, 
                 r.coverPhoto, 
                 r.dateRequested, 
-                r.dateModified 
+                r.dateModified,
+                s.firstName,
+                s.lastName,
+                s.profilePic
             FROM tbl_club_requests r 
+            JOIN tbl_students s ON r.student_id = s.student_id 
             WHERE r.request_id = :request_id"; 
 
     if ($stmt = $pdo->prepare($sql)) { 
@@ -27,11 +31,13 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
                 $clubName = htmlspecialchars($row["clubName"] ?? ''); 
                 $description = htmlspecialchars($row["description"] ?? ''); 
                 $activities = htmlspecialchars($row["activities"] ?? ''); 
-                $status = strtolower(htmlspecialchars($row["status"] ?? '')); // Convert status to lowercase
+                $status = strtolower(htmlspecialchars($row["status"] ?? '')); 
                 $coverPhoto = htmlspecialchars($row["coverPhoto"] ?: "default-cover.jpg"); 
                 $dateRequested = htmlspecialchars($row["dateRequested"] ?? ''); 
                 $dateModified = htmlspecialchars($row["dateModified"] ?? ''); 
-
+                $requestedByName = htmlspecialchars($row["firstName"] . ' ' . $row["lastName"] ?? '');
+                $profilePic = htmlspecialchars($row["profilePic"] ?: "default-profile.jpg");
+                
             } else { 
                 echo "No club request found with this ID."; 
                 exit(); 
@@ -46,6 +52,7 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
     header("location: error.php"); 
     exit(); 
 } 
+
 
 // Handle approval or disapproval
 if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprove'])) {
@@ -89,12 +96,19 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                         <div class="row">
                             <div class="col-md-3 text-center">
                                 <img src="/esas/esas_student/images/<?php echo $coverPhoto; ?>" 
-                                     alt="<?php echo $clubName; ?> Cover Photo" 
-                                     class="img-fluid" style="width: 300px; height: auto; border-radius: 5px; object-fit: cover;">
+                                    alt="<?php echo $clubName; ?> Cover Photo" 
+                                    class="img-fluid" style="width: 300px; height: auto; border-radius: 5px; object-fit: cover;">
                             </div>
                             <div class="col-md-9">
                                 <h4 class="text-muted mb-3"><?php echo $clubName; ?></h4>
                                 <hr>
+                                <p>
+                                    <strong>Requested by: </strong><br>
+                                    <img src="/esas/esas_student/images/<?php echo $profilePic; ?>" 
+                                        alt="Profile Picture" 
+                                        style="width: 50px; height: auto; border-radius: 50%;" />
+                                    <?php echo $requestedByName; ?>
+                                </p>
                                 <p><strong>Description: </strong><?php echo $description; ?></p>
                                 <p><strong>Activities: </strong><?php echo $activities; ?></p>
                                 <p><strong>Status: </strong><?php echo $status; ?></p>
@@ -103,6 +117,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                             </div>
                         </div>
                     </div>
+
 
                     <div class="card-footer text-center">
                         <?php if ($status === 'pending'): ?>
