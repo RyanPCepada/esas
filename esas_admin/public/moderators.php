@@ -165,7 +165,7 @@ try {
                                             <i class="fa fa-plus"></i> Add New Moderator
                                         </a>
                                         <a href="../public/crud/moderators/moderator_assign.php" class="btn btn-warning">
-                                            <i class="fa fa-plus"></i> Assign Moderator
+                                            <i class="fa fa-plus"></i> Assign A Moderator
                                         </a>
                                     </div>
                                 </div>

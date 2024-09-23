@@ -101,8 +101,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <h2 class="mt-5">Assign Moderator</h2>
-                    <p>Please fill this form to assign a new moderator.</p>
+                    <h2 class="mt-5">Assign a Moderator</h2>
+                    <p>Please select from dropboxes below to assign a new moderator.</p>
                     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                         <div class="form-group mb-2">
                             <label>Select a Moderator</label>

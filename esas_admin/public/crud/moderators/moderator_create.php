@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(":middleInitial", $middleInitial);
             $stmt->bindParam(":lastName", $lastName);
             $stmt->bindParam(":email", $email);
-            $stmt->bindParam(":password", $password); // No hashing
+            $stmt->bindParam(":password", $password);
             $stmt->bindParam(":profilePic", $profilePic);
 
             if ($stmt->execute()) {

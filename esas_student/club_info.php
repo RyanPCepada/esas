@@ -48,8 +48,8 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
         // Prepare SQL query to fetch club information and moderators' profile pictures
         $stmt = $pdo->prepare("
             SELECT c.clubName, c.information, c.coverPhoto, c.dateAdded,
-                GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', COALESCE(m.middleName, ''), ' ', m.lastName) ORDER BY m.firstName SEPARATOR '|') AS moderatorNames,
-                GROUP_CONCAT(DISTINCT m.profilePic ORDER BY m.firstName SEPARATOR '|') AS moderatorPics,
+                GROUP_CONCAT(CONCAT(m.firstName, ' ', COALESCE(m.middleName, ''), ' ', m.lastName) SEPARATOR '|') AS moderatorNames,
+                GROUP_CONCAT(m.profilePic SEPARATOR '|') AS moderatorPics,
                 COUNT(DISTINCT CASE WHEN r.status = 'active' THEN r.student_id END) AS membersCount,  -- Count only active members
                 COUNT(DISTINCT m.moderator_id) AS numModerators
             FROM tbl_clubs c
@@ -78,7 +78,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             // Generate moderators HTML
             $moderators = '';
             foreach ($moderatorNames as $index => $name) {
-                $pic = isset($moderatorPics[$index]) ? htmlspecialchars($moderatorPics[$index]) : '';
+                $pic = isset($moderatorPics[$index]) ? htmlspecialchars($moderatorPics[$index]) : 'default.png'; // Use a default image if the picture is missing
                 $moderators .= '
                 <div class="moderator-item">
                     <img src="/esas/esas_moderator/images/' . $pic . '" alt="Profile Pic" class="moderator-pic">
@@ -137,6 +137,7 @@ $encodedClubName = addslashes($clubName);
 $information = nl2br(htmlspecialchars($information)); // Convert newlines to <br>
 $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; // Wrap paragraphs
 ?>
+
 
 
 

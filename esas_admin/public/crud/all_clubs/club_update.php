@@ -215,48 +215,48 @@ unset($pdo);
                             <span class="invalid-feedback"><?php echo $coverPhoto_err; ?></span>
                             <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($coverPhoto); ?>" id="coverPhotoPreview" alt="" style="display: block; margin-top: 10px; width: 100%; height: auto;">
                         </div>
-                        <hr>
 
 
 
+                        <!-- <hr>
                         <div class="form-group mb-2"> 
                             <div id="moderatorDropdowns">
-                                <?php if (!empty($currentModerators)): ?>
+                                <php if (!empty($currentModerators)): ?>
                                     <label>Change Moderators</label>
-                                    <?php foreach ($currentModerators as $moderator): ?>
+                                    <php foreach ($currentModerators as $moderator): ?>
                                         <div class="d-flex align-items-center mb-2">
                                             <select name="moderator[]" class="form-control mr-2" required>
                                                 <option value="">-- Select Moderator --</option>
-                                                <option value="none">None</option> <!-- Option to remove moderator -->
+                                                <option value="none">None</option>
                                                 <optgroup label="Existing Moderators">
-                                                    <?php foreach ($moderators as $existingModerator): ?>
-                                                        <option value="<?php echo htmlspecialchars($existingModerator['moderator_id']); ?>"
-                                                            <?php echo ($existingModerator['moderator_id'] == $moderator['moderator_id']) ? 'selected disabled' : ''; ?>>
-                                                            <?php echo htmlspecialchars($existingModerator['moderator_name']); ?>
+                                                    <php foreach ($moderators as $existingModerator): ?>
+                                                        <option value="<php echo htmlspecialchars($existingModerator['moderator_id']); ?>"
+                                                            <php echo ($existingModerator['moderator_id'] == $moderator['moderator_id']) ? 'selected disabled' : ''; ?>>
+                                                            <php echo htmlspecialchars($existingModerator['moderator_name']); ?>
                                                         </option>
-                                                    <?php endforeach; ?>
+                                                    <php endforeach; ?>
                                                 </optgroup>
                                             </select>
                                         </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
+                                    <php endforeach; ?>
+                                <php else: ?>
                                     <p>No moderators currently associated with this club.</p>
                                     <div class="d-flex align-items-center mb-2">
                                         <select name="moderator[]" class="form-control mr-2" required>
                                             <option value="">-- Select Moderator --</option>
-                                            <option value="none">None</option> <!-- Option to remove moderator -->
+                                            <option value="none">None</option>
                                             <optgroup label="Existing Moderators">
-                                                <?php foreach ($moderators as $existingModerator): ?>
-                                                    <option value="<?php echo htmlspecialchars($existingModerator['moderator_id']); ?>">
-                                                        <?php echo htmlspecialchars($existingModerator['moderator_name']); ?>
+                                                <php foreach ($moderators as $existingModerator): ?>
+                                                    <option value="<php echo htmlspecialchars($existingModerator['moderator_id']); ?>">
+                                                        <php echo htmlspecialchars($existingModerator['moderator_name']); ?>
                                                     </option>
-                                                <?php endforeach; ?>
+                                                <php endforeach; ?>
                                             </optgroup>
                                         </select>
                                     </div>
-                                <?php endif; ?>
+                                <php endif; ?>
                             </div>
-                        </div>
+                        </div> -->
 
 
 
