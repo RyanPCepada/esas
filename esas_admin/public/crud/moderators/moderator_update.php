@@ -18,7 +18,30 @@ try {
 } catch (PDOException $e) {
     die("Error fetching moderator details: " . $e->getMessage());
 }
+
+// Check if the form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get the club ID from the POST data
+    $club_id = $_POST['club_id'];
+
+    // Assign the moderator to the selected club
+    try {
+        $stmt = $pdo->prepare("INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id, dateAdded) VALUES (?, ?, NOW())");
+        $stmt->execute([$club_id, $moderator_id]);
+
+        // Redirect back to the moderator update page with a success message
+        $_SESSION['message'] = 'Moderator assigned successfully!';
+        header("Location: moderator_update.php?moderator_id=" . htmlspecialchars($moderator_id));
+        exit;
+
+    } catch (PDOException $e) {
+        // Handle the error
+        die("Error assigning moderator: " . $e->getMessage());
+    }
+}
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -108,7 +131,6 @@ try {
 
         <h2 class="mt-5">Update Moderator:<br><div class="text-muted"><?php echo $moderatorName; ?></div></h2>
         <hr>
-        <p>Clubs Handled by <?php echo $moderatorName; ?></p>
 
         <div class="clubs-handled">
             <?php
@@ -122,6 +144,10 @@ try {
                 ");
                 $stmt->execute([$moderator_id]);
                 $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Dynamic text based on club count
+                echo '<p>' . (count($clubs) === 1 ? 'Club Handled by' : 'Clubs Handled by') . ' <strong>' . $moderatorName . '</strong></p>';
+
 
                 foreach ($clubs as $club) {
                     echo '
@@ -141,45 +167,68 @@ try {
             ?>
         </div>
 
+        <div class="row mt-5 m-0">
+            <div class="col-md-5 p-0"><hr></div>
+            <div class="col-md-2 text-center"><label>or</label></div>
+            <div class="col-md-5 p-0"><hr></div>
+        </div>
         <!-- Assign Moderator to Another Club -->
         <div class="assign-section">
-            <h3>Assign to Another Club</h3>
-            <form action="assign_moderator.php" method="POST">
+            <h4>Assign to Another Club</h4>
+            <form action="" method="POST">
                 <input type="hidden" name="moderator_id" value="<?php echo htmlspecialchars($moderator_id); ?>">
-                <label for="club">Select Club:</label>
-                <select name="club_id" id="club" class="dropdown mt-0">
-                    <option value="" disabled selected>-- Select from exisitng clubs --</option>
-                    <?php
-                    // Fetch all clubs that the moderator isn't already assigned to
-                    try {
-                        $stmt = $pdo->prepare("
-                            SELECT c.club_id, c.clubName
-                            FROM tbl_clubs c
-                            WHERE c.club_id NOT IN (
-                                SELECT club_id FROM tbl_clubs_and_moderators WHERE moderator_id = ?
-                            )
-                        ");
-                        $stmt->execute([$moderator_id]);
-                        $availableClubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                <div class="form-group">
+                    <label for="club">Select Club:</label>
+                    <select name="club_id" id="club" class="form-control">
+                        <option value="" disabled selected>-- Select from existing clubs --</option>
+                        <?php
+                        // Fetch all clubs that the moderator is assigned to
+                        try {
+                            $stmt = $pdo->prepare("
+                                SELECT c.club_id, c.clubName
+                                FROM tbl_clubs c
+                                JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                                WHERE cm.moderator_id = ?
+                            ");
+                            $stmt->execute([$moderator_id]);
+                            $currentClubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                        foreach ($availableClubs as $club) {
-                            echo '<option value="' . htmlspecialchars($club['club_id']) . '">' . htmlspecialchars($club['clubName']) . '</option>';
+                            foreach ($currentClubs as $club) {
+                                echo '<option value="' . htmlspecialchars($club['club_id']) . '" disabled>' . htmlspecialchars($club['clubName']) . ' (Current)</option>';
+                            }
+                        } catch (PDOException $e) {
+                            echo "Error fetching current clubs: " . $e->getMessage();
                         }
 
-                    } catch (PDOException $e) {
-                        echo "Error fetching available clubs: " . $e->getMessage();
-                    }
-                    ?>
-                </select>
+                        // Fetch all clubs that the moderator isn't already assigned to
+                        try {
+                            $stmt = $pdo->prepare("
+                                SELECT c.club_id, c.clubName
+                                FROM tbl_clubs c
+                                WHERE c.club_id NOT IN (
+                                    SELECT club_id FROM tbl_clubs_and_moderators WHERE moderator_id = ?
+                                )
+                            ");
+                            $stmt->execute([$moderator_id]);
+                            $availableClubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($availableClubs as $club) {
+                                echo '<option value="' . htmlspecialchars($club['club_id']) . '">' . htmlspecialchars($club['clubName']) . '</option>';
+                            }
+                        } catch (PDOException $e) {
+                            echo "Error fetching available clubs: " . $e->getMessage();
+                        }
+                        ?>
+                    </select>
+                </div>
 
                 <div class="text-center d-flex justify-content-between mt-2">
                     <button type="submit" class="btn assign-btn text-light">Assign to Club</button>
                     <a href="../../moderators.php" class="btn btn-secondary">Back to Moderators List</a>
                 </div>
-                
-
             </form>
         </div>
     </div>
+
 </body>
 </html>
