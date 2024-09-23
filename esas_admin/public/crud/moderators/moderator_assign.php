@@ -66,8 +66,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo "Oops! Something went wrong. Please try again later.";
             }
         }
-    } else {
-        echo "Please select both a moderator and a club.";
     }
 }
 
@@ -137,6 +135,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     <script>
+
+        // ALERT MESSAGE FOR UNSELECTED BOTH MODERATORS AND CLUBS
+        document.querySelector('form').addEventListener('submit', function(event) {
+            var moderatorSelect = document.getElementById('moderatorSelect');
+            var clubSelect = document.getElementById('clubSelect');
+
+            if (moderatorSelect.value === "" || clubSelect.value === "") {
+                event.preventDefault(); // Prevent form submission
+                alert('Please select both a moderator and a club.'); // Show alert
+            }
+        });
+        document.getElementById('moderatorSelect').addEventListener('change', function () {
+            var moderatorId = this.value;
+            if (moderatorId !== "") {
+                fetchAssignedClubs(moderatorId);
+            }
+        });
+        document.getElementById('clubSelect').addEventListener('change', function () {
+            var clubId = this.value;
+            if (clubId !== "") {
+                fetchAssignedModerators(clubId);
+            }
+        });
+        // ALERT MESSAGE FOR UNSELECTED BOTH MODERATORS AND CLUBS
+
+
+
+
+
+
+
         document.getElementById('moderatorSelect').addEventListener('change', function () {
             var moderatorId = this.value;
             if (moderatorId !== "") {
