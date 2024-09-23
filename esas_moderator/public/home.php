@@ -81,7 +81,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $stmt->execute();
                 }
             }
-
             echo "<script>alert('Post created successfully!');</script>";
             echo "<script>window.location.href = 'home.php';</script>";
             exit();
@@ -97,6 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Close connection
 unset($pdo);
 ?>
+
 
 
 
