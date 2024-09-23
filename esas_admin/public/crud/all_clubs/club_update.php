@@ -107,54 +107,54 @@ require_once "../../../../config.php";
         $selectedModerator = $_POST["moderator"] ?? null;
 
 
-    // Update the club if no errors
-if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err)) {
-    $sql = "UPDATE tbl_clubs SET clubName = :clubName, information = :information, coverPhoto = :coverPhoto WHERE club_id = :clubId";
-    if ($stmt = $pdo->prepare($sql)) {
-        $stmt->bindParam(":clubName", $clubName);
-        $stmt->bindParam(":information", $information);
-        $stmt->bindParam(":coverPhoto", $coverPhoto);
-        $stmt->bindParam(":clubId", $clubId);
+        // Update the club if no errors
+        if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err)) {
+            $sql = "UPDATE tbl_clubs SET clubName = :clubName, information = :information, coverPhoto = :coverPhoto WHERE club_id = :clubId";
+            if ($stmt = $pdo->prepare($sql)) {
+                $stmt->bindParam(":clubName", $clubName);
+                $stmt->bindParam(":information", $information);
+                $stmt->bindParam(":coverPhoto", $coverPhoto);
+                $stmt->bindParam(":clubId", $clubId);
 
-        if ($stmt->execute()) {
-            // Handle moderator association
-            if (!empty($_POST['moderator'])) { // Check if there are selected moderators
-                foreach ($_POST['moderator'] as $index => $moderatorId) {
-                    if ($moderatorId === 'none') {
-                        // Get the current moderator ID for this dropdown
-                        $currentModeratorId = $currentModerators[$index]['moderator_id'];
-                        
-                        // Delete the specific moderator association
-                        $deleteSql = "DELETE FROM tbl_clubs_and_moderators WHERE club_id = :clubId AND moderator_id = :moderatorId";
-                        if ($deleteStmt = $pdo->prepare($deleteSql)) {
-                            $deleteStmt->bindParam(":clubId", $clubId);
-                            $deleteStmt->bindParam(":moderatorId", $currentModeratorId);
-                            $deleteStmt->execute();
-                        }
-                    } else {
-                        // Associate the existing moderator with the club
-                        $sql2 = "INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id) VALUES (:clubId, :moderatorId)";
-                        if ($stmt2 = $pdo->prepare($sql2)) {
-                            $stmt2->bindParam(":clubId", $clubId);
-                            $stmt2->bindParam(":moderatorId", $moderatorId);
-                            if (!$stmt2->execute()) { // Check if the insertion was successful
-                                // Log or handle the error
-                                echo "Failed to associate moderator ID $moderatorId with club. Error: " . implode(", ", $stmt2->errorInfo());
+                if ($stmt->execute()) {
+                    // Handle moderator association
+                    if (!empty($_POST['moderator'])) { // Check if there are selected moderators
+                        foreach ($_POST['moderator'] as $index => $moderatorId) {
+                            if ($moderatorId === 'none') {
+                                // Get the current moderator ID for this dropdown
+                                $currentModeratorId = $currentModerators[$index]['moderator_id'];
+                                
+                                // Delete the specific moderator association
+                                $deleteSql = "DELETE FROM tbl_clubs_and_moderators WHERE club_id = :clubId AND moderator_id = :moderatorId";
+                                if ($deleteStmt = $pdo->prepare($deleteSql)) {
+                                    $deleteStmt->bindParam(":clubId", $clubId);
+                                    $deleteStmt->bindParam(":moderatorId", $currentModeratorId);
+                                    $deleteStmt->execute();
+                                }
+                            } else {
+                                // Associate the existing moderator with the club
+                                $sql2 = "INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id) VALUES (:clubId, :moderatorId)";
+                                if ($stmt2 = $pdo->prepare($sql2)) {
+                                    $stmt2->bindParam(":clubId", $clubId);
+                                    $stmt2->bindParam(":moderatorId", $moderatorId);
+                                    if (!$stmt2->execute()) { // Check if the insertion was successful
+                                        // Log or handle the error
+                                        echo "Failed to associate moderator ID $moderatorId with club. Error: " . implode(", ", $stmt2->errorInfo());
+                                    }
+                                }
                             }
                         }
+                    } else {
+                        echo "No moderators selected for association.";
                     }
-                }
-            } else {
-                echo "No moderators selected for association.";
-            }
 
-            header("location: ../../all_clubs.php");
-            exit();
-        } else {
-            echo "Oops! Something went wrong with the club update. Please try again later.";
+                    header("location: ../../all_clubs.php");
+                    exit();
+                } else {
+                    echo "Oops! Something went wrong with the club update. Please try again later.";
+                }
+            }
         }
-    }
-}
 
 
 
@@ -192,11 +192,36 @@ unset($pdo);
             height: auto;
             margin-top: 10px;
         }
+
+        .club-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .remove-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .remove-btn:hover {
+            background-color: #cc0000;
+        }
+
     </style>
 </head>
 <body>
-
-
     <div class="wrapper">
         <div class="container-fluid">
             <div class="row">
@@ -220,89 +245,49 @@ unset($pdo);
                             <span class="invalid-feedback"><?php echo $coverPhoto_err; ?></span>
                             <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($coverPhoto); ?>" id="coverPhotoPreview" alt="" style="display: block; margin-top: 10px; width: 100%; height: auto;">
                         </div>
-
-
-
-                        <!-- <hr>
-                        <div class="form-group mb-2"> 
-                            <div id="moderatorDropdowns">
-                                <php if (!empty($currentModerators)): ?>
-                                    <label>Change Moderators</label>
-                                    <php foreach ($currentModerators as $moderator): ?>
-                                        <div class="d-flex align-items-center mb-2">
-                                            <select name="moderator[]" class="form-control mr-2" required>
-                                                <option value="">-- Select Moderator --</option>
-                                                <option value="none">None</option>
-                                                <optgroup label="Existing Moderators">
-                                                    <php foreach ($moderators as $existingModerator): ?>
-                                                        <option value="<php echo htmlspecialchars($existingModerator['moderator_id']); ?>"
-                                                            <php echo ($existingModerator['moderator_id'] == $moderator['moderator_id']) ? 'selected disabled' : ''; ?>>
-                                                            <php echo htmlspecialchars($existingModerator['moderator_name']); ?>
-                                                        </option>
-                                                    <php endforeach; ?>
-                                                </optgroup>
-                                            </select>
-                                        </div>
-                                    <php endforeach; ?>
-                                <php else: ?>
-                                    <p>No moderators currently associated with this club.</p>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <select name="moderator[]" class="form-control mr-2" required>
-                                            <option value="">-- Select Moderator --</option>
-                                            <option value="none">None</option>
-                                            <optgroup label="Existing Moderators">
-                                                <php foreach ($moderators as $existingModerator): ?>
-                                                    <option value="<php echo htmlspecialchars($existingModerator['moderator_id']); ?>">
-                                                        <php echo htmlspecialchars($existingModerator['moderator_name']); ?>
-                                                    </option>
-                                                <php endforeach; ?>
-                                            </optgroup>
-                                        </select>
-                                    </div>
-                                <php endif; ?>
-                            </div>
-                        </div> -->
-
-
-
-
-
-                        <!-- <div class="row mt-3 m-0">
-                            <div class="col-md-4 p-0"><hr></div>
-                            <div class="col-md-4 text-center"><label>Or Add New</label></div>
-                            <div class="col-md-4 p-0"><hr></div>
-                        </div> -->
-
-                        <!-- <select name="moderator" id="moderatorSelectNew" class="form-control mb-2">
-                            <option value="">-- Select From Other Existing Moderators --</option>
-                            <optgroup label="">
-                                <?php foreach ($moderators as $moderator): ?>
-                                    <?php if ($moderator['moderator_id'] == $currentModeratorId): ?>
-                                        <option value="<?php echo htmlspecialchars($moderator['moderator_id']); ?>" disabled>
-                                            <?php echo htmlspecialchars($moderator['moderator_name']) . ' (current)'; ?>
-                                        </option>
-                                    <?php else: ?>
-                                        <option value="<?php echo htmlspecialchars($moderator['moderator_id']); ?>">
-                                            <?php echo htmlspecialchars($moderator['moderator_name']); ?>
-                                        </option>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
-                            </optgroup>
-                            <optgroup label=" ">
-                                <option value="add_new_moderator" style="font-weight: bold;">+ Add New Moderator</option>
-                            </optgroup>
-                        </select> -->
-
-                        <input type="submit" class="btn btn-primary" value="Update">
-                        <a href="javascript:history.back()" class="btn btn-secondary">Cancel</a>
+                        <input type="submit" class="btn btn-block mt-5 btn-primary" value="Update">
                     </form>
                 </div>
             </div>
+
+            <hr>
+
+            <div class="assign-section mt-5">
+                <h3 class="text-muted">Current Moderators for this Club</h3>
+                <div class="clubs-handled">
+                    <?php
+                    if (!empty($currentModerators)) {
+                        echo '<p>' . (count($currentModerators) === 1 ? 'Moderator for' : 'Moderators for') . ' <strong>' . htmlspecialchars($clubName) . '</strong></p>';
+                        foreach ($currentModerators as $moderator) {
+                            echo '
+                            <div class="club-item">
+                                <span>' . htmlspecialchars($moderator['moderator_name']) . '</span>
+                                <form action="club_moderator_remove.php" method="POST" style="margin: 0;">
+                                    <input type="hidden" name="club_id" value="' . htmlspecialchars($clubId) . '">
+                                    <input type="hidden" name="moderator_id" value="' . htmlspecialchars($moderator['moderator_id']) . '">
+                                    <button type="submit" class="btn remove-btn text-light">Remove as Moderator</button>
+                                </form>
+                            </div>';
+                        }
+                    } else {
+                        echo '<p>No moderators assigned to this club. <a href="/esas/esas_admin/public/crud/all_clubs/club_moderator_assign.php" class="btn btn-warning mt-2">
+                            +Assign a Moderator</a></p>';
+                    }                    
+                    ?>
+                </div>
+            </div>
+
+            <hr>
+            <div class="text-center">
+                <a href="javascript:history.back()" class="btn text-align-end btn-secondary">Cancel</a>
+            </div>
+
         </div>
     </div>
 
 
 
+    
 
     <!-- Add New Moderator Modal -->
     <div class="modal fade" id="addModeratorModal" tabindex="-1" role="dialog" aria-labelledby="addModeratorModalLabel" aria-hidden="true">
