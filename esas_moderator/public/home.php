@@ -8,9 +8,9 @@ $moderator_id = $_SESSION['moderator_id'];
 // Initialize variables and error messages
 $postContent = "";
 $postContent_err = "";
-$club_id = ""; // Initialize club_id variable
-$clubName = ""; // Initialize clubName variable
-$coverPhoto = ""; // Initialize coverPhoto variable
+$club_id = ""; 
+$clubName = ""; 
+$coverPhoto = ""; 
 
 // Fetch the club_id for the current moderator through tbl_clubs_and_moderators
 $sql = "SELECT club_id FROM tbl_clubs_and_moderators WHERE moderator_id = :moderator_id";
@@ -20,7 +20,7 @@ $stmt->execute();
 $clubModerator = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($clubModerator) {
-    $club_id = $clubModerator['club_id']; // Set club_id from tbl_clubs_and_moderators
+    $club_id = $clubModerator['club_id'];
 
     // Fetch the club name and cover photo using the club_id
     $sql = "SELECT clubName, coverPhoto FROM tbl_clubs WHERE club_id = :club_id";
@@ -30,8 +30,8 @@ if ($clubModerator) {
     $club = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($club) {
-        $clubName = $club['clubName']; // Set clubName from clubs table
-        $coverPhoto = $club['coverPhoto']; // Set coverPhoto from clubs table
+        $clubName = $club['clubName']; 
+        $coverPhoto = $club['coverPhoto']; 
     }
 }
 
@@ -48,18 +48,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     // Check for errors before inserting into the database
     if (empty($postContent_err)) {
-        // Prepare an insert statement
+        // Prepare an insert statement for the post
         $sql = "INSERT INTO tbl_posts (post, dateAdded, club_id, moderator_id) VALUES (:post, NOW(), :club_id, :moderator_id)";
-
         $stmt = $pdo->prepare($sql);
 
         // Bind variables to the prepared statement as parameters
         $stmt->bindParam(":post", $postContent);
-        $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT); // Bind club_id
+        $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT); 
         $stmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT);
-
-        // Attempt to execute the prepared statement
+        
+        // Execute the statement
         if ($stmt->execute()) {
+            // Get the ID of the inserted post
+            $post_id = $pdo->lastInsertId();
+
+            // Notify all students registered in the club
+            $sql = "SELECT student_id FROM tbl_registration WHERE club_id = :club_id AND status = 'active'";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Check if any students were found
+            if (!empty($students)) {
+                foreach ($students as $student) {
+                    // Insert notification for each student
+                    $sql = "INSERT INTO tbl_notifications (student_id, club_id, post_id, is_read, dateAdded) VALUES (:student_id, :club_id, :post_id, 0, NOW())";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->bindParam(":student_id", $student['student_id'], PDO::PARAM_INT);
+                    $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+                    $stmt->bindParam(":post_id", $post_id, PDO::PARAM_INT);
+                    $stmt->execute();
+                }
+            }
+
             echo "<script>alert('Post created successfully!');</script>";
             echo "<script>window.location.href = 'home.php';</script>";
             exit();
