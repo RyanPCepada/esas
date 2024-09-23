@@ -164,19 +164,33 @@ try {
                                         <i class="fa fa-plus"></i> Add New Student
                                     </a>
                                 </div>
-                            
-                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <input id="studentSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                                            </th>
-                                            <th class="text-center" colspan="8">
-                                                <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6> <!-- Updated row count display -->
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                </table>
+
+                                
+                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="9">
+                                                    <div class="row">
+                                                        <div class="col-12 col-md-8 d-flex align-items-center">
+                                                            <select id="statusSelect" class="form-select me-2" style="width: 20%;">
+                                                                <optgroup label="Select Club Request Status">
+                                                                    <option value="" selected>All</option>
+                                                                    <option value="pending">Pending</option>
+                                                                    <option value="approved">Approved</option>
+                                                                    <option value="disapproved">Disapproved</option>
+                                                                </optgroup>
+                                                            </select>
+                                                            <input id="studentSearch" class="form-control mr-sm-2" type="search" placeholder="Search for clubs here..." aria-label="Search">
+                                                        </div>
+                                                        <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
+                                                            <h6 id="rowCountDisplay">Showing 0 / 0 Club Requests</h6>
+                                                        </div>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+
 
                                 <?php
                                 // Include config file
@@ -283,30 +297,71 @@ try {
                             <script>
                                 document.addEventListener('DOMContentLoaded', function () {
                                     const searchInput = document.getElementById('studentSearch');
+                                    const statusSelect = document.getElementById('statusSelect');
                                     const requestRows = document.querySelectorAll('.request-row'); // Update class name here
                                     const rowCountDisplay = document.getElementById('rowCountDisplay');
                                     const noResultsMessage = document.getElementById('noResultsMessage');
                                     const totalRows = requestRows.length;
 
+                                    // Retrieve stored filter from localStorage and apply it if present
+                                    const storedFilter = localStorage.getItem('selectedStatus');
+                                    if (storedFilter) {
+                                        statusSelect.value = storedFilter;
+                                    }
+
                                     rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`;
 
+                                    // Apply the filter right after loading the page
+                                    filterTable();
+
+                                    // Function to handle filtering by status
+                                    statusSelect.addEventListener('change', function () {
+                                        localStorage.setItem('selectedStatus', statusSelect.value); // Store the selected status in localStorage
+                                        filterTable();
+                                    });
+
+                                    // Function to handle search filtering
                                     searchInput.addEventListener('input', function () {
+                                        filterTable();
+                                    });
+
+                                    // Function to filter the table based on both search term and status
+                                    function filterTable() {
                                         const searchTerm = searchInput.value.trim().toLowerCase();
+                                        const selectedStatus = statusSelect.value;
                                         let visibleRowCount = 0;
 
                                         requestRows.forEach(function (row) {
                                             const cells = row.querySelectorAll('td');
-                                            let rowContainsTerm = false;
+                                            let rowContainsSearchTerm = false;
+                                            let rowMatchesStatus = false;
+                                            let rowVisible = true;
 
+                                            const statusCell = row.cells[5].textContent.trim().toLowerCase(); // Adjust based on status column index
+
+                                            // Check if row matches selected status
+                                            if (selectedStatus === '' || selectedStatus === statusCell) {
+                                                rowMatchesStatus = true;
+                                            }
+
+                                            // Check if row matches search term (highlighting logic)
                                             cells.forEach(function (cell) {
-                                                // Reset cell content and apply highlight
-                                                cell.innerHTML = removeHighlight(cell.innerHTML);
+                                                cell.innerHTML = removeHighlight(cell.innerHTML); // Remove previous highlights
                                                 if (highlightText(cell, searchTerm)) {
-                                                    rowContainsTerm = true;
+                                                    rowContainsSearchTerm = true;
                                                 }
                                             });
 
-                                            if (rowContainsTerm) {
+                                            // Determine if row should be visible
+                                            if (!rowContainsSearchTerm && searchTerm !== '') {
+                                                rowVisible = false;
+                                            }
+                                            if (!rowMatchesStatus) {
+                                                rowVisible = false;
+                                            }
+
+                                            // Toggle row visibility
+                                            if (rowVisible) {
                                                 row.style.display = '';
                                                 visibleRowCount++;
                                             } else {
@@ -316,8 +371,9 @@ try {
 
                                         rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
                                         noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
-                                    });
+                                    }
 
+                                    // Highlight matching text
                                     function highlightText(cell, term) {
                                         const textNodes = getTextNodes(cell);
                                         let found = false;
@@ -337,6 +393,7 @@ try {
                                         return found;
                                     }
 
+                                    // Get text nodes for highlighting
                                     function getTextNodes(element) {
                                         let textNodes = [];
                                         function recurse(node) {
@@ -350,11 +407,13 @@ try {
                                         return textNodes;
                                     }
 
+                                    // Remove highlights from text
                                     function removeHighlight(html) {
                                         return html.replace(/<span[^>]*style="[^"]*background-color:[^"]*"[^>]*>(.*?)<\/span>/gi, '$1');
                                     }
                                 });
                             </script>
+
 
                         </div>
                         <!-- THE MAIN PAGE END -->
