@@ -273,7 +273,7 @@ try {
                             // Fetch and display notification count
                             function fetchNotificationCount() {
                                 $.ajax({
-                                    url: '/esas/esas_student/apis/notifications-api.php',
+                                    url: '/esas/esas_student/apis/notifications/notifications-api.php',
                                     method: 'GET',
                                     success: function(response) {
                                         const data = JSON.parse(response);
@@ -293,7 +293,7 @@ try {
                             // Mark notifications as read when "My Clubs" is clicked
                             $('#my-clubs').click(function() {
                                 $.ajax({
-                                    url: '/esas/esas_student/apis/mark-notifications-read.php',
+                                    url: '/esas/esas_student/apis/notifications/notifications-mark-read.php',
                                     method: 'POST',
                                     data: { student_id: <?php echo $_SESSION['student_id']; ?> },
                                     success: function() {
