@@ -224,10 +224,47 @@ try {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="my-clubs">
-                                <i class="fas fa-user"></i> My Clubs
-                            </a>
-                        </li>
+    <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="my-clubs">
+        <i class="fas fa-user"></i> My Clubs
+        <span id="notification-count" class="badge badge-danger" style="display:none;"></span>
+    </a>
+</li>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Fetch and display notification count
+    function fetchNotificationCount() {
+        $.ajax({
+            url: '/esas/esas_student/apis/notifications-api.php',
+            method: 'GET',
+            success: function(response) {
+                const data = JSON.parse(response);
+                if (data.unread_count > 0) {
+                    $('#notification-count').text(data.unread_count).show();
+                } else {
+                    $('#notification-count').hide();
+                }
+            }
+        });
+    }
+
+    // Fetch notifications every 10 seconds
+    setInterval(fetchNotificationCount, 10000);
+    fetchNotificationCount();
+
+    // Mark notifications as read when "My Clubs" is clicked
+    $('#my-clubs').click(function() {
+        $.ajax({
+            url: '/esas/esas_student/apis/mark-notifications-read.php',
+            method: 'POST',
+            data: { student_id: <?php echo $_SESSION['student_id']; ?> },
+            success: function() {
+                $('#notification-count').hide(); // Hide the count after marking notifications as read
+            }
+        });
+    });
+</script>
+
                         <li>
                             <a href="../esas_student/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
                                 <i class="fas fa-file-alt"></i> My Club Requests
