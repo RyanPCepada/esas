@@ -27,7 +27,12 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moderator Update</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="../../../assets/js/all.js" crossorigin="anonymous"></script>
+    <script src="../../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../../assets/css/styles.css" rel="stylesheet" />
+    <link href="../../../assets/img/nbsclogo.png" rel="icon">
     <style>
         /* Use the same font and wrapper styles as previous pages */
         body {
@@ -54,7 +59,7 @@ try {
             border-radius: 5px;
             background-color: #f9f9f9;
         }
-
+        
         .remove-btn {
             background-color: red;
             color: white;
@@ -63,6 +68,11 @@ try {
             cursor: pointer;
             border-radius: 3px;
             font-size: 14px;
+            transition: background-color 0.3s; /* Smooth transition */
+        }
+
+        .remove-btn:hover {
+            background-color: #cc0000;
         }
 
         .assign-section {
@@ -77,7 +87,13 @@ try {
             cursor: pointer;
             border-radius: 3px;
             font-size: 14px;
+            transition: background-color 0.3s; /* Smooth transition */
         }
+
+        .assign-btn:hover {
+            background-color: darkgreen; /* Slightly darker green */
+        }
+
 
         .dropdown {
             width: 100%;
@@ -114,7 +130,7 @@ try {
                         <form action="moderator_remove.php" method="POST">
                             <input type="hidden" name="club_id" value="' . htmlspecialchars($club['club_id']) . '">
                             <input type="hidden" name="moderator_id" value="' . htmlspecialchars($moderator_id) . '">
-                            <button type="submit" class="remove-btn">Remove as Moderator</button>
+                            <button type="submit" class="btn remove-btn text-light">Remove as Moderator</button>
                         </form>
                     </div>';
                 }
@@ -157,8 +173,8 @@ try {
                 </select>
 
                 <div class="text-center d-flex justify-content-between mt-2">
-                    <button type="submit" class="assign-btn">Assign to Club</button>
-                    <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Moderators List</a>
+                    <button type="submit" class="btn assign-btn text-light">Assign to Club</button>
+                    <a href="../../moderators.php" class="btn btn-secondary">Back to Moderators List</a>
                 </div>
                 
 
