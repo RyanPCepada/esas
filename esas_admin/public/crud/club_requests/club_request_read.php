@@ -33,8 +33,8 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
                 $activities = htmlspecialchars($row["activities"] ?? ''); 
                 $status = strtolower(htmlspecialchars($row["status"] ?? '')); 
                 $coverPhoto = htmlspecialchars($row["coverPhoto"] ?: "default-cover.jpg"); 
-                $dateRequested = htmlspecialchars($row["dateRequested"] ?? ''); 
-                $dateModified = htmlspecialchars($row["dateModified"] ?? ''); 
+                $dateRequested = !empty($row["dateRequested"]) ? date("F j, Y", strtotime($row["dateRequested"])) : 'None';
+                $dateModified = !empty($row["dateModified"]) ? date("F j, Y", strtotime($row["dateModified"])) : 'None';
                 $requestedByName = htmlspecialchars($row["firstName"] . ' ' . $row["lastName"] ?? '');
                 $profilePic = htmlspecialchars($row["profilePic"] ?: "default-profile.jpg");
                 
@@ -94,25 +94,25 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-3 text-center">
+                            <div class="col-md-4 text-center">
                                 <img src="/esas/esas_student/images/<?php echo $coverPhoto; ?>" 
                                     alt="<?php echo $clubName; ?> Cover Photo" 
                                     class="img-fluid" style="width: 300px; height: auto; border-radius: 5px; object-fit: cover;">
+                                    <h4 class="text-muted mt-3"><?php echo $clubName; ?></h4>
                             </div>
-                            <div class="col-md-9">
-                                <h4 class="text-muted mb-3"><?php echo $clubName; ?></h4>
-                                <hr>
+                            <div class="col-md-8">
                                 <p>
                                     <strong>Requested by: </strong><br>
-                                    <img src="/esas/esas_student/images/<?php echo $profilePic; ?>" 
+                                    <img class="mt-2 mb-0" src="/esas/esas_student/images/<?php echo $profilePic; ?>" 
                                         alt="Profile Picture" 
-                                        style="width: 50px; height: auto; border-radius: 50%;" />
-                                    <?php echo $requestedByName; ?>
+                                        style="width: 70px; height: auto; border-radius: 50%;" />
+                                    <h4><?php echo $requestedByName; ?></h4>
                                 </p>
+                                <hr>
                                 <p><strong>Description: </strong><?php echo $description; ?></p>
                                 <p><strong>Activities: </strong><?php echo $activities; ?></p>
                                 <p><strong>Status: </strong><?php echo $status; ?></p>
-                                <p><strong>Date Requested: </strong><?php echo $dateRequested; ?></p>
+                                <p><strong>Date Requested: </strong><?php echo $dateRequested; ?></p> 
                                 <p><strong>Date Modified: </strong><?php echo $dateModified; ?></p>
                             </div>
                         </div>
