@@ -38,7 +38,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
 
                 // For clubs
                 $clubNames = 'None'; // Default value for now
-                $clubSql = "SELECT c.clubName FROM tbl_registration r 
+                $clubSql = "SELECT c.clubName, c.coverPhoto FROM tbl_registration r 
                     JOIN tbl_clubs c ON r.club_id = c.club_id 
                     WHERE r.student_id = :student_id AND r.status = 'active'"; // Add status condition
                 
@@ -85,19 +85,19 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
 <body>
 <div class="container">
     <div class="row mt-5">
-        <div class="col-md-12">
+        <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
                     <h3>Student Profile</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-3 text-center">
+                        <div class="col-md-4 text-center">
                             <img src="<?php echo $profilePic; ?>" 
                                  alt="<?php echo htmlspecialchars($fullName); ?> Profile Picture" 
                                  class="img-fluid rounded-circle" style="width: 150px; height: 150px;">
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-8">
                             <h3 class="text-muted mb-3"><?php echo htmlspecialchars($fullName); ?></h3>
                             <hr>
                             <p><strong>Student ID: </strong><?php echo $student_id; ?></p>
@@ -120,8 +120,70 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                 </div>
             </div>
         </div>
+
+        <!-- ID Card Section -->
+        <div class="col-md-4">
+            <div style="position: relative; width: 100%; height: auto;">
+
+
+
+    <!-- ID Background Image -->
+    <div style="position: relative; width: 100%; height: auto; border-radius: 10px; overflow: hidden; z-index: 2;">
+    <div style="background-image: url('/esas/esas_admin/images/COVERPHOTO_MOUNTAINEERINGSOCIETY.png');
+         width: 100%; height: 100%; border-radius: 10px; 
+         background-size: cover; background-position: center; 
+         position: absolute; top: 0; left: 0; opacity: 0.7;">
+    </div>
+    <img src="/esas/esas_admin/images/ID_BACKGROUND.png" alt="ID Generator" 
+         style="width: 100%; height: auto; border-radius: 10px; position: relative; z-index: 1;">
+</div>
+
+
+                
+
+                
+                <!-- Overlay Content -->
+                <div style="position: absolute; top: 2%; left: 50%; transform: translateX(-50%); text-align: center; color: white; width: 90%; z-index: 2000;">
+                    
+                    <div class="row d-flex align-items-center">
+                        <div class="ml-2">
+                            <img src="../../../../assets/img/nbsclogo.png" style="height: 0.5in; margin-right: 10px;">
+                        </div>
+                        
+                        <div class="text-start" style="line-height: 1; margin-top: -13px; text-align: left;">
+                            <p style="font-size: 8px; margin: 0;">REPUBLIC OF THE PHILIPPINES</p>
+                            <p style="font-size: 11px; margin: 0;"><strong>NORTHERN BUKIDNON STATE COLLEGE</strong></p>
+                            <p style="font-size: 9px; margin: 0;">Kihare, Manolo Fortich, Bukidnon</p>
+                        </div>
+
+                    </div>
+
+
+                    
+                    <h3 style="margin-top: 55px; margin-left: -45px; max-width: 100%; color: gold; transform: rotate(-42.5deg);"><em><?php echo htmlspecialchars($clubNames); ?></em></h3>
+
+
+
+                    <!-- Profile Pic -->
+                    <img src="<?php echo $profilePic; ?>" 
+                         alt="<?php echo htmlspecialchars($fullName); ?> Profile Picture" 
+                         style="width: 135px; height: 135px; border-radius: 50%; margin-bottom: 10px;">
+
+
+                    <!-- Student Info -->
+                    <h4><?php echo htmlspecialchars($fullName); ?></h4>
+                    <p class="text-dark">Student ID: <?php echo $student_id; ?></p>
+                    <p class="text-dark">Club: <?php echo $clubNames; ?></p>
+                    <p class="text-dark">Email: <?php echo $email; ?></p>
+                    <p class="text-dark">Phone: <?php echo $phoneNumber; ?></p>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </div>
+
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
