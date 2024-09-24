@@ -49,6 +49,23 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                         $clubNames = !empty($clubs) ? implode(", ", $clubs) : 'None';
                     }
                 }
+                // Fetch moderators for the clubs the student is part of
+                $moderatorNames = 'None'; // Default value for moderators
+                $moderatorSql = "SELECT m.firstName, m.middleName, m.lastName 
+                                 FROM tbl_clubs_and_moderators cm 
+                                 JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id 
+                                 JOIN tbl_registration r ON cm.club_id = r.club_id 
+                                 WHERE r.student_id = :student_id AND r.status = 'active'";
+                
+                if ($moderatorStmt = $pdo->prepare($moderatorSql)) {
+                    $moderatorStmt->bindParam(":student_id", $student_id);
+                    if ($moderatorStmt->execute()) {
+                        $moderators = $moderatorStmt->fetchAll(PDO::FETCH_ASSOC);
+                        $moderatorNames = !empty($moderators) ? implode(", ", array_map(function($mod) {
+                            return trim("{$mod['firstName']} {$mod['middleName']} {$mod['lastName']}");
+                        }, $moderators)) : 'None';
+                    }
+                }
 
                 // For profile picture
                 $profilePic = !empty($row['profilePic']) ? '/esas/esas_student/images/' . $row['profilePic'] : 'No Image Available';
@@ -121,68 +138,120 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
             </div>
         </div>
 
-        <!-- ID Card Section -->
+        <!-- ID Card Section Start -->
         <div class="col-md-4">
-            <div style="position: relative; width: 100%; height: auto;">
+            <div style="position: relative; width: 100%; height: 100%;">
+
+                <!-- ID Background Image -->
+                <div style="position: relative; width: 100%; height: auto; border-radius: 10px; overflow: hidden; z-index: 2;">
+                    
+                    <div style="position: relative; display: inline-block;">
+                        <img src="/esas/esas_admin/images/ID_BACKGROUND.png" alt="ID Generator" 
+                            style="width: 100%; height: auto; border-radius: 10px; position: relative; z-index: 1; 
+                                    filter: drop-shadow(0 0 25px white);">
+                    </div>
+
+                    
+                    <img class="trapezoid-img" 
+                        src="/esas/esas_admin/images/COVERPHOTO_ARTSSOCIETY.png" 
+                        alt="Mountaineering Society Cover Photo" 
+                        style="margin-top: 50px; margin-left: -204px; width: 37%; height: 170px; display: block; opacity: 1;
+                        transform: perspective(410px) rotateX(0deg) rotateY(-56deg) rotateZ(0deg) translateX(200px) translateY(-165px); transform-origin: center left;">
+
+                </div>
 
 
 
-    <!-- ID Background Image -->
-    <div style="position: relative; width: 100%; height: auto; border-radius: 10px; overflow: hidden; z-index: 2;">
-    <div style="background-image: url('/esas/esas_admin/images/COVERPHOTO_MOUNTAINEERINGSOCIETY.png');
-         width: 100%; height: 100%; border-radius: 10px; 
-         background-size: cover; background-position: center; 
-         position: absolute; top: 0; left: 0; opacity: 0.7;">
-    </div>
-    <img src="/esas/esas_admin/images/ID_BACKGROUND.png" alt="ID Generator" 
-         style="width: 100%; height: auto; border-radius: 10px; position: relative; z-index: 1;">
-</div>
-
-
-                
-
-                
                 <!-- Overlay Content -->
                 <div style="position: absolute; top: 2%; left: 50%; transform: translateX(-50%); text-align: center; color: white; width: 90%; z-index: 2000;">
                     
                     <div class="row d-flex align-items-center">
                         <div class="ml-2">
-                            <img src="../../../../assets/img/nbsclogo.png" style="height: 0.5in; margin-right: 10px;">
+                            <img src="../../../../assets/img/nbsclogo.png" style="height: 0.5in; margin-right: 10px; filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.5));">
                         </div>
-                        
                         <div class="text-start" style="line-height: 1; margin-top: -13px; text-align: left;">
-                            <p style="font-size: 8px; margin: 0;">REPUBLIC OF THE PHILIPPINES</p>
-                            <p style="font-size: 11px; margin: 0;"><strong>NORTHERN BUKIDNON STATE COLLEGE</strong></p>
-                            <p style="font-size: 9px; margin: 0;">Kihare, Manolo Fortich, Bukidnon</p>
+                            <p style="font-size: 8px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">REPUBLIC OF THE PHILIPPINES</p>
+                            <p style="font-size: 11px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);"><strong>NORTHERN BUKIDNON STATE COLLEGE</strong></p>
+                            <p style="font-size: 9px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">Kihare, Manolo Fortich, Bukidnon</p>
                         </div>
-
                     </div>
 
-
-                    
-                    <h3 style="margin-top: 55px; margin-left: -45px; max-width: 100%; color: gold; transform: rotate(-42.5deg);"><em><?php echo htmlspecialchars($clubNames); ?></em></h3>
-
-
+                    <div class="" style="position: absolute; margin-top: 20px; max-width: 100%;">
+                        <h2 style="color: gold; line-height: 1; text-shadow: 0 3px 3px rgba(0, 0, 0, .5);">
+                            <em><strong><?php echo htmlspecialchars($clubNames); ?></strong></em></h3>
+                    </div>
 
                     <!-- Profile Pic -->
                     <img src="<?php echo $profilePic; ?>" 
                          alt="<?php echo htmlspecialchars($fullName); ?> Profile Picture" 
-                         style="width: 135px; height: 135px; border-radius: 50%; margin-bottom: 10px;">
-
+                         style="width: 130px; height: 130px; border: solid 5px white; border-radius: 50%;
+                         margin-top: 110px; margin-bottom: 10px;
+                         box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
 
                     <!-- Student Info -->
-                    <h4><?php echo htmlspecialchars($fullName); ?></h4>
-                    <p class="text-dark">Student ID: <?php echo $student_id; ?></p>
-                    <p class="text-dark">Club: <?php echo $clubNames; ?></p>
-                    <p class="text-dark">Email: <?php echo $email; ?></p>
-                    <p class="text-dark">Phone: <?php echo $phoneNumber; ?></p>
+                    <h3 style="color: black; 
+                                text-shadow: 
+                                    2px 2px 0 rgba(255, 255, 255, 1),  
+                                    -2px -2px 0 rgba(255, 255, 255, 1),  
+                                    2px -2px 0 rgba(255, 255, 255, 1),  
+                                    -2px 2px 0 rgba(255, 255, 255, 1),  
+                                    0 0 5px rgba(0, 0, 0, 0.7);">
+                        <strong><?php echo htmlspecialchars($fullName); ?></strong>
+                    </h3>
+
+
+                    <div style="margin-top: 20px; line-height: .5;">
+                        <h6 style="color: black; text-shadow: 
+                                    0 0 5px rgba(255, 255, 255, 0.7),  
+                                    0 0 10px rgba(255, 255, 255, 0.5),  
+                                    0 0 15px rgba(255, 255, 255, 0.3);">
+                            Student ID: <?php echo $student_id; ?>
+                        </h6>
+                        <h6 style="color: black; text-shadow: 
+                                    0 0 5px rgba(255, 255, 255, 0.7),  
+                                    0 0 10px rgba(255, 255, 255, 0.5),  
+                                    0 0 15px rgba(255, 255, 255, 0.3);">
+                            Email: <?php echo $email; ?>
+                        </h6>
+                        <h6 style="color: black; text-shadow: 
+                                    0 0 5px rgba(255, 255, 255, 0.7),  
+                                    0 0 10px rgba(255, 255, 255, 0.5),  
+                                    0 0 15px rgba(255, 255, 255, 0.3);">
+                            Phone: <?php echo $phoneNumber; ?>
+                        </h6>
+                    </div>
+
+                    <!-- MODERATORS' DIV -->
+                    <div class="" style="margin-top: 30px; color: black;">
+                        <strong>Moderators:<br></strong>
+                        <?php
+                        // Assuming $moderatorNames is a string with names separated by commas
+                        $moderatorArray = explode(',', $moderatorNames);
+                        foreach ($moderatorArray as $moderator) {
+                            echo '<h6><span style="margin-top: 8px; display: block;">' . htmlspecialchars(trim($moderator)) . '</span></h6>';
+                        }
+                        ?>
+                    </div>
                 </div>
+
+                
+
             </div>
         </div>
+        <!-- ID Card Section End -->
 
 
     </div>
 </div>
+
+<!-- CLUB NAME -->
+                    <!-- <div class="" style="position: absolute; margin-top: 60px; margin-left: -50px; max-width: 100%; transform: rotate(-42.5deg);">
+                        <h3 style="color: gold; font-style: italic; transform: skewX(-30deg);"><strong><?php echo htmlspecialchars($clubNames); ?></strong></h3>
+                    </div> -->
+     <!-- <img class="trapezoid-img" 
+            src="/esas/esas_admin/images/COVERPHOTO_MOUNTAINEERINGSOCIETY.png" 
+            alt="Mountaineering Society Cover Photo" 
+            style="width: 130px; height: 200px; display: block; transform: perspective(400px) rotateX(0deg) rotateY(-60deg) rotateZ(0deg) translateX(200px) translateY(-250px); transform-origin: center left;"> -->
 
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="nbsc-sas text-center">
             <img src="../assets/img/SAS_LOGO.png" id="sas_logo" alt="SAS Logo">
             <h3 class="mb-1" id="nbsc_sas_name">NBSC-SAS</h3>
-            <h5 class="text-muted" id="system_name">Student Organization Information System<h5>
+            <h5 class="text-muted" id="system_name">Student Club Organization and Information System<h5>
         </div>
 
         <div class="login-container">
