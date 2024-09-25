@@ -187,37 +187,38 @@ try {
                 <div class="row g-0 h-100">
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
                         <div class="row align-items-center mb-2">
-                            <label for="schoolYearDropdown" class="col-auto col-form-label">Month:</label>
+                            <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
                             <div class="col-auto">
                                 <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
                                     <?php
-                                    // Define months
-                                    $months = [
-                                        '01' => 'January',
-                                        '02' => 'February',
-                                        '03' => 'March',
-                                        '04' => 'April',
-                                        '05' => 'May',
-                                        '06' => 'June',
-                                        '07' => 'July',
-                                        '08' => 'August',
-                                        '09' => 'September',
-                                        '10' => 'October',
-                                        '11' => 'November',
-                                        '12' => 'December'
-                                    ];
+                                    try {
+                                        // Fetch distinct years where clubs were added
+                                        $sql = "SELECT DISTINCT YEAR(dateAdded) as year FROM tbl_clubs ORDER BY year DESC";
+                                        $stmt = $pdo->prepare($sql);
+                                        $stmt->execute();
+                                        $years = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                                    // Get the current month
-                                    $currentMonth = date('m');
+                                        // Latest school year by default (if not set via URL)
+                                        $latestYear = $years[0]['year'];
+                                        $defaultSchoolYear = $latestYear . '-' . ($latestYear + 1);
 
-                                    // Output month options
-                                    foreach ($months as $key => $month) {
-                                        echo "<option value=\"" . htmlspecialchars($key) . "\"";
-                                        // Check if $_GET['school_year'] is set, otherwise default to the current month
-                                        if ((isset($_GET['school_year']) && $_GET['school_year'] == $key) || (!isset($_GET['school_year']) && $key == $currentMonth)) {
-                                            echo " selected";
+                                        // Selected school year from the URL, or default to the latest school year
+                                        $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
+
+                                        // Create school year ranges starting from August and ending in July next year
+                                        foreach ($years as $year) {
+                                            $startYear = $year['year'];
+                                            $endYear = $startYear + 1;
+                                            $schoolYear = $startYear . '-' . $endYear;
+
+                                            echo "<option value=\"" . htmlspecialchars($schoolYear) . "\"";
+                                            if ($selectedSchoolYear === $schoolYear) {
+                                                echo " selected";
+                                            }
+                                            echo ">" . htmlspecialchars($schoolYear) . "</option>";
                                         }
-                                        echo ">" . htmlspecialchars($month) . "</option>";
+                                    } catch (PDOException $e) {
+                                        echo "Error: " . htmlspecialchars($e->getMessage());
                                     }
                                     ?>
                                 </select>
@@ -235,6 +236,7 @@ try {
                                     window.location.search = queryParams.toString();
                                 }
                             </script>
+
                         </div>
 
                         <!-- THE MAIN PAGE START -->
@@ -246,34 +248,41 @@ try {
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
-                                            // Get the selected month from the URL
-                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                            // Get the selected school year from the URL or default to the latest
+                                            $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
 
-                                            // Base SQL query to count total clubs
+                                            // Base SQL query to count total clubs up to the end of the selected school year
                                             $sql = "SELECT COUNT(*) AS total_clubs FROM tbl_clubs";
 
-                                            // Add condition for the selected month if applicable
-                                            if ($selectedMonth) {
-                                                // Ensure clubs are counted if they were created or approved up to the selected month
-                                                $sql .= " WHERE MONTH(dateAdded) <= :month";
+                                            // If a school year is selected, adjust the SQL to count clubs cumulatively up to July of the end year
+                                            if ($selectedSchoolYear) {
+                                                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+
+                                                // Define the end date for the school year (July 31 of the end year)
+                                                $endDate = "$endYear-07-31";
+
+                                                // Add the WHERE condition to count clubs added up to the end of the school year
+                                                $sql .= " WHERE dateAdded <= :endDate";
                                             }
 
                                             // Prepare and execute the query
                                             $stmt_clubs = $pdo->prepare($sql);
 
-                                            if ($selectedMonth) {
-                                                $stmt_clubs->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                            // Bind the end date parameter if filtering by school year
+                                            if ($selectedSchoolYear) {
+                                                $stmt_clubs->bindParam(':endDate', $endDate);
                                             }
 
                                             $stmt_clubs->execute();
 
-                                            // Fetch the total number of clubs
+                                            // Fetch and display the total number of clubs
                                             $total_clubs = $stmt_clubs->fetchColumn();
                                             echo "<h3>" . htmlspecialchars($total_clubs) . "</h3>";
                                         } catch (PDOException $e) {
                                             echo "Error: " . htmlspecialchars($e->getMessage());
                                         }
                                         ?>
+
                                         <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
                                         <p>Total Clubs</p>
                                     </div>
@@ -285,24 +294,31 @@ try {
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
-                                            // Get the selected month from the URL
-                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                            // Get the selected school year from the URL
+                                            $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : null;
 
                                             // Base SQL query to count total moderators
                                             $sql = "SELECT COUNT(*) AS total_moderators FROM tbl_moderators";
 
-                                            // Add condition for the selected month, if applicable
-                                            if ($selectedMonth) {
-                                                $sql .= " WHERE MONTH(dateAdded) <= :month";
+                                            // If a school year is selected, count moderators up to the end of that school year (July 31 of the end year)
+                                            if ($selectedSchoolYear) {
+                                                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+
+                                                // Define end date as July 31 of the end year
+                                                $endDate = "$endYear-07-31";
+
+                                                // Add the WHERE condition for dateAdded up to the end of the school year
+                                                $sql .= " WHERE dateAdded <= :endDate";
                                             }
 
                                             // Prepare and execute the query
                                             $stmt_moderators = $pdo->prepare($sql);
 
-                                            if ($selectedMonth) {
-                                                $stmt_moderators->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                            // Bind the endDate parameter if filtering by school year
+                                            if ($selectedSchoolYear) {
+                                                $stmt_moderators->bindParam(':endDate', $endDate);
                                             }
-                                            
+
                                             $stmt_moderators->execute();
 
                                             // Fetch the total number of moderators
@@ -323,28 +339,33 @@ try {
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
-                                            // Get the selected month from the URL
-                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                            // Get the selected school year from the URL
+                                            $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : null;
 
-                                            // Base SQL query to count total active students up to the selected month
-                                            $sql = "
-                                                SELECT COUNT(DISTINCT student_id) AS total_students 
-                                                FROM tbl_registration 
-                                                WHERE status = 'active'
-                                                AND MONTH(dateApproved) <= :month
-                                                AND YEAR(dateApproved) = YEAR(CURDATE())"; // Assuming we're filtering within the current year
+                                            // Base SQL query to count total active students
+                                            $sql = "SELECT COUNT(DISTINCT student_id) AS total_students 
+                                                    FROM tbl_registration 
+                                                    WHERE status = 'active'";
+
+                                            // If a school year is selected, count students up to the end of that school year (July 31 of the end year)
+                                            if ($selectedSchoolYear) {
+                                                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+
+                                                // Define end date as July 31 of the end year
+                                                $endDate = "$endYear-07-31";
+
+                                                // Add the WHERE condition for students active up to the end of the selected school year
+                                                $sql .= " AND dateApproved <= :endDate";
+                                            }
 
                                             // Prepare and execute the query
                                             $stmt_students = $pdo->prepare($sql);
-                                            
-                                            if ($selectedMonth) {
-                                                $stmt_students->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-                                            } else {
-                                                // Default to current month if no month is selected
-                                                $currentMonth = date('m');
-                                                $stmt_students->bindParam(':month', $currentMonth, PDO::PARAM_INT);
+
+                                            // Bind the endDate parameter if filtering by school year
+                                            if ($selectedSchoolYear) {
+                                                $stmt_students->bindParam(':endDate', $endDate);
                                             }
-                                            
+
                                             $stmt_students->execute();
 
                                             // Fetch the total number of students
@@ -359,32 +380,38 @@ try {
                                     </div>
                                 </div>
 
+
                                 <!-- Card for CLUB REQUESTS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
-                                            // Get the selected month from the URL
-                                            $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                            // Get the selected school year from the URL
+                                            $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : null;
 
                                             // Base SQL query to count total club requests
-                                            $sql = "
-                                                SELECT COUNT(request_id) AS total_requests 
-                                                FROM tbl_club_requests
-                                            ";
+                                            $sql = "SELECT COUNT(request_id) AS total_requests 
+                                                    FROM tbl_club_requests";
 
-                                            // Add condition for the selected month, if applicable
-                                            if ($selectedMonth) {
-                                                $sql .= " WHERE MONTH(dateRequested) <= :month";
+                                            // If a school year is selected, count requests up to the end of that school year (July 31 of the end year)
+                                            if ($selectedSchoolYear) {
+                                                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+
+                                                // Define end date as July 31 of the end year
+                                                $endDate = "$endYear-07-31";
+
+                                                // Add the WHERE condition for requests made up to the end of the selected school year
+                                                $sql .= " WHERE dateRequested <= :endDate";
                                             }
 
                                             // Prepare and execute the query
                                             $stmt_requests = $pdo->prepare($sql);
 
-                                            if ($selectedMonth) {
-                                                $stmt_requests->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                            // Bind the endDate parameter if filtering by school year
+                                            if ($selectedSchoolYear) {
+                                                $stmt_requests->bindParam(':endDate', $endDate);
                                             }
-                                            
+
                                             $stmt_requests->execute();
 
                                             // Fetch the total number of requests
@@ -399,6 +426,7 @@ try {
                                     </div>
                                 </div>
 
+
                             </div>
                             <!-- UPPER CARDS END -->
 
@@ -408,30 +436,42 @@ try {
                                 <!-- PIE CHART -->
                                 <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <p>Registered Students per Club</p>
+                                        <p>Total Students per Club</p>
                                         <div style="height: 365px; background-color: transparent;">
                                             <?php
                                             try {
-                                                // Get the selected month from the URL
-                                                $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                                // Get the selected school year and/or month
+                                                $selectedYear = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                                $selectedMonth = isset($_GET['month']) ? intval($_GET['month']) : null;
 
-                                                // Prepare the SQL query
+                                                // SQL Query to get cumulative data per club up to the selected year and month
                                                 $sql = "
-                                                    SELECT tc.clubName, COUNT(DISTINCT tr.student_id) AS member_count
+                                                    SELECT tc.clubName, COUNT(tr.student_id) AS member_count
                                                     FROM tbl_registration tr
                                                     JOIN tbl_clubs tc ON tr.club_id = tc.club_id
                                                     WHERE tr.status = 'active'
                                                 ";
 
-                                                // Add condition for the selected month, if applicable
+                                                // Apply cumulative conditions based on year and month
+                                                if ($selectedYear) {
+                                                    // Use the end of May of the following year for the cumulative count
+                                                    $endDate = ($selectedYear + 1) . "-05-31";  // May 31st of the following year
+                                                    $sql .= " AND tr.dateApproved <= :endDate";
+                                                }
+
                                                 if ($selectedMonth) {
+                                                    // Apply the selected month for further narrowing down within the year
                                                     $sql .= " AND MONTH(tr.dateApproved) <= :month";
                                                 }
 
-                                                $sql .= " GROUP BY tc.club_id";
+                                                $sql .= " GROUP BY tc.club_id ORDER BY member_count DESC";
 
                                                 // Prepare and execute the query
                                                 $stmt = $pdo->prepare($sql);
+
+                                                if ($selectedYear) {
+                                                    $stmt->bindParam(':endDate', $endDate);
+                                                }
 
                                                 if ($selectedMonth) {
                                                     $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
@@ -439,6 +479,7 @@ try {
 
                                                 $stmt->execute();
                                                 $club_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
                                             } catch (PDOException $e) {
                                                 echo "Error: " . htmlspecialchars($e->getMessage());
                                             }
@@ -454,7 +495,7 @@ try {
                                                 $total_students += $row['member_count'];
                                             }
 
-                                            // Calculate percentage for each club
+                                            // Calculate percentages for each club
                                             $percentages = [];
                                             foreach ($counts as $count) {
                                                 $percentages[] = $total_students > 0 ? round(($count / $total_students) * 100) : 0;
@@ -491,7 +532,7 @@ try {
                                                         data: {
                                                             labels: labelsWithPercentages,  // Club names with percentages
                                                             datasets: [{
-                                                                label: 'Registered Students per Club',
+                                                                label: 'Cumulative Registered Students per Club',
                                                                 data: counts,  // Member count per club
                                                                 backgroundColor: [
                                                                     'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
@@ -557,61 +598,16 @@ try {
 
                                                 <?php
                                                 try {
-                                                    // Get the current academic year based on today's date
-                                                    $currentYear = date('Y');
-                                                    $currentSY = $currentYear . '-' . ($currentYear + 1);
-
-                                                    // Get the selected club_id and month from the URL, if available
-                                                    $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
-                                                    $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null; // Assuming 'school_year' is used for month
-
-                                                    // SQL query to fetch the count of members per academic year
+                                                    // Fetch the count of members per academic year
                                                     $sql = "
-                                                        SELECT academicYear, COALESCE(memberCount, 0) AS memberCount
-                                                        FROM (
-                                                            SELECT CONCAT(YEAR(r.dateApproved), '-', YEAR(r.dateApproved) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
-                                                            FROM tbl_students s
-                                                            JOIN tbl_registration r ON s.student_id = r.student_id
-                                                            JOIN tbl_clubs c ON r.club_id = c.club_id
-                                                            WHERE r.status = 'active'
+                                                        SELECT CONCAT(YEAR(r.dateApproved), '-', YEAR(r.dateApproved) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
+                                                        FROM tbl_students s
+                                                        JOIN tbl_registration r ON s.student_id = r.student_id
+                                                        WHERE r.status = 'active'
+                                                        GROUP BY academicYear
+                                                        ORDER BY academicYear ASC
                                                     ";
-
-                                                    // Add condition for club_id if it's set
-                                                    if ($club_id) {
-                                                        $sql .= " AND r.club_id = :club_id";
-                                                    }
-
-                                                    // Add condition for month if it's set
-                                                    if ($selectedMonth) {
-                                                        $sql .= " AND MONTH(r.dateApproved) = :month";
-                                                    }
-
-                                                    $sql .= "
-                                                            GROUP BY academicYear
-                                                            UNION ALL
-                                                            SELECT '2023-2024' AS academicYear, 0 AS memberCount
-                                                            WHERE NOT EXISTS (
-                                                                SELECT 1 FROM tbl_registration
-                                                                WHERE CONCAT(YEAR(dateApproved), '-', YEAR(dateApproved) + 1) = '2023-2024'
-                                                            )
-                                                        ) AS yearlyData
-                                                        WHERE academicYear = '2023-2024' OR academicYear = '$currentSY'
-                                                        ORDER BY academicYear
-                                                    ";
-
-                                                    // Prepare the statement
                                                     $stmt = $pdo->prepare($sql);
-
-                                                    // Bind club_id parameter if it's set
-                                                    if ($club_id) {
-                                                        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-                                                    }
-
-                                                    // Bind month parameter if it's set
-                                                    if ($selectedMonth) {
-                                                        $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-                                                    }
-
                                                     $stmt->execute();
                                                     $registryPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -625,7 +621,7 @@ try {
                                                         $memberCountsPerSY[] = $row['memberCount'];  // Number of members for each year
                                                     }
 
-                                                    // Fetch the total number of students for the max value
+                                                    // Fetch the total number of students for max value
                                                     $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
                                                     $totalStudentsStmt->execute();
                                                     $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
@@ -711,6 +707,7 @@ try {
                                         </div>
 
 
+
                                     </div>
 
 
@@ -732,21 +729,26 @@ try {
                                                     
                                                     <?php
                                                     try {
-                                                        // Get the selected month from the URL parameter or default to the current month
-                                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
+                                                        // Get the selected school year from the URL parameter or default to the current school year
+                                                        $currentYear = date('Y');
+                                                        $selectedSchoolYear = isset($_GET['school_year']) ? intval($_GET['school_year']) : $currentYear;
+                                                        $nextSchoolYear = $selectedSchoolYear + 1;
 
-                                                        // SQL Query to fetch year level counts, aggregated up to the selected month
+                                                        // Define end date as July 31 of the next school year
+                                                        $endDate = "$nextSchoolYear-07-31";
+
+                                                        // SQL Query to fetch year level counts by school year
                                                         $sql = "
                                                             SELECT s.year, COUNT(DISTINCT s.student_id) AS count
                                                             FROM tbl_students s
                                                             JOIN tbl_registration r ON s.student_id = r.student_id
                                                             WHERE r.status = 'active'
-                                                            AND MONTH(r.dateApproved) <= :selectedMonth
+                                                            AND r.dateApproved <= :endDate
                                                             GROUP BY s.year
                                                         ";
 
                                                         $stmt = $pdo->prepare($sql);
-                                                        $stmt->bindParam(':selectedMonth', $selectedMonth, PDO::PARAM_INT);
+                                                        $stmt->bindParam(':endDate', $endDate);
                                                         $stmt->execute();
                                                         
                                                         // Fetch the results into an associative array
@@ -830,10 +832,12 @@ try {
                                                             new Chart(studentBarChartElement, config);
                                                         }
                                                     </script>
-
                                                 </div>
                                             </div>
                                         </div>
+                                        <!-- YEAR LEVEL COUNT END -->
+
+
 
                                         <!-- Student Gender -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
@@ -842,22 +846,25 @@ try {
                                                 <div style="height: 150px; position: relative;">
                                                     <?php
                                                     try {
-                                                        // Get the selected month from the URL parameter or default to the current month
-                                                        $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
+                                                        // Get the selected school year from the URL or default to the latest year
+                                                        $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
 
-                                                        // SQL Query to fetch gender counts, aggregated up to the selected month
+                                                        // Parse the selected school year to get the end year
+                                                        list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+                                                        $endDate = "$endYear-07-31"; // End date is July 31 of the end year
+
+                                                        // SQL Query to fetch cumulative gender counts, filtered by the selected school year
                                                         $sqlCounts = "
                                                             SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
                                                             FROM tbl_students s
                                                             JOIN tbl_registration r ON s.student_id = r.student_id
                                                             WHERE r.status = 'active' 
-                                                            AND MONTH(r.dateApproved) <= :selectedMonth
-                                                            AND YEAR(r.dateApproved) = YEAR(CURDATE()) 
+                                                            AND r.dateApproved <= :endDate
                                                             GROUP BY s.gender
                                                         ";
 
                                                         $stmtCounts = $pdo->prepare($sqlCounts);
-                                                        $stmtCounts->bindParam(':selectedMonth', $selectedMonth, PDO::PARAM_INT);
+                                                        $stmtCounts->bindParam(':endDate', $endDate);
                                                         $stmtCounts->execute();
                                                         $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
 
@@ -875,8 +882,9 @@ try {
                                                         }
 
                                                         // Prepare the SQL statement to get the total number of students
-                                                        $sqlTotal = "SELECT COUNT(*) AS total_count FROM tbl_students";
-                                                        $stmtTotal = $pdo->query($sqlTotal);
+                                                        $sqlTotal = "SELECT COUNT(DISTINCT student_id) AS total_count FROM tbl_students";
+                                                        $stmtTotal = $pdo->prepare($sqlTotal);
+                                                        $stmtTotal->execute();
                                                         $totalCount = $stmtTotal->fetchColumn();
 
                                                         // Prepare the data for JavaScript
@@ -885,7 +893,7 @@ try {
 
                                                     } catch (PDOException $e) {
                                                         // Handle query error
-                                                        echo 'Error: ' . $e->getMessage();
+                                                        echo 'Error: ' . htmlspecialchars($e->getMessage());
                                                     }
                                                     ?>
                                                     <canvas id="studentGenderChart" style="width: 100%; height: 100%;"></canvas>
@@ -950,6 +958,7 @@ try {
                                                 </div>
                                             </div>
                                         </div>
+
 
 
                                     </div>
