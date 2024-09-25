@@ -97,15 +97,37 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Details</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="../../../assets/js/all.js" crossorigin="anonymous"></script>
+    <script src="../../../assets/js/jquery-3.6.0.js"></script>
+    <link href="../../../assets/css/styles.css" rel="stylesheet" />
+    <link href="../../../assets/img/nbsclogo.png" rel="icon">
+    <style>
+    @media print {
+        /* Hide the modal header and footer */
+        .modal-header,
+        .modal-footer {
+            display: none;
+        }
+
+        /* Optionally, you can adjust styles for the modal body if needed */
+        .modal-body {
+            margin: 0; /* Remove any margins */
+        }
+    }
+</style>
+
 </head>
 <body>
 <div class="container">
     <div class="row mt-5">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h3>Student Profile</h3>
+                    <button class="btn btn-info" id="generateIDBtn" data-toggle="modal" data-target="#generateIDModal">Generate ID</button>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -138,111 +160,166 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
             </div>
         </div>
 
-        <!-- ID Card Section Start -->
-        <div class="col-md-4">
-            <div style="position: relative; width: 100%; height: 100%;">
-
-                <!-- ID Background Image -->
-                <div style="position: relative; width: 100%; height: auto; border-radius: 10px; overflow: hidden; z-index: 2;">
-                    
-                    <div style="position: relative; display: inline-block;">
-                        <img src="/esas/esas_admin/images/ID_BACKGROUND.png" alt="ID Generator" 
-                            style="width: 100%; height: auto; border-radius: 10px; position: relative; z-index: 1; 
-                                    filter: drop-shadow(0 0 25px white);">
-                    </div>
-
-                    
-                    <img class="trapezoid-img" 
-                        src="/esas/esas_admin/images/COVERPHOTO_ARTSSOCIETY.png" 
-                        alt="Mountaineering Society Cover Photo" 
-                        style="margin-top: 50px; margin-left: -204px; width: 37%; height: 170px; display: block; opacity: 1;
-                        transform: perspective(410px) rotateX(0deg) rotateY(-56deg) rotateZ(0deg) translateX(200px) translateY(-165px); transform-origin: center left;">
-
-                </div>
-
-
-
-                <!-- Overlay Content -->
-                <div style="position: absolute; top: 2%; left: 50%; transform: translateX(-50%); text-align: center; color: white; width: 90%; z-index: 2000;">
-                    
-                    <div class="row d-flex align-items-center">
-                        <div class="ml-2">
-                            <img src="../../../../assets/img/nbsclogo.png" style="height: 0.5in; margin-right: 10px; filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.5));">
-                        </div>
-                        <div class="text-start" style="line-height: 1; margin-top: -13px; text-align: left;">
-                            <p style="font-size: 8px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">REPUBLIC OF THE PHILIPPINES</p>
-                            <p style="font-size: 11px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);"><strong>NORTHERN BUKIDNON STATE COLLEGE</strong></p>
-                            <p style="font-size: 9px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">Kihare, Manolo Fortich, Bukidnon</p>
-                        </div>
-                    </div>
-
-                    <div class="" style="position: absolute; margin-top: 20px; max-width: 100%;">
-                        <h2 style="color: gold; line-height: 1; text-shadow: 0 3px 3px rgba(0, 0, 0, .5);">
-                            <em><strong><?php echo htmlspecialchars($clubNames); ?></strong></em></h3>
-                    </div>
-
-                    <!-- Profile Pic -->
-                    <img src="<?php echo $profilePic; ?>" 
-                         alt="<?php echo htmlspecialchars($fullName); ?> Profile Picture" 
-                         style="width: 130px; height: 130px; border: solid 5px white; border-radius: 50%;
-                         margin-top: 110px; margin-bottom: 10px;
-                         box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
-
-                    <!-- Student Info -->
-                    <h3 style="color: black; 
-                                text-shadow: 
-                                    2px 2px 0 rgba(255, 255, 255, 1),  
-                                    -2px -2px 0 rgba(255, 255, 255, 1),  
-                                    2px -2px 0 rgba(255, 255, 255, 1),  
-                                    -2px 2px 0 rgba(255, 255, 255, 1),  
-                                    0 0 5px rgba(0, 0, 0, 0.7);">
-                        <strong><?php echo htmlspecialchars($fullName); ?></strong>
-                    </h3>
-
-
-                    <div style="margin-top: 20px; line-height: .5;">
-                        <h6 style="color: black; text-shadow: 
-                                    0 0 5px rgba(255, 255, 255, 0.7),  
-                                    0 0 10px rgba(255, 255, 255, 0.5),  
-                                    0 0 15px rgba(255, 255, 255, 0.3);">
-                            Student ID: <?php echo $student_id; ?>
-                        </h6>
-                        <h6 style="color: black; text-shadow: 
-                                    0 0 5px rgba(255, 255, 255, 0.7),  
-                                    0 0 10px rgba(255, 255, 255, 0.5),  
-                                    0 0 15px rgba(255, 255, 255, 0.3);">
-                            Email: <?php echo $email; ?>
-                        </h6>
-                        <h6 style="color: black; text-shadow: 
-                                    0 0 5px rgba(255, 255, 255, 0.7),  
-                                    0 0 10px rgba(255, 255, 255, 0.5),  
-                                    0 0 15px rgba(255, 255, 255, 0.3);">
-                            Phone: <?php echo $phoneNumber; ?>
-                        </h6>
-                    </div>
-
-                    <!-- MODERATORS' DIV -->
-                    <div class="" style="margin-top: 30px; color: black;">
-                        <strong>Moderators:<br></strong>
-                        <?php
-                        // Assuming $moderatorNames is a string with names separated by commas
-                        $moderatorArray = explode(',', $moderatorNames);
-                        foreach ($moderatorArray as $moderator) {
-                            echo '<h6><span style="margin-top: 8px; display: block;">' . htmlspecialchars(trim($moderator)) . '</span></h6>';
-                        }
-                        ?>
-                    </div>
-                </div>
-
-                
-
-            </div>
-        </div>
-        <!-- ID Card Section End -->
-
-
+        
     </div>
 </div>
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="generateIDModal" tabindex="-1" aria-labelledby="generateIDModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="generateIDModalLabel">Student Club ID</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+
+                <div class="modal-body p-5">
+
+                    <div class="card" style="border: none;">
+                        <!-- ID Card Section Start -->
+                        <div style="position: relative; width: 100%; height: 100%;">
+
+                            <!-- ID Background Image -->
+                            <div style="position: relative; width: 100%; height: auto; border-radius: 10px; overflow: hidden; z-index: 2;">
+                                
+                                <div style="position: relative; display: inline-block;">
+                                    <img src="/esas/esas_admin/images/ID_BACKGROUND.png" alt="ID Generator" 
+                                        style="width: 100%; height: auto; border-radius: 10px; position: relative; z-index: 1; 
+                                                filter: drop-shadow(0 0 25px white);">
+                                </div>
+
+                                
+                                <img class="trapezoid-img" 
+                                    src="/esas/esas_admin/images/COVERPHOTO_ARTSSOCIETY.png" 
+                                    alt="Mountaineering Society Cover Photo" 
+                                    style="margin-top: 50px; margin-left: -204px; width: 37%; height: 170px; display: block; opacity: 1;
+                                    transform: perspective(410px) rotateX(0deg) rotateY(-56deg) rotateZ(0deg) translateX(200px) translateY(-165px); transform-origin: center left;
+                                    z-index: -1">
+
+                            </div>
+
+
+
+                            <!-- Overlay Content -->
+                            <div class="text-center" style="position: absolute; top: 2%; left: 50%; transform: translateX(-50%); text-align: center; color: white; width: 90%; z-index: 2000;">
+                                
+                                <div class="row d-flex align-items-center">
+                                    <div class="ml-2">
+                                        <img src="../../../../assets/img/nbsclogo.png" style="height: 0.5in; margin-right: 10px; filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.5));">
+                                    </div>
+                                    <div class="text-start" style="line-height: 1; margin-top: -13px; text-align: left;">
+                                        <p style="font-size: 8px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">REPUBLIC OF THE PHILIPPINES</p>
+                                        <p style="font-size: 11px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);"><strong>NORTHERN BUKIDNON STATE COLLEGE</strong></p>
+                                        <p style="font-size: 9px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">Kihare, Manolo Fortich, Bukidnon</p>
+                                    </div>
+                                </div>
+
+                                <div class="text-center" style="position: absolute; top: 50px; left: 0; right: 0; margin: 20px auto; max-width: 90%;">
+                                    <h2 style="color: gold; line-height: 1; text-shadow: 0 3px 3px rgba(0, 0, 0, .5);">
+                                        <em><strong><?php echo htmlspecialchars($clubNames); ?></strong></em>
+                                    </h2>
+                                </div>
+
+                                <!-- Profile Pic -->
+                                <img src="<?php echo $profilePic; ?>" 
+                                    alt="<?php echo htmlspecialchars($fullName); ?> Profile Picture" 
+                                    style="width: 150px; height: 150px; border: solid 5px white; border-radius: 50%;
+                                    margin-top: 110px; margin-bottom: 10px;
+                                    box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
+
+                                <!-- Student Info -->
+                                <h3 style="color: black; 
+                                            text-shadow: 
+                                                2px 2px 0 rgba(255, 255, 255, 1),  
+                                                -2px -2px 0 rgba(255, 255, 255, 1),  
+                                                2px -2px 0 rgba(255, 255, 255, 1),  
+                                                -2px 2px 0 rgba(255, 255, 255, 1),  
+                                                0 0 5px rgba(0, 0, 0, 0.7);">
+                                    <strong><?php echo htmlspecialchars($fullName); ?></strong>
+                                </h3>
+
+
+                                <div style="margin-top: 20px; line-height: .5;">
+                                    <h6 style="color: black; text-shadow: 
+                                                0 0 5px rgba(255, 255, 255, 0.7),  
+                                                0 0 10px rgba(255, 255, 255, 0.5),  
+                                                0 0 15px rgba(255, 255, 255, 0.3);">
+                                        Student ID: <?php echo $student_id; ?>
+                                    </h6>
+                                    <h6 style="color: black; text-shadow: 
+                                                0 0 5px rgba(255, 255, 255, 0.7),  
+                                                0 0 10px rgba(255, 255, 255, 0.5),  
+                                                0 0 15px rgba(255, 255, 255, 0.3);">
+                                        Email: <?php echo $email; ?>
+                                    </h6>
+                                    <h6 style="color: black; text-shadow: 
+                                                0 0 5px rgba(255, 255, 255, 0.7),  
+                                                0 0 10px rgba(255, 255, 255, 0.5),  
+                                                0 0 15px rgba(255, 255, 255, 0.3);">
+                                        Phone: <?php echo $phoneNumber; ?>
+                                    </h6>
+                                </div>
+
+                                <!-- MODERATORS' DIV -->
+                                <div class="" style="margin-top: 80px; color: black;">
+                                    <strong>Moderators:<br></strong>
+                                    <?php
+                                    // Assuming $moderatorNames is a string with names separated by commas
+                                    $moderatorArray = explode(',', $moderatorNames);
+                                    foreach ($moderatorArray as $moderator) {
+                                        echo '<h6><span style="margin-top: 8px; display: block;">' . htmlspecialchars(trim($moderator)) . '</span></h6>';
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+
+                            
+
+                        </div>
+                        <!-- ID Card Section End -->
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button id="downloadPDF" class="btn btn-primary" onclick="downloadPDF()">Download PDF</button>
+                        <button id="printID" class="btn btn-secondary" onclick="printID()">Print</button>
+                    </div>
+                    <script>
+                        function downloadPDF() {
+                            alert("Download PDF functionality not implemented yet.");
+                        }
+
+                        function printID() {
+                            window.print();
+                        }
+                    </script>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
 
 <!-- CLUB NAME -->
                     <!-- <div class="" style="position: absolute; margin-top: 60px; margin-left: -50px; max-width: 100%; transform: rotate(-42.5deg);">
