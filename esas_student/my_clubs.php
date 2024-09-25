@@ -292,17 +292,17 @@ try {
                             setInterval(fetchNotificationCount, 10000);
                             fetchNotificationCount();
 
-                            // Mark notifications as read when "My Clubs" is clicked
-                            $('#my-clubs').click(function() {
-                                $.ajax({
-                                    url: '/esas/esas_student/apis/notifications/notifications-mark-read.php',
-                                    method: 'POST',
-                                    data: { student_id: <?php echo $_SESSION['student_id']; ?> },
-                                    success: function() {
-                                        $('#notification-count').hide(); // Hide the count after marking notifications as read
-                                    }
-                                });
-                            });
+                            // // Mark notifications as read when "My Clubs" is clicked
+                            // $('#my-clubs').click(function() {
+                            //     $.ajax({
+                            //         url: '/esas/esas_student/apis/notifications/notifications-mark-read.php',
+                            //         method: 'POST',
+                            //         data: { student_id: <?php echo $_SESSION['student_id']; ?> },
+                            //         success: function() {
+                            //             $('#notification-count').hide(); // Hide the count after marking notifications as read
+                            //         }
+                            //     });
+                            // });
                         </script>
 
                         <li>
@@ -402,39 +402,39 @@ try {
         $(document).ready(function() {
             let clubs = [];
 
-            function loadClubs(tab, containerId, dateLabel) {
-    $.ajax({
-        url: `/esas/esas_student/apis/student-clubs-${tab}-api.php`,
-        type: "GET",
-        success: function(response) {
-            const clubsContainer = document.getElementById(containerId);
-            if (response && response.length > 0) {
-                clubs = response.map(club => club.club_id); // Populate clubs array
-                clubsContainer.innerHTML = response.map(club => `
-                    <div class="col-md-4 card-container"> 
-                        <div class="card card-img-only">
-                            <span class="club-notification-badge" id="club-notification-${club.club_id}" style="display:none;"></span>
-                            <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}` : `/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}`}" 
-                               onclick="markClubNotificationsAsRead(${club.club_id})">
-                                <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
-                                <div class="overlay-text">
-                                    <h4>${club.clubName}</h4>
+        function loadClubs(tab, containerId, dateLabel) {
+            $.ajax({
+                url: `/esas/esas_student/apis/student-clubs-${tab}-api.php`,
+                type: "GET",
+                success: function(response) {
+                    const clubsContainer = document.getElementById(containerId);
+                    if (response && response.length > 0) {
+                        clubs = response.map(club => club.club_id); // Populate clubs array
+                        clubsContainer.innerHTML = response.map(club => `
+                            <div class="col-md-4 card-container"> 
+                                <div class="card card-img-only">
+                                    <span class="club-notification-badge" id="club-notification-${club.club_id}" style="display:none;"></span>
+                                    <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}` : `/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}`}" 
+                                    onclick="markClubNotificationsAsRead(${club.club_id})">
+                                        <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
+                                        <div class="overlay-text">
+                                            <h4>${club.clubName}</h4>
+                                        </div>
+                                    </a>
                                 </div>
-                            </a>
-                        </div>
-                    </div>
-                `).join('');
-                fetchNotificationCounts();
-            } else {
-                clubsContainer.innerHTML = '<p>No clubs found.</p>';
-            }
-        },
-        error: function() {
-            const clubsContainer = document.getElementById(containerId);
-            clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
+                            </div>
+                        `).join('');
+                        fetchNotificationCounts();
+                    } else {
+                        clubsContainer.innerHTML = '<p>No clubs found.</p>';
+                    }
+                },
+                error: function() {
+                    const clubsContainer = document.getElementById(containerId);
+                    clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
+                }
+            });
         }
-    });
-}
 
 
             function fetchNotificationCounts() {
