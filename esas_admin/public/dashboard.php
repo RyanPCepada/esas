@@ -590,7 +590,7 @@ try {
                                         <!-- Registry per SY -->
                                         <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Registry per SY</p>
+                                                <p>Total Registry per SY</p>
                                                 <div style="height: 100%; width: 100%; background-color: transparent;">
                                                     <canvas id="registryPerSYChart"></canvas>
                                                 </div>
