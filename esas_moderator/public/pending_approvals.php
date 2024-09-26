@@ -274,17 +274,17 @@ try {
 
                                 <script>
                                     function filterDashboard() {
-    var club_id = document.getElementById('clubDropdown').value;
-    var school_year = document.getElementById('schoolYearDropdown').value;
-    var queryParams = new URLSearchParams(window.location.search);
+                                        var club_id = document.getElementById('clubDropdown').value;
+                                        var school_year = document.getElementById('schoolYearDropdown').value;
+                                        var queryParams = new URLSearchParams(window.location.search);
 
-    // Update the club_id and school_year parameters in the URL
-    queryParams.set('club_id', club_id);
-    queryParams.set('school_year', school_year);
+                                        // Update the club_id and school_year parameters in the URL
+                                        queryParams.set('club_id', club_id);
+                                        queryParams.set('school_year', school_year);
 
-    // Navigate to the updated URL
-    window.location.search = queryParams.toString();
-}
+                                        // Navigate to the updated URL
+                                        window.location.search = queryParams.toString();
+                                    }
 
                                 </script>
 
@@ -323,7 +323,8 @@ try {
                                             s.department,
                                             s.course,
                                             s.profilePic,
-                                            MIN(r.dateApplied) AS dateApplied
+                                            MIN(r.dateApplied) AS dateApplied,
+                                            c.club_id
                                         FROM tbl_students s
                                         LEFT JOIN tbl_registration r ON s.student_id = r.student_id
                                         LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
@@ -397,9 +398,9 @@ try {
                                             <td>' . $course . '</td>
                                             <td>' . $dateApplied . '</td>
                                             <td class="text-center">
-                                                <a href="../public/crud/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                <a href="../public/crud/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                <a href="../public/crud/student_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                                <a href="../public/crud/pending_approval/pending_approval_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                <!-- <a href="../public/crud/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a> -->
+                                                <a href="../public/crud/registration_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
                                             </td>
                                         </tr>';
                                     }
