@@ -134,15 +134,6 @@ $disapprovedCount = $stmt->fetchColumn();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eSAS - Pending Approvals</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script>
-        function confirmAction(action) {
-            const confirmation = confirm(`Are you sure you want to ${action} this student?`);
-            if (confirmation) {
-                document.getElementById('action').value = action;
-                document.getElementById('approvalForm').submit();
-            }
-        }
-    </script>
 </head>
 <body>
 <div class="container">
@@ -209,26 +200,32 @@ $disapprovedCount = $stmt->fetchColumn();
                 </div>
 
 
-                <div class="card-footer text-center">
-
-                    <?php if ($clubsCount >= 2): ?>
-                        <form id="approvalForm" method="post">
-                            <input type="hidden" name="action" id="action" value="">
-                            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
-                            <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Students List</a>
-                        </form>
-                    <?php else: ?>
-                        <form id="approvalForm" method="post">
-                            <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve Student</button>
-                            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
-                            <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Students List</a>
-                        </form>
-                    <?php endif; ?>
+                <script>
+function confirmAction(action) {
+    const confirmation = confirm(`Are you sure you want to ${action} this student?`);
+    if (confirmation) {
+        document.getElementById('action').value = action;
+        document.getElementById('approvalForm').submit();
+    }
+}
+</script>
 
 
+<div class="card-footer text-center">
+    <form id="approvalForm" method="post">
+        <input type="hidden" name="action" id="action" value="">
+        <?php if ($clubsCount >= 2): ?>
+            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
+            <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Students List</a>
+        <?php else: ?>
+            <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve Student</button>
+            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
+            <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Students List</a>
+        <?php endif; ?>
+    </form>
+</div>
 
-                    
-                </div>
+
             </div>
         </div>
     </div>
