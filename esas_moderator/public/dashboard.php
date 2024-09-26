@@ -879,302 +879,292 @@ try {
 
                                     
                                         <!-- Year Level Numbers -->
-                                        <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
-                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Year Level Count</p>
-                                                <div style="height: 150px; background-color: transparent;">
-                                                    <div>
-                                                        <canvas id="studentBarChart"></canvas>
-                                                    </div>
-                                                    <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
-                                                    
-                                                    <?php
-                                                    // Get the selected club_id and school_year (month) from the URL 
-                                                    $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
-                                                    $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
+<div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+        <p>Year Level Count</p>
+        <div style="height: 150px; background-color: transparent;">
+            <div>
+                <canvas id="studentBarChart"></canvas>
+            </div>
+            <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
 
-                                                    try {
-                                                        // SQL Query to fetch year level counts, filtered by moderator, club_id, and dateApproved
-                                                        $sql = "
-                                                        SELECT s.year, COUNT(DISTINCT s.student_id) AS count
-                                                        FROM tbl_students s
-                                                        JOIN tbl_registration r ON s.student_id = r.student_id
-                                                        JOIN tbl_clubs_and_moderators cm ON r.club_id = cm.club_id
-                                                        WHERE r.status = 'active'
-                                                        AND cm.moderator_id = :moderator_id
-                                                        ";
+            <?php
+            // Get the selected club_id and school_year from the URL 
+            $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
+            $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
 
-                                                        // Add condition for club_id if it's set
-                                                        if ($club_id) {
-                                                            $sql .= " AND r.club_id = :club_id";
-                                                        }
+            try {
+                // Extract start and end years from selected school year
+                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
 
-                                                        // Add condition for dateApproved month if it's set
-                                                        if ($selectedMonth) {
-                                                            $sql .= " AND MONTH(r.dateApproved) <= :month";
-                                                        }
+                // SQL Query to fetch year level counts, filtered by moderator, club_id, and school year
+                $sql = "
+                SELECT s.year, COUNT(DISTINCT s.student_id) AS count
+                FROM tbl_students s
+                JOIN tbl_registration r ON s.student_id = r.student_id
+                JOIN tbl_clubs_and_moderators cm ON r.club_id = cm.club_id
+                WHERE r.status = 'active'
+                AND cm.moderator_id = :moderator_id
+                AND r.club_id = :club_id
+                AND r.dateApproved BETWEEN :start_date AND :end_date
+                GROUP BY s.year";
 
-                                                        $sql .= " GROUP BY s.year";
+                // Prepare and execute the query
+                $stmtCounts = $pdo->prepare($sql);
+                $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                $stmtCounts->bindParam(':club_id', $selectedClubId, PDO::PARAM_INT);
 
-                                                        $stmtCounts = $pdo->prepare($sql);
-                                                        $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                // Bind the start and end date based on the school year
+                $startDate = $startYear . '-08-01'; // Assuming school year starts in August
+                $endDate = $endYear . '-07-31'; // Assuming school year ends in July
+                $stmtCounts->bindParam(':start_date', $startDate);
+                $stmtCounts->bindParam(':end_date', $endDate);
 
-                                                        // Bind club_id parameter if it's set
-                                                        if ($club_id) {
-                                                            $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-                                                        }
+                $stmtCounts->execute();
 
-                                                        // Bind month parameter if it's set
-                                                        if ($selectedMonth) {
-                                                            $stmtCounts->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-                                                        }
+                // Fetch the results into an associative array
+                $yearData = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
 
-                                                        $stmtCounts->execute();
+                // Initialize arrays for years and counts
+                $years = ['1', '2', '3', '4']; // Ensure all years are included
+                $counts = [0, 0, 0, 0]; // Initialize with zeros
 
-                                                        // Fetch the results into an associative array
-                                                        $yearData = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
+                // Populate the counts array based on fetched data
+                foreach ($yearData as $row) {
+                    $year = (int)$row['year']; // Ensure $year is an integer
+                    $count = (int)$row['count']; // Ensure $count is an integer
 
-                                                        // Initialize arrays for years and counts
-                                                        $years = ['1', '2', '3', '4']; // Ensure all years are included
-                                                        $counts = [0, 0, 0, 0]; // Initialize with zeros
+                    // Check if $year is within the valid range
+                    if ($year >= 1 && $year <= 4) {
+                        $counts[$year - 1] = $count;
+                    }
+                }
 
-                                                        // Populate the counts array based on fetched data
-                                                        foreach ($yearData as $row) {
-                                                            $year = (int)$row['year']; // Ensure $year is an integer
-                                                            $count = (int)$row['count']; // Ensure $count is an integer
+                // SQL Query to get the total student count from tbl_students
+                $sqlTotalStudents = "
+                SELECT COUNT(DISTINCT student_id) AS total_student_count
+                FROM tbl_students";
 
-                                                            // Check if $year is within the valid range
-                                                            if ($year >= 1 && $year <= 4) {
-                                                                $counts[$year - 1] = $count;
-                                                            }
-                                                        }
+                $stmtTotalStudents = $pdo->prepare($sqlTotalStudents);
+                $stmtTotalStudents->execute();
+                $totalStudentCount = $stmtTotalStudents->fetchColumn();
 
-                                                        // SQL Query to get the total student count from tbl_students
-                                                        $sqlTotalStudents = "
-                                                        SELECT COUNT(DISTINCT student_id) AS total_student_count
-                                                        FROM tbl_students
-                                                        ";
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
+            ?>
 
-                                                        $stmtTotalStudents = $pdo->prepare($sqlTotalStudents);
-                                                        $stmtTotalStudents->execute();
-                                                        $totalStudentCount = $stmtTotalStudents->fetchColumn();
+            <!-- Include Chart.js -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-                                                    } catch (PDOException $e) {
-                                                        echo "Error: " . $e->getMessage();
-                                                    }
-                                                    ?>
+            <script>
+                // PHP arrays passed into JavaScript
+                const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+                const dataCounts = <?php echo json_encode($counts); ?>;
+                const totalStudentCount = <?php echo $totalStudentCount; ?>; // Get the total student count
 
-                                                    <!-- Include Chart.js -->
-                                                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                // Check if there is no data to display
+                const hasDataYearLevels = dataCounts.some(count => count > 0);
 
-                                                    <script>
-                                                        // PHP arrays passed into JavaScript
-                                                        const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
-                                                        const dataCounts = <?php echo json_encode($counts); ?>;
-                                                        const totalStudentCount = <?php echo $totalStudentCount; ?>; // Get the total student count
+                // Show or hide the "No Data" message based on data availability
+                const studentBarChartElement = document.getElementById('studentBarChart');
+                const noDataMessageYearLevels = document.getElementById('noDataMessageYearLevels');
 
-                                                        // Check if there is no data to display
-                                                        const hasDataYearLevels = dataCounts.some(count => count > 0);
+                if (!hasDataYearLevels) {
+                    studentBarChartElement.style.display = 'none';
+                    noDataMessageYearLevels.style.display = 'block';
+                } else {
+                    // Data for the chart
+                    const data = {
+                        labels: labels,
+                        datasets: [{
+                            data: dataCounts, // Dynamic data from PHP
+                            backgroundColor: ['blue', 'orange', 'green', 'red'], // Colors for bars
+                        }]
+                    };
 
-                                                        // Show or hide the "No Data" message based on data availability
-                                                        const studentBarChartElement = document.getElementById('studentBarChart');
-                                                        const noDataMessageYearLevels = document.getElementById('noDataMessageYearLevels');
+                    // Configurations for the chart with total student count as the peak limit
+                    const config = {
+                        type: 'bar',
+                        data: data,
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    suggestedMax: totalStudentCount // Set the total student count as the maximum y-axis value
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false // Remove the legend
+                                }
+                            }
+                        }
+                    };
 
-                                                        if (!hasDataYearLevels) {
-                                                            studentBarChartElement.style.display = 'none';
-                                                            noDataMessageYearLevels.style.display = 'block';
-                                                        } else {
-                                                            // Data for the chart
-                                                            const data = {
-                                                                labels: labels,
-                                                                datasets: [{
-                                                                    data: dataCounts, // Dynamic data from PHP
-                                                                    backgroundColor: ['blue', 'orange', 'green', 'red'], // Colors for bars
-                                                                }]
-                                                            };
+                    // Render the chart
+                    const studentBarChart = new Chart(
+                        studentBarChartElement,
+                        config
+                    );
+                }
+            </script>
 
-                                                            // Configurations for the chart with total student count as the peak limit
-                                                            const config = {
-                                                                type: 'bar',
-                                                                data: data,
-                                                                options: {
-                                                                    scales: {
-                                                                        y: {
-                                                                            beginAtZero: true,
-                                                                            suggestedMax: totalStudentCount // Set the total student count as the maximum y-axis value
-                                                                        }
-                                                                    },
-                                                                    plugins: {
-                                                                        legend: {
-                                                                            display: false // Remove the legend
-                                                                        }
-                                                                    }
-                                                                }
-                                                            };
-
-                                                            // Render the chart
-                                                            const studentBarChart = new Chart(
-                                                                studentBarChartElement,
-                                                                config
-                                                            );
-                                                        }
-                                                    </script>
-
-                                                </div>
-                                            </div>
-                                        </div>
+        </div>
+    </div>
+</div>
 
 
-                                        <!-- Student Gender -->
-                                        <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
-                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Student Gender</p>
-                                                <div style="height: 150px; position: relative;">
-                                                    <?php
-                                                    try {
-                                                        // Get the selected club_id and month (school_year) from the URL
-                                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
-                                                        $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
 
-                                                        // Prepare the SQL statement to get gender counts filtered by club, moderator, and date
-                                                        $sqlCounts = "
-                                                            SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
-                                                            FROM tbl_students s
-                                                            JOIN tbl_registration r ON s.student_id = r.student_id
-                                                            JOIN tbl_clubs c ON r.club_id = c.club_id
-                                                            JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
-                                                            WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
-                                                        ";
+                                        <!-- Student Gender --> 
+<div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+        <p>Student Gender</p>
+        <div style="height: 150px; position: relative;">
+            <?php
+            try {
+                // Get the selected club_id and school_year from the URL
+                $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
+                $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
 
-                                                        // Add condition for club_id if it's set
-                                                        if ($club_id) {
-                                                            $sqlCounts .= " AND r.club_id = :club_id";
-                                                        }
+                // Determine the start and end year for the selected school year
+                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+                $startDate = "$startYear-08-01"; // Start from August 1 of the start year
+                $endDate = "$endYear-07-31"; // End on July 31 of the end year
 
-                                                        // Add condition for the selected month, if applicable
-                                                        if ($selectedMonth) {
-                                                            $sqlCounts .= " AND MONTH(r.dateApproved) <= :month";
-                                                        }
+                // Prepare the SQL statement to get gender counts filtered by club, moderator, and date
+                $sqlCounts = "
+                    SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
+                    FROM tbl_students s
+                    JOIN tbl_registration r ON s.student_id = r.student_id
+                    JOIN tbl_clubs c ON r.club_id = c.club_id
+                    JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                    WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
+                    AND r.dateApproved BETWEEN :startDate AND :endDate
+                ";
 
-                                                        $sqlCounts .= " GROUP BY s.gender";
+                // Add condition for club_id if it's set
+                if ($selectedClubId) {
+                    $sqlCounts .= " AND r.club_id = :club_id";
+                }
 
-                                                        $stmtCounts = $pdo->prepare($sqlCounts);
-                                                        $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                $sqlCounts .= " GROUP BY s.gender";
 
-                                                        // Bind club_id parameter if it's set
-                                                        if ($club_id) {
-                                                            $stmtCounts->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-                                                        }
+                $stmtCounts = $pdo->prepare($sqlCounts);
+                $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                $stmtCounts->bindParam(':startDate', $startDate);
+                $stmtCounts->bindParam(':endDate', $endDate);
 
-                                                        // Bind month parameter if it's set
-                                                        if ($selectedMonth) {
-                                                            $stmtCounts->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-                                                        }
+                // Bind club_id parameter if it's set
+                if ($selectedClubId) {
+                    $stmtCounts->bindParam(':club_id', $selectedClubId, PDO::PARAM_INT);
+                }
 
-                                                        $stmtCounts->execute();
-                                                        $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
+                $stmtCounts->execute();
+                $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
 
-                                                        // Initialize arrays for gender counts
-                                                        $genderCounts = [
-                                                            'Male' => 0,
-                                                            'Female' => 0
-                                                        ];
+                // Initialize arrays for gender counts
+                $genderCounts = [
+                    'Male' => 0,
+                    'Female' => 0
+                ];
 
-                                                        // Populate the counts array based on fetched data
-                                                        foreach ($counts as $row) {
-                                                            if (array_key_exists($row['gender'], $genderCounts)) {
-                                                                $genderCounts[$row['gender']] = $row['count'];
-                                                            }
-                                                        }
+                // Populate the counts array based on fetched data
+                foreach ($counts as $row) {
+                    if (array_key_exists($row['gender'], $genderCounts)) {
+                        $genderCounts[$row['gender']] = $row['count'];
+                    }
+                }
 
-                                                        // Prepare the SQL statement to get the total student count in the system
-                                                        $sqlTotal = "SELECT COUNT(DISTINCT student_id) AS total_count FROM tbl_students";
-                                                        $stmtTotal = $pdo->query($sqlTotal);
-                                                        $totalCount = $stmtTotal->fetchColumn();
+                // Prepare the SQL statement to get the total student count in the system
+                $sqlTotal = "SELECT COUNT(DISTINCT student_id) AS total_count FROM tbl_students";
+                $stmtTotal = $pdo->query($sqlTotal);
+                $totalCount = $stmtTotal->fetchColumn();
 
-                                                        // Function to round up to the nearest multiple of 5
-                                                        function roundUpToNearest5($num) {
-                                                            return $num > 0 ? ceil($num / 5) * 5 : 5;
-                                                        }
+                // Function to round up to the nearest multiple of 5
+                function roundUpToNearest5($num) {
+                    return $num > 0 ? ceil($num / 5) * 5 : 5;
+                }
 
-                                                        // Calculate the peak limit
-                                                        $peakLimit = roundUpToNearest5($totalCount);
+                // Calculate the peak limit
+                $peakLimit = roundUpToNearest5($totalCount);
 
-                                                        // Prepare the data for JavaScript
-                                                        $labels = array_keys($genderCounts);
-                                                        $data = array_values($genderCounts);
+                // Prepare the data for JavaScript
+                $labels = array_keys($genderCounts);
+                $data = array_values($genderCounts);
 
-                                                    } catch (PDOException $e) {
-                                                        // Handle query error
-                                                        echo 'Error: ' . $e->getMessage();
-                                                    }
-                                                    ?>
+            } catch (PDOException $e) {
+                // Handle query error
+                echo 'Error: ' . $e->getMessage();
+            }
+            ?>
 
-                                                    <canvas id="studentGenderChart" style="width: 100%; height: 100%;"></canvas>
-                                                    <p id="noDataMessageGender" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
+            <canvas id="studentGenderChart" style="width: 100%; height: 100%;"></canvas>
+            <p id="noDataMessageGender" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
 
-                                                    <script>
-                                                        document.addEventListener('DOMContentLoaded', function() {
-                                                            const ctx = document.getElementById('studentGenderChart').getContext('2d');
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const ctx = document.getElementById('studentGenderChart').getContext('2d');
 
-                                                            // Data from PHP
-                                                            const labels = <?php echo json_encode($labels); ?>;
-                                                            const dataCounts = <?php echo json_encode($data); ?>;
-                                                            const peakLimit = <?php echo $peakLimit; ?>;
+                    // Data from PHP
+                    const labels = <?php echo json_encode($labels); ?>;
+                    const dataCounts = <?php echo json_encode($data); ?>;
+                    const peakLimit = <?php echo $peakLimit; ?>;
 
-                                                            // Check if there is no data to display
-                                                            const hasDataGender = dataCounts.some(count => count > 0);
+                    // Check if there is no data to display
+                    const hasDataGender = dataCounts.some(count => count > 0);
 
-                                                            // Show or hide the "No Data" message based on data availability
-                                                            const studentGenderChartElement = document.getElementById('studentGenderChart');
-                                                            const noDataMessageGender = document.getElementById('noDataMessageGender');
+                    // Show or hide the "No Data" message based on data availability
+                    const studentGenderChartElement = document.getElementById('studentGenderChart');
+                    const noDataMessageGender = document.getElementById('noDataMessageGender');
 
-                                                            if (!hasDataGender) {
-                                                                studentGenderChartElement.style.display = 'none';  // Hide the chart
-                                                                noDataMessageGender.style.display = 'block';  // Show "No data available" message
-                                                            } else {
-                                                                // Data for the chart
-                                                                const data = {
-                                                                    labels: labels,
-                                                                    datasets: [{
-                                                                        data: dataCounts,
-                                                                        backgroundColor: ['#3498db', '#e74c3c'], // Male: blue, Female: red
-                                                                        borderColor: ['#2980b9', '#c0392b'],
-                                                                        borderWidth: 1
-                                                                    }]
-                                                                };
+                    if (!hasDataGender) {
+                        studentGenderChartElement.style.display = 'none';  // Hide the chart
+                        noDataMessageGender.style.display = 'block';  // Show "No data available" message
+                    } else {
+                        // Data for the chart
+                        const data = {
+                            labels: labels,
+                            datasets: [{
+                                data: dataCounts,
+                                backgroundColor: ['#3498db', '#e74c3c'], // Male: blue, Female: red
+                                borderColor: ['#2980b9', '#c0392b'],
+                                borderWidth: 1
+                            }]
+                        };
 
-                                                                // Configurations for the chart
-                                                                const config = {
-                                                                    type: 'bar',
-                                                                    data: data,
-                                                                    options: {
-                                                                        indexAxis: 'y', // Horizontal bar chart
-                                                                        scales: {
-                                                                            x: {
-                                                                                beginAtZero: true,
-                                                                                max: peakLimit // Set the maximum value to the nearest higher multiple of 5
-                                                                            },
-                                                                            y: {
-                                                                                // Automatically handled by Chart.js for labels
-                                                                            }
-                                                                        },
-                                                                        plugins: {
-                                                                            legend: {
-                                                                                display: false // Hide the legend
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                };
+                        // Configurations for the chart
+                        const config = {
+                            type: 'bar',
+                            data: data,
+                            options: {
+                                indexAxis: 'y', // Horizontal bar chart
+                                scales: {
+                                    x: {
+                                        beginAtZero: true,
+                                        max: peakLimit // Set the maximum value to the nearest higher multiple of 5
+                                    },
+                                    y: {
+                                        // Automatically handled by Chart.js for labels
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: false // Hide the legend
+                                    }
+                                }
+                            }
+                        };
 
-                                                                // Render the chart
-                                                                new Chart(ctx, config);
-                                                            }
-                                                        });
-                                                    </script>
-                                                </div>
-                                            </div>
-                                        </div>
+                        // Render the chart
+                        new Chart(ctx, config);
+                    }
+                });
+            </script>
+        </div>
+    </div>
+</div>
+
 
                                 </div>
 
