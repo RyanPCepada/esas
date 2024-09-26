@@ -508,7 +508,7 @@ try {
                                             }
                                             ?>
                                             <!-- Canvas for the pie chart -->
-                                            <canvas id="pieChart" style="height: 100%;"></canvas>
+                                            <canvas id="pieChart" style="height: 100%; margin: auto;"></canvas>
                                             <p id="noDataMessage" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 35%;"><em>No students.</em></p>
 
                                             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -720,7 +720,7 @@ try {
                                         <!-- Year Level Count -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Year Level Count</p>
+                                                <p>Total Year Level Count</p>
                                                 <div style="height: 150px; background-color: transparent;">
                                                     <div>
                                                         <canvas id="studentBarChart"></canvas>
@@ -842,7 +842,7 @@ try {
                                         <!-- Student Gender -->
                                         <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Student Gender</p>
+                                                <p>Total Student Gender</p>
                                                 <div style="height: 150px; position: relative;">
                                                     <?php
                                                     try {
