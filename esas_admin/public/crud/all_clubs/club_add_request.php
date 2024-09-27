@@ -126,6 +126,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     unset($pdo);
 }
+$clubName = isset($_GET['clubName']) ? htmlspecialchars($_GET['clubName']) : '';
+$coverPhoto = isset($_GET['coverPhoto']) ? htmlspecialchars($_GET['coverPhoto']) : '';
 ?>
 
 
