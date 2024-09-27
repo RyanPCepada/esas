@@ -499,6 +499,18 @@ function loadClubDetails(requestId) {
                     $('#modalRequestLetter').html('<p>No attached request letter.</p>');
                 }
 
+                // Conditional display of buttons based on status
+                if (response.status === 'pending') {
+                    $('#updateButton').show();
+                    $('#deleteButton').show();
+                } else if (response.status === 'disapproved') {
+                    $('#updateButton').hide();
+                    $('#deleteButton').show();
+                } else if (response.status === 'approved') {
+                    $('#updateButton').hide();
+                    $('#deleteButton').hide();
+                }
+
                 // Show the modal
                 $('#clubDetailsModal').modal('show');
             }
@@ -508,6 +520,7 @@ function loadClubDetails(requestId) {
         }
     });
 }
+
 
 $(document).on('click', '#updateButton', function(e) {
     e.preventDefault();
