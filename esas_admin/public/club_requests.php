@@ -200,7 +200,7 @@ try {
                                 $sql = "SELECT 
                                             r.request_id,
                                             r.clubName,
-                                            r.description,
+                                            r.goal,
                                             r.activities,
                                             r.status,
                                             r.coverPhoto,

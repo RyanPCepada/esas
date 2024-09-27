@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         /* Use the same font and wrapper styles as previous pages */
         body {
-            font-family: 'Arial', sans-serif; /* Replace 'Arial' with your preferred font */
+            /* font-family: 'Arial', sans-serif; Replace 'Arial' with your preferred font */
             background-color: #f4f4f9;
             margin: 0;
             padding: 0;

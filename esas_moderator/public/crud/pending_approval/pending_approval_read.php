@@ -201,29 +201,29 @@ $disapprovedCount = $stmt->fetchColumn();
 
 
                 <script>
-function confirmAction(action) {
-    const confirmation = confirm(`Are you sure you want to ${action} this student?`);
-    if (confirmation) {
-        document.getElementById('action').value = action;
-        document.getElementById('approvalForm').submit();
-    }
-}
-</script>
+                    function confirmAction(action) {
+                        const confirmation = confirm(`Are you sure you want to ${action} this student?`);
+                        if (confirmation) {
+                            document.getElementById('action').value = action;
+                            document.getElementById('approvalForm').submit();
+                        }
+                    }
+                </script>
 
 
-<div class="card-footer text-center">
-    <form id="approvalForm" method="post">
-        <input type="hidden" name="action" id="action" value="">
-        <?php if ($clubsCount >= 2): ?>
-            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
-            <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Students List</a>
-        <?php else: ?>
-            <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve Student</button>
-            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
-            <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Students List</a>
-        <?php endif; ?>
-    </form>
-</div>
+                <div class="card-footer text-center">
+                    <form id="approvalForm" method="post">
+                        <input type="hidden" name="action" id="action" value="">
+                        <?php if ($clubsCount >= 2): ?>
+                            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
+                            <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Students List</a>
+                        <?php else: ?>
+                            <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve Student</button>
+                            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
+                            <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Students List</a>
+                        <?php endif; ?>
+                    </form>
+                </div>
 
 
             </div>

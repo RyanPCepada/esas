@@ -7,7 +7,9 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
     $sql = "SELECT 
                 r.request_id, 
                 r.clubName, 
-                r.description, 
+                r.goal, 
+                r.mission,  -- Add mission to the selection
+                r.vision,   -- Add vision to the selection
                 r.activities, 
                 r.status, 
                 r.coverPhoto, 
@@ -29,7 +31,9 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
 
                 // Initialize variables
                 $clubName = htmlspecialchars($row["clubName"] ?? ''); 
-                $description = htmlspecialchars($row["description"] ?? ''); 
+                $goal = htmlspecialchars($row["goal"] ?? ''); 
+                $mission = htmlspecialchars($row["mission"] ?? ''); // New mission variable
+                $vision = htmlspecialchars($row["vision"] ?? '');   // New vision variable
                 $activities = htmlspecialchars($row["activities"] ?? ''); 
                 $status = strtolower(htmlspecialchars($row["status"] ?? '')); 
                 $coverPhoto = htmlspecialchars($row["coverPhoto"] ?: "default-cover.jpg"); 
@@ -54,13 +58,23 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
 } 
 
 
+
 // Handle approval or disapproval
 if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprove'])) {
     $newStatus = $_POST["action"] === 'approve' ? 'approved' : 'disapproved'; // Changed to lowercase
-    $updateSql = "UPDATE tbl_club_requests SET status = :status WHERE request_id = :request_id";
+    $dateApproved = null; // Default to null for disapproval
+    if ($newStatus === 'approved') {
+        $dateApproved = date('Y-m-d H:i:s'); // Get current date and time
+    }
+
+    $updateSql = "UPDATE tbl_club_requests 
+                   SET status = :status, 
+                       dateApproved = :dateApproved 
+                   WHERE request_id = :request_id";
 
     if ($updateStmt = $pdo->prepare($updateSql)) {
         $updateStmt->bindParam(":status", $newStatus);
+        $updateStmt->bindParam(":dateApproved", $dateApproved);
         $updateStmt->bindParam(":request_id", $request_id, PDO::PARAM_INT);
 
         if ($updateStmt->execute()) {
@@ -73,6 +87,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     }
     unset($updateStmt);
 }
+
 
 ?>
 
@@ -109,11 +124,13 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                                     <h4><?php echo $requestedByName; ?></h4>
                                 </p>
                                 <hr>
-                                <p><strong>Description: </strong><?php echo $description; ?></p>
+                                <p><strong>Goal: </strong><?php echo $goal; ?></p>
+                                <p><strong>Mission: </strong><?php echo $mission; ?></p> <!-- Display mission -->
+                                <p><strong>Vision: </strong><?php echo $vision; ?></p>   <!-- Display vision -->
                                 <p><strong>Activities: </strong><?php echo $activities; ?></p>
                                 <p><strong>Status: </strong><?php echo $status; ?></p>
                                 <p><strong>Date Requested: </strong><?php echo $dateRequested; ?></p> 
-                                <p><strong>Date Modified: </strong><?php echo $dateModified; ?></p>
+                                <p><strong>Date Modified: </strong><?php echo $dateModified; ?></p> 
                             </div>
                         </div>
                     </div>
@@ -124,13 +141,13 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                             <form method="post">
                                 <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
                                 <button type="submit" name="action" value="disapprove" class="btn btn-danger">Disapprove</button>
-                                <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Requests List</a>
+                                <a href="../../club_requests.php" class="btn btn-secondary">Back to Requests List</a>
                             </form>
                         <?php elseif ($status === 'approved'): ?>
                             <a href="../../crud/all_clubs/club_create.php?clubName=<?php echo urlencode($clubName); ?>&coverPhoto=<?php echo urlencode($coverPhoto); ?>" class="btn btn-success">Add to Clubs</a>
-                            <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Requests List</a>
+                            <a href="../../club_requests.php" class="btn btn-secondary">Back to Requests List</a>
                         <?php else: ?>
-                            <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Requests List</a>
+                            <a href="../../club_requests.php" class="btn btn-secondary">Back to Requests List</a>
                         <?php endif; ?>
                     </div>
 

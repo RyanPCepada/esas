@@ -27,7 +27,7 @@ switch ($method) {
 
         // Prepare and execute the query to fetch details for the specific club request
         $stmt = $pdo->prepare('
-            SELECT request_id, clubName, description, activities, status, coverPhoto, dateRequested, dateModified
+            SELECT request_id, clubName, goal, activities, status, coverPhoto, dateRequested, dateModified
             FROM tbl_club_requests
             WHERE request_id = :request_id AND student_id = :student_id
         ');

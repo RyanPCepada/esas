@@ -41,7 +41,7 @@ try {
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
+    <meta name="goal" content="" />
     <meta name="author" content="" />
     <title>Sample Template</title>
     <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
@@ -326,9 +326,9 @@ try {
                                     <div class="row g-0">
                                         <div class="d-flex align-items-center justify-content-end pb-3 mt-2 mb-3">
                                             <!-- <h2 class="text-muted mt-0 mb-0">My Club Requests</h2> -->
-                                            <button type="button" class="btn btn-primary" id="request-club-btn" data-bs-toggle="modal" data-bs-target="#requestClubModal" style="width: 160px; border-radius: 5px;">
+                                            <a href="club_request.php" class="btn btn-primary" id="request-club-btn" style="width: 160px; border-radius: 5px;">
                                                 Request for a Club
-                                            </button>
+                                            </a>
                                         </div>
 
                                         <!-- Modal HTML -->
@@ -347,8 +347,8 @@ try {
                                                                 <input type="text" name="clubName" class="form-control" id="clubName" required>
                                                             </div>
                                                             <div class="form-group mb-3">
-                                                                <label for="description">What is the primary goal of this club?</label>
-                                                                <textarea name="description" class="form-control" id="description" rows="3" required></textarea>
+                                                                <label for="goal">What is the primary goal of this club?</label>
+                                                                <textarea name="goal" class="form-control" id="goal" rows="3" required></textarea>
                                                             </div>
                                                             <div class="form-group mb-3">
                                                                 <label for="activities">Proposed activities</label>
@@ -505,8 +505,8 @@ try {
                 $('#modalDateRequested').text(`Date Requested: ${response.dateRequested}`);
                 $('#modalStatus').text(`Status: ${response.status}`);
 
-                // Set description and activities
-                $('#modalDescription').text(response.description);
+                // Set goal and activities
+                $('#modalGoal').text(response.goal);
                 $('#modalActivities').text(response.activities);
 
                 // Show the modal
@@ -578,8 +578,8 @@ try {
                     <p id="modalStatus" class="text-right"></p>
                 </div>
                 <hr>
-                <label>Description:</label>
-                <p id="modalDescription" class="modal-paragraph"></p>
+                <label>Goal:</label>
+                <p id="modalGoal" class="modal-paragraph"></p>
                 <label>Activities:</label>
                 <p id="modalActivities" class="modal-paragraph"></p>
             </div>

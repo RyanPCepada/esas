@@ -24,7 +24,7 @@ switch ($method) {
 
         // Prepare and execute the query to fetch approved requests for the specific student
         $stmt = $pdo->prepare('
-            SELECT r.request_id, r.clubName, r.description, r.activities, r.status, r.coverPhoto, r.dateModified,
+            SELECT r.request_id, r.clubName, r.goal, r.activities, r.status, r.coverPhoto, r.dateModified,
                    s.firstName, s.lastName
             FROM tbl_club_requests r
             LEFT JOIN tbl_students s ON r.student_id = s.student_id
