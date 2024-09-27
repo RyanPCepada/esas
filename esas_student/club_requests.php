@@ -472,7 +472,7 @@ try {
                     $('#modalDateRequested').html(`<strong>Date Requested:</strong> ${response.dateRequested}`);
 
                     // Set status
-                    $('#modalStatus').html(`<strong>Status:</strong> ${response.status}`);
+                    $('#modalStatus').html(`<strong class="text-danger">Status:</strong> ${response.status}`);
 
                     // Conditionally set the approved or disapproved date
                     if (response.status === 'approved') {
@@ -598,27 +598,38 @@ $(document).on('click', '#updateButton', function(e) {
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 id="modalClubName"></h4>
+                <h4 class="text-muted" id="modalClubName"></h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 15px;">
                 <div id="modalCoverPhoto" class="text-center">
-                    <img src="" alt="Cover Photo" class="img-fluid">
+                    <img src="" alt="Cover Photo" class="img-fluid" style="border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
                 </div>
-                <div class="mt-3">
+                <div class="mt-4">
                     <p id="modalStatus" class="text-left m-0"></p>
                     <p id="modalDateRequested" class="text-left m-0"></p>
                     <p id="modalDateApprovedOrDisapproved" class="text-left m-0"></p>
                 </div>
                 <hr>
-                <strong>Goal:</strong>
-                <p id="modalGoal" class="modal-paragraph"></p>
-                <strong>Mission:</strong>
-                <p id="modalMission" class="modal-paragraph"></p>
-                <strong>Vision:</strong>
-                <p id="modalVision" class="modal-paragraph"></p>
-                <strong>Activities:</strong>
-                <p id="modalActivities" class="modal-paragraph"></p>
+                <div class="card p-2 pb-0 mt-2 bg-light">
+                    <strong>Goal:</strong>
+                    <p id="modalGoal" class="modal-paragraph"></p>
+                </div>
+
+                <div class="card p-2 pb-0 mt-2 bg-light">
+                    <strong>Mission:</strong>
+                    <p id="modalMission" class="modal-paragraph"></p>
+                </div>
+
+                <div class="card p-2 pb-0 mt-2 bg-light">
+                    <strong>Vision:</strong>
+                    <p id="modalVision" class="modal-paragraph"></p>
+                </div>
+
+                <div class="card p-2 pb-0 mt-2 bg-light">
+                    <strong>Activities:</strong>
+                    <p id="modalActivities" class="modal-paragraph"></p>
+                </div>
 
                 <hr>
                 <strong>Request Letter:</strong>
