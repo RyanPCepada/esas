@@ -545,6 +545,36 @@ $(document).on('click', '#updateButton', function(e) {
     }
 });
 
+$(document).on('click', '#deleteButton', function(e) {
+    e.preventDefault();
+    const requestId = $('#request_id').val(); // Get the value from the hidden input
+    if (requestId) {
+        if (confirm('Are you sure you want to delete this club request?')) {
+            // Make an AJAX call to delete the club request
+            $.ajax({
+                url: '/esas/esas_student/crud/club_requests/club_request_delete.php',
+                type: 'POST',
+                data: { request_id: requestId },
+                success: function(response) {
+                    if (response.success) {
+                        alert('Club request deleted successfully.');
+                        // Optionally, reload the page or close the modal
+                        window.location.reload(); // You can also redirect to another page
+                    } else {
+                        alert('Failed to delete the club request.');
+                    }
+                },
+                error: function() {
+                    alert('Error occurred while deleting the club request. Please try again.');
+                }
+            });
+        }
+    } else {
+        alert('Request ID not found.');
+    }
+});
+
+
 
 
 
