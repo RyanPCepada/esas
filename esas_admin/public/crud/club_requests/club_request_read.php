@@ -124,9 +124,9 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                                             $fileType = pathinfo($requestLetter, PATHINFO_EXTENSION);
                                             $fileIcon = ($fileType === 'pdf') ? '/esas/esas_student/icons/ICON_PDF.png' :
                                                         (($fileType === 'doc' || $fileType === 'docx') ? '/esas/esas_student/icons/ICON_WORD.png' : ''); ?>
-                                            <div class="d-flex align-items-center justify-content-center" style="cursor: pointer;" onclick="window.open('/esas/esas_student/request_letter/<?php echo $requestLetter; ?>', '_blank')">
+                                            <div class="d-flex align-items-center justify-content-center" style="cursor: pointer;" onclick="window.open('/esas/esas_student/request_letters/<?php echo $requestLetter; ?>', '_blank')">
                                                 <img src="<?php echo $fileIcon; ?>" alt="<?php echo strtoupper($fileType); ?> File" style="width: 70px; margin-right: 10px;">
-                                                <a href="/esas/esas_student/request_letter/<?php echo $requestLetter; ?>" target="_blank" style="color: blue; text-decoration: underline;">See Attached Request Letter</a>
+                                                <a href="/esas/esas_student/request_letters/<?php echo $requestLetter; ?>" target="_blank" style="color: blue; text-decoration: underline;">See Attached Request Letter</a>
                                             </div>
                                         <?php else: ?>
                                             <p>No attached request letter.</p>
@@ -137,32 +137,32 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
 
                             <div class="col-md-8">
-    <p>
-        <strong>Request from: </strong><br>
-        <img class="mt-2 mb-0" src="/esas/esas_student/images/<?php echo $profilePic; ?>" 
-            alt="Profile Picture" 
-            style="width: 100px; height: auto; border-radius: 50%;" />
-        <h3 class="text-muted"><?php echo $requestedByName; ?></h3>
-        <p><strong>Student ID: </strong><?php echo $student_id; ?></p>
-    </p>
-    <hr>
-    <div class="container mt-3 p-0">
-            <p><strong>Goal: </strong><br><?php echo htmlspecialchars($goal); ?></p>
-      
-    
-            <p><strong>Mission: </strong><br><?php echo htmlspecialchars($mission); ?></p> <!-- Display mission -->
-        
-            <p><strong>Vision: </strong><br><?php echo htmlspecialchars($vision); ?></p>   <!-- Display vision -->
-        
-            <p><strong>Activities: </strong><br><?php echo htmlspecialchars($activities); ?></p>
-        
-            <hr>
-    
-            <p>Status: </strong><?php echo htmlspecialchars($status); ?></p>
-            <p>Date Requested: </strong><?php echo htmlspecialchars($dateRequested); ?></p> 
-</div>
+                                <p>
+                                    <strong>Request from: </strong><br>
+                                    <img class="mt-2 mb-0" src="/esas/esas_student/images/<?php echo $profilePic; ?>" 
+                                        alt="Profile Picture" 
+                                        style="width: 100px; height: auto; border-radius: 50%;" />
+                                    <h3 class="text-muted"><?php echo $requestedByName; ?></h3>
+                                    <p><strong>Student ID: </strong><?php echo $student_id; ?></p>
+                                </p>
+                                <hr>
+                                <div class="container mt-3 p-0">
+                                        <p><strong>Goal: </strong><br><?php echo htmlspecialchars($goal); ?></p>
+                                
+                                
+                                        <p><strong>Mission: </strong><br><?php echo htmlspecialchars($mission); ?></p> <!-- Display mission -->
+                                    
+                                        <p><strong>Vision: </strong><br><?php echo htmlspecialchars($vision); ?></p>   <!-- Display vision -->
+                                    
+                                        <p><strong>Activities: </strong><br><?php echo htmlspecialchars($activities); ?></p>
+                                    
+                                        <hr>
+                                
+                                        <p>Status: </strong><?php echo htmlspecialchars($status); ?></p>
+                                        <p>Date Requested: </strong><?php echo htmlspecialchars($dateRequested); ?></p> 
+                                </div>
 
-</div>
+                            </div>
 
                         </div>
                     </div>

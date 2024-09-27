@@ -27,7 +27,7 @@ switch ($method) {
 
         // Prepare and execute the query to fetch details for the specific club request
         $stmt = $pdo->prepare('
-            SELECT request_id, clubName, goal, activities, status, coverPhoto, requestLetter, dateRequested, dateModified
+            SELECT request_id, clubName, goal, mission, vision, activities, status, coverPhoto, requestLetter, dateDecided, dateModified, dateRequested
             FROM tbl_club_requests
             WHERE request_id = :request_id AND student_id = :student_id
         ');
@@ -36,8 +36,9 @@ switch ($method) {
 
         if ($result) {
             // Format the dateRequested and dateModified fields
-            $result['dateRequested'] = (new DateTime($result['dateRequested']))->format('F j, Y'); // Format the date
+            $result['dateDecided'] = (new DateTime($result['dateDecided']))->format('F j, Y'); // Format the date
             $result['dateModified'] = (new DateTime($result['dateModified']))->format('F j, Y'); // Format the date
+            $result['dateRequested'] = (new DateTime($result['dateRequested']))->format('F j, Y'); // Format the date
 
             echo json_encode($result);
         } else {

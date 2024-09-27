@@ -43,7 +43,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="goal" content="" />
     <meta name="author" content="" />
-    <title>Sample Template</title>
+    <title>eSAS - Club Requests</title>
     <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -205,6 +205,9 @@ try {
         }
 
 
+        .btn {
+            border-radius: 5px;
+        }
 
 
         .notification-badge {
@@ -326,7 +329,7 @@ try {
                                     <div class="row g-0">
                                         <div class="d-flex align-items-center justify-content-end pb-3 mt-2 mb-3">
                                             <!-- <h2 class="text-muted mt-0 mb-0">My Club Requests</h2> -->
-                                            <a href="club_request.php" class="btn btn-primary" id="request-club-btn" style="width: 160px; border-radius: 5px;">
+                                            <a href="../esas_student/crud/club_requests/club_request_create.php" class="btn btn-primary" id="request-club-btn" style="width: 160px; border-radius: 5px;">
                                                 Request for a Club
                                             </a>
                                         </div>
@@ -435,6 +438,7 @@ try {
                                     </div>
                                 </a>
                             </div>
+                            <!-- <p class="request-id">Request ID: ${club.request_id}</p> -->
                         </div>
                     `).join('');
                 } else {
@@ -448,7 +452,10 @@ try {
         });
     }
 
-    function loadClubDetails(requestId) { 
+
+
+
+function loadClubDetails(requestId) { 
     $.ajax({
         url: `/esas/esas_student/apis/club-request-details-api.php`,
         type: "GET",
@@ -465,8 +472,14 @@ try {
                 $('#modalDateRequested').text(`Date Requested: ${response.dateRequested}`);
                 $('#modalStatus').text(`Status: ${response.status}`);
 
-                // Set goal and activities
+                // Set Request ID
+                $('#modalRequestId').text(response.request_id); // Display the request ID
+                $('#request_id').val(response.request_id); // Set the value of the hidden input
+
+                // Set goal, mission, vision, and activities
                 $('#modalGoal').text(response.goal);
+                $('#modalMission').text(response.mission);
+                $('#modalVision').text(response.vision);
                 $('#modalActivities').text(response.activities);
 
                 // Handle the request letter (if exists)
@@ -479,7 +492,7 @@ try {
                     $('#modalRequestLetter').html(`
                         <div class="d-flex align-items-center">
                             <img src="${fileIcon}" alt="${fileType.toUpperCase()} File" style="width: 100px; margin: 10px;">
-                            <a href="/esas/esas_student/request_letter/${response.requestLetter}" target="_blank" style="color: blue; text-decoration: underline; margin-left: 5px;">See Your Attached Request Letter</a>
+                            <a href="/esas/esas_student/request_letters/${response.requestLetter}" target="_blank" style="color: blue; text-decoration: underline; margin-left: 5px;">See Your Attached Request Letter</a>
                         </div>
                     `);
                 } else {
@@ -495,6 +508,17 @@ try {
         }
     });
 }
+
+$(document).on('click', '#updateButton', function(e) {
+    e.preventDefault();
+    const requestId = $('#request_id').val(); // Get the value from the hidden input
+    if (requestId) {
+        window.location.href = `../esas_student/crud/club_requests/club_request_update.php?request_id=${requestId}`;
+    } else {
+        alert('Request ID not found.');
+    }
+});
+
 
 
 
@@ -540,6 +564,10 @@ try {
     </script>
 
 
+
+
+
+
 <div id="clubDetailsModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -558,6 +586,10 @@ try {
                 <hr>
                 <label>Goal:</label>
                 <p id="modalGoal" class="modal-paragraph"></p>
+                <label>Mission:</label>
+                <p id="modalMission" class="modal-paragraph"></p>
+                <label>Vision:</label>
+                <p id="modalVision" class="modal-paragraph"></p>
                 <label>Activities:</label>
                 <p id="modalActivities" class="modal-paragraph"></p>
 
@@ -567,11 +599,17 @@ try {
                 <div class="card mt-3 p-3 align-items-center bg-light" id="modalRequestLetter" style="border-radius: 15px;"></div>
             </div>
             <div class="modal-footer">
+                <div class="text-center align-items-center justify-content-center">
+                    <input type="hidden" name="request_id" id="request_id" value="">
+                    <a href="#" class="btn btn-warning" id="updateButton" title="Update Request" data-toggle="tooltip">Update</a>
+                    <a href="#" class="btn btn-danger" id="deleteButton" title="Delete Request" data-toggle="tooltip">Delete</a>
+                </div>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
+
 
 
 

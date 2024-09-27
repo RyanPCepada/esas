@@ -57,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // File upload logic for request letter
     $requestLetter = '';
-    $letterTargetDir = "/esas/esas_student/request_letter/"; // Directory for uploaded letters
+    $letterTargetDir = "/esas/esas_student/request_letters/"; // Directory for uploaded letters
     $allowedLetterTypes = ['pdf', 'doc', 'docx']; // Allowed types for letters
 
     if (isset($_FILES['requestLetter']) && $_FILES['requestLetter']['error'] == 0) {
