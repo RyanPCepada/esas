@@ -200,7 +200,7 @@ try {
 
         .modal-paragraph {
             text-align: justify;         /* Ensures text is justified (end-to-end alignment) */
-            text-indent: 30px;           /* Indents the first line of the paragraph */
+            /* text-indent: 30px;           Indents the first line of the paragraph */
             margin-bottom: 15px;         /* Adds space between paragraphs */
         }
 
@@ -455,7 +455,7 @@ try {
 
 
 
-function loadClubDetails(requestId) { 
+    function loadClubDetails(requestId) { 
     $.ajax({
         url: `/esas/esas_student/apis/club-request-details-api.php`,
         type: "GET",
@@ -468,12 +468,35 @@ function loadClubDetails(requestId) {
                 // Set club name
                 $('#modalClubName').text(response.clubName);
 
-                // Set date requested and status separately
-                $('#modalDateRequested').text(`Date Requested: ${response.dateRequested}`);
-                $('#modalStatus').text(`Status: ${response.status}`);
+                // Set date requested
+                    $('#modalDateRequested').html(`<strong>Date Requested:</strong> ${response.dateRequested}`);
+
+                    // Set status
+                    $('#modalStatus').html(`<strong>Status:</strong> ${response.status}`);
+
+                    // Conditionally set the approved or disapproved date
+                    if (response.status === 'approved') {
+                        $('#modalDateApprovedOrDisapproved').html(`<strong>Date Approved:</strong> ${response.dateDecided}`);
+                    } else if (response.status === 'disapproved') {
+                        $('#modalDateApprovedOrDisapproved').html(`<strong>Date Disapproved:</strong> ${response.dateDecided}`);
+                    } else {
+                        // If pending, keep the approved/disapproved date empty
+                        $('#modalDateApprovedOrDisapproved').html('');
+                    }
+
+                // Conditional display of buttons based on status
+                if (response.status === 'pending') {
+                    $('#updateButton').show();
+                    $('#deleteButton').show();
+                } else if (response.status === 'disapproved') {
+                    $('#updateButton').hide();
+                    $('#deleteButton').show();
+                } else if (response.status === 'approved') {
+                    $('#updateButton').hide();
+                    $('#deleteButton').hide();
+                }
 
                 // Set Request ID
-                $('#modalRequestId').text(response.request_id); // Display the request ID
                 $('#request_id').val(response.request_id); // Set the value of the hidden input
 
                 // Set goal, mission, vision, and activities
@@ -499,18 +522,6 @@ function loadClubDetails(requestId) {
                     $('#modalRequestLetter').html('<p>No attached request letter.</p>');
                 }
 
-                // Conditional display of buttons based on status
-                if (response.status === 'pending') {
-                    $('#updateButton').show();
-                    $('#deleteButton').show();
-                } else if (response.status === 'disapproved') {
-                    $('#updateButton').hide();
-                    $('#deleteButton').show();
-                } else if (response.status === 'approved') {
-                    $('#updateButton').hide();
-                    $('#deleteButton').hide();
-                }
-
                 // Show the modal
                 $('#clubDetailsModal').modal('show');
             }
@@ -520,6 +531,8 @@ function loadClubDetails(requestId) {
         }
     });
 }
+
+
 
 
 $(document).on('click', '#updateButton', function(e) {
@@ -592,37 +605,34 @@ $(document).on('click', '#updateButton', function(e) {
                 <div id="modalCoverPhoto" class="text-center">
                     <img src="" alt="Cover Photo" class="img-fluid">
                 </div>
-                <div class="d-flex justify-content-between mt-3">
-                    <p id="modalDateRequested" class="text-left"></p>
-                    <p id="modalStatus" class="text-right"></p>
+                <div class="mt-3">
+                    <p id="modalStatus" class="text-left m-0"></p>
+                    <p id="modalDateRequested" class="text-left m-0"></p>
+                    <p id="modalDateApprovedOrDisapproved" class="text-left m-0"></p>
                 </div>
                 <hr>
-                <label>Goal:</label>
+                <strong>Goal:</strong>
                 <p id="modalGoal" class="modal-paragraph"></p>
-                <label>Mission:</label>
+                <strong>Mission:</strong>
                 <p id="modalMission" class="modal-paragraph"></p>
-                <label>Vision:</label>
+                <strong>Vision:</strong>
                 <p id="modalVision" class="modal-paragraph"></p>
-                <label>Activities:</label>
+                <strong>Activities:</strong>
                 <p id="modalActivities" class="modal-paragraph"></p>
 
-                <!-- New section for Request Letter -->
                 <hr>
-                <label>Request Letter:</label>
+                <strong>Request Letter:</strong>
                 <div class="card mt-3 p-3 align-items-center bg-light" id="modalRequestLetter" style="border-radius: 15px;"></div>
             </div>
-            <div class="modal-footer">
-                <div class="text-center align-items-center justify-content-center">
-                    <input type="hidden" name="request_id" id="request_id" value="">
-                    <a href="#" class="btn btn-warning" id="updateButton" title="Update Request" data-toggle="tooltip">Update</a>
-                    <a href="#" class="btn btn-danger" id="deleteButton" title="Delete Request" data-toggle="tooltip">Delete</a>
-                </div>
+            <div class="modal-footer text-center align-items-center justify-content-center">
+                <input type="hidden" name="request_id" id="request_id" value="">
+                <a href="#" class="btn btn-warning" id="updateButton" title="Update Request" data-toggle="tooltip">Update</a>
+                <a href="#" class="btn btn-danger" id="deleteButton" title="Delete Request" data-toggle="tooltip">Delete</a>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
-
 
 
 
