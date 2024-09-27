@@ -478,8 +478,8 @@ try {
                     // Open file when icon is clicked
                     $('#modalRequestLetter').html(`
                         <div class="d-flex align-items-center">
-                            <img src="${fileIcon}" alt="${fileType.toUpperCase()} File" style="width: 100px; margin-right: 10px;">
-                            <a href="/esas/esas_student/request_letter/${response.requestLetter}" target="_blank" style="color: blue; text-decoration: underline; margin-left: 5px;">View Attached Request Letter</a>
+                            <img src="${fileIcon}" alt="${fileType.toUpperCase()} File" style="width: 100px; margin: 10px;">
+                            <a href="/esas/esas_student/request_letter/${response.requestLetter}" target="_blank" style="color: blue; text-decoration: underline; margin-left: 5px;">See Your Attached Request Letter</a>
                         </div>
                     `);
                 } else {
@@ -564,7 +564,7 @@ try {
                 <!-- New section for Request Letter -->
                 <hr>
                 <label>Request Letter:</label>
-                <div id="modalRequestLetter"></div>
+                <div class="card mt-3 p-3 align-items-center bg-light" id="modalRequestLetter" style="border-radius: 15px;"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

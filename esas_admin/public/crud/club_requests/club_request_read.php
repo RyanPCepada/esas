@@ -8,16 +8,18 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
                 r.request_id, 
                 r.clubName, 
                 r.goal, 
-                r.mission,  -- Add mission to the selection
-                r.vision,   -- Add vision to the selection
+                r.mission,  
+                r.vision,   
                 r.activities, 
                 r.status, 
                 r.coverPhoto, 
+                r.requestLetter,
                 r.dateRequested, 
                 r.dateModified,
                 s.firstName,
                 s.lastName,
-                s.profilePic
+                s.profilePic,
+                s.student_id
             FROM tbl_club_requests r 
             JOIN tbl_students s ON r.student_id = s.student_id 
             WHERE r.request_id = :request_id"; 
@@ -37,10 +39,12 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
                 $activities = htmlspecialchars($row["activities"] ?? ''); 
                 $status = strtolower(htmlspecialchars($row["status"] ?? '')); 
                 $coverPhoto = htmlspecialchars($row["coverPhoto"] ?: "default-cover.jpg"); 
+                $requestLetter = htmlspecialchars($row["requestLetter"] ?? ''); // New requestLetter variable
                 $dateRequested = !empty($row["dateRequested"]) ? date("F j, Y", strtotime($row["dateRequested"])) : 'None';
                 $dateModified = !empty($row["dateModified"]) ? date("F j, Y", strtotime($row["dateModified"])) : 'None';
                 $requestedByName = htmlspecialchars($row["firstName"] . ' ' . $row["lastName"] ?? '');
                 $profilePic = htmlspecialchars($row["profilePic"] ?: "default-profile.jpg");
+                $student_id = htmlspecialchars($row["student_id"] ?? ''); 
                 
             } else { 
                 echo "No club request found with this ID."; 
@@ -114,33 +118,72 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                                     alt="<?php echo $clubName; ?> Cover Photo" 
                                     class="img-fluid" style="width: 300px; height: auto; border-radius: 5px; object-fit: cover;">
                                     <h4 class="text-muted mt-3"><?php echo $clubName; ?></h4>
+                                    
+                                    <div class="card p-3 bg-light" style="width: auto; margin-top: 70px; border-radius: 15px;">
+                                        <?php if (!empty($requestLetter)): 
+                                            $fileType = pathinfo($requestLetter, PATHINFO_EXTENSION);
+                                            $fileIcon = ($fileType === 'pdf') ? '/esas/esas_student/icons/ICON_PDF.png' :
+                                                        (($fileType === 'doc' || $fileType === 'docx') ? '/esas/esas_student/icons/ICON_WORD.png' : ''); ?>
+                                            <div class="d-flex align-items-center justify-content-center" style="cursor: pointer;" onclick="window.open('/esas/esas_student/request_letter/<?php echo $requestLetter; ?>', '_blank')">
+                                                <img src="<?php echo $fileIcon; ?>" alt="<?php echo strtoupper($fileType); ?> File" style="width: 70px; margin-right: 10px;">
+                                                <a href="/esas/esas_student/request_letter/<?php echo $requestLetter; ?>" target="_blank" style="color: blue; text-decoration: underline;">See Attached Request Letter</a>
+                                            </div>
+                                        <?php else: ?>
+                                            <p>No attached request letter.</p>
+                                        <?php endif; ?>
+                                    </div>
+
                             </div>
+
+
                             <div class="col-md-8">
-                                <p>
-                                    <strong>Requested by: </strong><br>
-                                    <img class="mt-2 mb-0" src="/esas/esas_student/images/<?php echo $profilePic; ?>" 
-                                        alt="Profile Picture" 
-                                        style="width: 70px; height: auto; border-radius: 50%;" />
-                                    <h4><?php echo $requestedByName; ?></h4>
-                                </p>
-                                <hr>
-                                <p><strong>Goal: </strong><?php echo $goal; ?></p>
-                                <p><strong>Mission: </strong><?php echo $mission; ?></p> <!-- Display mission -->
-                                <p><strong>Vision: </strong><?php echo $vision; ?></p>   <!-- Display vision -->
-                                <p><strong>Activities: </strong><?php echo $activities; ?></p>
-                                <p><strong>Status: </strong><?php echo $status; ?></p>
-                                <p><strong>Date Requested: </strong><?php echo $dateRequested; ?></p> 
-                                <p><strong>Date Modified: </strong><?php echo $dateModified; ?></p> 
-                            </div>
+    <p>
+        <strong>Request from: </strong><br>
+        <img class="mt-2 mb-0" src="/esas/esas_student/images/<?php echo $profilePic; ?>" 
+            alt="Profile Picture" 
+            style="width: 100px; height: auto; border-radius: 50%;" />
+        <h3 class="text-muted"><?php echo $requestedByName; ?></h3>
+        <p><strong>Student ID: </strong><?php echo $student_id; ?></p>
+    </p>
+    <hr>
+    <div class="container mt-3 p-0">
+            <p><strong>Goal: </strong><br><?php echo htmlspecialchars($goal); ?></p>
+      
+    
+            <p><strong>Mission: </strong><br><?php echo htmlspecialchars($mission); ?></p> <!-- Display mission -->
+        
+            <p><strong>Vision: </strong><br><?php echo htmlspecialchars($vision); ?></p>   <!-- Display vision -->
+        
+            <p><strong>Activities: </strong><br><?php echo htmlspecialchars($activities); ?></p>
+        
+            <hr>
+    
+            <p>Status: </strong><?php echo htmlspecialchars($status); ?></p>
+            <p>Date Requested: </strong><?php echo htmlspecialchars($dateRequested); ?></p> 
+</div>
+
+</div>
+
                         </div>
                     </div>
 
 
+                    <script>
+                        function confirmAction(action) {
+                            const confirmation = confirm(`Are you sure you want to ${action} this request?`);
+                            if (confirmation) {
+                                document.getElementById('action').value = action;
+                                document.getElementById('approvalForm').submit();
+                            }
+                        }
+                    </script>
+
                     <div class="card-footer text-center">
                         <?php if ($status === 'pending'): ?>
-                            <form method="post">
-                                <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
-                                <button type="submit" name="action" value="disapprove" class="btn btn-danger">Disapprove</button>
+                            <form id="approvalForm" method="post">
+                                <input type="hidden" name="action" id="action" value="">
+                                <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve</button>
+                                <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove</button>
                                 <a href="../../club_requests.php" class="btn btn-secondary">Back to Requests List</a>
                             </form>
                         <?php elseif ($status === 'approved'): ?>
