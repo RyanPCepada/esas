@@ -331,47 +331,6 @@ try {
                                             </a>
                                         </div>
 
-                                        <!-- Modal HTML -->
-                                        <div class="modal fade" id="requestClubModal" tabindex="-1" aria-labelledby="requestClubModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="requestClubModalLabel">Request for a New Club</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <!-- <p class="py-2">Please fill out this form and submit your request for a new club.</p> -->
-                                                        <form id="clubRequestForm" action="../esas_student/actions/club_request_action.php" method="POST" enctype="multipart/form-data">
-                                                            <div class="form-group mb-3">
-                                                                <label for="clubName">Club name</label>
-                                                                <input type="text" name="clubName" class="form-control" id="clubName" required>
-                                                            </div>
-                                                            <div class="form-group mb-3">
-                                                                <label for="goal">What is the primary goal of this club?</label>
-                                                                <textarea name="goal" class="form-control" id="goal" rows="3" required></textarea>
-                                                            </div>
-                                                            <div class="form-group mb-3">
-                                                                <label for="activities">Proposed activities</label>
-                                                                <textarea name="activities" class="form-control" id="activities" rows="2"></textarea>
-                                                            </div>
-                                                            <div class="form-group mb-3">
-                                                                <label for="coverPhoto">Add a coverphoto</label>
-                                                                <input type="file" name="coverPhoto" class="form-control" id="coverPhoto" required onchange="previewImage(event)">
-                                                            </div>
-                                                            
-                                                            <div class="form-group mb-3">
-                                                                <img id="coverPhotoPreview" src="#" alt="Cover Photo Preview" style="display:none; width: 50%; object-fit: cover;" />
-                                                            </div>
-                                                            <div class="d-flex justify-content-end">
-                                                                <a href="javascript:history.go(0)" class="btn btn-secondary me-2">Cancel</a>
-                                                                <button type="submit" class="btn btn-primary">Submit</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
 
                                         <nav>
                                             <div class="nav nav-tabs n" role="tablist">
@@ -392,6 +351,7 @@ try {
                                                 </button> -->
                                             </div>
                                         </nav>
+
                                         <div class="tab-content">
                                             <!-- All Club Request Tab -->
                                             <div class="tab-pane fade show active" id="nav-requestedclubs" role="tabpanel" aria-labelledby="nav-requestedclubs-tab">
@@ -488,7 +448,7 @@ try {
         });
     }
 
-    function loadClubDetails(requestId) {
+    function loadClubDetails(requestId) { 
     $.ajax({
         url: `/esas/esas_student/apis/club-request-details-api.php`,
         type: "GET",
@@ -509,6 +469,23 @@ try {
                 $('#modalGoal').text(response.goal);
                 $('#modalActivities').text(response.activities);
 
+                // Handle the request letter (if exists)
+                if (response.requestLetter) {
+                    const fileType = response.requestLetter.split('.').pop().toLowerCase();
+                    const fileIcon = (fileType === 'pdf') ? '/esas/esas_student/icons/ICON_PDF.png' :
+                                     (fileType === 'doc' || fileType === 'docx') ? '/esas/esas_student/icons/ICON_WORD.png' : '';
+
+                    // Open file when icon is clicked
+                    $('#modalRequestLetter').html(`
+                        <div class="d-flex align-items-center">
+                            <img src="${fileIcon}" alt="${fileType.toUpperCase()} File" style="width: 100px; margin-right: 10px;">
+                            <a href="/esas/esas_student/request_letter/${response.requestLetter}" target="_blank" style="color: blue; text-decoration: underline; margin-left: 5px;">View Attached Request Letter</a>
+                        </div>
+                    `);
+                } else {
+                    $('#modalRequestLetter').html('<p>No attached request letter.</p>');
+                }
+
                 // Show the modal
                 $('#clubDetailsModal').modal('show');
             }
@@ -518,6 +495,8 @@ try {
         }
     });
 }
+
+
 
 
     $(document).on('click', '.club-card', function(e) {
@@ -561,7 +540,6 @@ try {
     </script>
 
 
-
 <div id="clubDetailsModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -582,6 +560,11 @@ try {
                 <p id="modalGoal" class="modal-paragraph"></p>
                 <label>Activities:</label>
                 <p id="modalActivities" class="modal-paragraph"></p>
+
+                <!-- New section for Request Letter -->
+                <hr>
+                <label>Request Letter:</label>
+                <div id="modalRequestLetter"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
