@@ -215,7 +215,7 @@ $disapprovedCount = $stmt->fetchColumn();
                     <form id="approvalForm" method="post">
                         <input type="hidden" name="action" id="action" value="">
                         <?php if ($clubsCount >= 2): ?>
-                            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
+                            <!-- <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button> -->
                             <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Students List</a>
                         <?php else: ?>
                             <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve Student</button>
