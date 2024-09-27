@@ -399,6 +399,7 @@ try {
                                             <td>' . $dateApplied . '</td>
                                             <td class="text-center">
                                                 <a href="../public/crud/pending_approval/pending_approval_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                <!-- <a href="../public/crud/pending_approval/pending_approval_read.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $club_id; ?>" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a> -->
                                                 <!-- <a href="../public/crud/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a> -->
                                                 <!-- <a href="../public/crud/pending_approval/pending_approval_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a> -->
                                             </td>
