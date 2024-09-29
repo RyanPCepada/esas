@@ -45,6 +45,20 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
                 $requestedByName = htmlspecialchars($row["firstName"] . ' ' . $row["lastName"] ?? '');
                 $profilePic = htmlspecialchars($row["profilePic"] ?: "default-profile.jpg");
                 $student_id = htmlspecialchars($row["student_id"] ?? ''); 
+
+                // Check if the club already exists in tbl_clubs
+                $clubExists = false;
+                $sqlCheckClub = "SELECT COUNT(*) as count FROM tbl_clubs WHERE clubName = :clubName";
+                if ($stmtCheck = $pdo->prepare($sqlCheckClub)) {
+                    $stmtCheck->bindParam(":clubName", $clubName, PDO::PARAM_STR);
+                    if ($stmtCheck->execute()) {
+                        $rowCheck = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+                        if ($rowCheck['count'] > 0) {
+                            $clubExists = true;
+                        }
+                    }
+                    unset($stmtCheck);
+                }
                 
             } else { 
                 echo "No club request found with this ID."; 
@@ -161,10 +175,17 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                                         <p>Status: </strong><?php echo htmlspecialchars($status); ?></p>
                                         <p>Date Requested: </strong><?php echo htmlspecialchars($dateRequested); ?></p> 
                                 </div>
-
                             </div>
-
                         </div>
+
+                        <div class="text-center d-flex justify-content-center mt-3">
+                            <?php if ($status === 'approved' && $clubExists): ?>
+                                <div class="alert alert-info custom-alert" role="alert">
+                                    <p class="lead mb-0">This club request has already been added to the clubs list.</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
                     </div>
 
 
@@ -186,6 +207,8 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                                 <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove</button>
                                 <a href="../../club_requests.php" class="btn btn-secondary">Back to Requests List</a>
                             </form>
+                        <?php elseif ($status === 'approved' && $clubExists): ?>
+                            <a href="../../club_requests.php" class="btn btn-secondary">Back to Requests List</a>
                         <?php elseif ($status === 'approved'): ?>
                             <a href="../../crud/club_requests/club_add_request.php?clubName=<?php echo urlencode($clubName); ?>&coverPhoto=<?php echo urlencode($coverPhoto); ?>" class="btn btn-success">Add to Clubs</a>
                             <a href="../../club_requests.php" class="btn btn-secondary">Back to Requests List</a>
