@@ -39,6 +39,11 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
                 $dateAdded = !empty($row["dateAdded"]) ? htmlspecialchars($row["dateAdded"]) : 'None';
                 $moderatorNames = !empty($row["moderatorNames"]) ? htmlspecialchars($row["moderatorNames"]) : 'None';
                 $coverPhoto = !empty($row["coverPhoto"]) ? htmlspecialchars($row["coverPhoto"]) : "default-cover.jpg";
+            
+                // Determine if the label should be "Moderator" or "Moderators"
+                $moderatorCount = substr_count($moderatorNames, ',') + 1; // Count commas and add 1 for total moderators
+                $moderatorLabel = ($moderatorCount > 1) ? "Moderators:" : "Moderator:";
+            
             } else {
                 // Redirect if no record is found
                 header("location: error.php");
@@ -102,7 +107,7 @@ unset($pdo);
                                 <h3 class="text-muted mb-3"><?php echo $clubName; ?></h3>
                                 <hr>
                                 <p><strong>Date Created: </strong><?php echo date("F j, Y", strtotime($dateAdded)); ?></p>
-                                <p><strong>Moderators: </strong><?php echo $moderatorNames; ?></p>
+                                <p><strong><?php echo $moderatorLabel; ?> </strong><?php echo $moderatorNames; ?></p>
                             </div>
                         </div>
                         <hr>
