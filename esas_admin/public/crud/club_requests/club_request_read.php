@@ -187,7 +187,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                                 <a href="../../club_requests.php" class="btn btn-secondary">Back to Requests List</a>
                             </form>
                         <?php elseif ($status === 'approved'): ?>
-                            <a href="../../crud/all_clubs/club_add_request.php?clubName=<?php echo urlencode($clubName); ?>&coverPhoto=<?php echo urlencode($coverPhoto); ?>" class="btn btn-success">Add to Clubs</a>
+                            <a href="../../crud/club_requests/club_add_request.php?clubName=<?php echo urlencode($clubName); ?>&coverPhoto=<?php echo urlencode($coverPhoto); ?>" class="btn btn-success">Add to Clubs</a>
                             <a href="../../club_requests.php" class="btn btn-secondary">Back to Requests List</a>
                         <?php else: ?>
                             <a href="../../club_requests.php" class="btn btn-secondary">Back to Requests List</a>

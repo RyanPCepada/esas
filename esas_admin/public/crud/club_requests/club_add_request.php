@@ -126,8 +126,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     unset($pdo);
 }
-$clubName = isset($_GET['clubName']) ? htmlspecialchars($_GET['clubName']) : '';
-$coverPhoto = isset($_GET['coverPhoto']) ? htmlspecialchars($_GET['coverPhoto']) : '';
+// $clubName = isset($_GET['clubName']) ? htmlspecialchars($_GET['clubName']) : '';
+// $coverPhoto = isset($_GET['coverPhoto']) ? htmlspecialchars($_GET['coverPhoto']) : '';
+$clubName = isset($_GET['clubName']) ? $_GET['clubName'] : '';
+$coverPhoto = isset($_GET['coverPhoto']) ? $_GET['coverPhoto'] : '';
+
 ?>
 
 
@@ -183,7 +186,7 @@ $coverPhoto = isset($_GET['coverPhoto']) ? htmlspecialchars($_GET['coverPhoto'])
                         <label>Cover Photo</label>
                         <input type="file" name="coverPhoto" id="coverPhoto" class="form-control-file <?php echo (!empty($coverPhoto_err)) ? 'is-invalid' : ''; ?>" onchange="previewImage()">
                         <span class="invalid-feedback"><?php echo $coverPhoto_err; ?></span>
-                        <img id="coverPhotoPreview" src="#" alt="" style="display: none;">
+                        <img id="coverPhotoPreview" src="<?php echo !empty($coverPhoto) ? '/esas/esas_student/images/' . htmlspecialchars($coverPhoto) : '#'; ?>" alt="Cover Photo Preview" style="display: <?php echo !empty($coverPhoto) ? 'block' : 'none'; ?>;">
                         <input type="hidden" name="hiddenCoverPhoto" id="hiddenCoverPhoto" value="<?php echo htmlspecialchars($coverPhoto); ?>">
                     </div>
                     <hr>
@@ -311,67 +314,27 @@ $coverPhoto = isset($_GET['coverPhoto']) ? htmlspecialchars($_GET['coverPhoto'])
 <script>
     let cropper;
 
-    function previewImage() {
-        const file = document.querySelector('input[name="coverPhoto"]').files[0];
-        const preview = document.getElementById('coverPhotoPreview');
-        const reader = new FileReader();
+    
+function previewImage() {
+    var file = document.getElementById('coverPhoto').files[0]; // Get the file from input
+    var preview = document.getElementById('coverPhotoPreview'); // Get the image element
+    var reader = new FileReader();
 
-        reader.addEventListener("load", function () {
-            // Convert image file to base64 string
-            preview.src = reader.result;
-            preview.style.display = 'block';
-
-            // Initialize Cropper.js with options (adjust as needed)
-            cropper = new Cropper(preview, {
-                aspectRatio: 16 / 9, // Set aspect ratio (e.g., 16:9)
-                crop(event) {
-                    // Output the cropped area data
-                    console.log(event.detail.x);
-                    console.log(event.detail.y);
-                    console.log(event.detail.width);
-                    console.log(event.detail.height);
-                },
-            });
-        }, false);
-
-        if (file) {
-            reader.readAsDataURL(file);
-        }
+    // If there's a file, display the image
+    if (file) {
+        reader.onload = function(e) {
+            preview.src = e.target.result; // Set the src of the image to the loaded file
+            preview.style.display = 'block'; // Display the image
+            preview.style.maxWidth = '100%'; // Adjust preview styling
+            preview.style.maxHeight = '300px'; // Limit the image height
+        };
+        reader.readAsDataURL(file); // Read the file as a data URL
+    } else {
+        preview.src = ''; // Clear the src if no file
+        preview.style.display = 'none'; // Hide the image preview
     }
+}
 
-    function saveImageData() {
-        if (cropper) {
-            // Get cropped canvas as base64 encoded JPEG image
-            const canvas = cropper.getCroppedCanvas({
-                width: 640, // Set desired output width (optional)
-                height: 360, // Set desired output height (optional)
-                imageSmoothingEnabled: true, // Smooth the image (optional)
-                imageSmoothingQuality: 'high', // High quality smoothing (optional)
-            });
-
-            if (canvas) {
-                // Convert canvas to base64 data URL
-                const dataURL = canvas.toDataURL('image/jpeg');
-
-                // Update hidden input with cropped image data
-                document.getElementById('hiddenCoverPhoto').value = dataURL;
-
-                // Optionally, display the cropped image preview
-                const preview = document.getElementById('coverPhotoPreview');
-                preview.src = dataURL;
-                preview.style.display = 'block';
-            }
-        }
-    }
-
-    window.addEventListener('load', function () {
-        const hiddenCoverPhoto = document.getElementById('hiddenCoverPhoto').value;
-        if (hiddenCoverPhoto) {
-            const preview = document.getElementById('coverPhotoPreview');
-            preview.src = hiddenCoverPhoto;
-            preview.style.display = 'block';
-        }
-    });
 </script>
 </body>
 </html>
