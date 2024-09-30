@@ -279,7 +279,7 @@ unset($pdo);
 
             <hr>
             <div class="text-center">
-                <a href="javascript:history.back()" class="btn text-align-end btn-secondary">Cancel</a>
+                <a href="javascript:history.back()" class="btn text-align-end btn-secondary">Back to Clubs List</a>
             </div>
 
         </div>

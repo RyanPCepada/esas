@@ -60,7 +60,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(":clubId", $selectedClubId);
             $stmt->bindParam(":moderatorId", $selectedModeratorId);
             if ($stmt->execute()) {
-                header("location: ../../all_clubs.php"); // Redirect to a list of moderators
+                // Redirect back to the moderator update page
+                header("Location: club_update.php?club_id=" . urlencode($club_id));
                 exit();
             } else {
                 echo "Oops! Something went wrong. Please try again later.";
