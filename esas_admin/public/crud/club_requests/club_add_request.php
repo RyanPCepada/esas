@@ -58,35 +58,64 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (isset($_FILES['coverPhoto']) && $_FILES['coverPhoto']['name']) {
-        $coverPhotoName = $_FILES['coverPhoto']['name'];
-        $coverPhotoSize = $_FILES['coverPhoto']['size'];
-        $coverPhotoTmpName = $_FILES['coverPhoto']['tmp_name'];
+    // File was uploaded
+    $coverPhotoName = $_FILES['coverPhoto']['name'];
+    $coverPhotoSize = $_FILES['coverPhoto']['size'];
+    $coverPhotoTmpName = $_FILES['coverPhoto']['tmp_name'];
 
-        $validImageExtensions = ['jpg', 'jpeg', 'png'];
-        $imageExtension = strtolower(pathinfo($coverPhotoName, PATHINFO_EXTENSION));
+    $validImageExtensions = ['jpg', 'jpeg', 'png'];
+    $imageExtension = strtolower(pathinfo($coverPhotoName, PATHINFO_EXTENSION));
 
-        if (!in_array($imageExtension, $validImageExtensions)) {
-            $coverPhoto_err = "Invalid image extension. Only JPG, JPEG, and PNG are allowed.";
-        } elseif ($coverPhotoSize > 5000000) {
-            $coverPhoto_err = "Image size is too large (max 5MB).";
+    if (!in_array($imageExtension, $validImageExtensions)) {
+        $coverPhoto_err = "Invalid image extension. Only JPG, JPEG, and PNG are allowed.";
+    } elseif ($coverPhotoSize > 10000000) {
+        $coverPhoto_err = "Image size is too large (max 10MB).";
+    } else {
+        // Generate a unique name for the cover photo
+        $newCoverPhotoName = 'club_' . uniqid() . '.' . $imageExtension;
+        $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_admin/images/';
+        $uploadPath = $uploadDir . $newCoverPhotoName;
+
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        if (move_uploaded_file($coverPhotoTmpName, $uploadPath)) {
+            // Successful upload, use the new image name
+            $coverPhoto = $newCoverPhotoName;
         } else {
-            $newCoverPhotoName = 'club_' . uniqid() . '.' . $imageExtension;
-            $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_admin/images/';
-            $uploadPath = $uploadDir . $newCoverPhotoName;
+            $coverPhoto_err = "Failed to upload image.";
+        }
+    }
+} else {
+    // No new file uploaded, use the hidden field value
+    $coverPhoto = $_POST['hiddenCoverPhoto']; // Keep the old cover photo
 
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
+    // Construct the destination path for the admin images
+    $adminImagesDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_admin/images/';
+    $adminCoverPhotoPath = $adminImagesDir . $coverPhoto;
 
-            if (!move_uploaded_file($coverPhotoTmpName, $uploadPath)) {
-                $coverPhoto_err = "Failed to upload image.";
-            } else {
-                $coverPhoto = $newCoverPhotoName;
-            }
+    // Check if the existing cover photo file exists in the student images directory
+    if (file_exists($adminCoverPhotoPath)) {
+        // Construct the destination path for the admin images
+        $adminCoverPhotoPath = $adminImagesDir . $coverPhoto;
+
+        // Copy the existing file to the admin images directory
+        if (!file_exists($adminCoverPhotoPath)) {
+            // Only copy if it doesn't already exist in admin images
+            copy($existingCoverPhotoPath, $adminCoverPhotoPath);
         }
     } else {
-        $coverPhoto = COVERPHOTO_DEFAULT;
+        $coverPhoto_err = "Existing cover photo does not exist.";
     }
+}
+
+// If no cover photo is uploaded and no previous one exists, use a default image
+if (empty($coverPhoto)) {
+    $coverPhoto = COVERPHOTO_DEFAULT; // You can set your own default image path here
+}
+
+    
 
     if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err)) {
         $sql = "INSERT INTO tbl_clubs (clubName, information, coverPhoto, dateAdded) VALUES (:clubName, :information, :coverPhoto, NOW())";
@@ -169,7 +198,7 @@ $coverPhoto = isset($_GET['coverPhoto']) ? $_GET['coverPhoto'] : '';
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <h2 class="mt-5">Add New Club</h2>
+                <h2 class="mt-5">Add Request to Clubs List</h2>
                 <p>Please fill this form and submit to add a new club to the record.</p>
                 <form id="clubForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data" onsubmit="saveImageData()">
                     <div class="form-group mb-2">

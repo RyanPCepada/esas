@@ -67,8 +67,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (!in_array($imageExtension, $validImageExtensions)) {
             $coverPhoto_err = "Invalid image extension. Only JPG, JPEG, and PNG are allowed.";
-        } elseif ($coverPhotoSize > 5000000) {
-            $coverPhoto_err = "Image size is too large (max 5MB).";
+        } elseif ($coverPhotoSize > 10000000) {
+            $coverPhoto_err = "Image size is too large (max 10MB).";
         } else {
             $newCoverPhotoName = 'club_' . uniqid() . '.' . $imageExtension;
             $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_admin/images/';
