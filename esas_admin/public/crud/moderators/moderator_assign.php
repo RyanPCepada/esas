@@ -197,7 +197,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 for (var i = 0; i < options.length; i++) {
                     if (assignedClubs.includes(options[i].value)) {
                         options[i].disabled = true;
-                        options[i].text += " (Current)"; // Add "Current" to the option text
+                        // Check if " (Current)" is already in the text
+                        if (!options[i].text.includes(" (Current)")) {
+                            options[i].text += " (Current)"; // Add "Current" to the option text
+                        }
                     } else {
                         options[i].disabled = false;
                     }
@@ -223,7 +226,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 for (var i = 0; i < options.length; i++) {
                     if (assignedModerators.includes(options[i].value)) {
                         options[i].disabled = true;
-                        options[i].text += " (Current)"; // Add "Current" to the option text
+                        // Check if " (Current)" is already in the text
+                        if (!options[i].text.includes(" (Current)")) {
+                            options[i].text += " (Current)"; // Add "Current" to the option text
+                        }
                     } else {
                         options[i].disabled = false;
                     }
@@ -231,6 +237,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             })
             .catch(error => console.error('Error:', error));
         }
+
 
     </script>
 </body>
