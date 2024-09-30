@@ -149,16 +149,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo '<p>' . (count($clubs) === 1 ? 'Club Handled by' : 'Clubs Handled by') . ' <strong>' . $moderatorName . '</strong></p>';
 
 
-                foreach ($clubs as $club) {
-                    echo '
-                    <div class="club-item">
-                        <span>' . htmlspecialchars($club['clubName']) . '</span>
-                        <form action="moderator_remove.php" method="POST">
-                            <input type="hidden" name="club_id" value="' . htmlspecialchars($club['club_id']) . '">
-                            <input type="hidden" name="moderator_id" value="' . htmlspecialchars($moderator_id) . '">
-                            <button type="submit" class="btn remove-btn text-light">Remove as Moderator</button>
-                        </form>
-                    </div>';
+                // Check if any clubs are found
+                if (count($clubs) === 0) {
+                    echo '<div class="alert alert-danger p-2 ps-3">
+                                <em>No clubs found.</em>
+                            </div>';
+                          
+                } else {
+                    foreach ($clubs as $club) {
+                        echo '
+                        <div class="club-item">
+                            <span>' . htmlspecialchars($club['clubName']) . '</span>
+                            <form action="moderator_remove.php" method="POST">
+                                <input type="hidden" name="club_id" value="' . htmlspecialchars($club['club_id']) . '">
+                                <input type="hidden" name="moderator_id" value="' . htmlspecialchars($moderator_id) . '">
+                                <button type="submit" class="btn remove-btn text-light">Remove as Moderator</button>
+                            </form>
+                        </div>';
+                    }
                 }
 
             } catch (PDOException $e) {
