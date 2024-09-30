@@ -37,21 +37,35 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                 $student_id = $row["student_id"]; // Save student ID
 
                 // For clubs
-                $clubNames = 'None'; // Default value for now
-                $clubSql = "SELECT c.clubName, c.coverPhoto FROM tbl_registration r 
-                    JOIN tbl_clubs c ON r.club_id = c.club_id 
-                    WHERE r.student_id = :student_id AND r.status = 'active'"; // Add status condition
-                
+                $clubDetails = 'None'; // Default value for now
+                $clubSql = "SELECT DISTINCT c.clubName, c.coverPhoto, r.dateApplied, r.dateApproved 
+                            FROM tbl_registration r 
+                            JOIN tbl_clubs c ON r.club_id = c.club_id 
+                            WHERE r.student_id = :student_id AND r.status = 'active'"; // Add status condition
+
                 if ($clubStmt = $pdo->prepare($clubSql)) {
                     $clubStmt->bindParam(":student_id", $student_id);
                     if ($clubStmt->execute()) {
-                        $clubs = $clubStmt->fetchAll(PDO::FETCH_COLUMN);
-                        $clubNames = !empty($clubs) ? implode(", ", $clubs) : 'None';
+                        $clubs = $clubStmt->fetchAll(PDO::FETCH_ASSOC);
+                        if (!empty($clubs)) {
+                            $clubDetails = '';
+                            foreach ($clubs as $club) {
+                                $clubName = htmlspecialchars($club['clubName']);
+                                $dateApplied = !empty($club['dateApplied']) ? date("F j, Y", strtotime($club['dateApplied'])) : 'None';
+                                $dateApproved = !empty($club['dateApproved']) ? date("F j, Y", strtotime($club['dateApproved'])) : 'None';
+                                
+                                // Append each club with its details
+                                $clubDetails .= "<p><strong class='text-muted'>{$clubName}</strong><br>";
+                                $clubDetails .= "<small>Date Applied: {$dateApplied}</small><br>";
+                                $clubDetails .= "<small>Date Approved: {$dateApproved}</small></p>";
+                            }
+                        }
                     }
                 }
+
                 // Fetch moderators for the clubs the student is part of
                 $moderatorNames = 'None'; // Default value for moderators
-                $moderatorSql = "SELECT m.firstName, m.middleName, m.lastName 
+                $moderatorSql = "SELECT DISTINCT m.firstName, m.middleName, m.lastName 
                                  FROM tbl_clubs_and_moderators cm 
                                  JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id 
                                  JOIN tbl_registration r ON cm.club_id = r.club_id 
@@ -139,16 +153,22 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                         <div class="col-md-8">
                             <h3 class="text-muted mb-3"><?php echo htmlspecialchars($fullName); ?></h3>
                             <hr>
-                            <p><strong>Student ID: </strong><?php echo $student_id; ?></p>
-                            <p><strong>Email: </strong><?php echo $email; ?></p>
-                            <p><strong>Phone Number: </strong><?php echo $phoneNumber; ?></p>
-                            <p><strong>Department: </strong><?php echo $department; ?></p>
-                            <p><strong>Course: </strong><?php echo $course; ?></p>
-                            <p><strong>Year: </strong><?php echo $year; ?></p>
-                            <p><strong>Gender: </strong><?php echo $gender; ?></p>
-                            <p><strong>Age: </strong><?php echo $age; ?></p>
-                            <p><strong>Birthday: </strong><?php echo $birthday; ?></p>
-                            <p><strong>Clubs: </strong><?php echo $clubNames; ?></p>
+                            <div class="row col-md-12">
+                                <div class="col-md-6">
+                                    <p><strong>Student ID: </strong><?php echo $student_id; ?></p>
+                                    <p><strong>Email: </strong><?php echo $email; ?></p>
+                                    <p><strong>Phone Number: </strong><?php echo $phoneNumber; ?></p>
+                                    <p><strong>Department: </strong><?php echo $department; ?></p>
+                                    <p><strong>Course: </strong><?php echo $course; ?></p>
+                                    <p><strong>Year: </strong><?php echo $year; ?></p>
+                                    <p><strong>Gender: </strong><?php echo $gender; ?></p>
+                                    <p><strong>Age: </strong><?php echo $age; ?></p>
+                                    <p><strong>Birthday: </strong><?php echo $birthday; ?></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Clubs:</strong><br><?php echo $clubDetails; ?></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
