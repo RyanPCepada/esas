@@ -21,20 +21,14 @@ switch ($method) {
             exit();
         }
 
-        $moderator_id = $_SESSION['moderator_id'];
-
-        // Fetch the club_id for the logged-in moderator from the tbl_clubs_and_moderators table
-        $stmt = $pdo->prepare('SELECT club_id FROM tbl_clubs_and_moderators WHERE moderator_id = ?');
-        $stmt->execute([$moderator_id]);
-        $moderator = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$moderator) {
-            http_response_code(404);
-            echo json_encode(['error' => 'Moderator not found']);
+        // Fetch the club_id from the GET parameters
+        if (!isset($_GET['club_id'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing club_id parameter']);
             exit();
         }
 
-        $club_id = $moderator['club_id'];
+        $club_id = $_GET['club_id']; // Get club_id from the request
 
         // Check if an ID parameter is provided
         if (isset($_GET['post_id'])) {
@@ -58,7 +52,7 @@ switch ($method) {
                 echo json_encode(['error' => 'Post not found']);
             }
         } else {
-            // Fetch all posts for the current club
+            // Fetch all posts for the provided club_id
             $stmt = $pdo->prepare('
                 SELECT tbl_posts.*, tbl_moderators.firstName, tbl_moderators.middleName, tbl_moderators.lastName, tbl_moderators.profilePic
                 FROM tbl_posts
@@ -83,4 +77,3 @@ switch ($method) {
         echo json_encode(['error' => 'Method not allowed']);
         break;
 }
-?>

@@ -15,15 +15,9 @@ $club_id = "";
 $clubName = ""; 
 $coverPhoto = ""; 
 
-// Fetch the club_id for the current moderator through tbl_clubs_and_moderators
-$sql = "SELECT club_id FROM tbl_clubs_and_moderators WHERE moderator_id = :moderator_id";
-$stmt = $pdo->prepare($sql);
-$stmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT);
-$stmt->execute();
-$clubModerator = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if ($clubModerator) {
-    $club_id = $clubModerator['club_id'];
+// Check if club_id is provided in the URL
+if (isset($_GET['club_id'])) {
+    $club_id = intval($_GET['club_id']); // Use intval to ensure it's an integer
 
     // Fetch the club name and cover photo using the club_id
     $sql = "SELECT clubName, coverPhoto FROM tbl_clubs WHERE club_id = :club_id";
@@ -36,11 +30,14 @@ if ($clubModerator) {
         $clubName = $club['clubName']; 
         $coverPhoto = $club['coverPhoto']; 
     }
+} else {
+    // Handle the case where no club_id is provided
+    echo "<script>alert('No club ID provided.'); window.location.href = 'some_page.php';</script>";
+    exit();
 }
 
 // Handle post submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     // Validate post content
     $input_postContent = trim($_POST["postContent"]);
     if (empty($input_postContent)) {
@@ -85,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
             echo "<script>alert('Post created successfully!');</script>";
-            echo "<script>window.location.href = 'home.php';</script>";
+            echo "<script>window.location.href = 'home.php?club_id={$club_id}';</script>";
             exit();
         } else {
             echo "Oops! Something went wrong. Please try again later.";
@@ -263,7 +260,7 @@ unset($pdo);
     <div class="wrapper">
         <div class="container-fluid">
             <div class="cover-photo-container">
-                <img src="/e-sas/esas-moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
+                <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
             </div>
             <div class="overlay-text">
                 <div class="d-flex align-items-center">
@@ -281,9 +278,10 @@ unset($pdo);
                         </div>
                         <div class="card-body">
                             <form id="postForm" method="POST" action="home.php">
+                            <!-- <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>"> -->
                                 <div class="form-group">
                                     <label for="postContent">What's on your mind?</label>
-                                    <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share your club's latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
+                                    <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
                                     <span class="text-danger"><?php echo $postContent_err; ?></span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
@@ -312,6 +310,9 @@ unset($pdo);
                 <div class="row" id="postsContainer">
                     <!-- Posts will be dynamically inserted here -->
                 </div>
+                <div class="mt-2 text-center align-items-center justify-content-center">
+                    <a href="javascript:history.back();" class="btn btn-secondary">Go Back</a>
+                </div>
             </div>
         </div>
     </div>
@@ -331,8 +332,8 @@ unset($pdo);
             }
 
             // Function to fetch and display posts
-            function fetchPosts() {
-                fetch('/esas/esas_moderator/apis/posts-api.php')
+            function fetchPosts(clubId) { // Pass clubId as a parameter
+                fetch(`/esas/esas_moderator/apis/posts-api.php?club_id=${clubId}`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
@@ -342,14 +343,12 @@ unset($pdo);
                     .then(data => {
                         console.log('Fetched posts:', data); // Log the fetched data
                         const postsContainer = document.getElementById('postsContainer');
+                        postsContainer.innerHTML = ''; // Clear existing posts
                         if (data && data.length > 0) {
-                            postsContainer.innerHTML = ''; // Clear existing posts
                             data.forEach(post => {
                                 const [date, time] = post.dateAdded.split(' ');
                                 const formattedDate = formatDate(date);
                                 const formattedTime = formatTime(time);
-
-                                // Determine the comment count text
                                 const commentText = post.numberOfComments === 1 ? '1 comment' : `${post.numberOfComments || 0} comments`;
 
                                 const postHTML = `
@@ -358,6 +357,8 @@ unset($pdo);
                                             <div class="card-header d-flex align-items-start">
                                                 <img src="/esas/esas_moderator/images/${post.profilePic}" alt="${post.fullName}" class="rounded-circle mr-3" width="50" height="50">
                                                 <div>
+                                                    <h5 class="card-title mb-1">Club ID: ${post.club_id}</h5>
+                                                    <h5 class="card-title mb-1">Post ID: ${post.post_id}</h5>
                                                     <h5 class="card-title mb-1">${post.fullName}</h5>
                                                     <p class="text-muted mb-0">${formattedDate} @ ${formattedTime}</p>
                                                 </div>
@@ -435,10 +436,13 @@ unset($pdo);
                 }
             };
 
-            // Call fetchPosts on page load
-            fetchPosts();
+            // Call fetchPosts with the correct club ID on page load
+            const clubId = "<?php echo $club_id; ?>"; // Ensure this variable is set correctly
+            fetchPosts(clubId);
         });
+        
     </script>
+
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
