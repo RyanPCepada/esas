@@ -70,24 +70,29 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             $dateAdded = htmlspecialchars($club['dateAdded']);
             $membersCount = htmlspecialchars($club['membersCount']);
             
-            // Process moderators' names and profile pictures
-            $moderatorNames = explode('|', $club['moderatorNames']);
-            $moderatorPics = explode('|', $club['moderatorPics']);
-            $numModerators = $club['numModerators'];
+            // Safely process moderators' names and profile pictures
+            $moderatorNames = !empty($club['moderatorNames']) ? explode('|', $club['moderatorNames']) : [];
+            $moderatorPics = !empty($club['moderatorPics']) ? explode('|', $club['moderatorPics']) : [];
+            $numModerators = isset($club['numModerators']) ? $club['numModerators'] : 0;
 
             // Generate moderators HTML
             $moderators = '';
-            foreach ($moderatorNames as $index => $name) {
-                $pic = isset($moderatorPics[$index]) ? htmlspecialchars($moderatorPics[$index]) : '';
-                $moderators .= '
-                <div class="moderator-item">
-                    <img src="/esas/esas_moderator/images/' . $pic . '" alt="Profile Pic" class="moderator-pic">
-                    <p class="moderator-name">' . htmlspecialchars($name) . '</p>
-                </div>';
+            if ($numModerators > 0) {
+                foreach ($moderatorNames as $index => $name) {
+                    $pic = isset($moderatorPics[$index]) ? htmlspecialchars($moderatorPics[$index]) : '';
+                    $moderators .= '
+                    <div class="moderator-item">
+                        <img src="/esas/esas_moderator/images/' . $pic . '" alt="Profile Pic" class="moderator-pic">
+                        <p class="moderator-name">' . htmlspecialchars($name) . '</p>
+                    </div>';
+                }
+            } else {
+                // If there are no moderators, show "None"
+                $moderators = '<h4 class="text-muted">None</h4>';
             }
 
             // Set the correct label for moderators
-            $moderatorsLabel = ($numModerators === 1) ? 'Moderator:' : 'Moderators:';
+            $moderatorsLabel = ($numModerators <= 1) ? 'Moderator:' : 'Moderators:';
 
             // Format the date into "Month Year"
             try {
@@ -102,12 +107,23 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             $information = 'No information available for this club.';
         }
 
+
+
         // Fetch the student's registration status for the current club
-        $stmt = $pdo->prepare("SELECT status FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id");
+        $stmt = $pdo->prepare("
+        SELECT status, registration_id 
+        FROM tbl_registration 
+        WHERE student_id = :student_id 
+        AND club_id = :club_id 
+        ORDER BY registration_id DESC LIMIT 1"); // Fetch the latest registration
         $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
         $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
         $stmt->execute();
-        $status = $stmt->fetchColumn(); // Fetch the registration status (e.g., 'active', 'pending', etc.)
+        $registration = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $status = $registration['status'] ?? null;  // Use null if no registration found
+        $registration_id = $registration['registration_id'] ?? null; // Fetch the corresponding registration_id
+
 
         // Count how many clubs the student is currently "active" in
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
@@ -340,6 +356,46 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                     <a href="javascript:history.go(-1)" class="btn btn-secondary">Go Back</a>
                 </div>
             </div>
+
+
+
+            <!-- REGISTRATION ID IS THE PARAMETER
+            <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
+                <?php if ($status === 'active'): ?>
+                    <div class="alert alert-info custom-alert" role="alert">
+                        <p class="lead mb-0">You are already a member of this club.
+                            <a href="/esas/esas_student/home.php?club_id=<?php echo $club_id; ?>&registration_id=<?php echo $registration_id; ?>"> Go to Home</a>
+                        </p>
+                    </div>
+                <?php elseif ($status === 'pending' && $clubsCount >= 2): ?>
+                    <div class="alert alert-danger custom-alert" role="alert">
+                        <p class="lead mb-0">You are no longer qualified for this club. You can only register for up to 2 clubs.</p>
+                    </div>
+                <?php elseif ($clubsCount >= 2 && $disapprovedCount >= 3): ?>
+                    <div class="alert alert-danger custom-alert" role="alert">
+                        <p class="lead mb-0">You are already registered in 2 clubs and reached the maximum number of registrations allowed for this club.</p>
+                    </div>
+                <?php elseif ($clubsCount >= 2): ?>
+                    <div class="alert alert-danger custom-alert" role="alert">
+                        <p class="lead mb-0">You can only register for up to 2 clubs.</p>
+                    </div>
+                <?php elseif ($status === 'pending'): ?>
+                    <div class="alert alert-warning custom-alert" role="alert">
+                        <p class="lead mb-0">You have already applied to this club. Please wait for the Moderator's approval.</p>
+                    </div>
+                <?php elseif ($disapprovedCount >= 3): ?>
+                    <div class="alert alert-danger custom-alert" role="alert">
+                        <p class="lead mb-0">You have reached the maximum number of registrations allowed for this club.</p>
+                    </div>
+                <?php else: ?>
+                    <h4 class="mb-3">Join Us Now!</h4>
+                    <p class="lead">If you want to be a part of us, register now and become a member of <?php echo $clubName; ?>.</p>
+                    <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>, <?php echo $registration_id; ?>)">Register Now</button>
+                <?php endif; ?>
+                <div class="mt-3">
+                    <a href="javascript:history.go(-1)" class="btn btn-secondary">Go Back</a>
+                </div>
+            </div> -->
 
         </div>
     </div>
