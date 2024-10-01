@@ -2,6 +2,9 @@
 session_start();
 require_once "../../../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 $student_id = $_SESSION['student_id'];
 $club_id = $_GET['club_id']; // Get the club ID from the request
 

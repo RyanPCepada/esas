@@ -4,6 +4,9 @@ require_once '../../config.php';
 // Start the session to access session variables
 session_start();
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Set the content type to JSON
 header('Content-Type: application/json');
 

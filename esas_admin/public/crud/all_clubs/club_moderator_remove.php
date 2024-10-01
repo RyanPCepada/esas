@@ -5,6 +5,9 @@ session_start();
 // Include the configuration file
 require_once '../../../../config.php';
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Check if both club_id and moderator_id are provided
 if (isset($_POST['club_id']) && isset($_POST['moderator_id'])) {
     $club_id = $_POST['club_id'];

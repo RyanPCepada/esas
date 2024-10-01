@@ -2,6 +2,9 @@
 session_start();
 require_once "../../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 $response = array('success' => false, 'message' => '', 'comments' => array());
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {

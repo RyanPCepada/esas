@@ -1,6 +1,9 @@
 <?php
     require_once '../../config.php';
 
+    // Set the default timezone to Asia/Manila
+    date_default_timezone_set('Asia/Manila');
+
     // Retrieve the student ID and password from the form
     $student_id = $_POST['student_id'];
     $pass =  $_POST['password'];

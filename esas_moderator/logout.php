@@ -2,6 +2,9 @@
 // Initialize the session
 session_start();
  
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Unset all of the session variables
 $_SESSION = array();
  

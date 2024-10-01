@@ -2,6 +2,9 @@
 // Include config file
 require_once "../../../../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Check if the club_id parameter exists
 if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
     // Get the club_id from the query string

@@ -5,6 +5,9 @@ session_start();
 // Include the configuration file
 require_once '../config.php';
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Initialize variables for club information
 $clubName = '';
 $information = '';

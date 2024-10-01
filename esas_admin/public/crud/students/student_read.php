@@ -1,5 +1,8 @@
 <?php
 // Check existence of student_id parameter before processing further
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
     // Include config file
     require_once "../../../../config.php";

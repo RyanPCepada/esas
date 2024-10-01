@@ -2,6 +2,9 @@
 
 require_once "../../../../config.php"; 
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) { 
     $request_id = trim($_GET["request_id"]); 
     $sql = "SELECT 

@@ -1,6 +1,9 @@
 <?php
 require_once "../../../../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Define the default profile picture constant
 define('PROF_PIC_DEFAULT', 'PROF_PIC.png'); // Change 'PROF_PIC.png' to your actual default image path if necessary
 

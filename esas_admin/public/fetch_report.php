@@ -1,6 +1,9 @@
 <?php
 require_once "../../config.php";  // Database connection
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $reportType = $_POST['reportType'];
     $startDate = $_POST['startDate'];

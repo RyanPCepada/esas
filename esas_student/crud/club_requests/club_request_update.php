@@ -1,6 +1,9 @@
 <?php
 require_once "../../../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 $requestId = $_GET['request_id'] ?? null; // Get the request ID from the query string
 $clubName = $goal = $activities = $coverPhoto = $requestLetter = "";
 $clubName_err = $goal_err = $activities_err = $coverPhoto_err = $requestLetter_err = "";

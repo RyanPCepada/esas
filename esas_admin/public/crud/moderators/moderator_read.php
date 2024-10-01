@@ -2,6 +2,9 @@
 // Include config file
 require_once "../../../../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Check if the moderator_id parameter exists
 if (isset($_GET["moderator_id"]) && !empty(trim($_GET["moderator_id"]))) {
     // Get the moderator_id from the query string

@@ -1,6 +1,9 @@
 <?php
 require_once "../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 try {
     $pdo = new PDO($dsn, $username, $password, $options);
 

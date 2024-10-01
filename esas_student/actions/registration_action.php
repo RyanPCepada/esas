@@ -2,6 +2,9 @@
 // Include config file
 require_once "../../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Define variables and initialize with empty values
 $question1 = $question2 = $question3 = $club_id = $status = "";
 $question1_err = $question2_err = $question3_err = $club_id_err = "";

@@ -2,6 +2,9 @@
 session_start();
 require_once "../../config.php";  // Assuming this file holds your PDO connection
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 if (!isset($_SESSION['admin_id'])) {
     echo "Admin ID is not set in the session.";
     exit;

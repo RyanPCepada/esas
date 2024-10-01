@@ -1,5 +1,8 @@
 <?php
 // Process delete operation after confirmation
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 if (isset($_POST["student_id"]) && !empty($_POST["student_id"])) {
     // Include config file
     require_once "../../../../config.php";

@@ -2,6 +2,9 @@
 session_start();
 require_once "../../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Fetch the current moderator's ID
 $moderator_id = $_SESSION['moderator_id'];
 

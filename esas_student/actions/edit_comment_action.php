@@ -2,6 +2,9 @@
 // Include config file
 require_once "../../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Define variables and initialize with empty values
 $new_comment = "";
 $new_comment_err = "";

@@ -5,6 +5,9 @@ session_start();
 // Include the configuration file
 require_once '../../../../config.php';
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Get the moderator ID from the URL or session
 $moderator_id = $_GET['moderator_id'] ?? $_SESSION['moderator_id'];
 

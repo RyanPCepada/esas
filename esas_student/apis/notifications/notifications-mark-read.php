@@ -2,6 +2,9 @@
 session_start();
 require_once "../../../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 $student_id = $_POST['student_id'];
 
 // Update the is_read field to 1 for all notifications for this student

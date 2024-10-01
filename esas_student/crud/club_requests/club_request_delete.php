@@ -1,6 +1,9 @@
 <?php
 require_once "../../../config.php";
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Check if request_id is set
     if (isset($_POST['request_id']) && !empty($_POST['request_id'])) {
