@@ -357,8 +357,6 @@ unset($pdo);
                                             <div class="card-header d-flex align-items-start">
                                                 <img src="/esas/esas_moderator/images/${post.profilePic}" alt="${post.fullName}" class="rounded-circle mr-3" width="50" height="50">
                                                 <div>
-                                                    <h5 class="card-title mb-1">Club ID: ${post.club_id}</h5>
-                                                    <h5 class="card-title mb-1">Post ID: ${post.post_id}</h5>
                                                     <h5 class="card-title mb-1">${post.fullName}</h5>
                                                     <p class="text-muted mb-0">${formattedDate} @ ${formattedTime}</p>
                                                 </div>

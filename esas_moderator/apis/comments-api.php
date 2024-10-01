@@ -12,22 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if (!empty($post_id)) {
         try {
-            // Fetch comments along with student or moderator profile pictures and names
-            $sql = "SELECT c.comment, c.dateAdded, 
-                           CASE 
-                               WHEN c.student_id IS NOT NULL THEN CONCAT(s.firstName, ' ', s.lastName)
-                               WHEN c.moderator_id IS NOT NULL THEN CONCAT(m.firstName, ' ', m.lastName)
-                           END as commenter_name,
-                           CASE 
-                               WHEN c.student_id IS NOT NULL THEN s.profilePic
-                               WHEN c.moderator_id IS NOT NULL THEN m.profilePic
-                           END as profilePic
-                    FROM comments c
-                    LEFT JOIN tbl_students s ON c.student_id = s.student_id
-                    LEFT JOIN tbl_moderators m ON c.moderator_id = m.moderator_id
+            // Fetch comments, student profile pictures, comment_id, and student_id
+            $sql = "SELECT c.comment_id, c.comment, c.dateAdded, c.student_id, CONCAT(s.firstName, ' ', s.lastName) as student_name, s.profilePic
+                    FROM tbl_comments c
+                    JOIN tbl_students s ON c.student_id = s.student_id
                     WHERE c.post_id = :post_id
                     ORDER BY c.dateAdded ASC";
-
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(":post_id", $post_id, PDO::PARAM_INT);
             $stmt->execute();
