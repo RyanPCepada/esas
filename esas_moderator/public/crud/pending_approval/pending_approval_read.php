@@ -2,8 +2,16 @@
 // Include config file
 require_once "../../../../config.php";
 
-// Check existence of student_id parameter before processing further
-if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"])) && isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
+// Check existence of student_id, club_id, and registration_id parameter before processing further
+if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"])) 
+    && isset($_GET["club_id"]) && !empty(trim($_GET["club_id"])) 
+    && isset($_GET["registration_id"]) && !empty(trim($_GET["registration_id"]))) {
+
+    // Set parameters
+    $param_student_id = trim($_GET["student_id"]);
+    $param_club_id = trim($_GET["club_id"]);
+    $param_registration_id = trim($_GET["registration_id"]); // Get registration_id from URL
+
     // Prepare a select statement to fetch the student details
     $sql = "SELECT * FROM tbl_students WHERE student_id = :student_id";
 
@@ -82,18 +90,25 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"])) && isset($_G
 // Handle approval or disapproval
 if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprove'])) {
     // Set new status based on action
-    $newStatus = $_POST["action"] === 'approve' ? 'active' : 'disapproved'; 
-    // Prepare the SQL statement to update the registration status and dateApproved
-    $updateSql = "UPDATE tbl_registration SET status = :status, dateApproved = NOW() WHERE student_id = :student_id AND club_id = :club_id";
+    $newStatus = $_POST["action"] === 'approve' ? 'active' : 'disapproved';
+
+    // Prepare the SQL statement to update the specific registration record
+    $updateSql = "UPDATE tbl_registration 
+                  SET status = :status, dateApproved = NOW() 
+                  WHERE student_id = :student_id 
+                  AND club_id = :club_id 
+                  AND registration_id = :registration_id"; // Include registration_id
 
     if ($updateStmt = $pdo->prepare($updateSql)) {
+        // Bind parameters
         $updateStmt->bindParam(":status", $newStatus);
         $updateStmt->bindParam(":student_id", $param_student_id, PDO::PARAM_INT);
-        $updateStmt->bindParam(":club_id", $param_club_id, PDO::PARAM_INT); // Add this line
+        $updateStmt->bindParam(":club_id", $param_club_id, PDO::PARAM_INT);
+        $updateStmt->bindParam(":registration_id", $param_registration_id, PDO::PARAM_INT); // Bind registration_id
 
+        // Execute the update statement
         if ($updateStmt->execute()) {
             header("location: ../../pending_approvals.php");
-            // header("Location: ../../pending_approvals.php?club_id=" . urlencode($_POST['club_id']) . "&school_year=" . urlencode($_POST['school_year']));
             exit();
         } else {
             echo "Error updating the request. Please try again.";
@@ -214,6 +229,7 @@ $disapprovedCount = $stmt->fetchColumn();
                 <div class="card-footer text-center">
                     <form id="approvalForm" method="post">
                         <input type="hidden" name="action" id="action" value="">
+                        <input type="hidden" name="registration_id" value="<?php echo htmlspecialchars($param_registration_id); ?>">
                         <?php if ($clubsCount >= 2): ?>
                             <!-- <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button> -->
                             <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Students List</a>
