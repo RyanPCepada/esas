@@ -541,32 +541,7 @@ unset($pdo);
         document.getElementById('editPostContent').value = postContent;
         $('#editPostModal').modal('show');
     }
-
-    // Open the Delete Post modal
-    function deletePost(button) {
-        const postId = button.getAttribute('data-post-id');
-        document.getElementById('deletePostId').value = postId;
-        $('#deletePostModal').modal('show');
-    }
-
-    // Confirm delete action
-    function confirmDelete() {
-        const postId = document.getElementById('deletePostId').value;
-        fetch(`/esas/esas_moderator/actions/delete_post_action.php?post_id=${postId}`, {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Post deleted successfully.'); // Alert for successful delete
-                location.reload(); // Reload the page after successful deletion
-            } else {
-                alert('Error deleting post.');
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
+    
     // Handle edit post form submission
     document.getElementById('editPostForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent default form submission
@@ -587,6 +562,33 @@ unset($pdo);
         })
         .catch(error => console.error('Error:', error));
     });
+
+    // Open the Delete Post modal
+    function deletePost(button) {
+        const postId = button.getAttribute('data-post-id');
+        document.getElementById('deletePostId').value = postId;
+        $('#deletePostModal').modal('show');
+    }
+
+    // Confirm delete action
+    function confirmDelete() {
+        const postId = document.getElementById('deletePostId').value;
+        fetch(`/esas/esas_moderator/actions/delete_post_action.php?post_id=${postId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Post deleted successfully.'); // Alert for successful delete
+                location.reload(); // Reload the page after successful deletion
+            } else {
+                alert(`Error deleting post ID #${postId}.`); 
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    
 </script>
 
 
