@@ -213,7 +213,8 @@ try {
                                             <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
                                                 <thead>
                                                     <tr>
-                                                        <th></th>
+                                                        <th>Moderator ID</th>
+                                                        <th>Profile</th>
                                                         <th>Full Name</th>
                                                         <th>Club</th>
                                                         <th>Department</th>
@@ -223,6 +224,7 @@ try {
                                                 <tbody>';
 
                                                 while ($row = $result->fetch()) {
+                                                    $moderator_id = htmlspecialchars($row['moderator_id']);
                                                     $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['lastName']);
                                                     $clubNames = htmlspecialchars($row['clubNames']);
                                                     $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
@@ -232,6 +234,7 @@ try {
 
                                                     echo '
                                                     <tr class="moderator-row">
+                                                        <td class="moderator-id">' . $moderator_id . '</td>
                                                         <td class="text-center p-1">
                                                             <img class="moderator-profile-pic" src="/esas/esas_moderator/images/' . $profilePic . '" 
                                                                 alt="' . $fullName . ' profile picture" 

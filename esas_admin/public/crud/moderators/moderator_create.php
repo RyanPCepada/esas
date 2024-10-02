@@ -5,10 +5,10 @@ require_once "../../../../config.php";
 date_default_timezone_set('Asia/Manila');
 
 // Define the default profile picture constant
-define('PROF_PIC_DEFAULT', 'PROF_PIC.png'); // Change 'PROF_PIC.png' to your actual default image path if necessary
+define('PROF_PIC_DEFAULT', 'PROF_PIC.png'); 
 
-$firstName = $middleInitial = $lastName = $email = $password = "";
-$firstName_err = $middleInitial_err = $lastName_err = $email_err = $password_err = "";
+$firstName = $middleInitial = $lastName = $password = "";
+$firstName_err = $middleInitial_err = $lastName_err = $password_err = "";
 $clubs = [];
 
 // Fetch clubs for selection
@@ -17,6 +17,33 @@ if ($stmt = $pdo->prepare($clubQuery)) {
     if ($stmt->execute()) {
         $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+}
+
+// Function to get the school year code '2425' for the 2024-2025 school year
+function getSchoolYearCode() {
+    $currentYear = date('Y');
+    $nextYear = $currentYear + 1; // School year spans two years
+    return substr($currentYear, 2, 2) . substr($nextYear, 2, 2); // Returns '2425' for 2024-2025
+}
+
+// Function to get the next available 4-digit increment for the moderator ID
+function getNextModeratorIncrement($pdo, $schoolYearCode) {
+    $sql = "SELECT moderator_id FROM tbl_moderators WHERE moderator_id LIKE :schoolYearCode ORDER BY moderator_id DESC LIMIT 1";
+    $stmt = $pdo->prepare($sql);
+    $likePattern = $schoolYearCode . '%';
+    $stmt->bindParam(':schoolYearCode', $likePattern);
+    $stmt->execute();
+    
+    $lastModeratorId = $stmt->fetchColumn();
+    
+    if ($lastModeratorId) {
+        $lastIncrement = (int)substr($lastModeratorId, 4, 4);
+        $nextIncrement = str_pad($lastIncrement + 1, 4, '0', STR_PAD_LEFT); 
+    } else {
+        $nextIncrement = '0001';
+    }
+    
+    return $nextIncrement;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -41,40 +68,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $lastName = $input_lastName;
     }
 
-    $input_email = trim($_POST["email"]);
-    if (empty($input_email)) {
-        $email_err = "Please enter an email.";
-    } elseif (!filter_var($input_email, FILTER_VALIDATE_EMAIL)) {
-        $email_err = "Invalid email format.";
-    } else {
-        $email = $input_email;
-    }
-
     $input_password = trim($_POST["password"]);
     if (empty($input_password)) {
         $password_err = "Please enter a password.";
     } else {
-        $password = $input_password; // No hashing
+        $password = $input_password;
     }
+
+    // Generate moderator ID
+    $schoolYearCode = getSchoolYearCode();
+    $nextIncrement = getNextModeratorIncrement($pdo, $schoolYearCode);
+    $moderator_id = $schoolYearCode . $nextIncrement; // Example: '24250022'
 
     // Set default profile picture
     $profilePic = PROF_PIC_DEFAULT;
 
-    if (empty($firstName_err) && empty($middleInitial_err) && empty($lastName_err) && empty($email_err) && empty($password_err)) {
-        $sql = "INSERT INTO tbl_moderators (firstName, middleName, lastName, email, password, profilePic, dateAdded) 
-                VALUES (:firstName, :middleInitial, :lastName, :email, :password, :profilePic, NOW())";
+    if (empty($firstName_err) && empty($middleInitial_err) && empty($lastName_err) && empty($password_err)) {
+        $sql = "INSERT INTO tbl_moderators (firstName, middleName, lastName, moderator_id, password, profilePic, dateAdded) 
+                VALUES (:firstName, :middleInitial, :lastName, :moderator_id, :password, :profilePic, NOW())";
         if ($stmt = $pdo->prepare($sql)) {
             $stmt->bindParam(":firstName", $firstName);
             $stmt->bindParam(":middleInitial", $middleInitial);
             $stmt->bindParam(":lastName", $lastName);
-            $stmt->bindParam(":email", $email);
+            $stmt->bindParam(":moderator_id", $moderator_id);
             $stmt->bindParam(":password", $password);
             $stmt->bindParam(":profilePic", $profilePic);
 
             if ($stmt->execute()) {
                 $newModeratorId = $pdo->lastInsertId();
 
-                // Associate moderator with club if selected
                 if (!empty($_POST["club"])) {
                     $selectedClubId = $_POST["club"];
                     $sql2 = "INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id, dateAdded) 
@@ -86,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                 }
 
-                header("location: ../../moderators.php"); // Redirect to a list of moderators
+                header("location: ../../moderators.php"); 
                 exit();
             } else {
                 echo "Oops! Something went wrong. Please try again later.";
@@ -97,6 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     unset($pdo);
 }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -144,11 +167,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <label>Last Name</label>
                         <input type="text" name="lastName" class="form-control <?php echo (!empty($lastName_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $lastName; ?>" required>
                         <span class="invalid-feedback"><?php echo $lastName_err; ?></span>
-                    </div>
-                    <div class="form-group mb-2">
-                        <label>Email</label>
-                        <input type="email" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>" required>
-                        <span class="invalid-feedback"><?php echo $email_err; ?></span>
                     </div>
                     <div class="form-group mb-2">
                         <label>Temporary Password</label>
