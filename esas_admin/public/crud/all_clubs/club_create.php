@@ -21,19 +21,19 @@ if (isset($_POST['action']) && $_POST['action'] == 'add_moderator') {
     $firstName = trim($_POST['firstName']);
     $middleInitial = trim($_POST['middleInitial']);
     $lastName = trim($_POST['lastName']);
-    $moderator_id = trim($_POST['moderator_id']);
+    $email = trim($_POST['email']);
     $password = trim($_POST['password']); // No hashing
 
     // Set the profile picture to default
     $profilePic = PROF_PIC_DEFAULT;
 
-    $sql2 = "INSERT INTO tbl_moderators (firstName, middleName, lastName, moderator_id, password, profilePic, dateAdded) 
-             VALUES (:firstName, :middleInitial, :lastName, :moderator_id, :password, :profilePic, NOW())";
+    $sql2 = "INSERT INTO tbl_moderators (firstName, middleName, lastName, email, password, profilePic, dateAdded) 
+             VALUES (:firstName, :middleInitial, :lastName, :email, :password, :profilePic, NOW())";
     if ($stmt2 = $pdo->prepare($sql2)) {
         $stmt2->bindParam(":firstName", $firstName);
         $stmt2->bindParam(":middleInitial", $middleInitial);
         $stmt2->bindParam(":lastName", $lastName);
-        $stmt2->bindParam(":moderator_id", $moderator_id);
+        $stmt2->bindParam(":email", $email);
         $stmt2->bindParam(":password", $password); // No hashing
         $stmt2->bindParam(":profilePic", $profilePic); // Bind the default profile picture
 
@@ -238,8 +238,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <input type="text" name="lastName" class="form-control underline-input" required>
                     </div>
                     <div class="form-group mb-2">
-                        <label>Moderator ID:</label>
-                        <input type="moderator_id" name="moderator_id" class="form-control underline-input" required>
+                        <label>Email:</label>
+                        <input type="email" name="email" class="form-control underline-input" required>
                     </div>
                     <div class="form-group mb-2">
                         <label>Temporary Password:</label>
