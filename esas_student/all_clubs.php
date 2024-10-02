@@ -299,6 +299,11 @@ try {
                 <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
                     <ul class="nav nav-pills flex-column mb-auto">
                         <li>
+                            <a href="../esas_student/dashboard.php" class="nav-link left-sidebar text-dark" id="dashboard">
+                                <i class="fas fa-university"></i> Dashboard
+                            </a>
+                        </li>
+                        <li>
                             <a href="../esas_student/all_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="all-clubs">
                                 <i class="fas fa-university"></i> All Clubs
                             </a>
