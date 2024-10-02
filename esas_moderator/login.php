@@ -6,24 +6,24 @@ include '../config.php';
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-$email = '';
+$moderator_id = '';
 $password = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = trim($_POST['email']);
+    $moderator_id = trim($_POST['moderator_id']);
     $password = trim($_POST['password']);
     
     // Function to check moderator login with plain text password
-    function checkModerator($pdo, $email, $password) {
-        $query = "SELECT * FROM tbl_moderators WHERE email = :email AND password = :password";
+    function checkModerator($pdo, $moderator_id, $password) {
+        $query = "SELECT * FROM tbl_moderators WHERE moderator_id = :moderator_id AND password = :password";
         $stmt = $pdo->prepare($query);
-        $stmt->execute(['email' => $email, 'password' => $password]);
+        $stmt->execute(['moderator_id' => $moderator_id, 'password' => $password]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
     // Assuming $pdo is correctly initialized in your config.php
     
-    $moderator_result = checkModerator($pdo, $email, $password);
+    $moderator_result = checkModerator($pdo, $moderator_id, $password);
     if ($moderator_result) {
         $_SESSION['moderator_id'] = $moderator_result['moderator_id'];
         // Redirect to clubs.php upon successful login
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     } else {
         // Show an alert if login credentials are incorrect
-        echo "<script>alert('Invalid username/email or password.');</script>";
+        echo "<script>alert('Invalid Moderator ID or password.');</script>";
     }
 }
 ?>
@@ -134,8 +134,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <h4 class="text-center" id="label_login">Moderator Login</h4>
             <form action="" method="POST">
                 <div class="form-group">
-                    <label for="email">Username/Email</label>
-                    <input type="text" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
+                    <label for="moderator_id">Moderator ID</label>
+                    <input type="text" class="form-control" id="moderator_id" name="moderator_id" value="<?php echo htmlspecialchars($moderator_id); ?>" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>

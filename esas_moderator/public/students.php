@@ -371,6 +371,7 @@ try {
                                     <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
                                         <thead>
                                             <tr>
+                                                <th>Student ID</th>
                                                 <th>Profile</th>
                                                 <th>Full Name</th>
                                                 <th>Gender</th>
@@ -385,6 +386,7 @@ try {
 
                                     foreach ($result as $row) {
                                         $formattedDate = date('F j, Y', strtotime($row['student_dateAdded']));
+                                        $student_id = htmlspecialchars($row['student_id']);
                                         $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
                                         $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
                                         $gender = htmlspecialchars($row['gender']);
@@ -397,6 +399,7 @@ try {
 
                                         echo '
                                         <tr class="student-row">
+                                            <td>' . $student_id . '</td>
                                             <td class="text-center p-1">
                                                 <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
                                                     alt="' . $fullName . ' profile picture" 
