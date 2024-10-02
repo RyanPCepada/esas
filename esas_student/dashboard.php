@@ -269,7 +269,7 @@ try {
         .card-row1 .icon-style {
             position: absolute;
             font-size: 18px;
-            width: 6%;
+            width: 8%;
             background-color: #4682B4; /*steel blue*/
             background-color: #89CFF0; /* baby blue */
             background-color: #70B9E6; /*darker baby blue*/
@@ -457,7 +457,7 @@ try {
                                     <h4 class="text-muted mb-0">Registration Status Summary</h4>
                                 </div>
 
-                                <!-- Card for STUDENT TOTAL ACTIVE CLUBS -->
+                                <!-- Card for STUDENT TOTAL REGISTRATIONS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
@@ -483,7 +483,7 @@ try {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
-                                        <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
+                                        <i class="fas fa-file-signature mt-2 me-2 p-2 icon-style"></i>
                                         <p>Total Registration</p>
                                     </div>
                                 </div>
@@ -551,7 +551,7 @@ try {
                                 </div>
 
 
-                                <!-- Card for STUDENT TOTAL PENDING APPROVAL -->
+                                <!-- Card for STUDENT TOTAL DISAPPROVAL -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
@@ -575,7 +575,7 @@ try {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
-                                        <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
+                                        <i class="fas fa-times mt-2 me-2 p-2 icon-style"></i>
                                         <p>Total Disapproval</p>
                                     </div>
                                 </div>
@@ -584,7 +584,170 @@ try {
                             <!-- ROW-1 CARDS END -->
 
 
-                            
+                            <!-- ROW-2 CARDS START -->
+                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+                                
+                                <div class="mt-3 mb-3 d-flex justify-content-between align-items-center">
+                                    <!-- <h4 class="text-muted mb-0">Registrations Overview</h4> -->
+                                    <h4 class="text-muted mb-0">Club Requests Overview</h4>
+                                </div>
+
+                                <!-- Card for TOTAL CLUB REQUESTS -->
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <?php
+                                        try {
+                                            // SQL query to count total club requests for the student
+                                            $sql = "
+                                                SELECT COUNT(request_id) AS total_club_requests 
+                                                FROM tbl_club_requests
+                                                WHERE student_id = :student_id
+                                            ";
+
+                                            // Parameters for the query
+                                            $params = ['student_id' => $student_id];
+
+                                            // Prepare and execute the query
+                                            $stmt_requests = $pdo->prepare($sql);
+                                            $stmt_requests->execute($params);
+
+                                            // Fetch the total number of club requests
+                                            $total_club_requests = $stmt_requests->fetchColumn();
+                                            echo "<h3>$total_club_requests</h3>";
+                                        } catch (PDOException $e) {
+                                            echo "Error: " . $e->getMessage();
+                                        }
+                                        ?>
+                                        <i class="fas fa-clipboard-list mt-2 me-2 p-2 icon-style"></i>
+                                        <p>Total Club Requests</p>
+                                    </div>
+                                </div>
+
+                                
+                                <!-- Card for TOTAL PENDING REQUESTS -->
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <?php
+                                        try {
+                                            // SQL query to count total pending club requests
+                                            $sql = "
+                                                SELECT COUNT(request_id) AS total_pending_requests 
+                                                FROM tbl_club_requests 
+                                                WHERE status = 'pending' 
+                                                AND student_id = :student_id
+                                            ";
+
+                                            // Prepare and execute the query
+                                            $stmt_pending_requests = $pdo->prepare($sql);
+                                            $stmt_pending_requests->execute(['student_id' => $student_id]);
+
+                                            // Fetch the total number of pending requests
+                                            $total_pending_requests = $stmt_pending_requests->fetchColumn();
+                                            echo "<h3>$total_pending_requests</h3>";
+                                        } catch (PDOException $e) {
+                                            echo "Error: " . $e->getMessage();
+                                        }
+                                        ?>
+                                        <i class="fas fa-hourglass-half mt-2 me-2 p-2 icon-style"></i>
+                                        <p>Total Pending Requests</p>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- Card for TOTAL APPROVED REQUESTS -->
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <?php
+                                        try {
+                                            // Base SQL query to count total approved club requests for the logged-in student
+                                            $sql = "
+                                                SELECT COUNT(*) AS total_approved_requests
+                                                FROM tbl_club_requests 
+                                                WHERE status = 'approved'
+                                                AND student_id = :student_id
+                                            ";
+
+                                            // Prepare and execute the query
+                                            $stmt_approved_requests = $pdo->prepare($sql);
+                                            $stmt_approved_requests->execute(['student_id' => $student_id]);
+
+                                            // Fetch the total number of approved requests
+                                            $total_approved_requests = $stmt_approved_requests->fetchColumn();
+                                            echo "<h3>$total_approved_requests</h3>";
+                                        } catch (PDOException $e) {
+                                            echo "Error: " . $e->getMessage();
+                                        }
+                                        ?>
+                                        <i class="fas fa-check mt-2 me-2 p-2 icon-style"></i>
+                                        <p>Total Approved Request</p>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- Card for TOTAL DISAPPROVED REQUESTS -->
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <?php
+                                        try {
+                                            // Base SQL query to count total disapproved club requests for the logged-in student
+                                            $sql = "
+                                                SELECT COUNT(*) AS total_disapproved_requests
+                                                FROM tbl_club_requests 
+                                                WHERE status = 'disapproved'
+                                                AND student_id = :student_id
+                                            ";
+
+                                            // Prepare and execute the query
+                                            $stmt_disapproved_requests = $pdo->prepare($sql);
+                                            $stmt_disapproved_requests->execute(['student_id' => $student_id]);
+
+                                            // Fetch the total number of disapproved requests
+                                            $total_disapproved_requests = $stmt_disapproved_requests->fetchColumn();
+                                            echo "<h3>$total_disapproved_requests</h3>";
+                                        } catch (PDOException $e) {
+                                            echo "Error: " . $e->getMessage();
+                                        }
+                                        ?>
+                                        <i class="fas fa-times mt-2 me-2 p-2 icon-style"></i>
+                                        <p>Total Disapproved Request</p>
+                                    </div>
+                                </div>
+
+
+                                <!-- Card for TOTAL ADDED REQUESTS -->
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <?php
+                                        try {
+                                            // Base SQL query to count total added club requests for the logged-in student
+                                            $sql = "
+                                                SELECT COUNT(*) AS total_approved_requests
+                                                FROM tbl_club_requests 
+                                                WHERE status = 'approved'
+                                                AND student_id = :student_id
+                                            ";
+
+                                            // Prepare and execute the query
+                                            $stmt_added_requests = $pdo->prepare($sql);
+                                            $stmt_added_requests->execute(['student_id' => $student_id]);
+
+                                            // Fetch the total number of added requests
+                                            $total_added_requests = $stmt_added_requests->fetchColumn();
+                                            echo "<h3>$total_added_requests</h3>";
+                                        } catch (PDOException $e) {
+                                            echo "Error: " . $e->getMessage();
+                                        }
+                                        ?>
+                                        <i class="fas fa-plus-circle mt-2 me-2 p-2 icon-style"></i>
+                                        <p>Total Added Request</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- ROW-2 CARDS END -->
+
 
                             
                         </div>
