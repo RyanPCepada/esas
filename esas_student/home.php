@@ -283,7 +283,7 @@ try {
         }
         .dropdown .ellipsis {
             position: absolute !important;
-            right: 10px; /* Position it on the far right */
+            right: 20px; /* Position it on the far right */
             top: 0%;
             border-radius: 50%;
             padding: 5px;
@@ -314,7 +314,10 @@ try {
                 margin-right: 10px;
                 line-height: 1.2; /* Adjust line height for closer spacing */
             }
-
+            .dropdown .ellipsis {
+                position: absolute !important;
+                right: 20px; /* Position it on the far right */
+            }
         }
     </style>
 </head>

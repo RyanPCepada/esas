@@ -1,97 +1,32 @@
 <?php
-// Check existence of student_id parameter before processing further
+// Database connection
+require_once "../../../../config.php";
+
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
-    // Include config file
-    require_once "../../../../config.php";
-    
-    // Prepare a select statement to fetch the student details
-    $sql = "SELECT * FROM tbl_students WHERE student_id = :student_id";
-    
-    if ($stmt = $pdo->prepare($sql)) {
-        // Bind variables to the prepared statement as parameters
-        $stmt->bindParam(":student_id", $param_student_id);
-        
-        // Set parameters
-        $param_student_id = trim($_GET["student_id"]);
-        
-        // Attempt to execute the prepared statement
-        if ($stmt->execute()) {
-            if ($stmt->rowCount() == 1) {
-                // Fetch result row as an associative array
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+// Get student_id from URL
+$student_id = $_GET['student_id'];
 
-                // Retrieve individual field values and set default values if necessary
-                $firstName = !empty($row["firstName"]) ? $row["firstName"] : '';
-                $middleName = !empty($row["middleName"]) ? $row["middleName"] : '';
-                $lastName = !empty($row["lastName"]) ? $row["lastName"] : '';
-                $fullName = trim("$firstName $middleName $lastName");
+// Fetch student details
+$studentQuery = $pdo->prepare("SELECT * FROM tbl_students WHERE student_id = ?");
+$studentQuery->execute([$student_id]);
+$student = $studentQuery->fetch();
 
-                $age = !empty($row["age"]) ? $row["age"] : 'None';
-                $birthday = !empty($row["birthday"]) ? date("F j, Y", strtotime($row["birthday"])) : 'None';
-                $gender = !empty($row["gender"]) ? $row["gender"] : 'None';
-                $email = !empty($row["instiEmail"]) ? $row["instiEmail"] : 'None';
-                $phoneNumber = !empty($row["phoneNumber"]) ? $row["phoneNumber"] : 'None';
-                $department = !empty($row["department"]) ? $row["department"] : 'None';
-                $course = !empty($row["course"]) ? $row["course"] : 'None';
-                $year = !empty($row["year"]) ? $row["year"] : 'None';
-                $student_id = $row["student_id"]; // Save student ID
-
-                // For clubs
-                $clubNames = 'None'; // Default value for now
-                $clubSql = "SELECT c.clubName, c.coverPhoto FROM tbl_registration r 
-                    JOIN tbl_clubs c ON r.club_id = c.club_id 
-                    WHERE r.student_id = :student_id AND r.status = 'active'"; // Add status condition
-                
-                if ($clubStmt = $pdo->prepare($clubSql)) {
-                    $clubStmt->bindParam(":student_id", $student_id);
-                    if ($clubStmt->execute()) {
-                        $clubs = $clubStmt->fetchAll(PDO::FETCH_COLUMN);
-                        $clubNames = !empty($clubs) ? implode(", ", $clubs) : 'None';
-                    }
-                }
-                // Fetch moderators for the clubs the student is part of
-                $moderatorNames = 'None'; // Default value for moderators
-                $moderatorSql = "SELECT m.firstName, m.middleName, m.lastName 
-                                 FROM tbl_clubs_and_moderators cm 
-                                 JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id 
-                                 JOIN tbl_registration r ON cm.club_id = r.club_id 
-                                 WHERE r.student_id = :student_id AND r.status = 'active'";
-                
-                if ($moderatorStmt = $pdo->prepare($moderatorSql)) {
-                    $moderatorStmt->bindParam(":student_id", $student_id);
-                    if ($moderatorStmt->execute()) {
-                        $moderators = $moderatorStmt->fetchAll(PDO::FETCH_ASSOC);
-                        $moderatorNames = !empty($moderators) ? implode(", ", array_map(function($mod) {
-                            return trim("{$mod['firstName']} {$mod['middleName']} {$mod['lastName']}");
-                        }, $moderators)) : 'None';
-                    }
-                }
-
-                // For profile picture
-                $profilePic = !empty($row['profilePic']) ? '/esas/esas_student/images/' . $row['profilePic'] : 'No Image Available';
-            } else {
-                // Redirect to error page if no valid id is found
-                header("location: ../public/error.php");
-                exit();
-            }
-        } else {
-            echo "Oops! Something went wrong. Please try again later.";
-        }
-    }
-     
-    // Close statement
-    unset($stmt);
-    
-    // Close connection
-    unset($pdo);
-} else {
-    // URL doesn't contain student_id parameter. Redirect to error page
-    header("location: ../public/error.php");
-    exit();
-}
+// Fetch active club registrations and concatenate moderator names for each club
+$clubQuery = $pdo->prepare("
+    SELECT cr.status, cl.clubName, cl.club_id, cl.coverPhoto, 
+           GROUP_CONCAT(CONCAT(m.firstName, ' ', m.middleName, ' ', m.lastName) SEPARATOR ', ') AS moderatorNames,
+           COUNT(m.moderator_id) AS moderatorCount
+    FROM tbl_registration cr
+    INNER JOIN tbl_clubs cl ON cr.club_id = cl.club_id
+    LEFT JOIN tbl_clubs_and_moderators cm ON cm.club_id = cl.club_id
+    LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
+    WHERE cr.student_id = ? AND cr.status = 'active'
+    GROUP BY cl.club_id
+");
+$clubQuery->execute([$student_id]);
+$clubs = $clubQuery->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -99,116 +34,253 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Details</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
-    <script src="../../../assets/js/all.js" crossorigin="anonymous"></script>
-    <script src="../../../assets/js/jquery-3.6.0.js"></script>
-    <link href="../../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../../assets/img/nbsclogo.png" rel="icon">
+    <title>Generate Student ID</title>
     <style>
-    @media print {
-        /* Hide the modal header and footer */
-        .modal-header,
-        .modal-footer {
-            display: none;
+        /* Your existing styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .id-container {
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            flex-wrap: wrap; /* Allow items to wrap */
+            align-items: center; /* Center vertically */
+            min-height: 100vh; /* Set a minimum height for vertical centering */
+        }
+        .id-card {
+            border-radius: 10px;
+            width: 280px;
+            height: 450px;
+            margin: 40px;
+            padding: 10px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Space items out within each card */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            flex: 0 1 280px; /* Prevent card from growing too much, maintain width */
+        }
+        .school-header, .student-info {
+            padding: 10px;
+        }
+        .school-header {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .school-header h4, .school-header h5 {
+            margin: 2px 0;
         }
 
-        /* Optionally, you can adjust styles for the modal body if needed */
-        .modal-body {
-            margin: 0; /* Remove any margins */
+        #profpic {
+            max-width: 100px;
+            height: auto;
+            border: solid 3px white;
+            border-radius: 50%;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
         }
-    }
-</style>
+        .fullname {
+            color: black;
+            text-shadow: 
+                1px 1px 0 rgba(255, 255, 255, 1),  
+                -1px -1px 0 rgba(255, 255, 255, 1),  
+                1px -1px 0 rgba(255, 255, 255, 1),  
+                -1px 1px 0 rgba(255, 255, 255, 1),  
+                0 3px 5px rgba(0, 0, 0, .5);
+            font-size: 20px;
+            margin-top: 0px !important;
+        }
+        
+        .moderator-label {
+            font-size: 14px;
+            color: black;
+            /* text-shadow: 
+                -1px -1px 0 white,  
+                1px -1px 0 white,
+                -1px 1px 0 white,
+                1px 1px 0 white; */
+            margin-bottom: 10px;
+        }
+        .moderator-info {
+            position: relative;
+            z-index: 2;
+            padding: 15px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .moderator-name {
+            margin: 0;
+            line-height: 2;
+            color: white;
+            text-shadow: 0 3px 5px rgba(0, 0, 0, .5);
+        }
 
+        /* Style for button container */
+        .button-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Hide buttons when printing */
+        @media print {
+            .button-container {
+                display: none;
+            }
+            body {
+                margin: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-    <div class="row p-5 text-center align-items-center justify-content-center">
 
+<!-- Button container placed at the top-right corner -->
+<div class="button-container">
+    <button onclick="printPage()">Print</button>
+    <button onclick="downloadPDF()">Download as PDF</button>
+</div>
 
-        <div class="card" style="border: none; border-radius: 20px; width: 350px; height: 550px; background-image: url('/esas/esas_admin/images/COVERPHOTO_ARTSSOCIETY.png'); background-size: 100% 100%; background-position: center;">
-
-            <img src="/esas/esas_admin/images/ID_BACKGROUND.png" 
-                style="width: 350px; height: 550px; border-radius: 20px; 
-                        opacity: 0.8;">
-
-
-
+<div class="id-container" id="id-container">
+    <?php if (count($clubs) > 0): ?>
+        <?php foreach ($clubs as $club): ?>
+            <div class="id-card" style="background-image: url('/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>');">
                 
+                <!-- Cover photo at the back -->
+                <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>" alt="Cover Photo" 
+                    style="width: 100%; height: 100%; border-radius: 10px; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 0; 
+                            opacity: 1; filter: brightness(0.5);">
 
-                <!-- Overlay Content -->
-                <div class="text-center" style="position: absolute; top: 2%; left: 50%; transform: translateX(-50%); text-align: center; color: white; width: 90%; z-index: 2000;">
-                    <div class="row d-flex align-items-center">
-                        <div class="ml-2">
-                            <img src="../../../../assets/img/nbsclogo.png" style="height: 0.5in; margin-right: 10px; filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.5));">
-                        </div>
-                        <div class="text-start" style="line-height: 1; margin-top: -13px; text-align: left;">
-                            <p style="font-size: 8px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">REPUBLIC OF THE PHILIPPINES</p>
-                            <p style="font-size: 11px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);"><strong>NORTHERN BUKIDNON STATE COLLEGE</strong></p>
-                            <p style="font-size: 9px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">Kihare, Manolo Fortich, Bukidnon</p>
-                        </div>
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+                            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, .95), rgba(255, 255, 255, 0.1)); 
+                            border-radius: 10px; z-index: 1;"></div>
+
+                <!-- ID Background in front of cover photo -->
+                <img src="/esas/esas_admin/images/ID_BACKGROUND.png" alt="ID Background" 
+                     style="width: 100%; height: 100%; border-radius: 10px; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;">
+
+                <div class="school-details" style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; margin: 0px;">
+                    <div style="margin-right: 5px;">
+                        <img src="../../../../assets/img/nbsclogo.png" style="height: 0.4in; filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.5));">
                     </div>
-
-                    <div class="text-center" style="position: absolute; top: 40px; left: 0; right: 0; margin: 20px auto; max-width: 90%;">
-                        <h2 style="color: gold; line-height: 1; text-shadow: 0 3px 3px rgba(0, 0, 0, .5);">
-                            <em><strong><?php echo htmlspecialchars($clubNames); ?></strong></em>
-                        </h2>
+                    <div style="text-align: center; color: rgba(255, 255, 255, 1);"> <!-- Center text here -->
+                        <p style="font-size: 8px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">REPUBLIC OF THE PHILIPPINES</p>
+                        <p style="font-size: 10px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);"><strong>NORTHERN BUKIDNON STATE COLLEGE</strong></p>
+                        <p style="font-size: 9px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">Kihare, Manolo Fortich, Bukidnon</p>
                     </div>
+                    <div style="margin-left: 5px;">
+                        <img src="../../../../assets/img/SAS_LOGO.png" style="height: 0.4in; filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.5));">
+                    </div>
+                </div>
 
-                    <!-- Profile Pic -->
-                    <img src="<?php echo $profilePic; ?>" 
-                        alt="<?php echo htmlspecialchars($fullName); ?> Profile Picture" 
-                        style="width: 125px; height: 125px; border: solid 5px white; border-radius: 50%;
-                        margin-top: 90px; margin-bottom: 10px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);">
-
-                    <!-- Student Info -->
-                    <h3 style="color: black; text-shadow: 
-                                2px 2px 0 rgba(255, 255, 255, 1),  
-                                -2px -2px 0 rgba(255, 255, 255, 1),  
-                                2px -2px 0 rgba(255, 255, 255, 1),  
-                                -2px 2px 0 rgba(255, 255, 255, 1),  
-                                0 0 5px rgba(0, 0, 0, 0.7);">
-                        <strong><?php echo htmlspecialchars($fullName); ?></strong>
+                <div class="student-info" style="position: relative; z-index: 2; text-align: center; padding-top: 0px; margin-top: 0px;">
+                    <!-- Club Name -->
+                    <h3 style="font-size: 21px; color: gold; line-height: 1; text-shadow: 0 3px 3px rgba(0, 0, 0, 1);">
+                        <em><strong><?php echo htmlspecialchars($club['clubName']); ?></strong></em>
                     </h3>
 
+                    <!-- Student Info -->
+                    <img id="profpic" src="/esas/esas_student/images/<?php echo htmlspecialchars($student['profilePic']); ?>" alt="Profile Picture">
+
+                    <h3 class="fullname"><?php echo htmlspecialchars($student['firstName'] . ' ' . $student['middleName'] . ' ' . $student['lastName']); ?></h3>
+
+    
+
                     <div style="margin-top: 20px;">
-                        <h6 style="color: black; text-shadow: 
+                        <h5 style="color: black; text-shadow: 
                                     0 0 5px rgba(255, 255, 255, 0.7),  
                                     0 0 10px rgba(255, 255, 255, 0.5),  
-                                    0 0 15px rgba(255, 255, 255, 0.3);">
-                            Student ID: <?php echo $student_id; ?>
-                        </h6>
-                        <h6 style="color: black; text-shadow: 
+                                    0 0 15px rgba(255, 255, 255, 0.3);
+                                    margin: 3px 0;">  <!-- Adjusted margin -->
+                            <strong>Student ID:</strong> <?php echo htmlspecialchars($student['student_id']); ?>
+                        </h5>
+                        <h5 style="color: black; text-shadow: 
                                     0 0 5px rgba(255, 255, 255, 0.7),  
                                     0 0 10px rgba(255, 255, 255, 0.5),  
-                                    0 0 15px rgba(255, 255, 255, 0.3);">
-                            Email: <?php echo $email; ?>
-                        </h6>
-                        <h6 style="color: black; text-shadow: 
+                                    0 0 15px rgba(255, 255, 255, 0.3);
+                                    margin: 3px 0;">  <!-- Adjusted margin -->
+                            <strong>Email:</strong> <?php echo htmlspecialchars($student['instiEmail']); ?>
+                        </h5>
+                        <h5 style="color: black; text-shadow: 
                                     0 0 5px rgba(255, 255, 255, 0.7),  
                                     0 0 10px rgba(255, 255, 255, 0.5),  
-                                    0 0 15px rgba(255, 255, 255, 0.3);">
-                            Phone: <?php echo $phoneNumber; ?>
-                        </h6>
+                                    0 0 15px rgba(255, 255, 255, 0.3);
+                                    margin: 3px 0;">  <!-- Adjusted margin -->
+                            <strong>Contact #:</strong> <?php echo htmlspecialchars($student['phoneNumber']); ?>
+                        </h5>
                     </div>
 
-                    <!-- MODERATORS' DIV -->
-                    <div class="" style="position: relative; margin-bottom: -40px; color: black;">
-                        <strong>Moderators:<br></strong>
-                        <?php
-                        // Assuming $moderatorNames is a string with names separated by commas
-                        $moderatorArray = explode(',', $moderatorNames);
-                        foreach ($moderatorArray as $moderator) {
-                            echo '<h6><span style="margin-top: 8px; display: block;">' . htmlspecialchars(trim($moderator)) . '</span></h6>';
+                </div>
+
+                <div class="moderator-info">
+                    <h5 class="moderator-label" style="margin-top: 0px;">
+                        <strong><?php echo $club['moderatorCount'] > 1 ? 'Moderators:' : 'Moderator:'; ?></strong>
+                    </h5>
+                    <div>
+                        <?php 
+                        $moderators = explode(', ', $club['moderatorNames']);
+                        foreach ($moderators as $moderator) {
+                            echo '<h5 class="moderator-name">' . htmlspecialchars($moderator) . '</h5>';
                         }
                         ?>
                     </div>
                 </div>
-        </div>
-    </div>
+
+
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>The student is not an active member of any clubs.</p>
+    <?php endif; ?>
 </div>
+
+
+<script>
+    // Function to trigger print dialog
+    function printPage() {
+        window.print();
+    }
+
+    // Function to download as PDF using jsPDF
+    function downloadPDF() {
+        var doc = new jsPDF('p', 'pt', 'a4');
+        var elementHTML = document.getElementById('id-container').innerHTML;
+        var specialElementHandlers = {
+            '#elementH': function (element, renderer) {
+                return true;
+            }
+        };
+        doc.fromHTML(elementHTML, 15, 15, {
+            'width': 170,
+            'elementHandlers': specialElementHandlers
+        });
+
+        // Save the generated PDF
+        doc.save('Student-ID.pdf');
+    }
+</script>
+
+<!-- Add the jsPDF library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </body>
 </html>
