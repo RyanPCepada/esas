@@ -291,8 +291,8 @@ unset($pdo);
                             <h4 class="mb-0">Share Something Exciting!</h4>
                         </div>
                         <div class="card-body">
-                            <form id="postForm" method="POST" action="home.php">
-                            <!-- <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>"> -->
+                            <!-- <form id="postForm" method="POST" action="home.php"> -->
+                            <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>">
                                 <div class="form-group">
                                     <label for="postContent">What's on your mind?</label>
                                     <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
