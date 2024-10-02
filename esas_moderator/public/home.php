@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $postContent = $input_postContent;
     }
-    
+
     // Check for errors before inserting into the database
     if (empty($postContent_err)) {
         // Prepare an insert statement for the post
@@ -81,17 +81,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $stmt->execute();
                 }
             }
-            echo "<script>alert('Post created successfully!');</script>";
-            echo "<script>window.location.href = 'home.php?club_id={$club_id}';</script>";
-            exit();
+
+            // Return a JSON response
+            echo json_encode([
+                "success" => true,
+                "message" => "Post created successfully!",
+                "redirect_url" => "home.php?club_id={$club_id}"
+            ]);
         } else {
-            echo "Oops! Something went wrong. Please try again later.";
+            echo json_encode(["success" => false, "message" => "Oops! Something went wrong. Please try again later."]);
         }
+    } else {
+        echo json_encode(["success" => false, "message" => $postContent_err]);
     }
 
     // Close statement
     unset($stmt);
+    // Close connection
+    unset($pdo);
+    exit();
 }
+
 
 // Close connection
 unset($pdo);
@@ -325,7 +335,7 @@ unset($pdo);
                     <!-- Posts will be dynamically inserted here -->
                 </div>
                 <div class="mt-2 text-center align-items-center justify-content-center">
-                    <a href="javascript:history.back();" class="btn btn-secondary">Go Back</a>
+                    <a href="../public/my_clubs.php" class="btn btn-secondary">Go Back</a>
                 </div>
             </div>
         </div>
@@ -500,7 +510,7 @@ unset($pdo);
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
         </div>
       </form>
     </div>
@@ -598,6 +608,29 @@ unset($pdo);
     }
 
     
+</script>
+
+
+<script>
+    document.getElementById('postForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(this); // Get form data
+        fetch(this.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json()) // Parse JSON response
+        .then(data => {
+            if (data.success) {
+                alert(data.message); // Show success message
+                window.location.href = data.redirect_url; // Redirect after successful post creation
+            } else {
+                alert('Error: ' + data.message); // Show error message
+            }
+        })
+        .catch(error => console.error('Error:', error)); // Log errors to console
+    });
 </script>
 
 
