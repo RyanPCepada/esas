@@ -724,9 +724,8 @@ try {
                                             // Base SQL query to count total added club requests for the logged-in student
                                             $sql = "
                                                 SELECT COUNT(*) AS total_approved_requests
-                                                FROM tbl_club_requests 
-                                                WHERE status = 'approved'
-                                                AND student_id = :student_id
+                                                FROM tbl_clubs
+                                                WHERE founder_id = :student_id
                                             ";
 
                                             // Prepare and execute the query
