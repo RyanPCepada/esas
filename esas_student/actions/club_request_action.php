@@ -8,9 +8,6 @@ require_once '../../config.php';
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-// Set the default timezone to Asia/Manila
-date_default_timezone_set('Asia/Manila');
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
     $clubName = $_POST['clubName'];

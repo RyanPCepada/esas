@@ -5,9 +5,6 @@ require_once "../../config.php";
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-// Set the default timezone to Asia/Manila
-date_default_timezone_set('Asia/Manila');
-
 // Define variables and initialize with empty values
 $firstName = $middleName = $lastName = $age = $birthday = $gender = $instiEmail = $phoneNumber = $department = $course = $year = $street = $barangay = $municipality = $province = $zipcode = $club_id = $status = "";
 $firstName_err = $middleName_err = $lastName_err = $age_err = $birthday_err = $gender_err = $instiEmail_err = $phoneNumber_err = $department_err = $course_err = $year_err = $street_err = $barangay_err = $municipality_err = $province_err = $zipcode_err = $club_id_err = "";

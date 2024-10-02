@@ -12,9 +12,6 @@ $question1_err = $question2_err = $question3_err = $club_id_err = "";
 // Start the session
 session_start();
 
-// Set the default timezone to Asia/Manila
-date_default_timezone_set('Asia/Manila');
-
 // Ensure student_id is set in the session
 if (!isset($_SESSION['student_id'])) {
     echo "<script>alert('Student not logged in.'); window.history.back();</script>";

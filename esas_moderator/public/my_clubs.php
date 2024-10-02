@@ -254,28 +254,28 @@ try {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row g-0">
-                                        <div class="d-flex align-items-center justify-content-end pb-3 mt-2 mb-3">
-                                            <!-- <h2 class="text-muted mt-0 mb-0">My Clubs</h2> -->
+                                        <div class="d-flex align-items-center pb-3 mt-2 mb-3">
+                                            <h3 class="text-muted ms-3 mt-0 mb-0">Clubs You Are Moderating</h3>
                                             <!-- <button type="button" class="btn btn-primary" id="request-club-btn" data-bs-toggle="modal" data-bs-target="#requestClubModal" style="width: 210px; border-radius: 5px;">
                                                 Request for a Club
                                             </button> -->
                                         </div>
-                                        <nav>
-                                            <div class="nav nav-tabs n" role="tablist">
-                                                <button title="Registered Clubs" class="ms-2 px-2 nav-link active" id="nav-activeclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-activeclubs" type="button" role="tab" aria-controls="nav-activeclubs" aria-selected="true" onclick="updateLabel('Registered Clubs')">
+                                        <!-- <nav>
+                                            <!-- <div class="nav nav-tabs n" role="tablist">
+                                                <!-- <button title="Registered Clubs" class="ms-2 px-2 nav-link active" id="nav-activeclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-activeclubs" type="button" role="tab" aria-controls="nav-activeclubs" aria-selected="true" onclick="updateLabel('Registered Clubs')">
                                                     My Clubs
-                                                </button>
-                                                <button title="Pending Approval" class="px-2 nav-link" id="nav-pendingclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-pendingclubs" type="button" role="tab" aria-controls="nav-pendingclubs" aria-selected="false" onclick="updateLabel('Pending Approval')">
+                                                </button> -->
+                                                <!-- <button title="Pending Approval" class="px-2 nav-link" id="nav-pendingclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-pendingclubs" type="button" role="tab" aria-controls="nav-pendingclubs" aria-selected="false" onclick="updateLabel('Pending Approval')">
                                                     Pending
                                                 </button>
                                                 <button title="Disapproved" class="px-2 nav-link" id="nav-disapprovedclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-disapprovedclubs" type="button" role="tab" aria-controls="nav-disapprovedclubs" aria-selected="false" onclick="updateLabel('Disapproved')">
                                                     Disapproved
-                                                </button>
+                                                </button> -->
                                                 <!-- <button title="Filter" class="px-1 btn ms-auto" tabindex="-1" type="button" style="box-shadow: none !important;">
                                                     <i class="fa-solid fa-sliders"></i>
-                                                </button> -->
-                                            </div>
-                                        </nav>
+                                                </button> --
+                                            </div> --
+                                        </nav> -->
                                         <div class="tab-content">
                                             <!-- Registered Clubs Tab -->
                                             <div class="tab-pane fade show active" id="nav-activeclubs" role="tabpanel" aria-labelledby="nav-activeclubs-tab">
@@ -337,7 +337,7 @@ try {
                         const clubsContainer = document.getElementById(containerId);
                         if (response && response.length > 0) {
                             clubsContainer.innerHTML = response.map(club => `
-                                <div class="col-md-4 mb-4 card-container">
+                                <div class="col-md-4 card-container">
                                     <div class="card card-img-only">
                                         <a href="/esas/esas_moderator/public/home.php?club_id=${club.club_id}">
                                             <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
