@@ -5,18 +5,26 @@ require_once "../../../../config.php";
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-// Get student_id from URL
-$student_id = $_GET['student_id'];
-
-$club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+// Get student_id and club_id from URL parameters
 $student_id = isset($_GET['student_id']) ? intval($_GET['student_id']) : null;
+$club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+
+// Ensure both student_id and club_id are present
+if (!$student_id || !$club_id) {
+    die("Invalid student ID or club ID.");
+}
 
 // Fetch student details
 $studentQuery = $pdo->prepare("SELECT * FROM tbl_students WHERE student_id = ?");
 $studentQuery->execute([$student_id]);
 $student = $studentQuery->fetch();
 
-// Fetch the club associated with the moderator (one club for the active status)
+// Check if student exists
+if (!$student) {
+    die("Student not found.");
+}
+
+// Fetch the club associated with the selected club_id and student
 $clubQuery = $pdo->prepare("
     SELECT cr.status, cl.clubName, cl.club_id, cl.coverPhoto, 
            GROUP_CONCAT(CONCAT(m.firstName, ' ', m.middleName, ' ', m.lastName) SEPARATOR ', ') AS moderatorNames,
@@ -25,14 +33,21 @@ $clubQuery = $pdo->prepare("
     INNER JOIN tbl_clubs cl ON cr.club_id = cl.club_id
     LEFT JOIN tbl_clubs_and_moderators cm ON cm.club_id = cl.club_id
     LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
-    WHERE cr.student_id = ? AND cr.status = 'active'
+    WHERE cr.student_id = ? AND cr.club_id = ? AND cr.status = 'active'
     GROUP BY cl.club_id
-    ORDER BY cr.registration_id DESC -- Ensure we are getting the most recent registration first
     LIMIT 1
 ");
-$clubQuery->execute([$student_id]);
+
+// Execute with both student_id and club_id
+$clubQuery->execute([$student_id, $club_id]);
 $club = $clubQuery->fetch();
 
+// Check if club is found
+if (!$club) {
+    die("Club not found or student not registered for this club.");
+}
+
+// Now proceed with generating the ID using the correct student and club data
 ?>
 
 <!DOCTYPE html>
