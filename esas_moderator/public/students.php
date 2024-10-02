@@ -308,129 +308,131 @@ try {
                                 </table>
 
                                 <?php
-                                // Include config file
-                                require_once "../../config.php";
-                                
-                                $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
-                                $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                    // Include config file
+                                    require_once "../../config.php";
 
-                                // SQL query to fetch cumulative students with "active" status in the selected club
-                                $sql = "SELECT 
-                                            s.student_id,
-                                            s.firstName,
-                                            s.middleName,
-                                            s.lastName,
-                                            s.age,
-                                            s.gender,
-                                            s.instiEmail,
-                                            s.phoneNumber,
-                                            s.department,
-                                            s.course,
-                                            s.year,
-                                            s.profilePic,
-                                            s.dateAdded AS student_dateAdded,
-                                            GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
-                                        FROM tbl_students s
-                                        LEFT JOIN tbl_registration r ON s.student_id = r.student_id
-                                        LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
-                                        WHERE r.status = 'active'";
+                                    $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
+                                    $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
 
-                                if ($club_id) {
-                                    $sql .= " AND c.club_id = :club_id";
-                                }
+                                    // SQL query to fetch cumulative students with "active" status in the selected club
+                                    $sql = "SELECT 
+                                                s.student_id,
+                                                s.firstName,
+                                                s.middleName,
+                                                s.lastName,
+                                                s.age,
+                                                s.gender,
+                                                s.instiEmail,
+                                                s.phoneNumber,
+                                                s.department,
+                                                s.course,
+                                                s.year,
+                                                s.profilePic,
+                                                s.dateAdded AS student_dateAdded,
+                                                GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
+                                            FROM tbl_students s
+                                            LEFT JOIN tbl_registration r ON s.student_id = r.student_id
+                                            LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
+                                            WHERE r.status = 'active'";
 
-                                // This condition accumulates students from the start of the selected month to the current month
-                                if ($selectedMonth) {
-                                    $sql .= " AND MONTH(s.dateAdded) <= :selectedMonth";
-                                }
-
-                                $sql .= " GROUP BY s.student_id ORDER BY s.student_id ASC";
-
-                                // Prepare and execute the SQL statement
-                                $stmt = $pdo->prepare($sql);
-
-                                // Bind parameters
-                                $params = [];
-                                if ($club_id) {
-                                    $params['club_id'] = $club_id;
-                                }
-                                if ($selectedMonth) {
-                                    $params['selectedMonth'] = $selectedMonth;
-                                }
-
-                                // Execute the SQL statement
-                                $stmt->execute($params);
-
-                                // Fetch all results
-                                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                                $totalRows = count($result);
-                                $rowCount = 0;
-
-                                if ($totalRows > 0) {
-                                    echo '
-                                    <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
-                                        <thead>
-                                            <tr>
-                                                <th>Student ID</th>
-                                                <th>Profile</th>
-                                                <th>Full Name</th>
-                                                <th>Gender</th>
-                                                <th>Age</th>
-                                                <th>Email</th>
-                                                <th>Phone</th>
-                                                <th>Course</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>';
-
-                                    foreach ($result as $row) {
-                                        $formattedDate = date('F j, Y', strtotime($row['student_dateAdded']));
-                                        $student_id = htmlspecialchars($row['student_id']);
-                                        $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
-                                        $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
-                                        $gender = htmlspecialchars($row['gender']);
-                                        $age = htmlspecialchars($row['age']);
-                                        $email = htmlspecialchars($row['instiEmail']);
-                                        $phoneNumber = htmlspecialchars($row['phoneNumber']);
-                                        $course = htmlspecialchars($row['course']);
-
-                                        $rowCount++;
-
-                                        echo '
-                                        <tr class="student-row">
-                                            <td>' . $student_id . '</td>
-                                            <td class="text-center p-1">
-                                                <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
-                                                    alt="' . $fullName . ' profile picture" 
-                                                    style="width: 35px; height: 35px; border-radius: 50%;">
-                                            </td>
-                                            <td>' . $fullName . '</td>
-                                            <td>' . $gender . '</td>
-                                            <td>' . $age . '</td>
-                                            <td>' . $email . '</td>
-                                            <td>' . $phoneNumber . '</td>
-                                            <td>' . $course . '</td>
-                                            <td class="text-center">
-                                                <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                <a href="../public/crud/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                <a href="../public/crud/student_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
-                                            </td>
-                                        </tr>';
+                                    // Check if club ID is set and add to the query
+                                    if ($selectedClubId) {
+                                        $sql .= " AND c.club_id = :club_id";
                                     }
 
-                                    echo '
-                                        </tbody>
-                                    </table>';
-                                } else {
-                                    echo '<p style="font-size: 16px; color: red;"><em>No students.</em></p>';
-                                }
+                                    // Check if a month is selected and add to the query
+                                    if ($selectedMonth) {
+                                        $sql .= " AND MONTH(s.dateAdded) <= :selectedMonth";
+                                    }
 
-                                // Update the row count display
-                                echo "<script>
-                                    document.getElementById('rowCountDisplay').innerText = 'Showing $rowCount / $totalRows Records';
-                                </script>";
+                                    $sql .= " GROUP BY s.student_id ORDER BY s.student_id ASC";
+
+                                    // Prepare the SQL statement
+                                    $stmt = $pdo->prepare($sql);
+
+                                    // Bind parameters
+                                    $params = [];
+                                    if ($selectedClubId) {
+                                        $params['club_id'] = $selectedClubId;
+                                    }
+                                    if ($selectedMonth) {
+                                        $params['selectedMonth'] = $selectedMonth;
+                                    }
+
+                                    // Execute the SQL statement
+                                    $stmt->execute($params);
+
+                                    // Fetch all results
+                                    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                    $totalRows = count($result);
+                                    $rowCount = 0;
+
+                                    if ($totalRows > 0) {
+                                        echo '
+                                        <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Student ID</th>
+                                                    <th>Profile</th>
+                                                    <th>Full Name</th>
+                                                    <th>Gender</th>
+                                                    <th>Age</th>
+                                                    <th>Email</th>
+                                                    <th>Phone</th>
+                                                    <th>Course</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>';
+
+                                        foreach ($result as $row) {
+                                            $formattedDate = date('F j, Y', strtotime($row['student_dateAdded']));
+                                            $student_id = htmlspecialchars($row['student_id']);
+                                            $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
+                                            $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
+                                            $gender = htmlspecialchars($row['gender']);
+                                            $age = htmlspecialchars($row['age']);
+                                            $email = htmlspecialchars($row['instiEmail']);
+                                            $phoneNumber = htmlspecialchars($row['phoneNumber']);
+                                            $course = htmlspecialchars($row['course']);
+
+                                            $rowCount++;
+
+                                            echo '
+                                            <tr class="student-row">
+                                                <td>' . $student_id . '</td>
+                                                <td class="text-center p-1">
+                                                    <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
+                                                        alt="' . $fullName . ' profile picture" 
+                                                        style="width: 35px; height: 35px; border-radius: 50%;">
+                                                </td>
+                                                <td>' . $fullName . '</td>
+                                                <td>' . $gender . '</td>
+                                                <td>' . $age . '</td>
+                                                <td>' . $email . '</td>
+                                                <td>' . $phoneNumber . '</td>
+                                                <td>' . $course . '</td>
+                                                <td class="text-center">
+                                                    <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($selectedClubId) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                    <!-- <a href="../public/crud/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
+                                                    <a href="../public/crud/student_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a> -->
+                                                </td>
+                                            </tr>';
+                                        }
+
+                                        echo '
+                                            </tbody>
+                                        </table>';
+                                    } else {
+                                        echo '<p style="font-size: 16px; color: red;"><em>No students.</em></p>';
+                                    }
+
+                                    // Update the row count display
+                                    echo "<script>
+                                        document.getElementById('rowCountDisplay').innerText = 'Showing $rowCount / $totalRows Records';
+                                    </script>";
                                 ?>
+
 
                             </div>
                             <!-- ALL STUDENT TABLE END -->

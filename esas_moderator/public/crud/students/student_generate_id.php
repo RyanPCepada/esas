@@ -8,12 +8,15 @@ date_default_timezone_set('Asia/Manila');
 // Get student_id from URL
 $student_id = $_GET['student_id'];
 
+$club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+$student_id = isset($_GET['student_id']) ? intval($_GET['student_id']) : null;
+
 // Fetch student details
 $studentQuery = $pdo->prepare("SELECT * FROM tbl_students WHERE student_id = ?");
 $studentQuery->execute([$student_id]);
 $student = $studentQuery->fetch();
 
-// Fetch active club registrations and concatenate moderator names for each club
+// Fetch the club associated with the moderator (one club for the active status)
 $clubQuery = $pdo->prepare("
     SELECT cr.status, cl.clubName, cl.club_id, cl.coverPhoto, 
            GROUP_CONCAT(CONCAT(m.firstName, ' ', m.middleName, ' ', m.lastName) SEPARATOR ', ') AS moderatorNames,
@@ -24,9 +27,12 @@ $clubQuery = $pdo->prepare("
     LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
     WHERE cr.student_id = ? AND cr.status = 'active'
     GROUP BY cl.club_id
+    ORDER BY cr.registration_id DESC -- Ensure we are getting the most recent registration first
+    LIMIT 1
 ");
 $clubQuery->execute([$student_id]);
-$clubs = $clubQuery->fetchAll();
+$club = $clubQuery->fetch();
+
 ?>
 
 <!DOCTYPE html>
@@ -161,8 +167,7 @@ $clubs = $clubQuery->fetchAll();
 </div>
 
 <div class="id-container" id="id-container">
-    <?php if (count($clubs) > 0): ?>
-        <?php foreach ($clubs as $club): ?>
+    <?php if ($club): ?>
             <div class="id-card" style="background-image: url('/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>');">
                 
                 <!-- Cover photo at the back -->
@@ -247,7 +252,6 @@ $clubs = $clubQuery->fetchAll();
 
 
             </div>
-        <?php endforeach; ?>
     <?php else: ?>
         <p>The student is not an active member of any clubs.</p>
     <?php endif; ?>
