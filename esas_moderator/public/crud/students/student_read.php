@@ -145,7 +145,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3>Student Profile</h3>
                     <!-- <button class="btn btn-info" id="generateIDBtn" data-toggle="modal" data-target="#generateIDModal">Generate ID</button> -->
-                    <a href="../../crud/students/student_generate_id.php?student_id=<?php echo $student_id; ?>" class="btn btn-warning">Generate ID</a>
+                    <a href="../../crud/students/student_generate_id.php?student_id=<?php echo $student_id; ?>" class="btn btn-primary">Generate ID</a>
                 </div>
                 <div class="card-body">
                     <div class="row">
