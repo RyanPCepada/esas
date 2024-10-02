@@ -245,6 +245,51 @@ try {
         }
 
         
+        @keyframes waveIn {
+            0% {
+                opacity: 0;
+                transform: translateY(5px) scale(0.95); /* Adjusted Y translation */
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateY(-2px) scale(1.05); /* Peak of the wave, adjusted */
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .card {
+            /* Ensure your card styles are here */
+        }
+
+        
+
+        .card-row1 .icon-style {
+            position: absolute;
+            font-size: 18px;
+            width: 6%;
+            background-color: #4682B4; /*steel blue*/
+            background-color: #89CFF0; /* baby blue */
+            background-color: #70B9E6; /*darker baby blue*/
+            color: white;
+            /* color: #6A5ACD; slate blue */
+            border-radius: 50%;
+            align-self: end;
+        }
+
+        @media (max-width: 768px) {
+            .col-auto {
+                width: auto;
+            }
+            .icon-style {
+                width: 7% !important;
+            }
+        }
+
+
+        
     </style>
 </head>
 <body>
@@ -407,8 +452,12 @@ try {
                             <!-- UPPER CARDS START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 
+                                <div class="mt-3 mb-3 d-flex justify-content-between align-items-center">
+                                    <!-- <h4 class="text-muted mb-0">Registrations Overview</h4> -->
+                                    <h4 class="text-muted mb-0">Registration Status Summary</h4>
+                                </div>
                                 <!-- Card for STUDENT TOTAL ACTIVE CLUBS -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-4 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -441,7 +490,7 @@ try {
 
 
                                 <!-- Card for STUDENT TOTAL PENDING APPROVAL -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-4 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -464,14 +513,14 @@ try {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
-                                        <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Pending</p>
+                                        <i class="fas fa-hourglass-half mt-2 me-2 p-2 icon-style"></i>
+                                        <p>Total Pending Approval</p>
                                     </div>
                                 </div>
 
 
                                 <!-- Card for STUDENT TOTAL PENDING APPROVAL -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-4 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -499,66 +548,6 @@ try {
                                     </div>
                                 </div>
 
-
-
-
-                                <!-- Card for LEAVE REQUESTS -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <?php
-                                        // Get the selected club_id and school_year from the URL
-                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
-                                        $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
-
-                                        try {
-                                            // Extract the start and end year from the selected school year
-                                            if ($selectedSchoolYear) {
-                                                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
-                                                $endDate = "$endYear-07-31"; // End date for the selected school year
-                                            } else {
-                                                // Default to the latest school year if none is selected
-                                                $latestYear = date('Y');
-                                                $endDate = ($latestYear + 1) . "-07-31"; // End date for the latest school year
-                                            }
-
-                                            // Base SQL query to count leave requests for clubs handled by the moderator
-                                            $sql = "
-                                                SELECT COUNT(tr.registration_id) AS total_leave_requests 
-                                                FROM tbl_registration tr
-                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id
-                                                JOIN tbl_clubs_and_moderators tcm ON tc.club_id = tcm.club_id
-                                                WHERE tr.status = 'Pending Leave' 
-                                                AND tcm.moderator_id = :moderator_id
-                                                AND tr.dateApplied <= :end_date
-                                            ";
-
-                                            // Parameters for the query
-                                            $params = [
-                                                'moderator_id' => $moderator_id,
-                                                'end_date' => $endDate,
-                                            ];
-
-                                            // Add condition for the selected club, if applicable
-                                            if ($selectedClubId) {
-                                                $sql .= " AND tr.club_id = :club_id";
-                                                $params['club_id'] = $selectedClubId;
-                                            }
-
-                                            // Prepare and execute the query
-                                            $stmt_leave_requests = $pdo->prepare($sql);
-                                            $stmt_leave_requests->execute($params);
-
-                                            // Fetch the total number of leave requests
-                                            $total_leave_requests = $stmt_leave_requests->fetchColumn();
-                                            echo "<h3>$total_leave_requests</h3>";
-                                        } catch (PDOException $e) {
-                                            echo "Error: " . $e->getMessage();
-                                        }
-                                        ?>
-                                        <i class="fas fa-door-open mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Leave Requests</p>
-                                    </div>
-                                </div>
 
 
                             </div>
