@@ -266,7 +266,7 @@ try {
                     <ul class="nav nav-pills flex-column mb-auto">
                         <li>
                             <a href="../esas_student/dashboard.php" class="nav-link left-sidebar text-dark" id="dashboard">
-                                <i class="fas fa-university"></i> Dashboard
+                                <i class="fas fa-chart-line"></i> Dashboard
                             </a>
                         </li>
                         <li>
