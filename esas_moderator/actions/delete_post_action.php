@@ -5,39 +5,50 @@ require_once "../../config.php";
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-// Initialize variables
-$post_id = "";
+// Get the POST data
+$data = json_decode(file_get_contents("php://input"), true);
+$post_id = $data['post_id'] ?? null; // Get the post ID from the request
 
-// Check if the post ID is provided
-if (isset($_GET['post_id'])) {
-    $post_id = trim($_GET['post_id']);
+$response = ['success' => false, 'message' => 'Something went wrong.'];
 
-    // Begin a transaction
-    $pdo->beginTransaction();
+// Validate post ID
+if ($post_id) {
     try {
+        // Begin transaction
+        $pdo->beginTransaction();
+
+        // Delete notifications associated with the post
+        $stmt = $pdo->prepare("DELETE FROM tbl_notifications WHERE post_id = :post_id");
+        $stmt->bindParam(':post_id', $post_id); // Use $post_id instead of $postId
+        $stmt->execute();
+
         // Delete comments associated with the post
-        $deleteCommentsStmt = $pdo->prepare("DELETE FROM tbl_comments WHERE post_id = :post_id");
-        $deleteCommentsStmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
-        $deleteCommentsStmt->execute();
+        $deleteCommentsQuery = "DELETE FROM tbl_comments WHERE post_id = :post_id"; // Adjust this to your actual comments table
+        $stmt = $pdo->prepare($deleteCommentsQuery);
+        $stmt->bindParam(':post_id', $post_id); // Use $post_id here
+        $stmt->execute();
 
         // Delete the post
-        $deletePostStmt = $pdo->prepare("DELETE FROM tbl_posts WHERE post_id = :post_id");
-        $deletePostStmt->bindParam(':post_id', $post_id, PDO::PARAM_INT);
-        $deletePostStmt->execute();
+        $deletePostQuery = "DELETE FROM tbl_posts WHERE post_id = :post_id"; // Adjust this to your actual posts table
+        $stmt = $pdo->prepare($deletePostQuery);
+        $stmt->bindParam(':post_id', $post_id); // Use $post_id here
+        $stmt->execute();
 
-        // Commit the transaction
+        // Commit transaction
         $pdo->commit();
 
-        // Return success response
-        echo json_encode(['success' => true, 'message' => 'Post and associated comments deleted successfully.']);
-    } catch (PDOException $e) {
-        // Rollback the transaction in case of an error
+        $response['success'] = true;
+        $response['message'] = 'Post deleted successfully.';
+    } catch (Exception $e) {
+        // Rollback transaction in case of error
         $pdo->rollBack();
-        // Log the error message
-        error_log($e->getMessage()); // Log error to server log
-        echo json_encode(['success' => false, 'message' => 'Error deleting post.']); // Keep the message generic
+        $response['message'] = 'Error: ' . $e->getMessage(); // Log or handle the error message appropriately
     }
 } else {
-    echo json_encode(['success' => false, 'message' => 'Post ID is required.']);
+    $response['message'] = 'Invalid post ID.';
 }
+
+// Return JSON response
+header('Content-Type: application/json');
+echo json_encode($response);
 ?>

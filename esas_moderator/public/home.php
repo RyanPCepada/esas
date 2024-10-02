@@ -523,7 +523,7 @@ unset($pdo);
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="confirmDelete()">Delete</button>
       </div>
     </div>
   </div>
@@ -563,29 +563,38 @@ unset($pdo);
         .catch(error => console.error('Error:', error));
     });
 
-    // Open the Delete Post modal
-    function deletePost(button) {
-        const postId = button.getAttribute('data-post-id');
-        document.getElementById('deletePostId').value = postId;
-        $('#deletePostModal').modal('show');
-    }
 
-    // Confirm delete action
+
+
+    // Confirm delete post function
     function confirmDelete() {
-        const postId = document.getElementById('deletePostId').value;
-        fetch(`/esas/esas_moderator/actions/delete_post_action.php?post_id=${postId}`, {
-            method: 'POST'
+        const postId = document.getElementById('deletePostId').value; // Get the post ID from hidden input
+
+        fetch(`/esas/esas_moderator/actions/delete_post_action.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ post_id: postId }) // Send post ID as JSON
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Post deleted successfully.'); // Alert for successful delete
-                location.reload(); // Reload the page after successful deletion
+                alert(data.message); // Alert the success message
+                location.reload(); // Reload the page to reflect changes
             } else {
-                alert(`Error deleting post ID #${postId}.`); 
+                alert('Error: ' + data.message); // Alert for errors
             }
         })
         .catch(error => console.error('Error:', error));
+    }
+
+
+    // Function to open the Delete Post modal
+    function deletePost(button) {
+        const postId = button.getAttribute('data-post-id');
+        document.getElementById('deletePostId').value = postId; // Set post ID
+        $('#deletePostModal').modal('show'); // Show modal
     }
 
     
