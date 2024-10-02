@@ -407,7 +407,7 @@ try {
                             <!-- UPPER CARDS START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 
-                                <!-- Card for TOTAL ACTIVE CLUBS FOR STUDENT -->
+                                <!-- Card for STUDENT TOTAL ACTIVE CLUBS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
@@ -440,21 +440,22 @@ try {
                                 </div>
 
 
-                                <!-- Card for TOTAL PENDING APPROVAL STUDENTS -->
+                                <!-- Card for STUDENT TOTAL PENDING APPROVAL -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
-                                            // Base SQL query to count total pending approval students
+                                            // Base SQL query to count total pending approval students for the logged-in student
                                             $sql = "
-                                                SELECT COUNT(DISTINCT tr.student_id) AS total_pending_students 
+                                                SELECT COUNT(*) AS total_pending_students 
                                                 FROM tbl_registration tr 
-                                                WHERE tr.status = 'pending'
+                                                WHERE tr.status = 'pending' 
+                                                AND tr.student_id = :student_id
                                             ";
 
                                             // Prepare and execute the query
                                             $stmt_pending_students = $pdo->prepare($sql);
-                                            $stmt_pending_students->execute();
+                                            $stmt_pending_students->execute(['student_id' => $student_id]);
 
                                             // Fetch the total number of pending students
                                             $total_pending_students = $stmt_pending_students->fetchColumn();
@@ -469,9 +470,7 @@ try {
                                 </div>
 
 
-
-
-                                <!-- Card for TOTAL PENDING -->
+                                <!-- Card for STUDENT TOTAL DISAPPROVAL -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php

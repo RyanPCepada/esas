@@ -117,7 +117,7 @@ try {
                 width: auto;
             }
             .icon-style {
-                width: 6% !important;
+                width: 7% !important;
             }
         }
     </style>
@@ -349,7 +349,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Clubs</p>
+                                        <p>Total Club</p>
                                     </div>
                                 </div>
 
@@ -410,7 +410,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Students</p>
+                                        <p>Total Student</p>
                                     </div>
                                 </div>
 
@@ -472,7 +472,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-hourglass-half mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Pending Approvals</p>
+                                        <p>Total Pending Approval</p>
                                     </div>
                                 </div>
 
@@ -533,7 +533,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-door-open mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Leave Requests</p>
+                                        <p>Leave Request</p>
                                     </div>
                                 </div>
 

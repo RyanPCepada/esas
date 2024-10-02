@@ -117,7 +117,7 @@ try {
                 width: auto;
             }
             .icon-style {
-                width: 6% !important;
+                width: 7% !important;
             }
         }
 
