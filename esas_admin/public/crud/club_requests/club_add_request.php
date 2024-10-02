@@ -120,12 +120,16 @@ if (empty($coverPhoto)) {
 
     
 
-    if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err)) {
-        $sql = "INSERT INTO tbl_clubs (clubName, information, coverPhoto, dateAdded) VALUES (:clubName, :information, :coverPhoto, NOW())";
-        if ($stmt = $pdo->prepare($sql)) {
-            $stmt->bindParam(":clubName", $clubName);
-            $stmt->bindParam(":information", $information);
-            $stmt->bindParam(":coverPhoto", $coverPhoto);
+$founder_id = isset($_POST['founder_id']) ? $_POST['founder_id'] : null; // Fetch the value from POST
+
+if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err) && !empty($founder_id)) {
+    $sql = "INSERT INTO tbl_clubs (clubName, information, coverPhoto, founder_id, dateAdded) VALUES (:clubName, :information, :coverPhoto, :founder_id, NOW())";
+    if ($stmt = $pdo->prepare($sql)) {
+        $stmt->bindParam(":clubName", $clubName);
+        $stmt->bindParam(":information", $information);
+        $stmt->bindParam(":coverPhoto", $coverPhoto);
+        $stmt->bindParam(":founder_id", $founder_id); // Ensure this is not null
+
 
             if ($stmt->execute()) {
                 $clubId = $pdo->lastInsertId();
@@ -140,7 +144,7 @@ if (empty($coverPhoto)) {
 
                 if (!empty($newModeratorId)) {
                     $sql3 = "INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id, dateAdded) 
-                             VALUES (:clubId, :moderatorId, NOW())";
+                            VALUES (:clubId, :moderatorId, NOW())";
                     if ($stmt3 = $pdo->prepare($sql3)) {
                         $stmt3->bindParam(":clubId", $clubId);
                         $stmt3->bindParam(":moderatorId", $newModeratorId);
@@ -156,12 +160,14 @@ if (empty($coverPhoto)) {
         }
         unset($stmt);
     }
+
     unset($pdo);
 }
 // $clubName = isset($_GET['clubName']) ? htmlspecialchars($_GET['clubName']) : '';
 // $coverPhoto = isset($_GET['coverPhoto']) ? htmlspecialchars($_GET['coverPhoto']) : '';
 $clubName = isset($_GET['clubName']) ? $_GET['clubName'] : '';
 $coverPhoto = isset($_GET['coverPhoto']) ? $_GET['coverPhoto'] : '';
+$student_id = isset($_GET['student_id']) ? $_GET['student_id'] : '';
 
 ?>
 
@@ -204,6 +210,7 @@ $coverPhoto = isset($_GET['coverPhoto']) ? $_GET['coverPhoto'] : '';
                 <h2 class="mt-5">Add Request to Clubs List</h2>
                 <p>Please fill this form and submit to add a new club to the record.</p>
                 <form id="clubForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data" onsubmit="saveImageData()">
+                    <input type="hidden" name="founder_id" value="<?php echo $student_id; ?>">
                     <div class="form-group mb-2">
                         <label>Club Name</label>
                         <input type="text" name="clubName" class="form-control <?php echo (!empty($clubName_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $clubName; ?>">
