@@ -435,7 +435,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Active Clubs</p>
+                                        <p>Total Active Club</p>
                                     </div>
                                 </div>
 
@@ -465,66 +465,37 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Pending Approval</p>
+                                        <p>Total Pending</p>
                                     </div>
                                 </div>
 
 
-                                <!-- Card for STUDENT TOTAL DISAPPROVAL -->
+                                <!-- Card for STUDENT TOTAL PENDING APPROVAL -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
-                                        // Get the selected club_id and school_year from the URL
-                                        $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
-                                        $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
-
                                         try {
-                                            // Extract the start and end year from the selected school year
-                                            if ($selectedSchoolYear) {
-                                                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
-                                                $endDate = "$endYear-07-31"; // End date for the selected school year
-                                            } else {
-                                                // Default to the latest school year if none is selected
-                                                $latestYear = date('Y');
-                                                $endDate = ($latestYear + 1) . "-07-31"; // End date for the latest school year
-                                            }
-
-                                            // Base SQL query to count total pending registrations for clubs handled by the moderator
+                                            // Base SQL query to count total pending approval students for the logged-in student
                                             $sql = "
-                                                SELECT COUNT(tr.registration_id) AS total_pending 
-                                                FROM tbl_registration tr
-                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id
-                                                JOIN tbl_clubs_and_moderators tcm ON tc.club_id = tcm.club_id
-                                                WHERE tr.status = 'pending' 
-                                                AND tcm.moderator_id = :moderator_id
-                                                AND tr.dateApplied <= :end_date
+                                                SELECT COUNT(*) AS total_disapproved_students 
+                                                FROM tbl_registration tr 
+                                                WHERE tr.status = 'disapproved' 
+                                                AND tr.student_id = :student_id
                                             ";
 
-                                            // Parameters for the query
-                                            $params = [
-                                                'moderator_id' => $moderator_id,
-                                                'end_date' => $endDate,
-                                            ];
-
-                                            // Add condition for the selected club, if applicable
-                                            if ($selectedClubId) {
-                                                $sql .= " AND tr.club_id = :club_id";
-                                                $params['club_id'] = $selectedClubId;
-                                            }
-
                                             // Prepare and execute the query
-                                            $stmt_pending = $pdo->prepare($sql);
-                                            $stmt_pending->execute($params);
+                                            $stmt_disapproved_students = $pdo->prepare($sql);
+                                            $stmt_disapproved_students->execute(['student_id' => $student_id]);
 
-                                            // Fetch the total number of pending registrations
-                                            $total_pending = $stmt_pending->fetchColumn();
-                                            echo "<h3>$total_pending</h3>";
+                                            // Fetch the total number of disapproved students
+                                            $total_disapproved_students = $stmt_disapproved_students->fetchColumn();
+                                            echo "<h3>$total_disapproved_students</h3>";
                                         } catch (PDOException $e) {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
-                                        <i class="fas fa-hourglass-half mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Pending Approvals</p>
+                                        <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
+                                        <p>Total Disapproval</p>
                                     </div>
                                 </div>
 
