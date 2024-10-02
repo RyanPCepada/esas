@@ -449,15 +449,47 @@ try {
 
 
 
-                            <!-- UPPER CARDS START -->
+                            <!-- ROW-1 CARDS START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 
                                 <div class="mt-3 mb-3 d-flex justify-content-between align-items-center">
                                     <!-- <h4 class="text-muted mb-0">Registrations Overview</h4> -->
                                     <h4 class="text-muted mb-0">Registration Status Summary</h4>
                                 </div>
+
                                 <!-- Card for STUDENT TOTAL ACTIVE CLUBS -->
-                                <div class="col-md-4 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <?php
+                                        try {
+                                            // Base SQL query to count total active clubs for the student
+                                            $sql = "
+                                                SELECT COUNT(r.club_id) AS total_registrations 
+                                                FROM tbl_registration r
+                                                WHERE r.student_id = :student_id
+                                            ";
+
+                                            // Parameters for the query
+                                            $params = ['student_id' => $student_id];
+
+                                            // Prepare and execute the query
+                                            $stmt_registrations = $pdo->prepare($sql);
+                                            $stmt_registrations->execute($params);
+
+                                            // Fetch the total number of registrations
+                                            $total_registrations = $stmt_registrations->fetchColumn();
+                                            echo "<h3>$total_registrations</h3>";
+                                        } catch (PDOException $e) {
+                                            echo "Error: " . $e->getMessage();
+                                        }
+                                        ?>
+                                        <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
+                                        <p>Total Registration</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Card for STUDENT TOTAL ACTIVE CLUBS -->
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -490,7 +522,7 @@ try {
 
 
                                 <!-- Card for STUDENT TOTAL PENDING APPROVAL -->
-                                <div class="col-md-4 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -520,7 +552,7 @@ try {
 
 
                                 <!-- Card for STUDENT TOTAL PENDING APPROVAL -->
-                                <div class="col-md-4 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -548,11 +580,11 @@ try {
                                     </div>
                                 </div>
 
-
-
                             </div>
-                            <!-- UPPER CARDS END -->
+                            <!-- ROW-1 CARDS END -->
 
+
+                            
 
                             
                         </div>
