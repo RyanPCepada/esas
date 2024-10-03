@@ -143,7 +143,7 @@ unset($pdo);
         }
         .wrapper {
             width: 100%;
-            max-width: 800px;
+            /* max-width: 800px; */
             margin: 0 auto;
             padding: 0px;
             min-height: 500px;
@@ -283,60 +283,102 @@ unset($pdo);
     
     <div class="wrapper">
         <div class="container-fluid">
-            <div class="cover-photo-container">
-                <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
-            </div>
-            <div class="overlay-text">
-                <div class="d-flex align-items-center">
-                    <h4><?php echo htmlspecialchars($clubName); ?></h4>
-                </div>
-            </div>
-            <hr>
-            <!-- Post Form -->
             <div class="row">
-                <div class="col-12">
-                    <div class="card" id="card_post">
-                        <div class="card-header bg-info text-white d-flex align-items-center">
-                            <i class="fa fa-pencil-square-o fa-2x mr-2"></i>
-                            <h4 class="mb-0">Share Something Exciting!</h4>
-                        </div>
-                        <div class="card-body">
-                            <!-- <form id="postForm" method="POST" action="home.php"> -->
-                            <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>">
-                                <div class="form-group">
-                                    <label for="postContent">What's on your mind?</label>
-                                    <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
-                                    <span class="text-danger"><?php echo $postContent_err; ?></span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Post</button>
-                                    <div class="text-muted ml-2">
-                                        <p>Let your club members know what's happening!</p>
-                                    </div>
-                                </div>
-                            </form>
+
+
+
+                <!-- Events Section -->
+                <div class="card col-md-3 p-3 auto-scroll" style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <div class="events-section">
+                        <h5 class="text-muted mb-3" style="text-align: center; font-size: 1.2em;">Upcoming Events</h5>
+
+                        <!-- Calendar Section -->
+                        <div id="calendar" style="margin-bottom: 20px; text-align: center;"></div>
+
+                        <!-- Static Event List -->
+                        <div class="event-list" id="eventList">
+                            <!-- Events will be dynamically inserted here -->
                         </div>
                     </div>
                 </div>
-            </div>
-            <br><hr>
-            <!-- Post List -->
-            <div class="post_list">
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <div class="d-flex align-items-center bg-info text-white p-2 rounded">
-                            <img src="../icons/ICON_ANNOUNCEMENT.png" height="75" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
-                            <h4 class="mb-0">Announcements and Updates</h4>
+
+
+                <!-- Main Body Section with Cover Photo -->
+                <div class="col-md-6 auto-scroll">
+                    <div class="cover-photo-container mb-3">
+                        <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
+                    </div>
+                    <div class="overlay-text">
+                        <div class="d-flex align-items-center">
+                            <h4><?php echo htmlspecialchars($clubName); ?></h4>
+                        </div>
+                    </div>
+                    <hr>
+                    <!-- Post Form -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card" id="card_post">
+                                <div class="card-header bg-info text-white d-flex align-items-center">
+                                    <i class="fa fa-pencil-square-o fa-2x mr-2"></i>
+                                    <h4 class="mb-0">Share Something Exciting!</h4>
+                                </div>
+                                <div class="card-body">
+                                    <!-- <form id="postForm" method="POST" action="home.php"> -->
+                                    <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>">
+                                        <div class="form-group">
+                                            <label for="postContent">What's on your mind?</label>
+                                            <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
+                                            <span class="text-danger"><?php echo $postContent_err; ?></span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Post</button>
+                                            <div class="text-muted ml-2">
+                                                <p>Let your club members know what's happening!</p>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br><hr>
+                    <!-- Post List -->
+                    <div class="post_list">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <div class="d-flex align-items-center bg-info text-white p-2 rounded">
+                                    <img src="../icons/ICON_ANNOUNCEMENT.png" height="75" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
+                                    <h4 class="mb-0">Announcements and Updates</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Post List -->
+                        <div class="row" id="postsContainer">
+                            <!-- Posts will be dynamically inserted here -->
+                        </div>
+                        <div class="mt-2 text-center align-items-center justify-content-center">
+                            <a href="../public/my_clubs.php" class="btn btn-secondary">Go Back</a>
                         </div>
                     </div>
                 </div>
-                <!-- Post List -->
-                <div class="row" id="postsContainer">
-                    <!-- Posts will be dynamically inserted here -->
+
+                <!-- Chatbox Section -->
+                <div class="card col-md-3 p-3 auto-scroll">
+                    <div class="chatbox-section">
+                        <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
+                        <div class="chatbox" id="chatbox">
+                            <!-- Example Chat Interface -->
+                            <div class="messages">
+                                <!-- Messages will be displayed here -->
+                            </div>
+                            <input type="text" id="chatInput" placeholder="Type a message..." class="form-control">
+                            <button id="sendMessage" class="btn btn-primary mt-2">Send</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="mt-2 text-center align-items-center justify-content-center">
-                    <a href="../public/my_clubs.php" class="btn btn-secondary">Go Back</a>
-                </div>
+
+
+
             </div>
         </div>
     </div>

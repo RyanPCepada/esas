@@ -323,71 +323,71 @@ try {
 </head>
 <body>
 
-<div class="wrapper">
-    <div class="container-fluid">
-        <div class="row">
+    <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
 
 
-        
-            <!-- Events Section -->
-            <div class="card col-md-3 p-3 auto-scroll" style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <div class="events-section">
-                    <h5 class="text-muted mb-3" style="text-align: center; font-size: 1.2em;">Upcoming Events</h5>
+            
+                <!-- Events Section -->
+                <div class="card col-md-3 p-3 auto-scroll" style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <div class="events-section">
+                        <h5 class="text-muted mb-3" style="text-align: center; font-size: 1.2em;">Upcoming Events</h5>
 
-                    <!-- Calendar Section -->
-                    <div id="calendar" style="margin-bottom: 20px; text-align: center;"></div>
+                        <!-- Calendar Section -->
+                        <div id="calendar" style="margin-bottom: 20px; text-align: center;"></div>
 
-                    <!-- Static Event List -->
-                    <div class="event-list" id="eventList">
-                        <!-- Events will be dynamically inserted here -->
+                        <!-- Static Event List -->
+                        <div class="event-list" id="eventList">
+                            <!-- Events will be dynamically inserted here -->
+                        </div>
                     </div>
                 </div>
-            </div>
 
 
-            <!-- Main Body Section with Cover Photo -->
-            <div class="col-md-6 auto-scroll">
-                <div class="cover-photo-container mb-3">
-                    <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid">
-                </div>
-                <div class="post_list">
-                    <div class="row">
-                        <div class="col-12 mb-3">
-                            <div class="d-flex align-items-center bg-info text-white p-2 rounded">
-                                <img src="./icons/ICON_ANNOUNCEMENT.png" height="75" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
-                                <h4 class="mb-0">Announcements and Updates</h4>
+                <!-- Main Body Section with Cover Photo -->
+                <div class="col-md-6 auto-scroll">
+                    <div class="cover-photo-container mb-3">
+                        <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid">
+                    </div>
+                    <div class="post_list">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <div class="d-flex align-items-center bg-info text-white p-2 rounded">
+                                    <img src="./icons/ICON_ANNOUNCEMENT.png" height="75" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
+                                    <h4 class="mb-0">Announcements and Updates</h4>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row" id="postsContainer">
-                        <!-- Posts will be dynamically inserted here -->
-                    </div>
-                    <div class="mt-2 text-center align-items-center justify-content-center">
-                        <a href="javascript:history.back();" class="btn btn-secondary">Go Back</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Chatbox Section -->
-            <div class="card col-md-3 p-3 auto-scroll">
-                <div class="chatbox-section">
-                    <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
-                    <div class="chatbox" id="chatbox">
-                        <!-- Example Chat Interface -->
-                        <div class="messages">
-                            <!-- Messages will be displayed here -->
+                        <div class="row" id="postsContainer">
+                            <!-- Posts will be dynamically inserted here -->
                         </div>
-                        <input type="text" id="chatInput" placeholder="Type a message..." class="form-control">
-                        <button id="sendMessage" class="btn btn-primary mt-2">Send</button>
+                        <div class="mt-2 text-center align-items-center justify-content-center">
+                            <a href="javascript:history.back();" class="btn btn-secondary">Go Back</a>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Chatbox Section -->
+                <div class="card col-md-3 p-3 auto-scroll">
+                    <div class="chatbox-section">
+                        <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
+                        <div class="chatbox" id="chatbox">
+                            <!-- Example Chat Interface -->
+                            <div class="messages">
+                                <!-- Messages will be displayed here -->
+                            </div>
+                            <input type="text" id="chatInput" placeholder="Type a message..." class="form-control">
+                            <button id="sendMessage" class="btn btn-primary mt-2">Send</button>
+                        </div>
+                    </div>
+                </div>
+
+
+
             </div>
-
-
-
         </div>
     </div>
-</div>
 
 
 
