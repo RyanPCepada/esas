@@ -121,9 +121,9 @@ try {
         } */
         .wrapper {
             width: 100%;
-            max-width: 800px;
+            /* max-width: 800px; */
             margin: 0 auto;
-            padding: 0px;
+            padding: 0px !important;
             min-height: 500px;
             /* height: 1000px;
             overflow-y: transparent;
@@ -323,40 +323,120 @@ try {
 </head>
 <body>
 
+<div class="wrapper">
+    <div class="container-fluid">
+        <div class="row">
 
-    <div class="wrapper">
-        <div class="container-fluid">
-            <div class="cover-photo-container">
-                <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
+
+        
+            <!-- Events Section -->
+<div class="card col-md-3 p-3 auto-scroll" style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <div class="events-section">
+        <h5 class="text-muted" style="text-align: center; font-size: 1.2em;">Upcoming Events</h5>
+        
+        <!-- Improved Mini Calendar -->
+        <div class="mini-calendar mb-4" style="border: 1px solid #e6e6e6; padding: 15px; border-radius: 8px; text-align: center; background-color: #f9f9f9; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="font-size: 16px; font-weight: bold; color: #333;">October 2024</div>
+            <table style="width: 100%; table-layout: fixed; font-size: 14px; color: #555;">
+                <thead>
+                    <tr style="color: #ff6b6b;">
+                        <th>Sun</th>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td><td></td><td>
+                            <span style="display: inline-block; width: 25px; height: 25px; border-radius: 50%; background-color: #ff6b6b; color: white; text-align: center; line-height: 25px;">1</span>
+                        </td><td>2</td><td>3</td><td>4</td><td>5</td>
+                    </tr>
+                    <tr>
+                        <td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>
+                            <span style="display: inline-block; width: 25px; height: 25px; border-radius: 50%; background-color: #ff6b6b; color: white; text-align: center; line-height: 25px;">11</span>
+                        </td><td>12</td>
+                    </tr>
+                    <tr>
+                        <td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td>
+                    </tr>
+                    <tr>
+                        <td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td>
+                    </tr>
+                    <tr>
+                        <td>27</td><td>28</td><td>29</td><td>30</td><td>
+                            <span style="display: inline-block; width: 25px; height: 25px; border-radius: 50%; background-color: #ff6b6b; color: white; text-align: center; line-height: 25px;">31</span>
+                        </td><td></td><td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Static Event List -->
+        <div class="event-list">
+            <div class="event-item" style="padding: 10px; border-bottom: 1px solid #ddd; margin-bottom: 10px;">
+                <h6 style="color: #007bff;">Club Orientation</h6>
+                <p style="margin: 0; color: #666;">October 10, 2024</p>
+                <p><a href="event_detail.php?id=1" class="btn btn-link" style="padding: 0; color: #007bff;">View Details</a></p>
             </div>
-            <div class="overlay-text">
-                <div class="d-flex align-items-center">
-                    <h4><?php echo htmlspecialchars($clubName); ?></h4>
-                </div>            </div>
-            <hr>
-            <div class="row-dashboard text-end">
-                <button class="btn btn-primary" type="button" id="dashboard-btn">
-                <i class="fas fa-chart-bar"></i>See Dashboard</button>
-                <i class="fas fa-ellipsis-v ellipsis" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
-            </div>
-            <div class="post_list">
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <div class="d-flex align-items-center bg-info text-white p-2 rounded">
-                            <img src="./icons/ICON_ANNOUNCEMENT.png" height="75" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
-                            <h4 class="mb-0">Announcements and Updates</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" id="postsContainer">
-                    <!-- Posts will be dynamically inserted here -->
-                </div>
-                <div class="mt-2 text-center align-items-center justify-content-center">
-                    <a href="javascript:history.back();" class="btn btn-secondary">Go Back</a>
-                </div>
+            <div class="event-item" style="padding: 10px; border-bottom: 1px solid #ddd; margin-bottom: 10px;">
+                <h6 style="color: #007bff;">Fundraising Event</h6>
+                <p style="margin: 0; color: #666;">October 15, 2024</p>
+                <p><a href="event_detail.php?id=2" class="btn btn-link" style="padding: 0; color: #007bff;">View Details</a></p>
             </div>
         </div>
     </div>
+</div>
+
+
+            <!-- Main Body Section with Cover Photo -->
+            <div class="col-md-6 auto-scroll">
+                <div class="cover-photo-container mb-3">
+                    <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid">
+                </div>
+                <div class="post_list">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <div class="d-flex align-items-center bg-info text-white p-2 rounded">
+                                <img src="./icons/ICON_ANNOUNCEMENT.png" height="75" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
+                                <h4 class="mb-0">Announcements and Updates</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="postsContainer">
+                        <!-- Posts will be dynamically inserted here -->
+                    </div>
+                    <div class="mt-2 text-center align-items-center justify-content-center">
+                        <a href="javascript:history.back();" class="btn btn-secondary">Go Back</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chatbox Section -->
+            <div class="card col-md-3 p-3 auto-scroll">
+                <div class="chatbox-section">
+                    <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
+                    <div class="chatbox" id="chatbox">
+                        <!-- Example Chat Interface -->
+                        <div class="messages">
+                            <!-- Messages will be displayed here -->
+                        </div>
+                        <input type="text" id="chatInput" placeholder="Type a message..." class="form-control">
+                        <button id="sendMessage" class="btn btn-primary mt-2">Send</button>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+
+
 
 
 
@@ -464,75 +544,55 @@ try {
             
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-
             // Function to fetch comments for a post
-function fetchComments(postId) {
-    const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
-    const currentStudentId = "<?php echo $student_id; ?>"; // Get the current student's ID from PHP
+            function fetchComments(postId) {
+                const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
+                const currentStudentId = "<?php echo $student_id; ?>"; // Get the current student's ID from PHP
 
-    fetch(`/esas/esas_student/apis/comments-api.php?post_id=${postId}&club_id=${clubId}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Fetched comments:', data);
-            if (data.success) {
-                const commentsSection = document.getElementById(`comments-${postId}`);
-                const commentCount = document.getElementById(`comment-count-${postId}`);
-                commentsSection.innerHTML = data.comments.map(comment => {
-                    const [date, time] = comment.dateAdded.split(' ');
+                fetch(`/esas/esas_student/apis/comments-api.php?post_id=${postId}&club_id=${clubId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Fetched comments:', data);
+                        if (data.success) {
+                            const commentsSection = document.getElementById(`comments-${postId}`);
+                            const commentCount = document.getElementById(`comment-count-${postId}`);
+                            commentsSection.innerHTML = data.comments.map(comment => {
+                                const [date, time] = comment.dateAdded.split(' ');
 
-                    // Only show the edit button if the comment's student_id matches the current user's student_id
-                    const showEllipsisButton = comment.student_id == currentStudentId ? `
-                        <div class="dropdown">
-                            <i class="fas fa-ellipsis-v ellipsis" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
-                            <div class="dropdown-menu">
-                                <button class="dropdown-item" data-comment-id="${comment.comment_id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
-                                    <i class="fa fa-pencil"></i> Edit
-                                </button>
-                                <button class="dropdown-item text-danger" data-comment-id="${comment.comment_id}" onclick="deleteComment(this)">
-                                    <i class="fa fa-trash"></i> Delete
-                                </button>
-                            </div>
-                        </div>` : '';
-                    return `
-                        <div class="comment d-flex align-items-start">
-                            <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
-                            <div class="comsec">
-                                <p class="student-name mb-1">
-                                    ${showEllipsisButton} <!-- Conditionally render the dropdown -->
-                                    <strong>${comment.student_name}</strong><br>
-                                    <span id="comment-text-${comment.comment_id}">${comment.comment}</span>
-                                    <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
-                                </p>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                commentCount.textContent = data.comments.length === 1 ? '1 comment' : `${data.comments.length} comments`;
-            } else {
-                console.error(data.message);
+                                // Only show the edit button if the comment's student_id matches the current user's student_id
+                                const showEllipsisButton = comment.student_id == currentStudentId ? `
+                                    <div class="dropdown">
+                                        <i class="fas fa-ellipsis-v ellipsis" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+                                        <div class="dropdown-menu">
+                                            <button class="dropdown-item" data-comment-id="${comment.comment_id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
+                                                <i class="fa fa-pencil"></i> Edit
+                                            </button>
+                                            <button class="dropdown-item text-danger" data-comment-id="${comment.comment_id}" onclick="deleteComment(this)">
+                                                <i class="fa fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>` : '';
+                                return `
+                                    <div class="comment d-flex align-items-start">
+                                        <img src="/esas/esas_student/images/${comment.profilePic}" alt="${comment.student_name}'s profile picture" class="rounded-circle mr-2" width="40" height="40">
+                                        <div class="comsec">
+                                            <p class="student-name mb-1">
+                                                ${showEllipsisButton} <!-- Conditionally render the dropdown -->
+                                                <strong>${comment.student_name}</strong><br>
+                                                <span id="comment-text-${comment.comment_id}">${comment.comment}</span>
+                                                <p class="comment text-muted">${formatDate(date)} @ ${formatTime(time)}</p>
+                                            </p>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('');
+                            commentCount.textContent = data.comments.length === 1 ? '1 comment' : `${data.comments.length} comments`;
+                        } else {
+                            console.error(data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error fetching comments:', error));
             }
-        })
-        .catch(error => console.error('Error fetching comments:', error));
-}
 
 
 
@@ -555,6 +615,69 @@ function fetchComments(postId) {
 
         
 
+
+        // Function to fetch chats and their replies
+function fetchChats() {
+    const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
+
+    fetch(`/esas/esas_student/apis/chats-api.php?club_id=${clubId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const chatSection = document.getElementById('chatbox');
+                chatSection.innerHTML = '';
+
+                data.chats.forEach(chat => {
+                    // Display the main chat message
+                    const chatHtml = `
+                        <div class="chat-message">
+                            <strong>${chat.student_name}</strong>: ${chat.message}
+                            <div class="reply-section" id="replies-${chat.chat_id}"></div>
+                            <button onclick="showReplyInput(${chat.chat_id})">Reply</button>
+                            <input type="text" id="replyInput-${chat.chat_id}" placeholder="Type your reply..." style="display:none;">
+                            <button id="sendReply-${chat.chat_id}" style="display:none;" onclick="sendReply(${chat.chat_id})">Send</button>
+                        </div>
+                    `;
+                    chatSection.innerHTML += chatHtml;
+
+                    // Fetch replies for the current chat message
+                    fetchReplies(chat.chat_id);
+                });
+            } else {
+                console.error(data.message);
+            }
+        })
+        .catch(error => console.error('Error fetching chats:', error));
+}
+
+// Function to fetch replies for a specific chat message
+function fetchReplies(chatId) {
+    fetch(`/esas/esas_student/apis/replies-api.php?reply_to=${chatId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const repliesSection = document.getElementById(`replies-${chatId}`);
+                repliesSection.innerHTML = data.replies.map(reply => `
+                    <div class="reply-message">
+                        <strong>${reply.student_name}</strong>: ${reply.message}
+                    </div>
+                `).join('');
+            } else {
+                console.error(data.message);
+            }
+        })
+        .catch(error => console.error('Error fetching replies:', error));
+}
+
+// Function to send a reply
+function sendReply(chatId) {
+    const replyInput = document.getElementById(`replyInput-${chatId}`);
+    const replyMessage = replyInput.value;
+
+    // Here you would send the replyMessage to the server via an API
+    // For simplicity, just logging it
+    console.log(`Sending reply to chat ${chatId}: ${replyMessage}`);
+}
 
         
 
