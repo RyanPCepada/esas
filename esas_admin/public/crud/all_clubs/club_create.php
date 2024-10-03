@@ -10,6 +10,53 @@ $moderators = [];
 define('COVERPHOTO_DEFAULT', 'COVERPHOTO_DEFAULT.png');
 define('PROF_PIC_DEFAULT', 'PROF_PIC.png');
 
+// Function to get the school year code '2425' for the 2024-2025 school year
+function getSchoolYearCode() {
+    $currentYear = date('Y');
+    $nextYear = $currentYear + 1; // School year spans two years
+    return substr($currentYear, 2, 2) . substr($nextYear, 2, 2); // Returns '2425' for 2024-2025
+}
+
+// Function to get the next available 4-digit increment for the club ID
+function getNextClubIncrement($pdo, $schoolYearCode) {
+    $sql = "SELECT club_id FROM tbl_clubs WHERE club_id LIKE :schoolYearCode ORDER BY club_id DESC LIMIT 1";
+    $stmt = $pdo->prepare($sql);
+    $likePattern = $schoolYearCode . '%';
+    $stmt->bindParam(':schoolYearCode', $likePattern);
+    $stmt->execute();
+
+    $lastClubId = $stmt->fetchColumn();
+
+    if ($lastClubId) {
+        $lastIncrement = (int)substr($lastClubId, 4, 4);
+        $nextIncrement = str_pad($lastIncrement + 1, 4, '0', STR_PAD_LEFT); 
+    } else {
+        $nextIncrement = '0001';
+    }
+
+    return $nextIncrement;
+}
+
+// Function to get the next available 4-digit increment for the moderator ID
+function getNextModeratorIncrement($pdo, $schoolYearCode) {
+    $sql = "SELECT moderator_id FROM tbl_moderators WHERE moderator_id LIKE :schoolYearCode ORDER BY moderator_id DESC LIMIT 1";
+    $stmt = $pdo->prepare($sql);
+    $likePattern = $schoolYearCode . '%';
+    $stmt->bindParam(':schoolYearCode', $likePattern);
+    $stmt->execute();
+    
+    $lastModeratorId = $stmt->fetchColumn();
+    
+    if ($lastModeratorId) {
+        $lastIncrement = (int)substr($lastModeratorId, 4, 4);
+        $nextIncrement = str_pad($lastIncrement + 1, 4, '0', STR_PAD_LEFT); 
+    } else {
+        $nextIncrement = '0001';
+    }
+    
+    return $nextIncrement;
+}
+
 $moderatorQuery = "SELECT moderator_id, CONCAT(firstName, ' ', lastName) AS moderator_name FROM tbl_moderators";
 if ($stmt = $pdo->prepare($moderatorQuery)) {
     if ($stmt->execute()) {
@@ -21,19 +68,23 @@ if (isset($_POST['action']) && $_POST['action'] == 'add_moderator') {
     $firstName = trim($_POST['firstName']);
     $middleInitial = trim($_POST['middleInitial']);
     $lastName = trim($_POST['lastName']);
-    $email = trim($_POST['email']);
     $password = trim($_POST['password']); // No hashing
 
     // Set the profile picture to default
     $profilePic = PROF_PIC_DEFAULT;
 
-    $sql2 = "INSERT INTO tbl_moderators (firstName, middleName, lastName, email, password, profilePic, dateAdded) 
-             VALUES (:firstName, :middleInitial, :lastName, :email, :password, :profilePic, NOW())";
+    // Generate moderator ID
+    $schoolYearCode = getSchoolYearCode();
+    $nextIncrement = getNextModeratorIncrement($pdo, $schoolYearCode);
+    $moderator_id = $schoolYearCode . $nextIncrement; // Example: '24250001'
+
+    $sql2 = "INSERT INTO tbl_moderators (firstName, middleName, lastName, moderator_id, password, profilePic, dateAdded) 
+             VALUES (:firstName, :middleInitial, :lastName, :moderator_id, :password, :profilePic, NOW())";
     if ($stmt2 = $pdo->prepare($sql2)) {
         $stmt2->bindParam(":firstName", $firstName);
         $stmt2->bindParam(":middleInitial", $middleInitial);
         $stmt2->bindParam(":lastName", $lastName);
-        $stmt2->bindParam(":email", $email);
+        $stmt2->bindParam(":moderator_id", $moderator_id);
         $stmt2->bindParam(":password", $password); // No hashing
         $stmt2->bindParam(":profilePic", $profilePic); // Bind the default profile picture
 
@@ -131,8 +182,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-
-
+<-- HERE -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -238,10 +288,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <input type="text" name="lastName" class="form-control underline-input" required>
                     </div>
                     <div class="form-group mb-2">
-                        <label>Email:</label>
-                        <input type="email" name="email" class="form-control underline-input" required>
-                    </div>
-                    <div class="form-group mb-2">
                         <label>Temporary Password:</label>
                         <input type="password" name="password" class="form-control underline-input" required>
                     </div>
@@ -310,7 +356,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 <script>
-    let cropper;
+    // let cropper;
 
     function previewImage() {
         const file = document.querySelector('input[name="coverPhoto"]').files[0];
@@ -323,16 +369,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             preview.style.display = 'block';
 
             // Initialize Cropper.js with options (adjust as needed)
-            cropper = new Cropper(preview, {
-                aspectRatio: 16 / 9, // Set aspect ratio (e.g., 16:9)
-                crop(event) {
-                    // Output the cropped area data
-                    console.log(event.detail.x);
-                    console.log(event.detail.y);
-                    console.log(event.detail.width);
-                    console.log(event.detail.height);
-                },
-            });
+            // cropper = new Cropper(preview, {
+            //     aspectRatio: 16 / 9, // Set aspect ratio (e.g., 16:9)
+            //     crop(event) {
+            //         // Output the cropped area data
+            //         console.log(event.detail.x);
+            //         console.log(event.detail.y);
+            //         console.log(event.detail.width);
+            //         console.log(event.detail.height);
+            //     },
+            // });
         }, false);
 
         if (file) {
@@ -340,30 +386,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    function saveImageData() {
-        if (cropper) {
-            // Get cropped canvas as base64 encoded JPEG image
-            const canvas = cropper.getCroppedCanvas({
-                width: 640, // Set desired output width (optional)
-                height: 360, // Set desired output height (optional)
-                imageSmoothingEnabled: true, // Smooth the image (optional)
-                imageSmoothingQuality: 'high', // High quality smoothing (optional)
-            });
+    // function saveImageData() {
+    //     if (cropper) {
+    //         // Get cropped canvas as base64 encoded JPEG image
+    //         const canvas = cropper.getCroppedCanvas({
+    //             width: 640, // Set desired output width (optional)
+    //             height: 360, // Set desired output height (optional)
+    //             imageSmoothingEnabled: true, // Smooth the image (optional)
+    //             imageSmoothingQuality: 'high', // High quality smoothing (optional)
+    //         });
 
-            if (canvas) {
-                // Convert canvas to base64 data URL
-                const dataURL = canvas.toDataURL('image/jpeg');
+    //         if (canvas) {
+    //             // Convert canvas to base64 data URL
+    //             const dataURL = canvas.toDataURL('image/jpeg');
 
-                // Update hidden input with cropped image data
-                document.getElementById('hiddenCoverPhoto').value = dataURL;
+    //             // Update hidden input with cropped image data
+    //             document.getElementById('hiddenCoverPhoto').value = dataURL;
 
-                // Optionally, display the cropped image preview
-                const preview = document.getElementById('coverPhotoPreview');
-                preview.src = dataURL;
-                preview.style.display = 'block';
-            }
-        }
-    }
+    //             // Optionally, display the cropped image preview
+    //             const preview = document.getElementById('coverPhotoPreview');
+    //             preview.src = dataURL;
+    //             preview.style.display = 'block';
+    //         }
+    //     }
+    // }
 
     window.addEventListener('load', function () {
         const hiddenCoverPhoto = document.getElementById('hiddenCoverPhoto').value;
