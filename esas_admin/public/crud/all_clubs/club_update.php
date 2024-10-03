@@ -253,8 +253,12 @@ unset($pdo);
                 </div>
             </div>
 
-            <hr>
 
+
+
+
+
+            <!-- <hr>
             <div class="assign-section mt-5">
                 <h3 class="text-muted">Current Moderators for this Club</h3>
                 <div class="clubs-handled">
@@ -278,7 +282,10 @@ unset($pdo);
                     }                    
                     ?>
                 </div>
-            </div>
+            </div> -->
+
+
+
 
             <hr>
             <div class="text-center">

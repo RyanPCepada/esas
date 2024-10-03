@@ -182,7 +182,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<-- HERE -->
+<!-- HERE -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -238,7 +238,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <input type="hidden" name="hiddenCoverPhoto" id="hiddenCoverPhoto" value="<?php echo htmlspecialchars($coverPhoto); ?>">
                     </div>
                     <hr>
-                    <div class="form-group mb-2">
+
+
+
+                    
+                    <!-- <div class="form-group mb-2">
                         <label>Add Moderator</label>
                         <select name="moderator" id="moderatorSelect" class="form-control">
                             <option value="">-- Select From Existing Moderators or Add New --</option>
@@ -253,7 +257,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <option value="add_new_moderator" style="font-weight: bold;">+ Add New Moderator</option>
                             </optgroup>
                         </select>
-                    </div>
+                    </div> -->
+
+
+
+
 
                     <input type="submit" class="btn btn-primary" value="Submit">
                     <a href="javascript:window.history.back();" class="btn btn-secondary">Cancel</a>
