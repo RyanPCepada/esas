@@ -303,104 +303,166 @@ unset($pdo);
             }
 
         }
+
+
+
+        .cover-photo-container {
+    position: relative;
+}
+
+.icons-container {
+    position: absolute;
+    top: 10px; /* Adjust as needed */
+    left: 10px; /* Adjust as needed */
+    display: flex;
+    gap: 10px; /* Space between icons */
+}
+
+.icon-calendar, .icon-chatbox {
+    background: rgba(255, 255, 255, 0.8); /* Optional: background for visibility */
+    border-radius: 50%;
+    padding: 3px; /* Adjust padding for smaller icons */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px; /* Ensure the container is the right size */
+    height: 30px; /* Ensure the container is the right size */
+}
+
     </style>
 </head>
 <body>
     
-    <div class="wrapper">
-        <div class="container-fluid">
-            <div class="row">
+<div class="wrapper">
+    <div class="container-fluid">
+        <div class="row">
 
-
-
-                <!-- Events Section -->
-                <div class="card col-md-3 p-3 auto-scroll" style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                    
-                    <?php include '../public/components/events.php' ?>
-                </div>
-
-
-                <!-- Main Body Section with Cover Photo -->
-                <div class="col-md-6 auto-scroll">
-                    <div class="cover-photo-container mb-3">
-                        <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
-                    </div>
-                    <div class="overlay-text">
-                        <div class="d-flex align-items-center">
-                            <h4><?php echo htmlspecialchars($clubName); ?></h4>
-                        </div>
-                    </div>
-                    <hr>
-                    <!-- Post Form -->
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card" id="card_post">
-                                <div class="card-header bg-info text-white d-flex align-items-center" style="position: relative; z-index: 1;">
-                                    <img src="../icons/ICON_ANNOUNCEMENT.png" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
-                                    <h4 class="mb-0">Share Something Exciting!</h4>
-                                </div>
-                                <div class="card-body">
-                                    <!-- <form id="postForm" method="POST" action="home.php"> -->
-                                    <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>">
-                                        <div class="form-group">
-                                            <label for="postContent">What's on your mind?</label>
-                                            <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
-                                            <span class="text-danger"><?php echo $postContent_err; ?></span>
-                                        </div>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <button type="submit" class="btn btn-primary" style="border-radius: 3px;"><i class="fa fa-paper-plane"></i> Post</button>
-                                            <div class="text-muted ml-2">
-                                                <p>Let your club members know what's happening!</p>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br><hr>
-                    <!-- Post List -->
-                    <div class="post_list">
-                        <!-- <div class="row">
-                            <div class="col-12 mb-3">
-                                <div class="d-flex align-items-center bg-info text-white p-2 rounded">
-                                    <img src="../icons/ICON_ANNOUNCEMENT.png" height="75" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
-                                    <h4 class="mb-0">Announcements and Updates</h4>
-                                </div>
-                            </div>
-                        </div> -->
-                        <!-- Post List -->
-                        <div>
-                            <?php include '../public/components/posts_and_comments.php' ?>
-                        </div>
-                        <div class="mt-2 text-center align-items-center justify-content-center">
-                            <a href="../public/my_clubs.php" class="btn btn-secondary">Go Back</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chatbox Section -->
-                <div class="card col-md-3 p-3 auto-scroll">
-                    <div class="chatbox-section">
-                        <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
-                        <div class="chatbox" id="chatbox">
-                            <!-- Example Chat Interface -->
-                            <div class="messages">
-                                <!-- Messages will be displayed here -->
-                            </div>
-                            <input type="text" id="chatInput" placeholder="Type a message..." class="form-control">
-                            <button id="sendMessage" class="btn btn-primary mt-2">Send</button>
-                        </div>
-                    </div>
-                </div>
-
-
-
+            <!-- Events Section -->
+            <div class="card col-md-3 p-3 auto-scroll d-none d-md-block" style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <?php include '../public/components/events.php' ?>
             </div>
+
+            <!-- Main Body Section with Cover Photo -->
+            <div class="col-md-6 auto-scroll">
+                <div class="cover-photo-container mb-3 position-relative">
+                    <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
+                    <div class="icons-container">
+                        <span class="icon-calendar" style="font-size: 20px; margin-right: 10px;" data-bs-toggle="modal" data-bs-target="#eventsModal"> 
+                            <i class="fas fa-calendar-alt"></i> <!-- Font Awesome Calendar Icon -->
+                        </span>
+                        <span class="icon-chatbox" style="font-size: 20px;" data-bs-toggle="modal" data-bs-target="#chatboxModal"> 
+                            <i class="fas fa-comment-dots"></i> <!-- Font Awesome Chatbox Icon -->
+                        </span>
+                    </div>
+                </div>
+                <div class="overlay-text">
+                    <div class="d-flex align-items-center">
+                        <h4><?php echo htmlspecialchars($clubName); ?></h4>
+                    </div>
+                </div>
+                <hr>
+                <!-- Post Form -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card" id="card_post">
+                            <div class="card-header bg-info text-white d-flex align-items-center" style="position: relative; z-index: 1;">
+                                <img src="../icons/ICON_ANNOUNCEMENT.png" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
+                                <h4 class="mb-0">Share Something Exciting!</h4>
+                            </div>
+                            <div class="card-body">
+                                <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>">
+                                    <div class="form-group">
+                                        <label for="postContent">What's on your mind?</label>
+                                        <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
+                                        <span class="text-danger"><?php echo $postContent_err; ?></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <button type="submit" class="btn btn-primary" style="border-radius: 3px;"><i class="fa fa-paper-plane"></i> Post</button>
+                                        <div class="text-muted ml-2">
+                                            <p>Let your club members know what's happening!</p>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br><hr>
+                <!-- Post List -->
+                <div class="post_list">
+                    <div>
+                        <?php include '../public/components/posts_and_comments.php' ?>
+                    </div>
+                    <div class="mt-2 text-center align-items-center justify-content-center">
+                        <a href="../public/my_clubs.php" class="btn btn-secondary">Go Back</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chatbox Section -->
+            <div class="card col-md-3 p-3 auto-scroll d-none d-md-block">
+                <div class="chatbox-section">
+                    <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
+                    <div class="chatbox" id="chatbox">
+                        <div class="messages">
+                            <!-- Messages will be displayed here -->
+                        </div>
+                        <input type="text" id="chatInput" placeholder="Type a message..." class="form-control">
+                        <button id="sendMessage" class="btn btn-primary mt-2">Send</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
 
+    <!-- Events Modal -->
+<div class="modal fade" id="eventsModal" tabindex="-1" aria-labelledby="eventsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventsModalLabel">Events</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Include your events content here -->
+                <?php include '../public/components/events.php' ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chatbox Modal -->
+<div class="modal fade" id="chatboxModal" tabindex="-1" aria-labelledby="chatboxModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="chatboxModalLabel">Chatbox</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Include your chatbox content here -->
+                <div class="chatbox-section">
+                    <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
+                    <div class="chatbox" id="chatboxModalContent">
+                        <div class="messages">
+                            <!-- Messages will be displayed here -->
+                        </div>
+                        <input type="text" id="chatInputModal" placeholder="Type a message..." class="form-control">
+                        <button id="sendMessageModal" class="btn btn-primary mt-2">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
+
+    <!--HERE-->
     <!--HERE-->
 
 <!-- <?php include 'assets/components/modals.php' ?> -->
