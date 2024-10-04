@@ -172,12 +172,11 @@ function fetchEvents() {
             
             if (data.length === 0) {
                 // No events found
-                eventList.innerHTML = `
-                    <div style="text-align: center; margin-top: 30px;">
+                eventList.innerHTML = 
+                    `<div style="text-align: center; margin-top: 30px;">
                         <i class="fas fa-calendar-times" style="font-size: 50px; color: #ff6b6b;"></i>
                         <p style="color: #666; margin-top: 10px;">No upcoming events.<br>Please stay tuned!</p>
-                    </div>
-                `;
+                    </div>`;
                 document.getElementById('calendar').style.display = 'none'; // Hide calendar
                 return; // Exit the function early
             }
@@ -185,7 +184,12 @@ function fetchEvents() {
             // If events are present, show the calendar
             document.getElementById('calendar').style.display = 'block'; // Show calendar
             
-            data.forEach(event => {
+            const today = new Date(); // Get today's date
+
+            // Filter out past events
+            const futureEvents = data.filter(event => new Date(event.date) >= today);
+
+            futureEvents.forEach(event => {
                 const eventDate = new Date(event.date);
                 const monthNames = [
                     "January", "February", "March", "April", "May", "June", 
@@ -196,7 +200,6 @@ function fetchEvents() {
                 eventDates.push(formattedDate); // Add date to the array
 
                 // Check if event date is today or tomorrow
-                const today = new Date();
                 const tomorrow = new Date();
                 tomorrow.setDate(today.getDate() + 1);
 
@@ -212,23 +215,21 @@ function fetchEvents() {
                 eventCard.style.maxWidth = '540px'; // Set a max width for the card
 
                 // Cover photo with 50% opacity and square shape
-                const eventIcon = `
-                    <div style="position: relative; width: 100%; height: 0; padding-top: 100%; overflow: hidden;">
+                const eventIcon = 
+                    `<div style="position: relative; width: 100%; height: 0; padding-top: 100%; overflow: hidden;">
                         <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>"
                              alt="Cover Photo" 
                              class="img-fluid" 
                              style="position: absolute; top: 0; left: 12px; width: 100%; height: 100%; object-fit: cover; opacity: 0.5;">
-                    </div>
-                `;
+                    </div>`;
 
-                eventCard.innerHTML = `
-                    <div class="row no-gutters">
+                eventCard.innerHTML = 
+                    `<div class="row no-gutters">
                         <div class="col-md-4" style="text-align: center;">
                             ${eventIcon} <!-- Inserted Cover Photo -->
                         </div>
                         <div class="col-md-8">
                             <div class="card-body" style="position: relative;">
-                                <style>.event-ellipsis:hover{background-color: lightgrey;"}</style>
                                 <div class="event-ellipsis text-center" style="position: absolute; top: 10px; right: 12px; cursor: pointer; width: 22px; border-radius: 50%;" onclick="toggleDropdown(${event.event_id})">
                                     <i class="fas fa-ellipsis-v" style="color: #666;"></i>
                                 </div>
@@ -243,20 +244,19 @@ function fetchEvents() {
                                 </p>
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
 
                 eventList.appendChild(eventCard);
             });
 
-            // Create the calendar for the current month
-            const today = new Date();
+            // Create the calendar for the current month with the filtered future events
             createCalendar(today.getMonth(), today.getFullYear(), eventDates);
         })
         .catch(error => {
             console.error('Error fetching events:', error);
         });
 }
+
 
 
 
