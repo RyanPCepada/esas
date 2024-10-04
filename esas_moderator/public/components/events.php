@@ -1,10 +1,20 @@
 <div class="events-section">
-                        <button type="button" class="btn btn-info p-0" id="addEventBtn" data-toggle="modal" data-target="#addEventModal"
-                            style="position: absolute; color: white; width: 30px; height: 30px; border-radius: 10%;">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                        <h5 class="text-muted mb-3" style="text-align: center; font-size: 1.2em;">Upcoming Events</h5>
-                        
+
+<div class="row d-flex align-items-center">
+    <div class="col-10">
+        <h5 class="text-muted mb-3" style="font-size: 1.2em;">Upcoming Events</h5>
+    </div>
+    <div class="col-2">
+        <button type="button" class="btn btn-info p-0" id="addEventBtn" data-toggle="modal" data-target="#addEventModal"
+            style="color: white; width: 30px; height: 30px; margin-top: -20px; border-radius: 10%; padding: 0;">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+</div>
+
+
+
+
 
                         <!-- Calendar Section -->
                         <div id="calendar" style="margin-bottom: 20px; text-align: center;"></div>

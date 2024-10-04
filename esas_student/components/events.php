@@ -1,5 +1,5 @@
 <div class="events-section">
-    <h5 class="text-muted mb-3" style="text-align: center; font-size: 1.2em;">Upcoming Events</h5>
+    <h5 class="text-muted mb-3" style="text-align: start; font-size: 1.2em;">Upcoming Events</h5>
 
     <!-- Calendar Section -->
     <div id="calendar" style="margin-bottom: 20px; text-align: center;"></div>

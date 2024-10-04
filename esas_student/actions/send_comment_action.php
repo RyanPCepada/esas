@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmt->execute()) {
                 // Comment inserted successfully
                 echo '<script>
-                    alert("Comment added successfully.");
+                    // alert("Comment added successfully.");
                     window.location.href = "../home.php?club_id=' . urlencode($club_id) . '";
                 </script>';
             } else {
