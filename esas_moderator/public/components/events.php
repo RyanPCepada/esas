@@ -90,15 +90,16 @@ function createCalendar(month, year, events) {
             return `${monthIndex}/${day}/${parts[2]}`; // Format as MM/DD/YYYY
         });
 
-        // Check if it's an event date or today
+        // Check if it's an event date
         if (formattedEventDates.includes(eventDate)) {
             td.style.backgroundColor = '#007bff'; // Event highlight color
             td.style.color = '#fff'; // Text color for event dates
             td.style.borderRadius = '50%'; // Circular effect
             td.style.padding = '10px'; // Increased padding for event dates
             td.style.margin = '5px'; // Margin for spacing
-        } else if (todayFormatted === eventDate) {
-            td.style.backgroundColor = 'yellowgreen'; // Color for today
+        } else if (todayFormatted === eventDate && formattedEventDates.includes(todayFormatted)) {
+            // Check if today has events
+            td.style.backgroundColor = 'yellowgreen'; // Color for today with events
             td.style.color = '#fff'; // Text color for today's date
             td.style.borderRadius = '50%'; // Circular effect
             td.style.padding = '10px'; // Increased padding for today's date
@@ -115,6 +116,7 @@ function createCalendar(month, year, events) {
             row = document.createElement('tr'); // Start a new row
         }
     }
+
     tbody.appendChild(row); // Append the last row if it has any remaining days
     table.appendChild(tbody);
     calendarDiv.appendChild(table);
@@ -197,7 +199,7 @@ function fetchEvents() {
                                 </div>
                                 <div id="dropdown-${event.event_id}" style="display: none; position: absolute; top: 30px; right: 20px; background-color: white; border: 1px solid #ccc; border-radius: 4px; z-index: 1000;">
                                     <a href="#" class="dropdown-item" onclick="editEvent(${event.event_id})" style="display: block; padding: 5px 10px; color: #007bff;">Edit</a>
-                                    <a href="#" class="dropdown-item" onclick="confirmDelete(${event.event_id})" style="display: block; padding: 5px 10px; color: #ff6b6b;">Delete</a>
+                                    <a href="#" class="dropdown-item" onclick="openDeleteModal(${event.event_id})" style="display: block; padding: 5px 10px; color: #ff6b6b;">Delete</a>
                                 </div>
                                 <h5 class="card-title" style="color: #007bff;">${event.title}</h5>
                                 <p class="card-text" style="margin: 0; color: #666;">${formattedDate}</p>
@@ -406,8 +408,30 @@ window.onload = fetchEvents;
 </div>
 
 
-
-
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this event?
+      </div>
+      <div class="modal-footer">
+        <!-- Form for delete confirmation -->
+        <form id="deleteForm" method="POST" action="/esas/esas_moderator/actions/delete_event_action.php">
+          <input type="hidden" name="event_id" id="deleteEventId" value="">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <script>
@@ -434,32 +458,20 @@ function editEvent(event_id) {
         });
 }
 
+let eventToDelete = null;
 
-
-
-function confirmDelete(eventId) {
-    const confirmation = confirm("Are you sure you want to delete this event?");
-    if (confirmation) {
-        deleteEvent(eventId);
-    }
+function openDeleteModal(eventId) {
+  // Set the hidden input value in the form to the event ID
+  document.getElementById('deleteEventId').value = eventId;
+  $('#deleteModal').modal('show'); // Show the modal
 }
 
-function deleteEvent(eventId) {
-    // Create a form and submit it to delete_event_action.php
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = "delete_event_action.php";
 
-    // Create hidden inputs for the necessary data
-    const eventInput = document.createElement("input");
-    eventInput.type = "hidden";
-    eventInput.name = "event_id";
-    eventInput.value = eventId;
-
-    form.appendChild(eventInput);
-    document.body.appendChild(form);
-    form.submit(); // Submit the form
-}
-
+document.getElementById('confirmDeleteButton').addEventListener('click', function() {
+  if (eventToDelete !== null) {
+    deleteEvent(eventToDelete); // Call the delete function with the stored event ID
+    $('#deleteModal').modal('hide'); // Hide the modal
+  }
+});
 
 </script>
