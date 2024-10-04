@@ -145,6 +145,11 @@ unset($pdo);
         /* body {
             font: 14px Helvetica;
         } */
+         
+
+        body.modal-open {
+            padding-right: 0 !important;
+        }
         .wrapper {
             width: 100%;
             /* max-width: 800px; */
@@ -240,6 +245,10 @@ unset($pdo);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+        
+        #card_posts {
+            /* box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); */
+        }
         .post-list .post-item {
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -279,10 +288,6 @@ unset($pdo);
             z-index: 2;
         }
 
-
-        body.modal-open {
-            padding-right: 0 !important;
-        }
 
         @media (min-width: 768px) {
             .overlay-text {
@@ -343,7 +348,7 @@ unset($pdo);
                                             <span class="text-danger"><?php echo $postContent_err; ?></span>
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Post</button>
+                                            <button type="submit" class="btn btn-primary" style="border-radius: 3px;"><i class="fa fa-paper-plane"></i> Post</button>
                                             <div class="text-muted ml-2">
                                                 <p>Let your club members know what's happening!</p>
                                             </div>
@@ -395,6 +400,8 @@ unset($pdo);
         </div>
     </div>
 
+
+    <!--HERE-->
 
 <!-- <?php include 'assets/components/modals.php' ?> -->
 <script src="../../assets/js/jquery.dataTables.min.js"></script>
