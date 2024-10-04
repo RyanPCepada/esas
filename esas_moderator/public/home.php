@@ -30,10 +30,14 @@ if (isset($_GET['club_id'])) {
         $clubName = $club['clubName']; 
         $coverPhoto = $club['coverPhoto']; 
     }
-} else {
+}
+ else {
     // Handle the case where no club_id is provided
-    echo "<script>alert('No club ID provided.'); window.location.href = 'some_page.php';</script>";
-    exit();
+    // echo "<script>alert('No club ID provided.'); window.location.href = 'home.php';</script>";
+    // exit();
+    
+    header("Location: /esas/esas_moderator/public/home.php?success=1&deleted=1");
+    exit(); // Make sure to call exit after redirecting
 }
 
 // Handle post submission

@@ -67,52 +67,72 @@ function createCalendar(month, year, events) {
         row.appendChild(td);
     }
 
-    // Get today's date in the format used for events
-    const today = new Date();
+    // Get today's date with timezone Asia/Manila
+    const today = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
     const todayFormatted = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
+    const endDate = new Date(today);
+    endDate.setDate(today.getDate() + 5); // Set end date to 5 days from today
 
     // Fill calendar with dates
     for (let date = 1; date <= daysInMonth; date++) {
         const td = document.createElement('td');
         td.innerText = date;
-        td.style.padding = '5px'; // Adjusted padding for better spacing
+        td.style.padding = '5px'; 
         td.style.textAlign = 'center'; 
-        td.style.fontSize = '1em'; // Increased font size for dates
+        td.style.fontSize = '1em'; 
 
         // Highlight event dates
-        const eventDate = `${month + 1}/${date}/${year}`; // Use MM/DD/YYYY format
+        const eventDate = new Date(year, month, date);
         const formattedEventDates = events.map(event => {
             const parts = event.split(' ');
-            const day = parts[1].replace(',', ''); // Extract day
-            const monthIndex = monthNames.indexOf(parts[0]) + 1; // Get month index
-            return `${monthIndex}/${day}/${parts[2]}`; // Format as MM/DD/YYYY
+            const day = parts[1].replace(',', '');
+            const monthIndex = monthNames.indexOf(parts[0]) + 1;
+            return new Date(parts[2], monthIndex - 1, day); // Return Date object for comparison
         });
 
-        // Check if it's an event date or today
-        if (formattedEventDates.includes(eventDate)) {
-            td.style.backgroundColor = '#007bff'; // Event highlight color
-            td.style.color = '#fff'; // Text color for event dates
-            td.style.borderRadius = '50%'; // Circular effect
-            td.style.padding = '10px'; // Increased padding for event dates
-            td.style.margin = '5px'; // Margin for spacing
-        } else if (todayFormatted === eventDate) {
-            td.style.backgroundColor = 'yellowgreen'; // Color for today
-            td.style.color = '#fff'; // Text color for today's date
-            td.style.borderRadius = '50%'; // Circular effect
-            td.style.padding = '10px'; // Increased padding for today's date
-            td.style.margin = '5px'; // Margin for spacing
+        // Check if today's date has events
+        const isToday = today.getDate() === date && today.getMonth() === month && today.getFullYear() === year;
+
+        // Encircle today's date if there are events
+        if (isToday && formattedEventDates.some(d => d.getTime() === today.getTime())) {
+            td.style.backgroundColor = 'yellowgreen';
+            td.style.color = '#fff'; 
+            td.style.borderRadius = '50%'; 
+            td.style.padding = '10px'; 
+            td.style.margin = '5px'; 
+        }
+
+        // Check if it's an event date and highlight accordingly
+        if (formattedEventDates.some(d => d.getTime() === eventDate.getTime())) {
+            if (eventDate >= today && eventDate <= endDate) {
+                td.style.backgroundColor = '#007bff';
+                td.style.color = '#fff';
+                td.style.borderRadius = '50%'; 
+                td.style.padding = '10px'; 
+                td.style.margin = '5px'; 
+            } else if (eventDate > endDate) {
+                // Encircle future event dates beyond the range
+                td.style.backgroundColor = '#007bff';
+                td.style.color = '#fff';
+                td.style.borderRadius = '50%'; 
+                td.style.padding = '10px'; 
+                td.style.margin = '5px'; 
+            }
         } else {
-            td.style.backgroundColor = '#f9f9f9'; // Light background for normal days
+            td.style.backgroundColor = '#f9f9f9'; 
             td.style.color = '#555'; 
-            td.style.border = '1px solid #e6e6e6'; // Border for normal days
+            td.style.border = '1px solid #e6e6e6'; 
         }
 
         row.appendChild(td);
-        if (row.children.length === 7) { // If 7 days are filled
+        if (row.children.length === 7) {
             tbody.appendChild(row);
-            row = document.createElement('tr'); // Start a new row
+            row = document.createElement('tr');
         }
     }
+
+
+
     tbody.appendChild(row); // Append the last row if it has any remaining days
     table.appendChild(tbody);
     calendarDiv.appendChild(table);
@@ -124,7 +144,6 @@ function createCalendar(month, year, events) {
     calendarDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'; // Subtle shadow for depth
     calendarDiv.style.backgroundColor = '#f9f9f9'; // Background color for the calendar
 }
-
 
 
 

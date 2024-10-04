@@ -69,53 +69,71 @@ function createCalendar(month, year, events) {
         row.appendChild(td);
     }
 
-    // Get today's date in the format used for events
-    const today = new Date();
+    // Get today's date with timezone Asia/Manila
+    const today = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
     const todayFormatted = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
+    const endDate = new Date(today);
+    endDate.setDate(today.getDate() + 5); // Set end date to 5 days from today
 
     // Fill calendar with dates
     for (let date = 1; date <= daysInMonth; date++) {
         const td = document.createElement('td');
         td.innerText = date;
-        td.style.padding = '5px'; // Adjusted padding for better spacing
+        td.style.padding = '5px'; 
         td.style.textAlign = 'center'; 
-        td.style.fontSize = '1em'; // Increased font size for dates
+        td.style.fontSize = '1em'; 
 
         // Highlight event dates
-        const eventDate = `${month + 1}/${date}/${year}`; // Use MM/DD/YYYY format
+        const eventDate = new Date(year, month, date);
         const formattedEventDates = events.map(event => {
             const parts = event.split(' ');
-            const day = parts[1].replace(',', ''); // Extract day
-            const monthIndex = monthNames.indexOf(parts[0]) + 1; // Get month index
-            return `${monthIndex}/${day}/${parts[2]}`; // Format as MM/DD/YYYY
+            const day = parts[1].replace(',', '');
+            const monthIndex = monthNames.indexOf(parts[0]) + 1;
+            return new Date(parts[2], monthIndex - 1, day); // Return Date object for comparison
         });
 
-        // Check if it's an event date
-        if (formattedEventDates.includes(eventDate)) {
-            td.style.backgroundColor = '#007bff'; // Event highlight color
-            td.style.color = '#fff'; // Text color for event dates
-            td.style.borderRadius = '50%'; // Circular effect
-            td.style.padding = '10px'; // Increased padding for event dates
-            td.style.margin = '5px'; // Margin for spacing
-        } else if (todayFormatted === eventDate && formattedEventDates.includes(todayFormatted)) {
-            // Check if today has events
-            td.style.backgroundColor = 'yellowgreen'; // Color for today with events
-            td.style.color = '#fff'; // Text color for today's date
-            td.style.borderRadius = '50%'; // Circular effect
-            td.style.padding = '10px'; // Increased padding for today's date
-            td.style.margin = '5px'; // Margin for spacing
+        // Check if today's date has events
+        const isToday = today.getDate() === date && today.getMonth() === month && today.getFullYear() === year;
+
+        // Encircle today's date if there are events
+        if (isToday && formattedEventDates.some(d => d.getTime() === today.getTime())) {
+            td.style.backgroundColor = 'yellowgreen';
+            td.style.color = '#fff'; 
+            td.style.borderRadius = '50%'; 
+            td.style.padding = '10px'; 
+            td.style.margin = '5px'; 
+        }
+
+        // Check if it's an event date and highlight accordingly
+        if (formattedEventDates.some(d => d.getTime() === eventDate.getTime())) {
+            if (eventDate >= today && eventDate <= endDate) {
+                td.style.backgroundColor = '#007bff';
+                td.style.color = '#fff';
+                td.style.borderRadius = '50%'; 
+                td.style.padding = '10px'; 
+                td.style.margin = '5px'; 
+            } else if (eventDate > endDate) {
+                // Encircle future event dates beyond the range
+                td.style.backgroundColor = '#007bff';
+                td.style.color = '#fff';
+                td.style.borderRadius = '50%'; 
+                td.style.padding = '10px'; 
+                td.style.margin = '5px'; 
+            }
         } else {
-            td.style.backgroundColor = '#f9f9f9'; // Light background for normal days
+            td.style.backgroundColor = '#f9f9f9'; 
             td.style.color = '#555'; 
-            td.style.border = '1px solid #e6e6e6'; // Border for normal days
+            td.style.border = '1px solid #e6e6e6'; 
         }
 
         row.appendChild(td);
-        if (row.children.length === 7) { // If 7 days are filled
+        if (row.children.length === 7) {
             tbody.appendChild(row);
-            row = document.createElement('tr'); // Start a new row
+            row = document.createElement('tr');
         }
     }
+
+
 
     tbody.appendChild(row); // Append the last row if it has any remaining days
     table.appendChild(tbody);
@@ -131,7 +149,6 @@ function createCalendar(month, year, events) {
 
 
 
-// Call this function after fetching events
 function fetchEvents() {
     const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
 
@@ -168,14 +185,22 @@ function fetchEvents() {
 
                 eventDates.push(formattedDate); // Add date to the array
 
+                // Check if event date is today or tomorrow
+                const today = new Date();
+                const tomorrow = new Date();
+                tomorrow.setDate(today.getDate() + 1);
+
+                let displayDate = formattedDate; // Default display date
+                if (eventDate.toDateString() === today.toDateString()) {
+                    displayDate = "Today"; // Change to "Today" for today's date
+                } else if (eventDate.toDateString() === tomorrow.toDateString()) {
+                    displayDate = "Tomorrow"; // Change to "Tomorrow" for tomorrow's date
+                }
+
                 const eventCard = document.createElement('div');
                 eventCard.className = 'card mb-3'; // Bootstrap card class
                 eventCard.style.maxWidth = '540px'; // Set a max width for the card
 
-                // Options for the icon/logo (keeping them as comments)
-                // const eventIcon = "🎉"; // Example: Use an emoji
-                // const eventIcon = `<i class="fas fa-bell"></i>`; // Example: Use a Font Awesome icon
-                
                 // Cover photo with 50% opacity and square shape
                 const eventIcon = `
                     <div style="position: relative; width: 100%; height: 0; padding-top: 100%; overflow: hidden;">
@@ -202,7 +227,7 @@ function fetchEvents() {
                                     <a href="#" class="dropdown-item" onclick="openDeleteModal(${event.event_id})" style="display: block; padding: 5px 10px; color: #ff6b6b;">Delete</a>
                                 </div>
                                 <h5 class="card-title" style="color: #007bff;">${event.title}</h5>
-                                <p class="card-text" style="margin: 0; color: #666;">${formattedDate}</p>
+                                <p class="card-text" style="margin: 0; color: #666;">${displayDate}</p> <!-- Display "Today" or "Tomorrow" -->
                                 <p class="card-text" style="display: flex; align-items: center; justify-content: flex-start;">
                                     <a href="#" class="btn btn-link" onclick="showEventDetails(${event.event_id})" style="white-space: nowrap; padding: 0; margin-right: 40px;">View Details</a>
                                 </p>
@@ -210,7 +235,6 @@ function fetchEvents() {
                         </div>
                     </div>
                 `;
-
 
                 eventList.appendChild(eventCard);
             });
@@ -223,6 +247,7 @@ function fetchEvents() {
             console.error('Error fetching events:', error);
         });
 }
+
 
 
 
@@ -255,11 +280,27 @@ function showEventDetails(event_id) {
                 // Populate modal with event details
                 document.getElementById('eventTitle').innerText = event.title;
                 document.getElementById('eventDescription').innerText = event.description;
-                document.getElementById('eventDate').innerText = new Date(event.date).toLocaleDateString('en-US', { 
+
+                // Get the event date and format it for the modal
+                const eventDate = new Date(event.date);
+                const today = new Date();
+                const tomorrow = new Date();
+                tomorrow.setDate(today.getDate() + 1);
+
+                let displayDate = eventDate.toLocaleDateString('en-US', { 
                     month: 'long', 
                     day: 'numeric', 
                     year: 'numeric' 
-                });
+                }); // Default display date
+
+                // Check if the event date is today or tomorrow
+                if (eventDate.toDateString() === today.toDateString()) {
+                    displayDate = "Today"; // Change to "Today" for today's date
+                } else if (eventDate.toDateString() === tomorrow.toDateString()) {
+                    displayDate = "Tomorrow"; // Change to "Tomorrow" for tomorrow's date
+                }
+
+                document.getElementById('eventDate').innerText = displayDate; // Set the formatted date
                 document.getElementById('eventTime').innerText = formatTime(event.time); // Use the new formatTime function
                 document.getElementById('eventLocation').innerText = event.location;
                 document.getElementById('eventLink').href = event.registrationLink;
@@ -273,6 +314,7 @@ function showEventDetails(event_id) {
             console.error('Error fetching event details:', error);
         });
 }
+
 
 
 
@@ -424,6 +466,8 @@ window.onload = fetchEvents;
       <div class="modal-footer">
         <!-- Form for delete confirmation -->
         <form id="deleteForm" method="POST" action="/esas/esas_moderator/actions/delete_event_action.php">
+            <input type="hidden" name="club_id" value="<?php echo $club_id; ?>">
+            <input type="hidden" name="moderator_id" value="<?php echo $moderator_id; ?>">
           <input type="hidden" name="event_id" id="deleteEventId" value="">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
           <button type="submit" class="btn btn-danger">Yes, Delete</button>
