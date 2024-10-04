@@ -18,161 +18,197 @@
 
 // Function to create a simple calendar
 function createCalendar(month, year, events) {
-const calendarDiv = document.getElementById('calendar');
-calendarDiv.innerHTML = ''; // Clear existing calendar
+    const calendarDiv = document.getElementById('calendar');
+    calendarDiv.innerHTML = ''; // Clear existing calendar
 
-const monthNames = [
-   "January", "February", "March", "April", "May", "June", 
-   "July", "August", "September", "October", "November", "December"
-];
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June", 
+        "July", "August", "September", "October", "November", "December"
+    ];
 
-// Header for the month and year
-const header = document.createElement('h4');
-header.innerText = `${monthNames[month]} ${year}`;
-header.style.textAlign = 'center';
-header.style.fontSize = '1.2em'; // Increased header font size for emphasis
-header.style.fontWeight = 'bold'; 
-header.style.color = '#333'; 
-calendarDiv.appendChild(header);
+    // Header for the month and year
+    const header = document.createElement('h4');
+    header.innerText = `${monthNames[month]} ${year}`;
+    header.style.textAlign = 'center';
+    header.style.fontSize = '1.2em'; // Increased header font size for emphasis
+    header.style.fontWeight = 'bold'; 
+    header.style.color = '#333'; 
+    calendarDiv.appendChild(header);
 
-const daysInMonth = new Date(year, month + 1, 0).getDate();
-const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
 
-// Create a styled table for the calendar
-const table = document.createElement('table');
-table.style.width = '100%';
-table.style.borderCollapse = 'collapse'; 
-table.style.fontSize = '12px'; // Consistent font size
-table.style.color = '#555'; // Consistent text color
-const tbody = document.createElement('tbody');
+    // Create a styled table for the calendar
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse'; 
+    table.style.fontSize = '12px'; // Consistent font size
+    table.style.color = '#555'; // Consistent text color
+    const tbody = document.createElement('tbody');
 
-// Create header row for days of the week
-const daysRow = document.createElement('tr'); 
-["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(day => {
-   const th = document.createElement('th');
-   th.innerText = day;
-   th.style.color = '#ff6b6b'; 
-   th.style.padding = '2px'; // Padding for header cells
-   th.style.fontWeight = 'bold'; 
-   th.style.textAlign = 'center'; 
-   th.style.fontSize = '1em'; // Slightly larger font size for day headers
-   daysRow.appendChild(th);
-});
-tbody.appendChild(daysRow);
+    // Create header row for days of the week
+    const daysRow = document.createElement('tr'); 
+    ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(day => {
+        const th = document.createElement('th');
+        th.innerText = day;
+        th.style.color = '#ff6b6b'; 
+        th.style.padding = '2px'; // Padding for header cells
+        th.style.fontWeight = 'bold'; 
+        th.style.textAlign = 'center'; 
+        th.style.fontSize = '1em'; // Slightly larger font size for day headers
+        daysRow.appendChild(th);
+    });
+    tbody.appendChild(daysRow);
 
-let row = document.createElement('tr');
-for (let i = 0; i < firstDay; i++) {
-   const td = document.createElement('td');
-   td.style.border = '1px solid #e6e6e6'; // Border for empty cells
-   row.appendChild(td);
+    let row = document.createElement('tr');
+    for (let i = 0; i < firstDay; i++) {
+        const td = document.createElement('td');
+        td.style.border = '1px solid #e6e6e6'; // Border for empty cells
+        row.appendChild(td);
+    }
+
+    // Get today's date in the format used for events
+    const today = new Date();
+    const todayFormatted = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
+
+    // Fill calendar with dates
+    for (let date = 1; date <= daysInMonth; date++) {
+        const td = document.createElement('td');
+        td.innerText = date;
+        td.style.padding = '5px'; // Adjusted padding for better spacing
+        td.style.textAlign = 'center'; 
+        td.style.fontSize = '1em'; // Increased font size for dates
+
+        // Highlight event dates
+        const eventDate = `${month + 1}/${date}/${year}`; // Use MM/DD/YYYY format
+        const formattedEventDates = events.map(event => {
+            const parts = event.split(' ');
+            const day = parts[1].replace(',', ''); // Extract day
+            const monthIndex = monthNames.indexOf(parts[0]) + 1; // Get month index
+            return `${monthIndex}/${day}/${parts[2]}`; // Format as MM/DD/YYYY
+        });
+
+        // Check if it's an event date or today
+        if (formattedEventDates.includes(eventDate)) {
+            td.style.backgroundColor = '#007bff'; // Event highlight color
+            td.style.color = '#fff'; // Text color for event dates
+            td.style.borderRadius = '50%'; // Circular effect
+            td.style.padding = '10px'; // Increased padding for event dates
+            td.style.margin = '5px'; // Margin for spacing
+        } else if (todayFormatted === eventDate) {
+            td.style.backgroundColor = 'yellowgreen'; // Color for today
+            td.style.color = '#fff'; // Text color for today's date
+            td.style.borderRadius = '50%'; // Circular effect
+            td.style.padding = '10px'; // Increased padding for today's date
+            td.style.margin = '5px'; // Margin for spacing
+        } else {
+            td.style.backgroundColor = '#f9f9f9'; // Light background for normal days
+            td.style.color = '#555'; 
+            td.style.border = '1px solid #e6e6e6'; // Border for normal days
+        }
+
+        row.appendChild(td);
+        if (row.children.length === 7) { // If 7 days are filled
+            tbody.appendChild(row);
+            row = document.createElement('tr'); // Start a new row
+        }
+    }
+    tbody.appendChild(row); // Append the last row if it has any remaining days
+    table.appendChild(tbody);
+    calendarDiv.appendChild(table);
+
+    // Style for the calendar container
+    calendarDiv.style.border = '1px solid #e6e6e6'; // Outer border for the calendar
+    calendarDiv.style.padding = '15px'; // Padding for the calendar container
+    calendarDiv.style.borderRadius = '10px'; // Rounded corners for the calendar container
+    calendarDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'; // Subtle shadow for depth
+    calendarDiv.style.backgroundColor = '#f9f9f9'; // Background color for the calendar
 }
 
-// Fill calendar with dates
-for (let date = 1; date <= daysInMonth; date++) {
-   const td = document.createElement('td');
-   td.innerText = date;
-   td.style.padding = '5px'; // Adjusted padding for better spacing
-   td.style.textAlign = 'center'; 
-   td.style.fontSize = '1em'; // Increased font size for dates
 
-   // Highlight event dates
-   const eventDate = `${month + 1}/${date}/${year}`; // Use MM/DD/YYYY format
-   const formattedEventDates = events.map(event => {
-       const parts = event.split(' ');
-       const day = parts[1].replace(',', ''); // Extract day
-       const monthIndex = monthNames.indexOf(parts[0]) + 1; // Get month index
-       return `${monthIndex}/${day}/${parts[2]}`; // Format as MM/DD/YYYY
-   });
-
-   if (formattedEventDates.includes(eventDate)) {
-       td.style.backgroundColor = '#007bff'; // Event highlight color
-       td.style.color = '#fff'; // Text color for event dates
-       td.style.borderRadius = '50%'; // Circular effect
-       td.style.padding = '10px'; // Increased padding for event dates
-       td.style.margin = '5px'; // Margin for spacing
-   } else {
-       td.style.backgroundColor = '#f9f9f9'; // Light background for normal days
-       td.style.color = '#555'; 
-       td.style.border = '1px solid #e6e6e6'; // Border for normal days
-   }
-
-   row.appendChild(td);
-   if (row.children.length === 7) { // If 7 days are filled
-       tbody.appendChild(row);
-       row = document.createElement('tr'); // Start a new row
-   }
-}
-tbody.appendChild(row); // Append the last row if it has any remaining days
-table.appendChild(tbody);
-calendarDiv.appendChild(table);
-
-// Style for the calendar container
-calendarDiv.style.border = '1px solid #e6e6e6'; // Outer border for the calendar
-calendarDiv.style.padding = '15px'; // Padding for the calendar container
-calendarDiv.style.borderRadius = '10px'; // Rounded corners for the calendar container
-calendarDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'; // Subtle shadow for depth
-calendarDiv.style.backgroundColor = '#f9f9f9'; // Background color for the calendar
-}
 
 
 // Call this function after fetching events
 function fetchEvents() {
-const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
+    const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
 
-fetch(`/esas/esas_student/apis/events-api.php?club_id=${clubId}`)
-   .then(response => response.json())
-   .then(data => {
-       const eventList = document.getElementById('eventList');
-       eventList.innerHTML = ''; // Clear the existing content
-       
-       const eventDates = []; // Array to store event dates
-       
-       if (data.length === 0) {
-           // No events found
-           eventList.innerHTML = `
-               <div style="text-align: center; margin-top: 30px;">
-                   <i class="fas fa-calendar-times" style="font-size: 50px; color: #ff6b6b;"></i>
-                   <p style="color: #666; margin-top: 10px;">No upcoming events.<br>Please stay tuned!</p>
-               </div>
-           `;
-           document.getElementById('calendar').style.display = 'none'; // Hide calendar
-           return; // Exit the function early
-       }
+    fetch(`/esas/esas_moderator/apis/events-api.php?club_id=${clubId}`)
+        .then(response => response.json())
+        .then(data => {
+            const eventList = document.getElementById('eventList');
+            eventList.innerHTML = ''; // Clear the existing content
+            
+            const eventDates = []; // Array to store event dates
+            
+            if (data.length === 0) {
+                // No events found
+                eventList.innerHTML = `
+                    <div style="text-align: center; margin-top: 30px;">
+                        <i class="fas fa-calendar-times" style="font-size: 50px; color: #ff6b6b;"></i>
+                        <p style="color: #666; margin-top: 10px;">No upcoming events.<br>Please stay tuned!</p>
+                    </div>
+                `;
+                document.getElementById('calendar').style.display = 'none'; // Hide calendar
+                return; // Exit the function early
+            }
 
-       // If events are present, show the calendar
-       document.getElementById('calendar').style.display = 'block'; // Show calendar
-       
-       data.forEach(event => {
-           const eventDate = new Date(event.date);
-           const monthNames = [
-               "January", "February", "March", "April", "May", "June", 
-               "July", "August", "September", "October", "November", "December"
-           ];
-           const formattedDate = `${monthNames[eventDate.getMonth()]} ${eventDate.getDate().toString().padStart(2, '0')}, ${eventDate.getFullYear()}`; // Format the date
+            // If events are present, show the calendar
+            document.getElementById('calendar').style.display = 'block'; // Show calendar
+            
+            data.forEach(event => {
+                const eventDate = new Date(event.date);
+                const monthNames = [
+                    "January", "February", "March", "April", "May", "June", 
+                    "July", "August", "September", "October", "November", "December"
+                ];
+                const formattedDate = `${monthNames[eventDate.getMonth()]} ${eventDate.getDate().toString().padStart(2, '0')}, ${eventDate.getFullYear()}`; // Format the date
 
-           eventDates.push(formattedDate); // Add date to the array
+                eventDates.push(formattedDate); // Add date to the array
 
-           const eventItem = document.createElement('div');
-           eventItem.className = 'event-item';
-           eventItem.style.padding = '10px';
-           eventItem.style.borderBottom = '1px solid #ddd';
-           eventItem.style.marginBottom = '10px';
+                const eventCard = document.createElement('div');
+                eventCard.className = 'card mb-3'; // Bootstrap card class
+                eventCard.style.maxWidth = '540px'; // Set a max width for the card
 
-           eventItem.innerHTML = `
-               <h6 style="color: #007bff;">${event.title}</h6> 
-               <p style="margin: 0; color: #666;">${formattedDate}</p>
-               <p><a href="#" class="btn btn-link" style="padding: 0; color: #007bff;" onclick="showEventDetails(${event.event_id})">View Details</a></p>
-           `;
-           eventList.appendChild(eventItem);
-       });
+                // Options for the icon/logo (keeping them as comments)
+                // const eventIcon = "🎉"; // Example: Use an emoji
+                // const eventIcon = `<i class="fas fa-bell"></i>`; // Example: Use a Font Awesome icon
+                
+                // Cover photo with 50% opacity and square shape
+                const eventIcon = `
+                    <div style="position: relative; width: 100%; height: 0; padding-top: 100%; overflow: hidden;">
+                        <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>"
+                             alt="Cover Photo" 
+                             class="img-fluid" 
+                             style="position: absolute; top: 0; left: 12px; width: 100%; height: 100%; object-fit: cover; opacity: 0.5;">
+                    </div>
+                `;
 
-       // Create the calendar for the current month
-       const today = new Date();
-       createCalendar(today.getMonth(), today.getFullYear(), eventDates);
-   })
-   .catch(error => {
-       console.error('Error fetching events:', error);
-   });
+                eventCard.innerHTML = `
+                    <div class="row no-gutters">
+                        <div class="col-md-4" style="text-align: center;">
+                            ${eventIcon} <!-- Inserted Cover Photo -->
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title" style="color: #007bff;">${event.title}</h5>
+                                <p class="card-text" style="margin: 0; color: #666;">${formattedDate}</p>
+                                <p class="card-text">
+                                    <a href="#" class="btn btn-link" onclick="showEventDetails(${event.event_id})">View Details</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                eventList.appendChild(eventCard);
+            });
+
+            // Create the calendar for the current month
+            const today = new Date();
+            createCalendar(today.getMonth(), today.getFullYear(), eventDates);
+        })
+        .catch(error => {
+            console.error('Error fetching events:', error);
+        });
 }
 
 
@@ -189,29 +225,30 @@ return `${formattedHours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
 
 // Function to show event details in a modal
 function showEventDetails(event_id) {
-fetch(`/esas/esas_student/apis/events-api.php?event_id=${event_id}`)
-   .then(response => response.json())
-   .then(event => {
-       if (event) {
-           // Populate modal with event details
-           document.getElementById('eventTitle').innerText = event.title;
-           document.getElementById('eventDescription').innerText = event.description;
-           document.getElementById('eventDate').innerText = new Date(event.date).toLocaleDateString('en-US', { 
-               month: 'long', 
-               day: 'numeric', 
-               year: 'numeric' 
-           });
-           document.getElementById('eventTime').innerText = formatTime(event.time); // Use the new formatTime function
-           document.getElementById('eventLocation').innerText = event.location;
-           document.getElementById('eventLink').href = event.registrationLink;
+    fetch(`/esas/esas_student/apis/events-api.php?event_id=${event_id}`)
+        .then(response => response.json())
+        .then(event => {
+            if (event) {
+                // Populate modal with event details
+                document.getElementById('eventTitle').innerText = event.title;
+                document.getElementById('eventDescription').innerText = event.description;
+                document.getElementById('eventDate').innerText = new Date(event.date).toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+                document.getElementById('eventTime').innerText = formatTime(event.time); // Use the new formatTime function
+                document.getElementById('eventLocation').innerText = event.location;
+                document.getElementById('eventLink').href = event.registrationLink;
+                document.getElementById('eventLinkText').innerText = event.registrationLink; // Display the link text
 
-           // Show the modal
-           $('#eventDetailsModal').modal('show');
-       }
-   })
-   .catch(error => {
-       console.error('Error fetching event details:', error);
-   });
+                // Show the modal
+                $('#eventDetailsModal').modal('show');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching event details:', error);
+        });
 }
 
 
@@ -224,27 +261,29 @@ window.onload = fetchEvents;
 
 <!-- Modal for Event Details -->
 <div class="modal fade" id="eventDetailsModal" tabindex="-1" role="dialog" aria-labelledby="eventDetailsModalLabel" aria-hidden="true">
-<div class="modal-dialog modal-dialog-centered" role="document">
-   <div class="modal-content">
-       <div class="modal-header" style="background-color: #007bff; color: #ffffff;">
-           <h5 class="modal-title" id="eventDetailsModalLabel">Event Details</h5>
-           <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="color: #ffffff;">
-               <span aria-hidden="true">&times;</span>
-           </button>
-       </div>
-       <div class="modal-body">
-           <h6 id="eventTitle" style="color: #007bff;"></h6>
-           <p id="eventDescription" style="margin-bottom: 1rem;"></p>
-           <p><strong>Date:</strong> <span id="eventDate" style="color: #666;"></span></p>
-           <p><strong>Time:</strong> <span id="eventTime" style="color: #666;"></span></p>
-           <p><strong>Location:</strong> <span id="eventLocation" style="color: #666;"></span></p>
-           <p><strong>Registration Link:</strong> <a id="eventLink" href="#" target="_blank" class="btn btn-primary btn-sm">Register</a></p>
-       </div>
-       <div class="modal-footer">
-           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-       </div>
-   </div>
-</div>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #007bff; color: #ffffff;">
+                <h5 class="modal-title" id="eventDetailsModalLabel">Event Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="color: #ffffff;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6 id="eventTitle" style="color: #007bff;"></h6>
+                <p id="eventDescription" style="margin-bottom: 1rem;"></p>
+                <p><strong>Date:</strong> <span id="eventDate" style="color: #666;"></span></p>
+                <p><strong>Time:</strong> <span id="eventTime" style="color: #666;"></span></p>
+                <p><strong>Location:</strong> <span id="eventLocation" style="color: #666;"></span></p>
+                <p><strong>Registration Link:</strong> <a id="eventLink" href="#" target="_blank" style="color: #007bff;"> 
+                    <span id="eventLinkText"></span>
+                </a></p> <!-- Display the link text -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 

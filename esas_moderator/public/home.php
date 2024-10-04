@@ -204,7 +204,7 @@ unset($pdo);
             line-height: .9; /* Adjust line height for closer spacing */
         }
         #icon_announcement {
-            margin-top: -30px;
+            height: 75px;
             margin-left: -5px;
             animation: zoomAndWave 1.2s ease-in-out;
             animation-play-state: paused; /* Start with the animation paused */
@@ -262,6 +262,9 @@ unset($pdo);
             margin-left: 100%;
         }
 
+        body.modal-open {
+            padding-right: 0 !important;
+        }
 
         @media (min-width: 768px) {
             .overlay-text {
@@ -309,8 +312,8 @@ unset($pdo);
                     <div class="row">
                         <div class="col-12">
                             <div class="card" id="card_post">
-                                <div class="card-header bg-info text-white d-flex align-items-center">
-                                    <i class="fa fa-pencil-square-o fa-2x mr-2"></i>
+                                <div class="card-header bg-info text-white d-flex align-items-center" style="position: relative; z-index: 1;">
+                                    <img src="../icons/ICON_ANNOUNCEMENT.png" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
                                     <h4 class="mb-0">Share Something Exciting!</h4>
                                 </div>
                                 <div class="card-body">
@@ -335,14 +338,14 @@ unset($pdo);
                     <br><hr>
                     <!-- Post List -->
                     <div class="post_list">
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="col-12 mb-3">
                                 <div class="d-flex align-items-center bg-info text-white p-2 rounded">
                                     <img src="../icons/ICON_ANNOUNCEMENT.png" height="75" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
                                     <h4 class="mb-0">Announcements and Updates</h4>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- Post List -->
                         <div>
                             <?php include '../public/components/posts_and_comments.php' ?>

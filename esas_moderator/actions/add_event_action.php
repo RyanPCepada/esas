@@ -5,6 +5,7 @@ require_once "../../config.php";
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
+// Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $description = $_POST['description'];
@@ -32,8 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':moderator_id' => $moderator_id
         ]);
 
-        echo json_encode(['success' => true]);
+        // Redirect to home.php after successful insertion
+        header("Location: /esas/esas_moderator/public/home.php?success=1&club_id=" . urlencode($club_id));
+        exit(); // Make sure to call exit after redirecting
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        echo "Error: " . $e->getMessage(); // Handle error appropriately
     }
 }
+?>

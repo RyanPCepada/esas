@@ -14,88 +14,11 @@
                             <!-- Events will be dynamically inserted here -->
                         </div>
                     </div>
-
-
-                    <!-- Modal for Adding Events -->
-<div class="modal fade" id="addEventModal" tabindex="-1" role="dialog" aria-labelledby="addEventModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addEventModalLabel">Add New Event</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="eventForm" action="../actions/add_event.php" method="POST">
-                    <input type="hidden" name="club_id" value="<?php echo $club_id; ?>">
-                    <input type="hidden" name="moderator_id" value="<?php echo $moderator_id; ?>">
-                    
-                    <div class="form-group mb-2">
-                        <label for="eventTitle">Title</label>
-                        <input type="text" class="form-control" id="eventTitle" name="title" required>
-                    </div>
-                    <div class="form-group mb-2">
-                        <label for="eventDescription">Description</label>
-                        <textarea class="form-control" id="eventDescription" name="description" required></textarea>
-                    </div>
-                    <div class="form-group mb-2">
-                        <label for="eventDate">Date</label>
-                        <input type="date" class="form-control" id="eventDate" name="date" required>
-                    </div>
-                    <div class="form-group mb-2">
-                        <label for="eventTime">Time</label>
-                        <input type="time" class="form-control" id="eventTime" name="time" required>
-                    </div>
-                    <div class="form-group mb-2">
-                        <label for="eventLocation">Location</label>
-                        <input type="text" class="form-control" id="eventLocation" name="location" required>
-                    </div>
-                    <div class="form-group mb-2">
-                        <label for="registrationLink">Registration Link</label>
-                        <input type="url" class="form-control" id="registrationLink" name="registrationLink">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Add Event</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    document.getElementById('eventForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
-
-        // Get form data
-        var formData = new FormData(this);
-
-        // Perform AJAX request
-        fetch('../actions/add_event.php', { 
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Redirect on success
-                window.location.href = '/esas/esas_moderator/public/home.php';
-            } else {
-                // Handle the error
-                alert('Error: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    });
-</script>
-
-
-
+       
 
 <script>
 
-     // Function to create a simple calendar
+// Function to create a simple calendar
 function createCalendar(month, year, events) {
     const calendarDiv = document.getElementById('calendar');
     calendarDiv.innerHTML = ''; // Clear existing calendar
@@ -104,7 +27,7 @@ function createCalendar(month, year, events) {
         "January", "February", "March", "April", "May", "June", 
         "July", "August", "September", "October", "November", "December"
     ];
-    
+
     // Header for the month and year
     const header = document.createElement('h4');
     header.innerText = `${monthNames[month]} ${year}`;
@@ -146,6 +69,10 @@ function createCalendar(month, year, events) {
         row.appendChild(td);
     }
 
+    // Get today's date in the format used for events
+    const today = new Date();
+    const todayFormatted = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
+
     // Fill calendar with dates
     for (let date = 1; date <= daysInMonth; date++) {
         const td = document.createElement('td');
@@ -163,11 +90,18 @@ function createCalendar(month, year, events) {
             return `${monthIndex}/${day}/${parts[2]}`; // Format as MM/DD/YYYY
         });
 
+        // Check if it's an event date or today
         if (formattedEventDates.includes(eventDate)) {
             td.style.backgroundColor = '#007bff'; // Event highlight color
             td.style.color = '#fff'; // Text color for event dates
             td.style.borderRadius = '50%'; // Circular effect
             td.style.padding = '10px'; // Increased padding for event dates
+            td.style.margin = '5px'; // Margin for spacing
+        } else if (todayFormatted === eventDate) {
+            td.style.backgroundColor = 'yellowgreen'; // Color for today
+            td.style.color = '#fff'; // Text color for today's date
+            td.style.borderRadius = '50%'; // Circular effect
+            td.style.padding = '10px'; // Increased padding for today's date
             td.style.margin = '5px'; // Margin for spacing
         } else {
             td.style.backgroundColor = '#f9f9f9'; // Light background for normal days
@@ -192,6 +126,7 @@ function createCalendar(month, year, events) {
     calendarDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'; // Subtle shadow for depth
     calendarDiv.style.backgroundColor = '#f9f9f9'; // Background color for the calendar
 }
+
 
 
 // Call this function after fetching events
@@ -231,18 +166,50 @@ function fetchEvents() {
 
                 eventDates.push(formattedDate); // Add date to the array
 
-                const eventItem = document.createElement('div');
-                eventItem.className = 'event-item';
-                eventItem.style.padding = '10px';
-                eventItem.style.borderBottom = '1px solid #ddd';
-                eventItem.style.marginBottom = '10px';
+                const eventCard = document.createElement('div');
+                eventCard.className = 'card mb-3'; // Bootstrap card class
+                eventCard.style.maxWidth = '540px'; // Set a max width for the card
 
-                eventItem.innerHTML = `
-                    <h6 style="color: #007bff;">${event.title}</h6> 
-                    <p style="margin: 0; color: #666;">${formattedDate}</p>
-                    <p><a href="#" class="btn btn-link" style="padding: 0; color: #007bff;" onclick="showEventDetails(${event.event_id})">View Details</a></p>
+                // Options for the icon/logo (keeping them as comments)
+                // const eventIcon = "🎉"; // Example: Use an emoji
+                // const eventIcon = `<i class="fas fa-bell"></i>`; // Example: Use a Font Awesome icon
+                
+                // Cover photo with 50% opacity and square shape
+                const eventIcon = `
+                    <div style="position: relative; width: 100%; height: 0; padding-top: 100%; overflow: hidden;">
+                        <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>"
+                             alt="Cover Photo" 
+                             class="img-fluid" 
+                             style="position: absolute; top: 0; left: 12px; width: 100%; height: 100%; object-fit: cover; opacity: 0.5;">
+                    </div>
                 `;
-                eventList.appendChild(eventItem);
+
+                eventCard.innerHTML = `
+                    <div class="row no-gutters">
+                        <div class="col-md-4" style="text-align: center;">
+                            ${eventIcon} <!-- Inserted Cover Photo -->
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body" style="position: relative;">
+                                <div style="position: absolute; top: 10px; right: 20px; cursor: pointer;" onclick="toggleDropdown(${event.event_id})">
+                                    <i class="fas fa-ellipsis-v" style="color: #666;"></i>
+                                </div>
+                                <div id="dropdown-${event.event_id}" style="display: none; position: absolute; top: 30px; right: 20px; background-color: white; border: 1px solid #ccc; border-radius: 4px; z-index: 1000;">
+                                    <a href="#" class="dropdown-item" onclick="editEvent(${event.event_id})" style="display: block; padding: 5px 10px; color: #007bff;">Edit</a>
+                                    <a href="#" class="dropdown-item" onclick="deleteEvent(${event.event_id})" style="display: block; padding: 5px 10px; color: #ff6b6b;">Delete</a>
+                                </div>
+                                <h5 class="card-title" style="color: #007bff;">${event.title}</h5>
+                                <p class="card-text" style="margin: 0; color: #666;">${formattedDate}</p>
+                                <p class="card-text" style="display: flex; align-items: center; justify-content: flex-start;">
+                                    <a href="#" class="btn btn-link" onclick="showEventDetails(${event.event_id})" style="white-space: nowrap; padding: 0; margin-right: 40px;">View Details</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+
+                eventList.appendChild(eventCard);
             });
 
             // Create the calendar for the current month
@@ -256,14 +223,24 @@ function fetchEvents() {
 
 
 
+function toggleDropdown(eventId) {
+    const dropdown = document.getElementById(`dropdown-${eventId}`);
+    if (dropdown.style.display === "none" || dropdown.style.display === "") {
+        dropdown.style.display = "block"; // Show the dropdown
+    } else {
+        dropdown.style.display = "none"; // Hide the dropdown
+    }
+}
+
+
 
 // Function to convert time to 12-hour format
 function formatTime(time) {
-    const [hours, minutes] = time.split(':').map(Number);
-    const isAM = hours < 12;
-    const formattedHours = hours % 12 || 12; // Converts 0 to 12 for midnight
-    const ampm = isAM ? 'AM' : 'PM';
-    return `${formattedHours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
+const [hours, minutes] = time.split(':').map(Number);
+const isAM = hours < 12;
+const formattedHours = hours % 12 || 12; // Converts 0 to 12 for midnight
+const ampm = isAM ? 'AM' : 'PM';
+return `${formattedHours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
 }
 
 // Function to show event details in a modal
@@ -283,6 +260,7 @@ function showEventDetails(event_id) {
                 document.getElementById('eventTime').innerText = formatTime(event.time); // Use the new formatTime function
                 document.getElementById('eventLocation').innerText = event.location;
                 document.getElementById('eventLink').href = event.registrationLink;
+                document.getElementById('eventLinkText').innerText = event.registrationLink; // Display the link text
 
                 // Show the modal
                 $('#eventDetailsModal').modal('show');
@@ -294,8 +272,10 @@ function showEventDetails(event_id) {
 }
 
 
-    // Fetch events when the page loads
-    window.onload = fetchEvents;
+
+
+// Fetch events when the page loads
+window.onload = fetchEvents;
 </script>
 
 
@@ -317,7 +297,9 @@ function showEventDetails(event_id) {
                 <p><strong>Date:</strong> <span id="eventDate" style="color: #666;"></span></p>
                 <p><strong>Time:</strong> <span id="eventTime" style="color: #666;"></span></p>
                 <p><strong>Location:</strong> <span id="eventLocation" style="color: #666;"></span></p>
-                <p><strong>Registration Link:</strong> <a id="eventLink" href="#" target="_blank" class="btn btn-primary btn-sm">Register</a></p>
+                <p><strong>Registration Link:</strong> <a id="eventLink" href="#" target="_blank" style="color: #007bff;"> 
+                    <span id="eventLinkText"></span>
+                </a></p> <!-- Display the link text -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -325,3 +307,131 @@ function showEventDetails(event_id) {
         </div>
     </div>
 </div>
+
+
+
+
+<!-- Modal for Adding Events -->
+<div class="modal fade" id="addEventModal" tabindex="-1" role="dialog" aria-labelledby="addEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEventModalLabel">Add New Event</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="eventForm" action="../actions/add_event_action.php" method="POST">
+                    <input type="hidden" name="club_id" value="<?php echo $club_id; ?>">
+                    <input type="hidden" name="moderator_id" value="<?php echo $moderator_id; ?>">
+                    
+                    <div class="form-group mb-2">
+                        <label for="eventTitle">Title</label>
+                        <input type="text" class="form-control" id="eventTitle" name="title" required>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="eventDescription">Description</label>
+                        <textarea class="form-control" id="eventDescription" name="description" required></textarea>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="eventDate">Date</label>
+                        <input type="date" class="form-control" id="eventDate" name="date" required>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="eventTime">Time</label>
+                        <input type="time" class="form-control" id="eventTime" name="time" required>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="eventLocation">Location</label>
+                        <input type="text" class="form-control" id="eventLocation" name="location" required>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="registrationLink">Registration Link</label>
+                        <input type="url" class="form-control" id="registrationLink" name="registrationLink">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Event</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal for Editing Events -->
+<div class="modal fade" id="editEventModal" tabindex="-1" role="dialog" aria-labelledby="editEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEventModalLabel">Edit Event</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editEventForm" action="../actions/edit_event_action.php" method="POST">
+                    <input type="hidden" name="club_id" value="<?php echo $club_id; ?>">
+                    <input type="hidden" name="moderator_id" value="<?php echo $moderator_id; ?>">
+                    <input type="hidden" name="event_id" id="editEventId">
+                    <div class="form-group mb-2">
+                        <label for="editEventTitle">Title</label>
+                        <input type="text" class="form-control" id="editEventTitle" name="title" required>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="editEventDescription">Description</label>
+                        <textarea class="form-control" id="editEventDescription" name="description" required></textarea>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="editEventDate">Date</label>
+                        <input type="date" class="form-control" id="editEventDate" name="date" required>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="editEventTime">Time</label>
+                        <input type="time" class="form-control" id="editEventTime" name="time" required>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="editEventLocation">Location</label>
+                        <input type="text" class="form-control" id="editEventLocation" name="location" required>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="editRegistrationLink">Registration Link</label>
+                        <input type="url" class="form-control" id="editRegistrationLink" name="registrationLink">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Event</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<script>
+
+function editEvent(event_id) {
+    // Fetch event details from the server using the event_id
+    fetch(`/esas/esas_moderator/apis/events-api.php?event_id=${event_id}`)
+        .then(response => response.json())
+        .then(event => {
+            // Populate the edit modal fields
+            document.getElementById('editEventId').value = event.event_id; // Assuming the event object contains an 'id' field
+            document.getElementById('editEventTitle').value = event.title;
+            document.getElementById('editEventDescription').value = event.description;
+            document.getElementById('editEventDate').value = event.date.split('T')[0]; // Format date correctly
+            document.getElementById('editEventTime').value = event.time; // Make sure this is the correct format
+            document.getElementById('editEventLocation').value = event.location;
+            document.getElementById('editRegistrationLink').value = event.registrationLink;
+
+            // Show the edit modal
+            $('#editEventModal').modal('show');
+        })
+        .catch(error => {
+            console.error('Error fetching event details:', error);
+        });
+}
+
+
+</script>
