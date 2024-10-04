@@ -191,12 +191,13 @@ function fetchEvents() {
                         </div>
                         <div class="col-md-8">
                             <div class="card-body" style="position: relative;">
-                                <div style="position: absolute; top: 10px; right: 20px; cursor: pointer;" onclick="toggleDropdown(${event.event_id})">
+                                <style>.event-ellipsis:hover{background-color: lightgrey;"}</style>
+                                <div class="event-ellipsis text-center" style="position: absolute; top: 10px; right: 12px; cursor: pointer; width: 22px; border-radius: 50%;" onclick="toggleDropdown(${event.event_id})">
                                     <i class="fas fa-ellipsis-v" style="color: #666;"></i>
                                 </div>
                                 <div id="dropdown-${event.event_id}" style="display: none; position: absolute; top: 30px; right: 20px; background-color: white; border: 1px solid #ccc; border-radius: 4px; z-index: 1000;">
                                     <a href="#" class="dropdown-item" onclick="editEvent(${event.event_id})" style="display: block; padding: 5px 10px; color: #007bff;">Edit</a>
-                                    <a href="#" class="dropdown-item" onclick="deleteEvent(${event.event_id})" style="display: block; padding: 5px 10px; color: #ff6b6b;">Delete</a>
+                                    <a href="#" class="dropdown-item" onclick="confirmDelete(${event.event_id})" style="display: block; padding: 5px 10px; color: #ff6b6b;">Delete</a>
                                 </div>
                                 <h5 class="card-title" style="color: #007bff;">${event.title}</h5>
                                 <p class="card-text" style="margin: 0; color: #666;">${formattedDate}</p>
@@ -364,7 +365,7 @@ window.onload = fetchEvents;
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editEventModalLabel">Edit Event</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -431,6 +432,33 @@ function editEvent(event_id) {
         .catch(error => {
             console.error('Error fetching event details:', error);
         });
+}
+
+
+
+
+function confirmDelete(eventId) {
+    const confirmation = confirm("Are you sure you want to delete this event?");
+    if (confirmation) {
+        deleteEvent(eventId);
+    }
+}
+
+function deleteEvent(eventId) {
+    // Create a form and submit it to delete_event_action.php
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "delete_event_action.php";
+
+    // Create hidden inputs for the necessary data
+    const eventInput = document.createElement("input");
+    eventInput.type = "hidden";
+    eventInput.name = "event_id";
+    eventInput.value = eventId;
+
+    form.appendChild(eventInput);
+    document.body.appendChild(form);
+    form.submit(); // Submit the form
 }
 
 

@@ -56,7 +56,7 @@
                                             <div class="card-body">
                                                 ${post.moderator_id == currentModeratorId ? `
                                                 <div class="dropdown">
-                                                    <i class="fas fa-ellipsis-v ellipsis" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+                                                    <i class="fas fa-ellipsis-v ellipsis post-ellipsis" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
                                                     <div class="dropdown-menu">
                                                         <button class="dropdown-item" data-post-id="${post.post_id}" onclick="openEditPostModal(this)">
                                                             <i class="fa fa-pencil"></i> Edit

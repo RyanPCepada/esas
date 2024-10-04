@@ -251,8 +251,11 @@ unset($pdo);
             border-radius: 50%;
             border: 2px solid lightblue;
         }
-
-        .ellipsis {
+        .post-ellipsis {
+            width: 15px;
+            right: -16px;
+            padding: 5px;
+            border-radius: 50%;
             position: absolute;
             cursor: pointer;
             align-self: right;
@@ -261,6 +264,17 @@ unset($pdo);
             margin-top: 0px;
             margin-left: 100%;
         }
+
+        .post-ellipsis:hover {
+            background-color: lightgrey;
+        }
+
+        .dropdown .dropdown-menu {
+            position: absolute;
+            margin-left: -150px !important;
+            z-index: 2;
+        }
+
 
         body.modal-open {
             padding-right: 0 !important;

@@ -276,33 +276,29 @@ try {
             background-color: #f7f7f7; /* Light background when hovering over the comment row */
         }
 
-        .dropdown {
-            position: absolute;
-            margin-left: 93%;
-            z-index: 2;
-        }
-        .dropdown .ellipsis {
-            position: absolute !important;
-            right: 20px; /* Position it on the far right */
-            top: 0%;
-            border-radius: 50%;
+        .comment-ellipsis {
+            width: 15px;
             padding: 5px;
-            transition: background-color 0.3s ease;
-            background-color: #f7f7f7; /* Ensure background color matches hover */
-        }
-        .dropdown .ellipsis:hover {
-            background-color: #d3d3d3; /* Light gray background on hover */
+            border-radius: 50%;
+            position: absolute;
+            top: 0; /* Align to the top */
+            right: 0; /* Align to the right */
             cursor: pointer;
+            font-size: 14px;
+            color: #333;
         }
+
+        .comment-ellipsis:hover {
+            background-color: lightgrey;
+        }
+
         .dropdown .dropdown-menu {
             position: absolute;
-            margin-left: -170px !important;
+            margin-left: -150px !important;
             z-index: 2;
         }
-
-
         
-        @media (min-width: 768px) {
+        @media (max-width: 767px) {
             .overlay-text {
                 padding: 10px;
                 border-radius: 5px;
@@ -314,9 +310,8 @@ try {
                 margin-right: 10px;
                 line-height: 1.2; /* Adjust line height for closer spacing */
             }
-            .dropdown .ellipsis {
-                position: absolute !important;
-                right: 20px; /* Position it on the far right */
+            .comment-ellipsis {
+                right: 0px !important;
             }
         }
     </style>
