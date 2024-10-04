@@ -147,11 +147,10 @@ function createCalendar(month, year, events) {
 
 
 
-// Call this function after fetching events
 function fetchEvents() {
     const clubId = "<?php echo $club_id; ?>"; // Get the club_id from PHP
 
-    fetch(`/esas/esas_moderator/apis/events-api.php?club_id=${clubId}`)
+    fetch(`/esas/esas_student/apis/events-api.php?club_id=${clubId}`)
         .then(response => response.json())
         .then(data => {
             const eventList = document.getElementById('eventList');
@@ -184,14 +183,22 @@ function fetchEvents() {
 
                 eventDates.push(formattedDate); // Add date to the array
 
+                // Check if event date is today or tomorrow
+                const today = new Date();
+                const tomorrow = new Date();
+                tomorrow.setDate(today.getDate() + 1);
+
+                let displayDate = formattedDate; // Default display date
+                if (eventDate.toDateString() === today.toDateString()) {
+                    displayDate = "Today"; // Change to "Today" for today's date
+                } else if (eventDate.toDateString() === tomorrow.toDateString()) {
+                    displayDate = "Tomorrow"; // Change to "Tomorrow" for tomorrow's date
+                }
+
                 const eventCard = document.createElement('div');
                 eventCard.className = 'card mb-3'; // Bootstrap card class
                 eventCard.style.maxWidth = '540px'; // Set a max width for the card
 
-                // Options for the icon/logo (keeping them as comments)
-                // const eventIcon = "🎉"; // Example: Use an emoji
-                // const eventIcon = `<i class="fas fa-bell"></i>`; // Example: Use a Font Awesome icon
-                
                 // Cover photo with 50% opacity and square shape
                 const eventIcon = `
                     <div style="position: relative; width: 100%; height: 0; padding-top: 100%; overflow: hidden;">
@@ -208,16 +215,17 @@ function fetchEvents() {
                             ${eventIcon} <!-- Inserted Cover Photo -->
                         </div>
                         <div class="col-md-8">
-                            <div class="card-body">
+                            <div class="card-body" style="position: relative;">
                                 <h5 class="card-title" style="color: #007bff;">${event.title}</h5>
-                                <p class="card-text" style="margin: 0; color: #666;">${formattedDate}</p>
-                                <p class="card-text">
-                                    <a href="#" class="btn btn-link" onclick="showEventDetails(${event.event_id})">View Details</a>
+                                <p class="card-text" style="margin: 0; color: #666;">${displayDate}</p> <!-- Display "Today" or "Tomorrow" -->
+                                <p class="card-text" style="display: flex; align-items: center; justify-content: flex-start;">
+                                    <a href="#" class="btn btn-link" onclick="showEventDetails(${event.event_id})" style="white-space: nowrap; padding: 0; margin-right: 40px;">View Details</a>
                                 </p>
                             </div>
                         </div>
                     </div>
                 `;
+
                 eventList.appendChild(eventCard);
             });
 
@@ -229,6 +237,7 @@ function fetchEvents() {
             console.error('Error fetching events:', error);
         });
 }
+
 
 
 
@@ -251,11 +260,27 @@ function showEventDetails(event_id) {
                 // Populate modal with event details
                 document.getElementById('eventTitle').innerText = event.title;
                 document.getElementById('eventDescription').innerText = event.description;
-                document.getElementById('eventDate').innerText = new Date(event.date).toLocaleDateString('en-US', { 
+
+                // Get the event date and format it for the modal
+                const eventDate = new Date(event.date);
+                const today = new Date();
+                const tomorrow = new Date();
+                tomorrow.setDate(today.getDate() + 1);
+
+                let displayDate = eventDate.toLocaleDateString('en-US', { 
                     month: 'long', 
                     day: 'numeric', 
                     year: 'numeric' 
-                });
+                }); // Default display date
+
+                // Check if the event date is today or tomorrow
+                if (eventDate.toDateString() === today.toDateString()) {
+                    displayDate = "Today"; // Change to "Today" for today's date
+                } else if (eventDate.toDateString() === tomorrow.toDateString()) {
+                    displayDate = "Tomorrow"; // Change to "Tomorrow" for tomorrow's date
+                }
+
+                document.getElementById('eventDate').innerText = displayDate; // Set the formatted date
                 document.getElementById('eventTime').innerText = formatTime(event.time); // Use the new formatTime function
                 document.getElementById('eventLocation').innerText = event.location;
                 document.getElementById('eventLink').href = event.registrationLink;
@@ -269,6 +294,8 @@ function showEventDetails(event_id) {
             console.error('Error fetching event details:', error);
         });
 }
+
+
 
 
 // Fetch events when the page loads
