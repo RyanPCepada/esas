@@ -303,32 +303,6 @@ unset($pdo);
             }
 
         }
-
-
-
-        .cover-photo-container {
-    position: relative;
-}
-
-.icons-container {
-    position: absolute;
-    top: 10px; /* Adjust as needed */
-    left: 10px; /* Adjust as needed */
-    display: flex;
-    gap: 10px; /* Space between icons */
-}
-
-.icon-calendar, .icon-chatbox {
-    background: rgba(255, 255, 255, 0.8); /* Optional: background for visibility */
-    border-radius: 50%;
-    padding: 3px; /* Adjust padding for smaller icons */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 30px; /* Ensure the container is the right size */
-    height: 30px; /* Ensure the container is the right size */
-}
-
     </style>
 </head>
 <body>
@@ -336,24 +310,10 @@ unset($pdo);
 <div class="wrapper">
     <div class="container-fluid">
         <div class="row">
-
-            <!-- Events Section -->
-            <div class="card col-md-3 p-3 auto-scroll d-none d-md-block" style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <?php include '../public/components/events.php' ?>
-            </div>
-
             <!-- Main Body Section with Cover Photo -->
-            <div class="col-md-6 auto-scroll">
-                <div class="cover-photo-container mb-3 position-relative">
+            <div class="col-12 col-md-6 auto-scroll">
+                <div class="cover-photo-container mb-3">
                     <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
-                    <div class="icons-container">
-                        <span class="icon-calendar" style="font-size: 20px; margin-right: 10px;" data-bs-toggle="modal" data-bs-target="#eventsModal"> 
-                            <i class="fas fa-calendar-alt"></i> <!-- Font Awesome Calendar Icon -->
-                        </span>
-                        <span class="icon-chatbox" style="font-size: 20px;" data-bs-toggle="modal" data-bs-target="#chatboxModal"> 
-                            <i class="fas fa-comment-dots"></i> <!-- Font Awesome Chatbox Icon -->
-                        </span>
-                    </div>
                 </div>
                 <div class="overlay-text">
                     <div class="d-flex align-items-center">
@@ -361,6 +321,24 @@ unset($pdo);
                     </div>
                 </div>
                 <hr>
+                <!-- Mobile Buttons -->
+                <div class="d-md-none mb-3">
+                    <button id="showEvents" class="btn btn-info me-2">Events</button>
+                    <button id="showChat" class="btn btn-info">Chat</button>
+                </div>
+                
+
+                <!-- Events Section (Initially Hidden) -->
+                <div class="card col-md-12 p-3 auto-scroll d-none" id="eventsSectionMobile" style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <?php 
+                        // Debugging: Check if events.php is being included
+                        if (file_exists('../public/components/events.php')) {
+                            include '../public/components/events.php'; 
+                        } else {
+                            echo '<p class="text-danger">Events file not found.</p>';
+                        }
+                    ?>
+                </div>
                 <!-- Post Form -->
                 <div class="row">
                     <div class="col-12">
@@ -387,11 +365,13 @@ unset($pdo);
                         </div>
                     </div>
                 </div>
-                <br><hr>
+                <br>
+                <hr>
+
                 <!-- Post List -->
                 <div class="post_list">
                     <div>
-                        <?php include '../public/components/posts_and_comments.php' ?>
+                        <?php include '../public/components/posts_and_comments.php'; ?>
                     </div>
                     <div class="mt-2 text-center align-items-center justify-content-center">
                         <a href="../public/my_clubs.php" class="btn btn-secondary">Go Back</a>
@@ -412,58 +392,28 @@ unset($pdo);
                     </div>
                 </div>
             </div>
-
-        </div>
-    </div>
-
-
-    <!-- Events Modal -->
-<div class="modal fade" id="eventsModal" tabindex="-1" aria-labelledby="eventsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="eventsModalLabel">Events</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Include your events content here -->
-                <?php include '../public/components/events.php' ?>
-            </div>
         </div>
     </div>
 </div>
 
-<!-- Chatbox Modal -->
-<div class="modal fade" id="chatboxModal" tabindex="-1" aria-labelledby="chatboxModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="chatboxModalLabel">Chatbox</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Include your chatbox content here -->
-                <div class="chatbox-section">
-                    <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
-                    <div class="chatbox" id="chatboxModalContent">
-                        <div class="messages">
-                            <!-- Messages will be displayed here -->
-                        </div>
-                        <input type="text" id="chatInputModal" placeholder="Type a message..." class="form-control">
-                        <button id="sendMessageModal" class="btn btn-primary mt-2">Send</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- JavaScript to Toggle Sections -->
+<script>
+    document.getElementById('showEvents').addEventListener('click', function() {
+        const eventsSection = document.getElementById('eventsSectionMobile');
+        eventsSection.classList.toggle('d-none'); // Show or hide events
+        document.querySelector('.chatbox-section').classList.add('d-none'); // Hide chat
+    });
 
-</div>
+    document.getElementById('showChat').addEventListener('click', function() {
+        document.querySelector('.chatbox-section').classList.toggle('d-none'); // Show or hide chat
+        document.getElementById('eventsSectionMobile').classList.add('d-none'); // Hide events
+    });
+</script>
 
 
 
     <!--HERE-->
-    <!--HERE-->
+    <!-- HERE -->
 
 <!-- <?php include 'assets/components/modals.php' ?> -->
 <script src="../../assets/js/jquery.dataTables.min.js"></script>
