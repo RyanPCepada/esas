@@ -89,7 +89,7 @@ if (!$club) {
             color: white;
         }
         .main-content {
-            padding: 15px;
+            padding: 30px 40px;
         }
     </style>
     <script src="../assets/js/jquery-3.6.0.js"></script>
