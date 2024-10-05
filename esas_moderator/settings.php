@@ -82,27 +82,78 @@ if (!$club) {
             display: block;
             padding: 10px;
             color: #007bff;
+            border-radius: 5px;
             text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
+
         .sidebar a:hover {
+            background-color: #AFEEEE;
+            color: #0056b3;
+        }
+
+        .sidebar a.active {
             background-color: #007bff;
             color: white;
         }
+
         .main-content {
             padding: 30px 40px;
         }
     </style>
     <script src="../assets/js/jquery-3.6.0.js"></script>
     <script>
-        $(document).ready(function() {
+       $(document).ready(function() {
             $(".main-content").load("../esas_moderator/public/crud/settings/update_profile.php"); // Load profile update by default
+
+            // Set active class on the default link
+            $(".sidebar a").first().addClass("active");
 
             $(".sidebar a").on("click", function(e) {
                 e.preventDefault();
                 let page = $(this).attr("href");
+
+                // Remove active class from all links and add it to the clicked link
+                $(".sidebar a").removeClass("active");
+                $(this).addClass("active");
+
                 $(".main-content").load(page);
             });
         });
+
+        $(document).ready(function() {
+            // Check if there's an active tab stored in localStorage
+            const activeTab = localStorage.getItem("activeTab");
+            
+            if (activeTab) {
+                // Load the saved tab content
+                $(".main-content").load(activeTab);
+                // Set the active class on the saved link
+                $(".sidebar a").removeClass("active");
+                $(".sidebar a[href='" + activeTab + "']").addClass("active");
+            } else {
+                // Load profile update by default
+                $(".main-content").load("../esas_moderator/public/crud/settings/update_profile.php");
+                // Set active class on the default link
+                $(".sidebar a").first().addClass("active");
+            }
+
+            $(".sidebar a").on("click", function(e) {
+                e.preventDefault();
+                let page = $(this).attr("href");
+
+                // Remove active class from all links and add it to the clicked link
+                $(".sidebar a").removeClass("active");
+                $(this).addClass("active");
+
+                // Load the content of the selected tab
+                $(".main-content").load(page);
+                
+                // Store the active tab in localStorage
+                localStorage.setItem("activeTab", page);
+            });
+        });
+
     </script>
 </head>
 <body>
