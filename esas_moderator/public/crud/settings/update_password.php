@@ -47,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-<h4 class="text-muted">Update Password</h4>
-<form class="mt-3" id="updatePasswordForm">
+<h4 class="text-muted mb-3">Update Password</h4>
+<form id="updatePasswordForm">
     <!-- <div id="responseMessage" class="mb-3"></div> -->
     <div class="form-group">
         <label for="currentPassword">Current Password</label>

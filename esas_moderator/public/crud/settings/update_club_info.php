@@ -19,21 +19,92 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute([$moderator_id]);
 $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Process form submission for updating club information
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
+    $clubId = $_POST['club_id'];
+    $clubName = $_POST['clubName'];
+    $information = $_POST['information'];
+    $coverPhoto = $_FILES['coverPhoto']['name'] ? $_FILES['coverPhoto']['name'] : null;
+
+    // Handle cover photo upload
+    if ($coverPhoto) {
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $maxFileSize = 10 * 1024 * 1024; // 10MB
+        $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_admin/images/';
+
+        if (in_array($_FILES['coverPhoto']['type'], $allowedTypes) && $_FILES['coverPhoto']['size'] <= $maxFileSize) {
+            $fileName = uniqid() . '-' . basename($coverPhoto);
+            $targetFilePath = $uploadDir . $fileName;
+
+            // Move the uploaded file to the desired location
+            if (!move_uploaded_file($_FILES['coverPhoto']['tmp_name'], $targetFilePath)) {
+                echo "Error uploading the cover photo.";
+            }
+        } else {
+            echo "Invalid file type or size exceeds 10MB.";
+            $coverPhoto = null; // Reset if there's an error
+        }
+    } else {
+        // If no new cover photo uploaded, keep the existing cover photo
+        $coverPhoto = null; // Set this to null to not update the coverPhoto field
+    }
+
+    // Update club information
+    $updateSql = "
+        UPDATE tbl_clubs 
+        SET clubName = ?, information = ?, coverPhoto = COALESCE(?, coverPhoto), dateModified = NOW() 
+        WHERE club_id = ?";
+    
+    $updateStmt = $pdo->prepare($updateSql);
+    if ($updateStmt->execute([$clubName, $information, $fileName ?? null, $clubId])) {
+        echo "Club information updated successfully!";
+        header("location: ../../../settings.php");
+        exit();
+    } else {
+        echo "Error updating club information.";
+    }
+}
 ?>
 
-<h4 class="text-muted">Update Club Information</h4>
+<h4 class="text-muted mb-3">Update Club Information</h4>
 
 <?php if ($clubs): ?>
     <div class="club-list">
-        <h5>Your Clubs:</h5>
         <ul>
             <?php foreach ($clubs as $club): ?>
                 <li>
                     <strong><?php echo htmlspecialchars($club['clubName']); ?></strong><br>
-                    <p><?php echo htmlspecialchars($club['information']); ?></p>
-                    <?php if (!empty($club['coverPhoto'])): ?>
-                        <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>" alt="<?php echo htmlspecialchars($club['clubName']); ?>" style="width: 215px; height: 120px; border-radius: 5px; object-fit: cover;">
-                    <?php endif; ?>
+
+                    <!-- Update Form -->
+                    <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($club['club_id']); ?>">
+                        <div class="form-group">
+                            <label for="clubName">Club Name</label>
+                            <input type="text" class="form-control" id="clubName" name="clubName" value="<?php echo htmlspecialchars($club['clubName']); ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="information">Information</label>
+                            <textarea class="form-control" id="information" name="information" rows="4" required><?php echo htmlspecialchars($club['information']); ?></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="coverPhoto">Cover Photo</label>
+                            
+                            <div class="cover-photo-container d-flex align-items-start">
+                                <?php if (!empty($club['coverPhoto'])): ?>
+                                    <div class="mb-2">
+                                        <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>" alt="Cover Photo" style="width: 430px; height: 240px; object-fit: cover;" id="img_<?php echo htmlspecialchars($club['club_id']); ?>">
+                                    </div>
+                                <?php endif; ?>
+
+                                <input type="file" class="d-none" id="coverPhoto_<?php echo htmlspecialchars($club['club_id']); ?>" name="coverPhoto" accept="image/*" onchange="updateImagePreview(this, document.getElementById('img_<?php echo htmlspecialchars($club['club_id']); ?>'))">
+                                
+                                <label for="coverPhoto_<?php echo htmlspecialchars($club['club_id']); ?>" class="btn btn-light text-primary edit-icon" style="cursor: pointer;">
+                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Club</button>
+                    </form>
                 </li>
                 <hr>
             <?php endforeach; ?>
@@ -42,3 +113,17 @@ $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php else: ?>
     <p>No clubs found for this moderator.</p>
 <?php endif; ?>
+
+
+
+<script>
+    function updateImagePreview(input, imgTag) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imgTag.src = e.target.result; // Update the image source to the new file
+            };
+            reader.readAsDataURL(input.files[0]); // Read the file as a data URL
+        }
+    }
+</script>
