@@ -298,7 +298,7 @@ try {
             z-index: 2;
         }
         
-        @media (max-width: 767px) {
+        @media (min-width: 767px) {
             .overlay-text {
                 padding: 10px;
                 border-radius: 5px;
@@ -335,6 +335,12 @@ try {
                     <div class="cover-photo-container mb-3">
                         <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid">
                     </div>
+                    <div class="overlay-text">
+                        <div class="d-flex align-items-center">
+                            <h4><?php echo htmlspecialchars($clubName); ?></h4>
+                        </div>
+                    </div>
+                    <hr>
                     <div class="post_list">
                         <div class="row">
                             <div class="col-12 mb-3">

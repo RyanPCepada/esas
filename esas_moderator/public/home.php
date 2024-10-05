@@ -207,7 +207,7 @@ unset($pdo);
             padding: 10px;
             border-radius: 5px;
             line-height: .5; /* Adjust line height for closer spacing */
-            margin-top: -80px;
+            margin-top: -50px;
         }
         .overlay-text h4 {
             line-height: .9; /* Adjust line height for closer spacing */
