@@ -319,78 +319,124 @@ try {
 <body>
 
     <div class="wrapper">
-        <div class="container-fluid">
-            <div class="row">
+    <div class="container-fluid">
+        <div class="row">
 
-
-            
-                <!-- Events Section -->
-                <div class="card col-md-3 p-3 auto-scroll" style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                    <?php include './components/events.php' ?>
-                </div>
-
-
-                <!-- Main Body Section with Cover Photo -->
-                <div class="col-md-6 auto-scroll">
-                    <div class="cover-photo-container mb-3">
-                        <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid">
-                    </div>
-                    <div class="overlay-text">
-                        <div class="d-flex align-items-center">
-                            <h4><?php echo htmlspecialchars($clubName); ?></h4>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="post_list">
-                        <div class="row">
-                            <div class="col-12 mb-3">
-                                <div class="d-flex align-items-center bg-info text-white p-2 rounded">
-                                    <img src="./icons/ICON_ANNOUNCEMENT.png" height="75" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
-                                    <h4 class="mb-0">Announcements and Updates</h4>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <?php include './components/posts_and_comments.php' ?>
-                        </div>
-
-                        <div class="mt-2 text-center align-items-center justify-content-center">
-                            <a href="javascript:history.back();" class="btn btn-secondary">Go Back</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chatbox Section -->
-                <div class="card col-md-3 p-3 auto-scroll">
-                    <div class="chatbox-section">
-                        <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
-                        <div class="chatbox" id="chatbox">
-                            <!-- Example Chat Interface -->
-                            <div class="messages">
-                                <!-- Messages will be displayed here -->
-                            </div>
-                            <input type="text" id="chatInput" placeholder="Type a message..." class="form-control">
-                            <button id="sendMessage" class="btn btn-primary mt-2">Send</button>
-                        </div>
-                    </div>
-                </div>
-
-
-
+            <!-- Events Section -->
+            <div class="card col-md-3 p-3 auto-scroll d-none d-md-block" style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <?php include './components/events.php' ?>
             </div>
+
+            <!-- Main Body Section with Cover Photo -->
+            <div class="col-md-6 auto-scroll" id="mainContent">
+                <div class="cover-photo-container mb-3">
+                    <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
+                </div>
+                <div class="overlay-text">
+                    <div class="d-flex align-items-center">
+                        <h4><?php echo htmlspecialchars($clubName); ?></h4>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- Icons for Calendar, Chat, and Home -->
+                <div class="col-12 d-md-none text-end mb-1 mt-0">
+                    <button type="button" class="btn btn-transparent p-0" id="homeButton" style="border-radius: 10%;">
+                        <i class="fas fa-home" style="font-size: 25px; color: grey;"></i>
+                    </button>
+                    <button type="button" class="btn btn-transparent p-0" id="calendarButton" style="border-radius: 10%;">
+                        <i class="fas fa-calendar-alt" style="font-size: 25px; color: grey;"></i>
+                    </button>
+                    <button type="button" class="btn btn-transparent p-0" id="chatButton" style="border-radius: 10%;">
+                        <i class="fas fa-comment-dots" style="font-size: 25px; color: grey;"></i>
+                    </button>
+                </div>
+
+                <!-- Post Section Wrapper -->
+                <div id="postSection">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <div class="d-flex align-items-center bg-info text-white p-2 rounded">
+                                <img src="./icons/ICON_ANNOUNCEMENT.png" height="75" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
+                                <h4 class="mb-0">Announcements and Updates</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <?php include './components/posts_and_comments.php' ?>
+                    </div>
+
+                    <div class="mt-2 text-center align-items-center justify-content-center">
+                        <a href="javascript:history.back();" class="btn btn-secondary">Go Back</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chatbox Section -->
+            <div class="card col-md-3 p-3 auto-scroll d-none d-md-block">
+                <div class="chatbox-section">
+                    <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
+                    <div class="chatbox" id="chatbox">
+                        <div class="messages">
+                            <!-- Messages will be displayed here -->
+                        </div>
+                        <input type="text" id="chatInput" placeholder="Type a message..." class="form-control">
+                        <button id="sendMessage" class="btn btn-primary mt-2">Send</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
+</div>
 
+<script>
+    $(document).ready(function () {
+        // Store the initial content of the post section including the announcements
+        let initialContent = $('#postSection').html();
 
+        // Function to show content with slide animation
+        function slideToContent(content) {
+            const $postSection = $('#postSection');
 
+            // Slide out the current content and slide in the new content
+            $postSection.animate({ left: '-100%' }, 300, function() {
+                $(this).html(content).css('left', '100%').animate({ left: '0%' }, 300);
+            });
+        }
 
+        // Home Button Click Event
+        $('#homeButton').click(function () {
+            // Check if the current content is not the initial content
+            if ($('#postSection').html() !== initialContent) {
+                slideToContent('<div class="loading">Loading posts...</div>'); // Show loading first
+                setTimeout(() => {
+                    slideToContent(initialContent); // Load initial content and slide into view
+                }, 1000);
+            }
+        });
 
+        // Calendar Button Click Event
+        $('#calendarButton').click(function () {
+            const eventsContent = $('.card.col-md-3.d-none.d-md-block').html(); // Get events content
+            slideToContent('<div class="loading">Loading events...</div>'); // Show loading first
+            setTimeout(() => {
+                slideToContent(eventsContent); // Slide to events content after loading
+            }, 1000);
+        });
 
+        // Chat Button Click Event
+        $('#chatButton').click(function () {
+            slideToContent('<div class="loading">Loading chat...</div>'); // Show loading first
+            setTimeout(() => {
+                // Replace with actual chat content
+                slideToContent($('.chatbox-section').html());
+            }, 1000);
+        });
+    });
+</script>
 
-
- 
-    
 
 
 
