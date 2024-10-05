@@ -205,7 +205,7 @@ function fetchEvents() {
                 // Cover photo with 50% opacity and square shape
                 const eventIcon = 
                     `<div style="position: relative; width: 100%; height: 0; padding-top: 100%; overflow: hidden;">
-                        <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>"
+                        <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($coverPhoto); ?>"
                              alt="Cover Photo" 
                              class="img-fluid" 
                              style="position: absolute; top: 0; left: 12px; width: 100%; height: 100%; object-fit: cover; opacity: 0.5;">

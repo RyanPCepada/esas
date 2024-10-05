@@ -333,7 +333,7 @@ try {
                 <!-- Main Body Section with Cover Photo -->
                 <div class="col-md-6 auto-scroll">
                     <div class="cover-photo-container mb-3">
-                        <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid">
+                        <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid">
                     </div>
                     <div class="post_list">
                         <div class="row">
