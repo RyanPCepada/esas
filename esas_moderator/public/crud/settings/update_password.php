@@ -6,52 +6,50 @@ if (!isset($_SESSION['moderator_id'])) {
     die("You are not logged in.");
 }
 
-$moderator_id = $_SESSION['moderator_id'];
+$moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 
 // Fetch moderator data
 $sql = "SELECT * FROM tbl_moderators WHERE moderator_id = ?";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$moderator_id]);
-$moderator = $stmt->fetch(PDO::FETCH_ASSOC);
+$moderator = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch as associative array
 
 if (!$moderator) {
     die("Moderator not found.");
 }
 
-// Process form submission
+// Process form submission via AJAX
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Get the form inputs
     $currentPassword = $_POST['currentPassword'];
     $newPassword = $_POST['newPassword'];
     $confirmPassword = $_POST['confirmPassword'];
+    $response = []; // Initialize response array
 
     // Verify current password
-    if (!password_verify($currentPassword, $moderator['password'])) {
-        echo "Current password is incorrect.";
+    if ($currentPassword !== $moderator['password']) { // Compare directly without hashing
+        $response['error'] = "Current password is incorrect.";
     } elseif ($newPassword !== $confirmPassword) {
-        echo "New password and confirmation do not match.";
+        $response['error'] = "New password and confirmation do not match.";
     } else {
-        // Hash the new password
-        $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
-
-        // Update password in the database
+        // Update password in the database directly
         $updateSql = "UPDATE tbl_moderators SET password = ? WHERE moderator_id = ?";
         $updateStmt = $pdo->prepare($updateSql);
 
-        if ($updateStmt->execute([$hashedPassword, $moderator_id])) {
-            echo "Password updated successfully!";
-            header("Location: ../../../settings.php");
-            exit();
+        if ($updateStmt->execute([$newPassword, $moderator_id])) { // No hashing here
+            $response['success'] = "Password updated successfully!";
         } else {
-            // Get detailed error info for debugging
-            $errorInfo = $updateStmt->errorInfo();
-            echo "Error updating password: " . $errorInfo[2]; // More detailed error message
+            // Get error information for debugging
+            $response['error'] = "Error updating password: " . implode(", ", $updateStmt->errorInfo());
         }
     }
+    echo json_encode($response); // Send response back to AJAX
+    exit; // Prevent further execution
 }
 ?>
 
-<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+<h4 class="text-muted">Update Password</h4>
+<form class="mt-3" id="updatePasswordForm">
+    <!-- <div id="responseMessage" class="mb-3"></div> -->
     <div class="form-group">
         <label for="currentPassword">Current Password</label>
         <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
@@ -66,3 +64,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
     <button type="submit" class="btn btn-primary">Update Password</button>
 </form>
+
+<script>
+$(document).ready(function() {
+    // Handle form submission
+    $('#updatePasswordForm').on('submit', function(e) {
+        e.preventDefault(); // Prevent default form submission
+
+        $.ajax({
+            url: '../esas_moderator/public/crud/settings/update_password.php', // Current script to handle AJAX request
+            type: 'POST',
+            data: $(this).serialize(), // Serialize form data
+            dataType: 'json',
+            success: function(response) {
+                // Clear previous messages
+                if (response.success) {
+                    alert(response.success); // Display success message
+                } else if (response.error) {
+                    alert(response.error); // Display error message
+                }
+            },
+            error: function() {
+                alert('An error occurred. Please try again.'); // General error alert
+            }
+        });
+    });
+});
+</script>
+

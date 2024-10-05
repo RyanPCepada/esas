@@ -103,8 +103,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data">
-    <div class="form-group text-center">
+<h4 class="text-muted">Update Profile</h4>
+<form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data">
+    <div class="form-group">
         <?php if (!empty($moderator['profilePic'])): ?>
             <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($moderator['profilePic']); ?>" alt="Profile Picture" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
         <?php endif; ?>
