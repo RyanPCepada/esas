@@ -28,7 +28,7 @@ try {
 
     // Query to fetch the student's departure requests
     $sql = "
-        SELECT dr.departure_id, dr.club_id, dr.dateRequested, dr.status, c.clubName 
+        SELECT dr.departure_id, dr.club_id, dr.reason, dr.dateRequested, dr.status, c.clubName 
         FROM tbl_departure_requests dr 
         INNER JOIN tbl_clubs c ON dr.club_id = c.club_id
         WHERE dr.student_id = :student_id
@@ -36,9 +36,10 @@ try {
 
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
-    $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT); // Bind the club_id
+    $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
     $stmt->execute();
 
+    $departureRequests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
     // Handle database connection or query error
@@ -78,37 +79,109 @@ try {
     </style>
 </head>
 <body>
-    
-    <div class="wrapper">
-        <h3 class="text-muted mt-5 mb-3">Departure Requests</h3>
+<div class="wrapper">
+    <h3 class="text-muted mt-5 mb-3">Departure Request</h3>
 
-        <div class="container-fluid container">
-            <div class="row">
-                <?php if (!empty($departureRequests)): ?>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Club Name</th>
-                                <th>Date Requested</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($departureRequests as $request): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($request['clubName']); ?></td>
-                                    <td><?php echo date('F j, Y', strtotime($request['dateRequested'])); ?></td>
-                                    <td><?php echo htmlspecialchars($request['status']); ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <div class="alert alert-info">You have not submitted any departure requests yet.</div>
-                <?php endif; ?>
-            </div>
+    <div class="container-fluid container">
+        <div class="row">
+            <?php if (!empty($departureRequests)): ?>
+                <?php foreach ($departureRequests as $request): ?>
+                    <div class="col-md-6">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">
+                                    <?php echo htmlspecialchars($request['clubName']); ?>
+                                </h5>
+                                <p class="card-text mb-1">
+                                    <strong>Date Requested:</strong> <?php echo date('F j, Y', strtotime($request['dateRequested'])); ?>
+                                </p>
+                                <p class="card-text mb-2">
+                                    <strong>Status:</strong> 
+                                    <span class="badge badge-<?php echo $request['status'] == 'Approved' ? 'success' : ($request['status'] == 'Pending' ? 'warning' : 'danger'); ?>">
+                                        <?php echo htmlspecialchars($request['status']); ?>
+                                    </span>
+                                </p>
+                                <p class="card-text mb-2">
+                                    <strong>Reason for Departure:</strong>
+                                    <em id="reason-<?php echo $request['club_id']; ?>"><?php echo htmlspecialchars($request['reason']); ?></em>
+                                </p>
+                                <button class="btn btn-outline-danger btn-sm mt-2" onclick="showEditModal('<?php echo $request['club_id']; ?>', '<?php echo htmlspecialchars($request['reason']); ?>')">
+                                    Edit Request
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm mt-2" onclick="withdrawRequest('<?php echo $request['club_id']; ?>', '<?php echo htmlspecialchars($request['clubName']); ?>')">
+    Withdraw Request
+</button>
+
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="alert alert-info w-100 text-center">
+                    You have not submitted any departure requests yet.
+                </div>
+            <?php endif; ?>
         </div>
     </div>
+</div>
 
+<!-- Departure Request Modal -->
+<div id="departureModal" class="modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+    <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
+        <span style="color: red; font-weight: bold;">We're sorry to see you go.</span>
+        <p class="mt-3">Edit reason:</p>
+        <form id="departureRequestForm" onsubmit="submitDepartureRequest(event)">
+            <div class="form-group">
+                <textarea id="reasonInput" class="form-control" rows="3" placeholder="Share your reason..." required></textarea>
+            </div>
+            <input type="hidden" id="clubIdInput" name="club_id" value="">
+            <button type="submit" class="btn btn-danger mb-1">Save Changes</button>
+            <button type="button" class="btn btn-secondary mb-1" onclick="closeDepartureModal()">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function showEditModal(club_id, reason) {
+        // Populate modal fields with existing values
+        document.getElementById('clubIdInput').value = club_id;
+        document.getElementById('reasonInput').value = reason;
+        document.getElementById('departureModal').style.display = 'block';
+    }
+
+    function closeDepartureModal() {
+        document.getElementById('departureModal').style.display = 'none';
+    }
+
+    function submitDepartureRequest(event) {
+        event.preventDefault();
+        const club_id = document.getElementById('clubIdInput').value;
+        const reason = document.getElementById('reasonInput').value;
+
+        // Example of how you would send this data via AJAX to update the reason
+        // $.post('/update-departure-request', { club_id: club_id, reason: reason }, function(response) {
+        //     document.getElementById('reason-' + club_id).innerHTML = reason; // Update the displayed reason
+        //     closeDepartureModal();
+        // });
+
+        // Temporary action to simulate the update
+        document.getElementById('reason-' + club_id).innerHTML = reason;
+        closeDepartureModal();
+    }
+
+    function withdrawRequest(club_id) {
+        // Send a request to delete the departure request or mark it as withdrawn
+        if (confirm('Are you sure you want to withdraw your departure request for this club?')) {
+            // Example of how you would send this data via AJAX
+            // $.post('/withdraw-departure-request', { club_id: club_id }, function(response) {
+            //     alert('Your request has been withdrawn.');
+            //     location.reload(); // Reload the page to reflect changes
+            // });
+
+            alert('Departure request for club ' + clubName + ' has been withdrawn.');
+        }
+    }
+</script>
 </body>
+
 </html>

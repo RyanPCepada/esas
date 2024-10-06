@@ -188,7 +188,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                             <div class="container mt-3 p-0">
                                 <div class="card mb-3 bg-light">
                                     <div class="card-body">
-                                        <p><strong>Reason:</strong><br><?php echo htmlspecialchars($questions['reason']); ?></p>
+                                        <p><strong>Reason for Departure:</strong><br><?php echo htmlspecialchars($questions['reason']); ?></p>
                                         <hr>
                                         <p><strong>Date Requested:</strong><br>
                                             <?php 
