@@ -82,6 +82,19 @@ try {
         $firstName = $middleName = $lastName = "UNKNOWN";
     }
 
+    // Check if the student has already submitted a departure request for the current club
+    $sql = "SELECT * FROM tbl_departure_requests WHERE student_id = :student_id AND club_id = :club_id LIMIT 1";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+    $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $departureRequest = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($departureRequest) {
+        // If a departure request exists, set the flag to true
+        $hasDepartureRequest = true;
+    }
+
 } catch (PDOException $e) {
     // Handle database connection or query error
     die("Database error: " . $e->getMessage());
@@ -413,7 +426,11 @@ try {
                     </div>
 
                     <div id="dropdownMenu" class="dropdown mt-4">
-                        <a href="#" onclick="openDepartureModal()">Request for Departure</a>
+                        <?php if ($hasDepartureRequest): ?>
+                            <a href="../esas_student/crud/departure_requests/departure_request_read.php?club_id=<?php echo $_GET['club_id']; ?>">See Departure Request</a>
+                        <?php else: ?>
+                            <a href="#" onclick="openDepartureModal()">Request for Departure</a>
+                        <?php endif; ?>
                     </div>
                 </div>
 
