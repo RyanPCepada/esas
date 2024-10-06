@@ -1,4 +1,6 @@
-<?php
+<!-- UNUSED -->
+ 
+ <?php
 require_once "../config.php";
 
 // Set the default timezone to Asia/Manila
