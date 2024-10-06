@@ -138,11 +138,15 @@ function createCalendar(month, year, events) {
     calendarDiv.appendChild(table);
 
     // Style for the calendar container
+    calendarDiv.style.width = '250px';
     calendarDiv.style.border = '1px solid #e6e6e6'; // Outer border for the calendar
     calendarDiv.style.padding = '15px'; // Padding for the calendar container
     calendarDiv.style.borderRadius = '10px'; // Rounded corners for the calendar container
     calendarDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'; // Subtle shadow for depth
     calendarDiv.style.backgroundColor = '#f9f9f9'; // Background color for the calendar
+    
+    calendarDiv.style.margin = 'auto'; // Center horizontally
+    calendarDiv.style.marginBottom = '20px';
 }
 
 
@@ -201,38 +205,42 @@ function fetchEvents() {
                     displayDate = "Tomorrow"; // Change to "Tomorrow" for tomorrow's date
                 }
 
+                // Inside your fetchEvents function, after defining `eventCard`
                 const eventCard = document.createElement('div');
-                eventCard.className = 'card mb-3'; // Bootstrap card class
-                eventCard.style.maxWidth = '540px'; // Set a max width for the card
+                eventCard.className = 'col-md-12 mb-4'; // Updated to have two cards per row
 
-                // Cover photo with 50% opacity and square shape
-                const eventIcon = `
-                    <div style="position: relative; width: 100%; height: 0; padding-top: 100%; overflow: hidden;">
-                        <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>"
-                             alt="Cover Photo" 
-                             class="img-fluid" 
-                             style="position: absolute; top: 0; left: 12px; width: 100%; height: 100%; object-fit: cover; opacity: 0.5;">
-                    </div>
-                `;
+                // Modified card structure
+                let cardStyle = ""; // Variable to store card style
+                if (eventDate.toDateString() === today.toDateString()) {
+                    cardStyle = "background-color: #f4f4f9; border-color: #bee5eb;"; // Light blue for today's events
+                } else {
+                    cardStyle = "border: 1px solid #ddd;"; // Default border for other events
+                }
 
                 eventCard.innerHTML = `
-                    <div class="row no-gutters">
-                        <div class="col-md-4" style="text-align: center;">
-                            ${eventIcon} <!-- Inserted Cover Photo -->
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body" style="position: relative;">
-                                <h5 class="card-title" style="color: #007bff;">${event.title}</h5>
-                                <p class="card-text" style="margin: 0; color: #666;">${displayDate}</p> <!-- Display "Today" or "Tomorrow" -->
-                                <p class="card-text" style="display: flex; align-items: center; justify-content: flex-start;">
-                                    <a href="#" class="btn btn-link" onclick="showEventDetails(${event.event_id})" style="white-space: nowrap; padding: 0; margin-right: 40px;">View Details</a>
-                                </p>
+                    <div class="card" style="border-radius: 10px; ${cardStyle}">
+                        <div class="row no-gutters">
+                            <div class="col-md-4" style="width: 30%;">
+                                <img src="./icons/ICON_ANNOUNCEMENT.png"
+                                    alt="Cover Photo" 
+                                    class="img-fluid" 
+                                    style="width: 200px; height: 112px; object-fit: cover; opacity: 0.5;">
+                            </div>
+                            <div class="col-md-8" style="width: 70%;">
+                                <div class="card-body" style="padding: 1rem;">
+                                    <h5 class="card-title" style="color: #007bff;">${event.title}</h5>
+                                    <p class="card-text" style="margin: 0; color: #666;">${displayDate}</p>
+                                    <p class="card-text" style="display: flex; align-items: center; justify-content: flex-start;">
+                                        <a href="#" class="btn btn-link" onclick="showEventDetails(${event.event_id})" style="white-space: nowrap; padding: 0; margin-right: 40px;">View Details</a>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 `;
 
                 eventList.appendChild(eventCard);
+
             });
 
             // Create the calendar for the current month
@@ -246,7 +254,8 @@ function fetchEvents() {
 
 
 
-
+//HERE
+// HERE (FORMAL CARD STYLE FOR EVENTS)
 
 
 // Function to convert time to 12-hour format
