@@ -337,7 +337,7 @@ try {
                                     <div class="row g-0">
                                         <div class="d-flex align-items-center justify-content-end pb-3 mt-2 mb-3">
                                             <!-- <h2 class="text-muted mt-0 mb-0">My Club Requests</h2> -->
-                                            <a href="../esas_student/crud/club_requests/club_request_create.php" class="btn btn-primary" id="request-club-btn" style="width: 160px; border-radius: 5px;">
+                                            <a href="../esas_student/crud/club_requests/club_request_create.php" class="btn btn-primary" id="request-club-btn" style="width: 160px; border-radius: 3px;">
                                                 Request for a Club
                                             </a>
                                         </div>
@@ -635,11 +635,8 @@ $(document).on('click', '#deleteButton', function(e) {
 <div id="clubDetailsModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="text-muted" id="modalClubName"></h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
             <div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 15px;">
+                <h4 class="text-muted mb-3" id="modalClubName"></h4>
                 <div id="modalCoverPhoto" class="text-center">
                     <img src="" alt="Cover Photo" class="img-fluid" style="border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
                 </div>
