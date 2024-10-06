@@ -34,7 +34,7 @@ $clubs = $clubQuery->fetchAll();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generate Student ID</title>
+    <title>eSAS - Generate Student ID</title>
     <style>
         /* Your existing styles */
         body {
