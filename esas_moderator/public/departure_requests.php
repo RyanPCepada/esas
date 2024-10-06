@@ -36,7 +36,7 @@ try {
     $sqlStudents = "
         SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.age, s.birthday, s.gender, s.instiEmail, s.phoneNumber, s.department, s.course, s.year, s.street, s.barangay, s.municipality, s.province, s.zipcode, s.profilePic
         FROM tbl_students s
-        JOIN tbl_registration r ON s.student_id = r.student_id
+        JOIN tbl_departure_requests r ON s.student_id = r.student_id
         WHERE r.status = 'active'
     ";
 
@@ -321,7 +321,7 @@ try {
                                 $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
                                 $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
 
-                                // SQL query to fetch distinct students with their pending registrations, including registration_id
+                                // SQL query to fetch distinct students with their pending departures, including departure_id
                                 $sql = "SELECT 
                                             s.student_id,
                                             s.firstName,
@@ -392,12 +392,12 @@ try {
                                         $gender = htmlspecialchars($row['gender']);
                                         $department = htmlspecialchars($row['department']);
                                         $course = htmlspecialchars($row['course']);
-                                        $dateApplied = htmlspecialchars(date('F j, Y', strtotime($row['dateRequested']))); // Format date
-                                        $registrationId = htmlspecialchars($row['departure_id']); // Get registration_id
+                                        $dateRequested = htmlspecialchars(date('F j, Y', strtotime($row['dateRequested']))); // Format date
+                                        $departureId = htmlspecialchars($row['departure_id']); // Get departure_id
 
                                         echo '
                                         <tr class="student-row">
-                                            <!-- <td>' . $registrationId . '</td> Display Registration ID -->
+                                            <!-- <td>' . $departureId . '</td> Display Registration ID -->
                                             <td class="text-center p-1">
                                                 <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
                                                     alt="' . $fullName . ' profile picture" 
@@ -408,9 +408,9 @@ try {
                                             <td>' . $gender . '</td>
                                             <td>' . $department . '</td>
                                             <td>' . $course . '</td>
-                                            <td>' . $dateApplied . '</td>
+                                            <td>' . $dateRequested . '</td>
                                             <td class="text-center">
-                                                <a href="../public/crud/departure_request/departure_request_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '&registration_id=' . $registrationId . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                <a href="../public/crud/departure_request/departure_request_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '&departure_id=' . $departureId . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                             </td>
                                         </tr>';
                                     }

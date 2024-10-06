@@ -93,7 +93,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
 // Handle approval or disapproval
 if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprove'])) {
     // Set new status based on action
-    $newStatus = $_POST["action"] === 'approve' ? 'active' : 'disapproved';
+    $newStatus = $_POST["action"] === 'approve' ? 'approved' : 'disapproved';
 
     // Prepare the SQL statement to update the specific departure record
     $updateSql = "UPDATE tbl_departure_requests 
@@ -111,8 +111,39 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
         // Execute the update statement
         if ($updateStmt->execute()) {
-            header("location: ../../departure_requests.php");
-            exit();
+            // Check if the request was approved
+            if ($_POST["action"] === 'approve') {
+                // Prepare to update the registration table
+                $updateRegistrationSql = "UPDATE tbl_registration 
+                           SET status = :new_status, dateApproved = NOW() 
+                           WHERE student_id = :student_id 
+                           AND status = 'active' 
+                           AND club_id = :club_id"; // Use relevant identifiers
+
+                if ($updateRegistrationStmt = $pdo->prepare($updateRegistrationSql)) {
+                    // Set new status value
+                    $newStatusValue = 'departed'; // Example status value for departure
+
+                    // Bind parameters
+                    $updateRegistrationStmt->bindParam(":new_status", $newStatusValue);
+                    $updateRegistrationStmt->bindParam(":student_id", $param_student_id, PDO::PARAM_INT);
+                    $updateRegistrationStmt->bindParam(":club_id", $param_club_id, PDO::PARAM_INT);
+
+                    // Execute the update statement for registration
+                    if ($updateRegistrationStmt->execute()) {
+                        header("location: ../../departure_requests.php");
+                        exit();
+                    } else {
+                        echo "Error updating the registration record. Please try again.";
+                        exit();
+                    }
+                }
+                unset($updateRegistrationStmt);
+            } else {
+                // Redirect or show success message for disapproved requests
+                header("location: ../../departure_requests.php");
+                exit();
+            }
         } else {
             echo "Error updating the request. Please try again.";
             exit();
@@ -120,6 +151,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     }
     unset($updateStmt);
 }
+
 
 ?>
 
@@ -157,17 +189,15 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                                 <div class="card mb-3 bg-light">
                                     <div class="card-body">
                                         <p><strong>Reason:</strong><br><?php echo htmlspecialchars($questions['reason']); ?></p>
+                                        <hr>
+                                        <p><strong>Date Requested:</strong><br>
+                                            <?php 
+                                            $formattedDate = (new DateTime($dateRequested))->format('F d, Y'); 
+                                            echo htmlspecialchars($formattedDate);
+                                            ?>
+                                        </p>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="d-flex justify-content-end">
-                                <p>Date Requested: 
-                                    <?php 
-                                    $formattedDate = (new DateTime($dateRequested))->format('F d, Y'); 
-                                    echo htmlspecialchars($formattedDate); 
-                                    ?>
-                                </p>
                             </div>
 
 
@@ -178,7 +208,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
                 <script>
                     function confirmAction(action) {
-                        const confirmation = confirm(`Are you sure you want to ${action} this student?`);
+                        const confirmation = confirm(`Are you sure you want to ${action} this student's departure?`);
                         if (confirmation) {
                             document.getElementById('action').value = action;
                             document.getElementById('approvalForm').submit();
@@ -191,14 +221,9 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                     <form id="approvalForm" method="post">
                         <input type="hidden" name="action" id="action" value="">
                         <input type="hidden" name="departure_id" value="<?php echo htmlspecialchars($param_departure_id); ?>">
-                        <?php if ($clubsCount >= 2): ?>
-                            <!-- <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button> -->
-                            <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
-                        <?php else: ?>
-                            <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve Student</button>
-                            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
-                            <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
-                        <?php endif; ?>
+                        <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve Departure</button>
+                        <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Departure</button>
+                        <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
                     </form>
                 </div>
 
