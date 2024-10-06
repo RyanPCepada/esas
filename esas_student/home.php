@@ -412,7 +412,7 @@ try {
                     </div>
 
                     <div id="dropdownMenu" class="dropdown mt-4">
-                        <a href="#" onclick="openDepartureModal()">Request to Leave Club</a>
+                        <a href="#" onclick="openDepartureModal()">Request for Departure</a>
                     </div>
                 </div>
 
@@ -477,11 +477,11 @@ try {
     <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
         <span style="color: red; font-weight: bold;">We're sorry to see you go.</span>
         <p>Could you please provide a reason for leaving the club?</p>
-        <form id="departureRequestForm" method="POST" action="../esas_student/actions/departure_request_action.php">
+        <form id="departureRequestForm" onsubmit="submitDepartureRequest(event)">
             <div class="form-group">
-                <textarea name="reason" class="form-control" rows="3" placeholder="Enter your reason..."></textarea>
+                <textarea id="reasonInput" class="form-control" rows="3" placeholder="Share your reason..." required></textarea>
             </div>
-            <input type="hidden" name="club_id" value="<?php echo $club_id; ?>">
+            <input type="hidden" id="clubIdInput" name="club_id" value="<?php echo $club_id; ?>">
             <button type="submit" class="btn btn-danger mb-1">Submit Departure Request</button>
             <button type="button" class="btn btn-secondary mb-1" onclick="document.getElementById('departureModal').style.display='none'">Cancel</button>
         </form>
@@ -538,6 +538,29 @@ function openDepartureModal() {
     document.getElementById('departureModal').style.display = 'block';
 }
 
+function submitDepartureRequest(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const reason = document.getElementById('reasonInput').value; // Get reason from input
+    const club_id = document.getElementById('clubIdInput').value; // Get club ID from input
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "../esas_student/actions/departure_request_action.php", true); // Update the path as needed
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onload = function() {
+        const response = JSON.parse(xhr.responseText);
+        if (response.success) {
+            alert('Departure request submitted successfully!'); // Show success message
+            window.location.href = '/esas/esas_student/home.php?club_id=' + encodeURIComponent(club_id);
+        } else {
+            alert(response.message || 'Something went wrong.'); // Show error message
+        }
+    };
+
+    xhr.send("reason=" + encodeURIComponent(reason) + "&club_id=" + encodeURIComponent(club_id));
+}
+
 // Close the modal when the user clicks outside of it
 window.onclick = function(event) {
     const modal = document.getElementById('departureModal');
@@ -545,6 +568,7 @@ window.onclick = function(event) {
         modal.style.display = 'none';
     }
 }
+
 </script>
 
 
