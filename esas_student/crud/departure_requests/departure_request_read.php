@@ -81,7 +81,6 @@ try {
 <body>
 <div class="wrapper">
     <h3 class="text-muted mt-5 mb-3">Departure Request</h3>
-
     <div class="container-fluid container">
         <div class="row">
             <?php if (!empty($departureRequests)): ?>
@@ -109,9 +108,8 @@ try {
                                     Edit Request
                                 </button>
                                 <button class="btn btn-outline-secondary btn-sm mt-2" onclick="withdrawRequest('<?php echo $request['club_id']; ?>', '<?php echo htmlspecialchars($request['clubName']); ?>')">
-    Withdraw Request
-</button>
-
+                                    Withdraw Request
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -130,11 +128,11 @@ try {
     <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
         <span style="color: red; font-weight: bold;">We're sorry to see you go.</span>
         <p class="mt-3">Edit reason:</p>
-        <form id="departureRequestForm" onsubmit="submitDepartureRequest(event)">
+        <form id="departureRequestForm" onsubmit="updateDepartureRequest(event)">
             <div class="form-group">
                 <textarea id="reasonInput" class="form-control" rows="3" placeholder="Share your reason..." required></textarea>
             </div>
-            <input type="hidden" id="clubIdInput" name="club_id" value="">
+            <input type="hidden" id="clubIdInput" name="club_id" value="<?php echo $club_id; ?>">
             <button type="submit" class="btn btn-danger mb-1">Save Changes</button>
             <button type="button" class="btn btn-secondary mb-1" onclick="closeDepartureModal()">Cancel</button>
         </form>
@@ -153,35 +151,39 @@ try {
         document.getElementById('departureModal').style.display = 'none';
     }
 
-    function submitDepartureRequest(event) {
+    function updateDepartureRequest(event) {
         event.preventDefault();
         const club_id = document.getElementById('clubIdInput').value;
         const reason = document.getElementById('reasonInput').value;
 
-        // Example of how you would send this data via AJAX to update the reason
-        // $.post('/update-departure-request', { club_id: club_id, reason: reason }, function(response) {
-        //     document.getElementById('reason-' + club_id).innerHTML = reason; // Update the displayed reason
-        //     closeDepartureModal();
-        // });
-
-        // Temporary action to simulate the update
-        document.getElementById('reason-' + club_id).innerHTML = reason;
-        closeDepartureModal();
+        $.post('./crud/departure_requests/departure_request_update.php', { club_id: club_id, reason: reason }, function(response) {
+            const result = JSON.parse(response);
+            if (result.success) {
+                document.getElementById('reason-' + club_id).innerHTML = reason; // Update the displayed reason
+                alert(result.message);
+            } else {
+                alert(result.message);
+            }
+            closeDepartureModal();
+        });
     }
 
-    function withdrawRequest(club_id) {
-        // Send a request to delete the departure request or mark it as withdrawn
-        if (confirm('Are you sure you want to withdraw your departure request for this club?')) {
-            // Example of how you would send this data via AJAX
-            // $.post('/withdraw-departure-request', { club_id: club_id }, function(response) {
-            //     alert('Your request has been withdrawn.');
-            //     location.reload(); // Reload the page to reflect changes
-            // });
 
-            alert('Departure request for club ' + clubName + ' has been withdrawn.');
+    function withdrawRequest(club_id, clubName) {
+        if (confirm('Are you sure you want to withdraw your departure request for ' + clubName + '?')) {
+            $.post('./crud/departure_requests/departure_request_delete.php', { club_id: club_id }, function(response) {
+                const result = JSON.parse(response);
+                if (result.success) {
+                    alert(result.message);
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert(result.message);
+                }
+            });
         }
     }
-</script>
-</body>
 
+</script>
+
+</body>
 </html>
