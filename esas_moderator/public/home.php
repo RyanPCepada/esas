@@ -452,8 +452,27 @@ function showContent(contentId) {
 
     // Show the selected content section
     document.getElementById(contentId).style.display = 'block';
+
+    // Save the selected section in localStorage
+    localStorage.setItem('selectedContent', contentId);
 }
+
+// Function to load the selected section from localStorage on page load
+function loadSelectedContent() {
+    const selectedContent = localStorage.getItem('selectedContent');
+
+    // If a section is saved, display it; otherwise, default to posts
+    if (selectedContent) {
+        showContent(selectedContent);
+    } else {
+        showContent('posts'); // Default to posts if nothing is saved
+    }
+}
+
+// Call loadSelectedContent on page load
+document.addEventListener('DOMContentLoaded', loadSelectedContent);
 </script>
+
 
 
 
