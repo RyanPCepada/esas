@@ -5,15 +5,15 @@ require_once "../../../../config.php";
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-// Check existence of student_id, club_id, and registration_id parameter before processing further
+// Check existence of student_id, club_id, and departure_id parameter before processing further
 if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"])) 
     && isset($_GET["club_id"]) && !empty(trim($_GET["club_id"])) 
-    && isset($_GET["registration_id"]) && !empty(trim($_GET["registration_id"]))) {
+    && isset($_GET["departure_id"]) && !empty(trim($_GET["departure_id"]))) {
 
     // Set parameters
     $param_student_id = trim($_GET["student_id"]);
     $param_club_id = trim($_GET["club_id"]);
-    $param_registration_id = trim($_GET["registration_id"]); // Get registration_id from URL
+    $param_departure_id = trim($_GET["departure_id"]); // Get departure_id from URL
 
     // Prepare a select statement to fetch the student details
     $sql = "SELECT * FROM tbl_students WHERE student_id = :student_id";
@@ -53,8 +53,8 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     unset($stmt);
 
 
-    // Prepare a select statement to fetch questions and dateApplied from tbl_registration
-    $sql_questions = "SELECT question1, question2, question3, dateApplied FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id";
+    // Prepare a select statement to fetch questions and dateRequested from tbl_departure_requests
+    $sql_questions = "SELECT reason, dateRequested FROM tbl_departure_requests WHERE student_id = :student_id AND club_id = :club_id";
 
     if ($stmt = $pdo->prepare($sql_questions)) {
         // Bind variables to the prepared statement as parameters
@@ -67,13 +67,13 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
 
         // Attempt to execute the prepared statement
         if ($stmt->execute()) {
-            // Fetch the questions and dateApplied together in one call
+            // Fetch the questions and dateRequested together in one call
             $questions = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch all as associative array
 
             if ($questions) {
-                $dateApplied = $questions['dateApplied']; // Date applied from the fetched array
+                $dateRequested = $questions['dateRequested']; // Date applied from the fetched array
             } else {
-                echo "No registration details found.";
+                echo "No departure details found.";
             }
         } else {
             echo "Could not fetch questions. Please try again later.";
@@ -95,23 +95,23 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     // Set new status based on action
     $newStatus = $_POST["action"] === 'approve' ? 'active' : 'disapproved';
 
-    // Prepare the SQL statement to update the specific registration record
-    $updateSql = "UPDATE tbl_registration 
+    // Prepare the SQL statement to update the specific departure record
+    $updateSql = "UPDATE tbl_departure_requests 
                   SET status = :status, dateApproved = NOW() 
                   WHERE student_id = :student_id 
                   AND club_id = :club_id 
-                  AND registration_id = :registration_id"; // Include registration_id
+                  AND departure_id = :departure_id"; // Include departure_id
 
     if ($updateStmt = $pdo->prepare($updateSql)) {
         // Bind parameters
         $updateStmt->bindParam(":status", $newStatus);
         $updateStmt->bindParam(":student_id", $param_student_id, PDO::PARAM_INT);
         $updateStmt->bindParam(":club_id", $param_club_id, PDO::PARAM_INT);
-        $updateStmt->bindParam(":registration_id", $param_registration_id, PDO::PARAM_INT); // Bind registration_id
+        $updateStmt->bindParam(":departure_id", $param_departure_id, PDO::PARAM_INT); // Bind departure_id
 
         // Execute the update statement
         if ($updateStmt->execute()) {
-            header("location: ../../pending_approvals.php");
+            header("location: ../../departure_requests.php");
             exit();
         } else {
             echo "Error updating the request. Please try again.";
@@ -120,28 +120,6 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     }
     unset($updateStmt);
 }
-
-
-    
-// Fetch the student's registration status for the current club
-$stmt = $pdo->prepare("SELECT status FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id");
-$stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-$stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-$stmt->execute();
-$status = $stmt->fetchColumn(); // Fetch the registration status (e.g., 'active', 'pending', etc.)
-
-// Count how many clubs the student is currently "active" in
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
-$stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-$stmt->execute();
-$clubsCount = $stmt->fetchColumn();
-
-// Count how many times the student has been "disapproved" for this club
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id AND status = 'disapproved'");
-$stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-$stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
-$stmt->execute();
-$disapprovedCount = $stmt->fetchColumn();
 
 ?>
 
@@ -159,7 +137,7 @@ $disapprovedCount = $stmt->fetchColumn();
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h3>Pending Approval</h3>
+                    <h3>Departure Request</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -173,32 +151,20 @@ $disapprovedCount = $stmt->fetchColumn();
                             <p><strong>Student ID: </strong><?php echo $student_id; ?></p>
                             <hr>
 
-                            <h5>Registration Details:</h5>
+                            <h5>Departure Details:</h5>
                             <!-- Display the questions -->
                             <div class="container mt-3 p-0">
                                 <div class="card mb-3 bg-light">
                                     <div class="card-body">
-                                        <p><strong>Why do you want to join this club?:</strong><br><?php echo htmlspecialchars($questions['question1']); ?></p>
-                                    </div>
-                                </div>
-                                
-                                <div class="card mb-3 bg-light">
-                                    <div class="card-body">
-                                        <p><strong>What skills or experiences do you have that will contribute to the club's activities?:</strong><br><?php echo htmlspecialchars($questions['question2']); ?></p>
-                                    </div>
-                                </div>
-                                
-                                <div class="card mb-3 bg-light">
-                                    <div class="card-body">
-                                        <p><strong>How do you plan to balance your time between club activities and your academic responsibilities?:</strong><br><?php echo htmlspecialchars($questions['question3']); ?></p>
+                                        <p><strong>Reason:</strong><br><?php echo htmlspecialchars($questions['reason']); ?></p>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="d-flex justify-content-end">
-                                <p>Date Applied: 
+                                <p>Date Requested: 
                                     <?php 
-                                    $formattedDate = (new DateTime($dateApplied))->format('F d, Y'); 
+                                    $formattedDate = (new DateTime($dateRequested))->format('F d, Y'); 
                                     echo htmlspecialchars($formattedDate); 
                                     ?>
                                 </p>
@@ -206,14 +172,6 @@ $disapprovedCount = $stmt->fetchColumn();
 
 
                         </div>
-                    </div>
-
-                    <div class="club-register-now mt-4 text-center align-items-center justify-content-center"> 
-                        <?php if ($clubsCount >= 2): ?>
-                            <div class="alert alert-warning custom-alert" role="alert">
-                                <p class="lead mb-0">This student has reached the maximum of 2 club memberships allowed.</p>
-                            </div>
-                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -232,7 +190,7 @@ $disapprovedCount = $stmt->fetchColumn();
                 <div class="card-footer text-center">
                     <form id="approvalForm" method="post">
                         <input type="hidden" name="action" id="action" value="">
-                        <input type="hidden" name="registration_id" value="<?php echo htmlspecialchars($param_registration_id); ?>">
+                        <input type="hidden" name="departure_id" value="<?php echo htmlspecialchars($param_departure_id); ?>">
                         <?php if ($clubsCount >= 2): ?>
                             <!-- <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button> -->
                             <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
