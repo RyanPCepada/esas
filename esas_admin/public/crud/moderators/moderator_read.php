@@ -122,7 +122,7 @@ unset($pdo);
                     <div class="card-footer text-center">
                         <a href="moderator_update.php?moderator_id=<?php echo $moderator_id; ?>" class="btn btn-warning">Update</a>
                         <a href="moderator_delete.php?moderator_id=<?php echo $moderator_id; ?>" class="btn btn-danger">Delete</a>
-                        <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Moderators List</a>
+                        <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
                     </div>
                 </div>
             </div>
