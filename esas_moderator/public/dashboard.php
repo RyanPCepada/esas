@@ -479,7 +479,7 @@ try {
 
 
 
-                                <!-- Card for LEAVE REQUESTS -->
+                                <!-- Card for DEPARTURE REQUESTS -->
                                 <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
@@ -498,15 +498,15 @@ try {
                                                 $endDate = ($latestYear + 1) . "-07-31"; // End date for the latest school year
                                             }
 
-                                            // Base SQL query to count leave requests for clubs handled by the moderator
+                                            // Base SQL query to count departure requests for clubs handled by the moderator
                                             $sql = "
-                                                SELECT COUNT(tr.registration_id) AS total_leave_requests 
-                                                FROM tbl_registration tr
-                                                JOIN tbl_clubs tc ON tr.club_id = tc.club_id
+                                                SELECT COUNT(td.departure_id) AS total_departure_requests 
+                                                FROM tbl_departure_requests td
+                                                JOIN tbl_clubs tc ON td.club_id = tc.club_id
                                                 JOIN tbl_clubs_and_moderators tcm ON tc.club_id = tcm.club_id
-                                                WHERE tr.status = 'Pending Leave' 
+                                                WHERE td.status = 'pending' 
                                                 AND tcm.moderator_id = :moderator_id
-                                                AND tr.dateApplied <= :end_date
+                                                AND td.dateRequested <= :end_date
                                             ";
 
                                             // Parameters for the query
@@ -517,26 +517,25 @@ try {
 
                                             // Add condition for the selected club, if applicable
                                             if ($selectedClubId) {
-                                                $sql .= " AND tr.club_id = :club_id";
+                                                $sql .= " AND td.club_id = :club_id";
                                                 $params['club_id'] = $selectedClubId;
                                             }
 
                                             // Prepare and execute the query
-                                            $stmt_leave_requests = $pdo->prepare($sql);
-                                            $stmt_leave_requests->execute($params);
+                                            $stmt_departure_requests = $pdo->prepare($sql);
+                                            $stmt_departure_requests->execute($params);
 
-                                            // Fetch the total number of leave requests
-                                            $total_leave_requests = $stmt_leave_requests->fetchColumn();
-                                            echo "<h3>$total_leave_requests</h3>";
+                                            // Fetch the total number of departure requests
+                                            $total_departure_requests = $stmt_departure_requests->fetchColumn();
+                                            echo "<h3>$total_departure_requests</h3>";
                                         } catch (PDOException $e) {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
                                         <i class="fas fa-door-open mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Leave Request</p>
+                                        <p>Total Departure Request</p>
                                     </div>
                                 </div>
-
 
                             </div>
                             <!-- UPPER CARDS END -->
@@ -548,7 +547,7 @@ try {
                                 <!-- PIE CHART -->
                                 <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <p>Students per Department</p>
+                                        <p>Total Students per Department</p>
                                         <div style="height: 365px; background-color: transparent;">
                                             <?php
                                             try {
@@ -710,7 +709,7 @@ try {
                                         <!-- Registry per SY -->
                                         <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Registry per SY</p>
+                                                <p>Total Registry per SY</p>
                                                 <div style="height: 100%; width: 100%; background-color: transparent;">
                                                     <canvas id="registryPerSYChart"></canvas>
                                                 </div>
@@ -884,7 +883,7 @@ try {
                                         <!-- Year Level Numbers -->
 <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-        <p>Year Level Count</p>
+        <p>Total Year Level Count</p>
         <div style="height: 150px; background-color: transparent;">
             <div>
                 <canvas id="studentBarChart"></canvas>
@@ -1022,7 +1021,7 @@ try {
                                         <!-- Student Gender --> 
 <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-        <p>Student Gender</p>
+        <p>Total Student Gender</p>
         <div style="height: 150px; position: relative;">
             <?php
             try {

@@ -335,6 +335,7 @@ try {
     margin: 3px;
     color: #555;
     background-color: #f9f9f9;
+    background-color: #e6e6e6;
     padding: 5px 10px;
     border-radius: 5px;
     font-weight: 500;
