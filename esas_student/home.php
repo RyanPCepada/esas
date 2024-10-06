@@ -477,10 +477,11 @@ try {
     <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
         <span style="color: red; font-weight: bold;">We're sorry to see you go.</span>
         <p>Could you please provide a reason for leaving the club?</p>
-        <form id="departureRequestForm" method="POST" action="submit_departure_request.php">
+        <form id="departureRequestForm" method="POST" action="../esas_student/actions/departure_request_action.php">
             <div class="form-group">
                 <textarea name="reason" class="form-control" rows="3" placeholder="Enter your reason..."></textarea>
             </div>
+            <input type="hidden" name="club_id" value="<?php echo $club_id; ?>">
             <button type="submit" class="btn btn-danger mb-1">Submit Departure Request</button>
             <button type="button" class="btn btn-secondary mb-1" onclick="document.getElementById('departureModal').style.display='none'">Cancel</button>
         </form>
