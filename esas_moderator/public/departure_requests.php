@@ -64,7 +64,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - Students</title>
+    <title>eSAS - Departure Requests</title>
     <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
@@ -300,131 +300,139 @@ try {
 
                             <!-- ALL STUDENT TABLE START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
-                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <input id="studentSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                                            </th>
-                                            <th class="text-center" colspan="8">
-                                                <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6> <!-- Updated row count display -->
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                </table>
-
-                                <?php
-                                // Include config file
-                                require_once "../../config.php";
-
-                                // Get club_id and selected month from the URL
-                                $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
-                                $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
-
-                                // SQL query to fetch distinct students with their pending registrations, including registration_id
-                                $sql = "SELECT 
-                                            s.student_id,
-                                            s.firstName,
-                                            s.middleName,
-                                            s.lastName,
-                                            s.gender,
-                                            s.department,
-                                            s.course,
-                                            s.profilePic,
-                                            MIN(r.dateApplied) AS dateApplied,
-                                            c.club_id,
-                                            r.registration_id
-                                        FROM tbl_students s
-                                        LEFT JOIN tbl_registration r ON s.student_id = r.student_id
-                                        LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
-                                        WHERE r.status = 'pending'";
-
-                                // Add filtering by club_id if provided
-                                if ($selectedClubId) {
-                                    $sql .= " AND c.club_id = :club_id";
-                                }
-
-                                // This condition accumulates students from the start of the selected month to the current month
-                                if ($selectedMonth) {
-                                    $sql .= " AND MONTH(r.dateApplied) <= :selectedMonth";
-                                }
-
-                                $sql .= " GROUP BY s.student_id
-                                        ORDER BY MIN(r.dateApplied) ASC"; // Order by the earliest date applied
-
-                                $stmt = $pdo->prepare($sql);
-
-                                // Bind parameters
-                                $params = [];
-                                if ($selectedClubId) {
-                                    $params['club_id'] = $selectedClubId;
-                                }
-                                if ($selectedMonth) {
-                                    $params['selectedMonth'] = $selectedMonth;
-                                }
-
-                                // Execute the SQL statement
-                                $stmt->execute($params);
-
-                                $totalRows = $stmt->rowCount(); // Get the total rows from the prepared statement
-
-                                if ($totalRows > 0) {
-                                    echo '
-                                    <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                            <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
                                         <thead>
                                             <tr>
-                                                <!-- <th>Registration ID</th> New column for Registration ID -->
-                                                <th>Profile</th>
-                                                <th>Student ID</th>
-                                                <th>Full Name</th>
-                                                <th>Gender</th>
-                                                <th>Department</th>
-                                                <th>Course</th>
-                                                <th>Date Applied</th>
-                                                <th>Actions</th>
+                                                <th colspan="9">
+                                                    <div class="row">
+                                                        <div class="col-12 col-md-8 d-flex align-items-center">
+                                                            <select id="statusSelect" class="form-select me-2" style="width: 20%;">
+                                                                <optgroup label="Select Club Request Status">
+                                                                    <option value="" selected>All</option>
+                                                                    <option value="pending">Pending</option>
+                                                                    <option value="approved">Approved</option>
+                                                                    <option value="disapproved">Disapproved</option>
+                                                                </optgroup>
+                                                            </select>
+                                                            <input id="studentSearch" class="form-control mr-sm-2" type="search" placeholder="Search for clubs here..." aria-label="Search">
+                                                        </div>
+                                                        <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
+                                                            <h6 id="rowCountDisplay">Showing 0 / 0 Club Requests</h6>
+                                                        </div>
+                                                    </div>
+                                                </th>
                                             </tr>
                                         </thead>
-                                        <tbody>';
+                                    </table>
 
-                                    while ($row = $stmt->fetch()) {
-                                        $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
-                                        $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
-                                        $gender = htmlspecialchars($row['gender']);
-                                        $department = htmlspecialchars($row['department']);
-                                        $course = htmlspecialchars($row['course']);
-                                        $dateApplied = htmlspecialchars(date('F j, Y', strtotime($row['dateApplied']))); // Format date
-                                        $registrationId = htmlspecialchars($row['registration_id']); // Get registration_id
+                                <?php
+    // Include config file
+    require_once "../../config.php";
 
-                                        echo '
-                                        <tr class="student-row">
-                                            <!-- <td>' . $registrationId . '</td> Display Registration ID -->
-                                            <td class="text-center p-1">
-                                                <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
-                                                    alt="' . $fullName . ' profile picture" 
-                                                    style="width: 35px; height: 35px; border-radius: 50%;">
-                                            </td>
-                                            <td>' . htmlspecialchars($row['student_id']) . '</td>
-                                            <td>' . $fullName . '</td>
-                                            <td>' . $gender . '</td>
-                                            <td>' . $department . '</td>
-                                            <td>' . $course . '</td>
-                                            <td>' . $dateApplied . '</td>
-                                            <td class="text-center">
-                                                <a href="../public/crud/pending_approval/pending_approval_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '&registration_id=' . $registrationId . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                <!-- <a href="../public/crud/pending_approval/pending_approval_read.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $club_id; ?>" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a> -->
-                                                <!-- <a href="../public/crud/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a> -->
-                                                <!-- <a href="../public/crud/pending_approval/pending_approval_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a> -->
-                                            </td>
-                                        </tr>';
-                                    }
+    // Get club_id and selected month from the URL
+    $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
+    $selectedMonth = isset($_GET['month']) ? intval($_GET['month']) : date('m'); // Month from URL or current month
 
-                                    echo '
-                                        </tbody>
-                                    </table>';
-                                } else {
-                                    echo '<p style="font-size: 16px; color: red;"><em>No students.</em></p>';
-                                }
-                            ?>
+    // SQL query to fetch distinct students with their pending departure requests
+    $sql = "SELECT 
+                s.student_id,
+                s.firstName,
+                s.middleName,
+                s.lastName,
+                s.gender,
+                s.department,
+                s.course,
+                s.profilePic,
+                MIN(dr.dateRequested) AS dateRequested,
+                c.club_id,
+                dr.departure_id
+            FROM tbl_students s
+            LEFT JOIN tbl_departure_requests dr ON s.student_id = dr.student_id
+            LEFT JOIN tbl_clubs c ON dr.club_id = c.club_id
+            WHERE dr.status = 'pending'";
+
+    // Add filtering by club_id if provided
+    if ($selectedClubId) {
+        $sql .= " AND c.club_id = :club_id";
+    }
+
+    // This condition accumulates students from the start of the selected month to the current month
+    if ($selectedMonth) {
+        $sql .= " AND MONTH(dr.dateRequested) <= :selectedMonth";
+    }
+
+    $sql .= " GROUP BY s.student_id
+            ORDER BY MIN(dr.dateRequested) ASC"; // Order by the earliest date requested
+
+    $stmt = $pdo->prepare($sql);
+
+    // Bind parameters
+    $params = [];
+    if ($selectedClubId) {
+        $params['club_id'] = $selectedClubId;
+    }
+    if ($selectedMonth) {
+        $params['selectedMonth'] = $selectedMonth;
+    }
+
+    // Execute the SQL statement
+    $stmt->execute($params);
+
+    $totalRows = $stmt->rowCount(); // Get the total rows from the prepared statement
+
+    if ($totalRows > 0) {
+        echo '
+        <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+            <thead>
+                <tr>
+                    <th>Profile</th>
+                    <th>Student ID</th>
+                    <th>Full Name</th>
+                    <th>Gender</th>
+                    <th>Department</th>
+                    <th>Course</th>
+                    <th>Date Requested</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>';
+
+        while ($row = $stmt->fetch()) {
+            $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
+            $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
+            $gender = htmlspecialchars($row['gender']);
+            $department = htmlspecialchars($row['department']);
+            $course = htmlspecialchars($row['course']);
+            $dateRequested = htmlspecialchars(date('F j, Y', strtotime($row['dateRequested']))); // Format date
+            $departureId = htmlspecialchars($row['departure_id']); // Get departure_id
+
+            echo '
+            <tr class="student-row">
+                <td class="text-center p-1">
+                    <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
+                        alt="' . $fullName . ' profile picture" 
+                        style="width: 35px; height: 35px; border-radius: 50%;">
+                </td>
+                <td>' . htmlspecialchars($row['student_id']) . '</td>
+                <td>' . $fullName . '</td>
+                <td>' . $gender . '</td>
+                <td>' . $department . '</td>
+                <td>' . $course . '</td>
+                <td>' . $dateRequested . '</td>
+                <td class="text-center">
+                    <a href="../public/crud/departure_requests/departure_request_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '&departure_id=' . $departureId . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                </td>
+            </tr>';
+        }
+
+        echo '
+            </tbody>
+        </table>';
+    } else {
+        echo '<p style="font-size: 16px; color: red;"><em>No departure requests found.</em></p>';
+    }
+?>
+
 
 
                             </div>
