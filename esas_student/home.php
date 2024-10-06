@@ -356,6 +356,33 @@ try {
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
 }
 
+
+
+
+.event-ellipsis:hover {
+            background-color: lightgrey;
+        }
+
+        .dropdown {
+            display: none; /* Hidden by default */
+            position: absolute; /* Position the dropdown */
+            z-index: 1; /* Sit on top */
+            background-color: white; /* Dropdown background */
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2); /* Dropdown shadow */
+            border-radius: 4px; /* Rounded corners */
+        }
+
+        .dropdown a {
+            color: black; /* Link color */
+            padding: 12px 16px; /* Link padding */
+            text-decoration: none; /* No underline */
+            display: block; /* Make it a block */
+        }
+
+        .dropdown a:hover {
+            background-color: #f1f1f1; /* Change color on hover */
+        }
+
     </style>
 </head>
 <body>
@@ -379,7 +406,16 @@ try {
                     <button class="btn btn-custom" onclick="showContent('posts')">Posts</button>
                     <button class="btn btn-custom" onclick="showContent('events')">Events</button>
                     <button class="btn btn-custom" onclick="showContent('chats')">Chats</button>
+
+                    <div class="event-ellipsis text-center" style="cursor: pointer; width: 22px; height: 22px; border-radius: 50%;" onclick="toggleDropdown()">
+                        <i class="fas fa-ellipsis-v" style="color: #666;"></i>
+                    </div>
+
+                    <div id="dropdownMenu" class="dropdown mt-4">
+                        <a href="#" onclick="openDepartureModal()">Request to Leave Club</a>
+                    </div>
                 </div>
+
 
                 <!-- Content Section -->
                 <div id="slideContent">
@@ -433,6 +469,25 @@ try {
     </div>
 </div>
 
+
+
+
+<!-- Departure Request Modal -->
+<div id="departureModal" class="modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); background-color: rgba(0,0,0,0.4);">
+    <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
+        <span style="color: red; font-weight: bold;">We're sorry to see you go.</span>
+        <p>Could you please provide a reason for leaving the club?</p>
+        <form id="departureRequestForm" method="POST" action="submit_departure_request.php">
+            <div class="form-group">
+                <textarea name="reason" class="form-control" rows="3" placeholder="Enter your reason..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-danger mb-1">Submit Departure Request</button>
+            <button type="button" class="btn btn-secondary mb-1" onclick="document.getElementById('departureModal').style.display='none'">Cancel</button>
+        </form>
+    </div>
+</div>
+
+
 <!-- JavaScript to switch between Posts, Events, and Chats -->
 <script>
 function showContent(contentId) {
@@ -443,6 +498,51 @@ function showContent(contentId) {
 
     // Show the selected content section
     document.getElementById(contentId).style.display = 'block';
+
+    // Save the selected section in localStorage
+    localStorage.setItem('selectedContent', contentId);
+}
+
+// Function to load the selected section from localStorage on page load
+function loadSelectedContent() {
+    const selectedContent = localStorage.getItem('selectedContent');
+
+    // If a section is saved, display it; otherwise, default to posts
+    if (selectedContent) {
+        showContent(selectedContent);
+    } else {
+        showContent('posts'); // Default to posts if nothing is saved
+    }
+}
+
+// Call loadSelectedContent on page load
+document.addEventListener('DOMContentLoaded', loadSelectedContent);
+
+
+
+
+
+
+
+function toggleDropdown() {
+    const dropdown = document.getElementById('dropdownMenu');
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+}
+
+function openDepartureModal() {
+    // Close the dropdown
+    toggleDropdown();
+
+    // Open the modal
+    document.getElementById('departureModal').style.display = 'block';
+}
+
+// Close the modal when the user clicks outside of it
+window.onclick = function(event) {
+    const modal = document.getElementById('departureModal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
 }
 </script>
 
