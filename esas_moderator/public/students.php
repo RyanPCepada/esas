@@ -141,9 +141,9 @@ try {
                 </div>
             </nav>
             <!-- LEFT SIDEBAR -->
-            <div class="col-12 col-md-2 ps-0 pt-3 border-end">
+            <div class="col-12 col-md-2 pt-3 border-end">
 
-                <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
+                <div class="d-flex flex-column flex-shrink-0 px-2 bg-body-tertiary">
                     <ul class="nav nav-pills flex-column mb-auto">
                         <li>
                             <a href="../../esas_moderator/public/dashboard.php" class="nav-link left-sidebar text-dark" id="all-clubs">
@@ -163,6 +163,11 @@ try {
                         <li>
                             <a href="../../esas_moderator/public/pending_approvals.php" class="nav-link left-sidebar text-dark" id="pending-approvals">
                                 <i class="fas fa-hourglass-half"></i> Pending Approvals
+                            </a>
+                        </li>
+                        <li>
+                            <a href="../../esas_moderator/public/departure_requests.php" class="nav-link left-sidebar text-dark" id="departure-requests">
+                                <i class="fas fa-door-open"></i> Departure Requests
                             </a>
                         </li>
                     </ul>

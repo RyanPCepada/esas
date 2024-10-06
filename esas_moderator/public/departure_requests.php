@@ -160,12 +160,12 @@ try {
                             </a>
                         </li>
                         <li>
-                            <a href="../../esas_moderator/public/pending_approvals.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="pending-approvals">
+                            <a href="../../esas_moderator/public/pending_approvals.php" class="nav-link left-sidebar text-dark" id="pending-approvals">
                                 <i class="fas fa-hourglass-half"></i> Pending Approvals
                             </a>
                         </li>
                         <li>
-                            <a href="../../esas_moderator/public/departure_requests.php" class="nav-link left-sidebar text-dark" id="departure-requests">
+                            <a href="../../esas_moderator/public/departure_requests.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="departure-requests">
                                 <i class="fas fa-door-open"></i> Departure Requests
                             </a>
                         </li>
