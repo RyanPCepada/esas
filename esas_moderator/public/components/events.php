@@ -1,10 +1,10 @@
 <div class="events-section">
 
 <div class="row d-flex align-items-center">
-    <div class="col-10">
+    <div class="col-11">
         <h5 class="text-muted mb-3" style="font-size: 1.2em;">Upcoming Events</h5>
     </div>
-    <div class="col-2">
+    <div class="col-1">
         <button type="button" class="btn btn-info p-0" id="addEventBtn" data-toggle="modal" data-target="#addEventModal"
             style="color: white; width: 30px; height: 30px; margin-top: -20px; border-radius: 10%; padding: 0;">
             <i class="fas fa-plus"></i>
@@ -150,11 +150,15 @@ function createCalendar(month, year, events) {
     calendarDiv.appendChild(table);
 
     // Style for the calendar container
+    calendarDiv.style.width = '250px';
     calendarDiv.style.border = '1px solid #e6e6e6'; // Outer border for the calendar
     calendarDiv.style.padding = '15px'; // Padding for the calendar container
     calendarDiv.style.borderRadius = '10px'; // Rounded corners for the calendar container
     calendarDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'; // Subtle shadow for depth
     calendarDiv.style.backgroundColor = '#f9f9f9'; // Background color for the calendar
+    
+    calendarDiv.style.margin = 'auto'; // Center horizontally
+    calendarDiv.style.marginBottom = '20px';
 }
 
 
@@ -213,46 +217,50 @@ function fetchEvents() {
                     displayDate = "Tomorrow"; // Change to "Tomorrow" for tomorrow's date
                 }
 
+                // Inside your fetchEvents function, after defining `eventCard`
                 const eventCard = document.createElement('div');
-                eventCard.className = 'card mb-3'; // Bootstrap card class
-                eventCard.style.maxWidth = '540px'; // Set a max width for the card
+                eventCard.className = 'col-md-12 mb-4'; // Updated to have two cards per row
 
-                // Cover photo with 50% opacity and square shape
-                const eventIcon = `
-                    <div style="position: relative; width: 100%; height: 0; padding-top: 100%; overflow: hidden;">
-                        <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>"
-                             alt="Cover Photo" 
-                             class="img-fluid" 
-                             style="position: absolute; top: 0; left: 12px; width: 100%; height: 100%; object-fit: cover; opacity: 0.5;">
-                    </div>
-                `;
+                // Modified card structure
+                let cardStyle = ""; // Variable to store card style
+                if (eventDate.toDateString() === today.toDateString()) {
+                    cardStyle = "background-color: #f4f4f9; border-color: #bee5eb;"; // Light blue for today's events
+                } else {
+                    cardStyle = "border: 1px solid #ddd;"; // Default border for other events
+                }
 
                 eventCard.innerHTML = `
-                    <div class="row no-gutters">
-                        <div class="col-md-4" style="text-align: center;">
-                            ${eventIcon} <!-- Inserted Cover Photo -->
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body" style="position: relative;">
-                                <style>.event-ellipsis:hover{background-color: lightgrey;"}</style>
-                                <div class="event-ellipsis text-center" style="position: absolute; top: 10px; right: 12px; cursor: pointer; width: 22px; border-radius: 50%;" onclick="toggleDropdown(${event.event_id})">
-                                    <i class="fas fa-ellipsis-v" style="color: #666;"></i>
+                    <div class="card" style="border-radius: 10px; ${cardStyle}">
+                        <div class="row no-gutters">
+                            <div class="col-md-4" style="width: 30%;">
+                                <img src="../icons/ICON_ANNOUNCEMENT.png"
+                                    alt="Cover Photo" 
+                                    class="img-fluid" 
+                                    style="width: 200px; height: 118px; object-fit: cover; opacity: 0.5;">
+                            </div>
+                            <div class="col-md-8" style="width: 70%;">
+                                <div class="card-body" style="padding: 1rem;">
+                                    <style>.event-ellipsis:hover{background-color: lightgrey;"}</style>
+                                    <div class="event-ellipsis text-center" style="position: absolute; top: 10px; right: 12px; cursor: pointer; width: 22px; border-radius: 50%;" onclick="toggleDropdown(${event.event_id})">
+                                        <i class="fas fa-ellipsis-v" style="color: #666;"></i>
+                                    </div>
+                                    <div id="dropdown-${event.event_id}" style="display: none; position: absolute; top: 30px; right: 20px; background-color: white; border: 1px solid #ccc; border-radius: 4px; z-index: 1000;">
+                                        <a href="#" class="dropdown-item" onclick="editEvent(${event.event_id})" style="display: block; padding: 5px 10px; color: #007bff;">Edit</a>
+                                        <a href="#" class="dropdown-item" onclick="openDeleteModal(${event.event_id})" style="display: block; padding: 5px 10px; color: #ff6b6b;">Delete</a>
+                                    </div>
+                                    <h5 class="card-title mt-1" style="color: #007bff;">${event.title}</h5>
+                                    <p class="card-text" style="margin: 0; color: #666;">${displayDate}</p>
+                                    <p class="card-text" style="display: flex; align-items: center; justify-content: flex-start;">
+                                        <a href="#" class="btn btn-link" onclick="showEventDetails(${event.event_id})" style="white-space: nowrap; padding: 0; margin-right: 40px;">View Details</a>
+                                    </p>
                                 </div>
-                                <div id="dropdown-${event.event_id}" style="display: none; position: absolute; top: 30px; right: 20px; background-color: white; border: 1px solid #ccc; border-radius: 4px; z-index: 1000;">
-                                    <a href="#" class="dropdown-item" onclick="editEvent(${event.event_id})" style="display: block; padding: 5px 10px; color: #007bff;">Edit</a>
-                                    <a href="#" class="dropdown-item" onclick="openDeleteModal(${event.event_id})" style="display: block; padding: 5px 10px; color: #ff6b6b;">Delete</a>
-                                </div>
-                                <h5 class="card-title" style="color: #007bff;">${event.title}</h5>
-                                <p class="card-text" style="margin: 0; color: #666;">${displayDate}</p> <!-- Display "Today" or "Tomorrow" -->
-                                <p class="card-text" style="display: flex; align-items: center; justify-content: flex-start;">
-                                    <a href="#" class="btn btn-link" onclick="showEventDetails(${event.event_id})" style="white-space: nowrap; padding: 0; margin-right: 40px;">View Details</a>
-                                </p>
                             </div>
                         </div>
                     </div>
                 `;
 
                 eventList.appendChild(eventCard);
+
             });
 
             // Create the calendar for the current month

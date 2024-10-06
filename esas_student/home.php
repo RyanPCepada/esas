@@ -383,7 +383,7 @@ try {
 
                 <!-- Content Section -->
                 <div id="slideContent">
-
+                    <hr>
                     <!-- DEFAULT POSTS DISPLAY -->
                     <div id="posts">
                         <!-- Post List -->
@@ -404,12 +404,12 @@ try {
                     </div>
 
                     <!-- EVENTS DISPLAY -->
-                    <div id="events" class="p-3" style="display: none;">
+                    <div id="events" class="p-0" style="display: none;">
                             <?php include './components/events.php' ?>
                     </div>
 
                     <!-- CHATS DISPLAY -->
-                    <div id="chats" class="p-3" style="display: none;">
+                    <div id="chats" class="p-0" style="display: none;">
                         <div class="chatbox-section">
                             <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
                             <div class="chatbox" id="chatbox">

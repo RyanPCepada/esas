@@ -224,11 +224,11 @@ function fetchEvents() {
                                 <img src="./icons/ICON_ANNOUNCEMENT.png"
                                     alt="Cover Photo" 
                                     class="img-fluid" 
-                                    style="width: 200px; height: 112px; object-fit: cover; opacity: 0.5;">
+                                    style="width: 200px; height: 118px; object-fit: cover; opacity: 0.5;">
                             </div>
                             <div class="col-md-8" style="width: 70%;">
                                 <div class="card-body" style="padding: 1rem;">
-                                    <h5 class="card-title" style="color: #007bff;">${event.title}</h5>
+                                    <h5 class="card-title mt-1" style="color: #007bff;">${event.title}</h5>
                                     <p class="card-text" style="margin: 0; color: #666;">${displayDate}</p>
                                     <p class="card-text" style="display: flex; align-items: center; justify-content: flex-start;">
                                         <a href="#" class="btn btn-link" onclick="showEventDetails(${event.event_id})" style="white-space: nowrap; padding: 0; margin-right: 40px;">View Details</a>

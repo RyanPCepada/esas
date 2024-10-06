@@ -367,7 +367,7 @@ unset($pdo);
                 <!-- <hr> -->
 
                 <!-- Buttons for Posts, Events, Chats -->
-                <div class="d-flex justify-content-center mb-3">
+                <div class="d-flex justify-content-end mb-3">
                     <button class="btn btn-custom" onclick="showContent('posts')">Posts</button>
                     <button class="btn btn-custom" onclick="showContent('events')">Events</button>
                     <button class="btn btn-custom" onclick="showContent('chats')">Chats</button>
@@ -375,7 +375,7 @@ unset($pdo);
 
                 <!-- Content Section -->
                 <div id="slideContent">
-
+                    <hr>
                     <!-- DEFAULT POSTS DISPLAY -->
                     <div id="posts">
                         <!-- Post Form -->
@@ -414,12 +414,12 @@ unset($pdo);
                     </div>
 
                     <!-- EVENTS DISPLAY -->
-                    <div id="events" class="p-3" style="display: none;"> <!-- style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: none;"-->
+                    <div id="events" class="p-0" style="display: none;"> <!-- style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: none;"-->
                         <?php include '../public/components/events.php' ?>
                     </div>
 
                     <!-- CHATS DISPLAY -->
-                    <div id="chats" class="p-3" style="display: none;">
+                    <div id="chats" class="p-0" style="display: none;">
                         <div class="chatbox-section">
                             <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
                             <div class="chatbox" id="chatbox">
