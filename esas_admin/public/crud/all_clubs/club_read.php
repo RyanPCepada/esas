@@ -125,7 +125,7 @@ unset($pdo);
                     <div class="card-footer text-center">
                         <a href="club_update.php?club_id=<?php echo $club_id; ?>" class="btn btn-warning">Update</a>
                         <a href="club_delete.php?club_id=<?php echo $club_id; ?>" class="btn btn-danger">Delete</a>
-                        <a href="javascript:window.history.back();" class="btn btn-secondary">Back to Clubs List</a>
+                        <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
                     </div>
                 </div>
             </div>
