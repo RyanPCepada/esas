@@ -331,36 +331,36 @@ try {
 
 
         .btn-custom {
-    border: 2px solid #ddd;
-    margin: 3px;
-    color: #555;
-    background-color: #f9f9f9;
-    background-color: #e6e6e6;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-}
+            border: 2px solid #ddd;
+            margin: 3px;
+            color: #555;
+            background-color: #f9f9f9;
+            background-color: #e6e6e6;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
-.btn-custom:hover {
-    background-color: #e6e6e6;
-    border-color: #bbb;
-    color: #333;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
-}
+        .btn-custom:hover {
+            background-color: #e6e6e6;
+            border-color: #bbb;
+            color: #333;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+        }
 
-.btn-custom:focus {
-    outline: none;
-    background-color: #e6e6e6;
-    border-color: #aaa;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
-}
-
-
+        .btn-custom:focus {
+            outline: none;
+            background-color: #e6e6e6;
+            border-color: #aaa;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        }
 
 
-.event-ellipsis:hover {
+
+
+        .event-ellipsis:hover {
             background-color: lightgrey;
         }
 
