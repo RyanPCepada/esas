@@ -582,9 +582,8 @@ try {
 
                                 <!-- OTHER CHARTS -->
                                 <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
-                                    <div class="row" style="border: 1px solid transparent; margin: 0;">
 
-                                    
+                                    <div class="row" style="border: 1px solid transparent; margin: 0;">
                                         <!-- Registry per SY -->
                                         <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
@@ -703,28 +702,16 @@ try {
                                                 </script>
                                             </div>
                                         </div>
-
-
-
+                                        <!-- Registry per SY END-->
                                     </div>
 
-
-
-
-                                    <!-- Vertically divided Year Level Count and Members per School Year -->
+                                        
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
-
-
                                         <!-- Year Level Count -->
-                                        <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                        <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                                 <p>Total Year Level Count</p>
-                                                <div style="height: 150px; background-color: transparent;">
-                                                    <div>
-                                                        <canvas id="studentBarChart"></canvas>
-                                                    </div>
-                                                    <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
-                                                    
+                                                <div style="height: auto; background-color: transparent;">
                                                     <?php
                                                     try {
                                                         // Get the selected school year from the URL parameter or default to the current school year
@@ -781,6 +768,13 @@ try {
                                                     <!-- Include Chart.js -->
                                                     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+                                                    <!-- Canvas for the bar chart -->
+                                                    <div style="max-width: 100%; overflow: hidden;">
+                                                        <canvas id="studentBarChart" style="max-width: 100%; height: 150px;"></canvas>
+                                                    </div>
+                                                    
+                                                    <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
+
                                                     <script>
                                                         // PHP arrays passed into JavaScript
                                                         const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
@@ -812,6 +806,8 @@ try {
                                                                 type: 'bar',
                                                                 data: data,
                                                                 options: {
+                                                                    responsive: true, // Ensure the chart resizes with the container
+                                                                    maintainAspectRatio: false, // Allow chart to adjust height and width dynamically
                                                                     scales: {
                                                                         y: {
                                                                             beginAtZero: true,
@@ -834,11 +830,14 @@ try {
                                             </div>
                                         </div>
                                         <!-- YEAR LEVEL COUNT END -->
+                                    </div>
 
 
 
+
+                                    <div class="row" style="border: 1px solid transparent; margin: 0;">
                                         <!-- Student Gender -->
-                                        <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                        <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                                 <p>Total Student Gender</p>
                                                 <div style="height: 150px; position: relative;">
@@ -956,9 +955,19 @@ try {
                                                 </div>
                                             </div>
                                         </div>
+                                        <!-- Student Gender END -->
+
+
+                                    </div>
 
 
 
+
+                                    <!-- Vertically divided Year Level Count and Members per School Year -->
+                                    <div class="row" style="border: 1px solid transparent; margin: 0;">
+
+                                        <!-- (OLD ROW FOR THE YEAR LEVEL COUNT AND STUDENT GENDER) -->
+                                    
                                     </div>
                                 </div>
 
