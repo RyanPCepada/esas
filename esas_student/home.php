@@ -81,6 +81,9 @@ try {
         // Handle the case where no data is found
         $firstName = $middleName = $lastName = "UNKNOWN";
     }
+    
+    // Initialize the variable
+    $hasDepartureRequest = false;
 
     // Check if the student has already submitted a departure request for the current club
     $sql = "SELECT * FROM tbl_departure_requests WHERE student_id = :student_id AND club_id = :club_id LIMIT 1";
