@@ -57,6 +57,47 @@ date_default_timezone_set('Asia/Manila');
         }
     }
 
+    // Fetch all departments
+$departmentQuery = "SELECT DISTINCT department FROM tbl_club_recommendations";
+$departments = [];
+if ($stmt = $pdo->prepare($departmentQuery)) {
+    if ($stmt->execute()) {
+        $departments = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+}
+
+// Fetch current recommendations for the club
+$currentRecommendations = [];
+if ($clubId) {
+    $recommendationQuery = "SELECT department FROM tbl_club_recommendations WHERE club_id = :clubId";
+    if ($stmt = $pdo->prepare($recommendationQuery)) {
+        $stmt->bindParam(":clubId", $clubId);
+        if ($stmt->execute()) {
+            $currentRecommendations = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        }
+    }
+}
+// Handle recommendations
+if (!empty($_POST['recommendedDepartments'])) {
+    // First, delete existing recommendations for the club
+    $deleteRecommendationsSql = "DELETE FROM tbl_club_recommendations WHERE club_id = :clubId";
+    if ($deleteStmt = $pdo->prepare($deleteRecommendationsSql)) {
+        $deleteStmt->bindParam(":clubId", $clubId);
+        $deleteStmt->execute();
+    }
+
+    // Insert selected recommendations
+    foreach ($_POST['recommendedDepartments'] as $department) {
+        $insertRecommendationSql = "INSERT INTO tbl_club_recommendations (club_id, department, dateAdded) VALUES (:clubId, :department, NOW())";
+        if ($insertStmt = $pdo->prepare($insertRecommendationSql)) {
+            $insertStmt->bindParam(":clubId", $clubId);
+            $insertStmt->bindParam(":department", $department);
+            $insertStmt->execute();
+        }
+    }
+}
+
+
     // Handle form submission
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $input_clubName = trim($_POST["clubName"]);
@@ -248,6 +289,23 @@ unset($pdo);
                             <span class="invalid-feedback"><?php echo $coverPhoto_err; ?></span>
                             <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($coverPhoto); ?>" id="coverPhotoPreview" alt="" style="display: block; margin-top: 10px; width: 100%; height: auto;">
                         </div>
+
+                        <hr>
+
+                        <div class="form-group mb-2">
+                            <label>Recommend to Departments<p class="text-muted"><em>(Check all that applies)</em></label>
+                            <?php foreach ($departments as $department): ?>
+                                <div class="form-check">
+                                    <input type="checkbox" name="recommendedDepartments[]" value="<?php echo htmlspecialchars($department); ?>" 
+                                    <?php echo in_array($department, $currentRecommendations) ? 'checked' : ''; ?> 
+                                    class="form-check-input" id="<?php echo htmlspecialchars($department); ?>">
+                                    <label class="form-check-label" for="<?php echo htmlspecialchars($department); ?>">
+                                        <?php echo htmlspecialchars($department); ?>
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
                         <input type="submit" class="btn btn-block mt-5 btn-primary" value="Update">
                     </form>
                 </div>
