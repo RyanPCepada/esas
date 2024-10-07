@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 06, 2024 at 04:52 PM
+-- Generation Time: Oct 07, 2024 at 08:57 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -80,7 +80,7 @@ CREATE TABLE `tbl_clubs` (
 --
 
 INSERT INTO `tbl_clubs` (`club_id`, `clubName`, `information`, `keywords`, `coverPhoto`, `founder_id`, `dateAdded`, `dateModified`) VALUES
-(1, 'NBSC Quick Response Team', 'The NBSC Quick Response Team (QRT) is a dedicated student organization at NBSC College, focused on providing rapid assistance and support in emergency situations within the campus. Comprised of well-trained and committed students, the QRT specializes in first aid, emergency response, and disaster preparedness. The club regularly conducts training sessions and workshops in collaboration with local emergency services to ensure its members are equipped with the latest knowledge and skills. This proactive approach not only enhances the safety and well-being of the NBSC community but also fosters a culture of readiness and resilience among students.\\r\\nIn addition to emergency response, the NBSC Quick Response Team plays a significant role in promoting health and safety awareness across the campus. Through various outreach programs, the club educates students and staff on best practices for personal safety, emergency preparedness, and effective response strategies. The QRT also actively participates in campus-wide drills and simulations, ensuring that the entire college community is prepared to handle potential crises. By serving as a vital resource and advocate for safety, the NBSC Quick Response Team contributes to creating a secure and supportive environment at NBSC College.', '', '67012e4aba0ee-COVERPHOTO_QUICKRESPONSETEAM.png', 0, '2022-08-18 03:19:13', '2024-10-05 12:17:14'),
+(1, 'NBSC Quick Response Team', 'The NBSC Quick Response Team (QRT) is a dedicated student organization at NBSC College, focused on providing rapid assistance and support in emergency situations within the campus. Comprised of well-trained and committed students, the QRT specializes in first aid, emergency response, and disaster preparedness. The club regularly conducts training sessions and workshops in collaboration with local emergency services to ensure its members are equipped with the latest knowledge and skills. This proactive approach not only enhances the safety and well-being of the NBSC community but also fosters a culture of readiness and resilience among students.\\r\\nIn addition to emergency response, the NBSC Quick Response Team plays a significant role in promoting health and safety awareness across the campus. Through various outreach programs, the club educates students and staff on best practices for personal safety, emergency preparedness, and effective response strategies. The QRT also actively participates in campus-wide drills and simulations, ensuring that the entire college community is prepared to handle potential crises. By serving as a vital resource and advocate for safety, the NBSC Quick Response Team contributes to creating a secure and supportive environment at NBSC College.', '', 'COVERPHOTO_QUICKRESPONSETEAM.png', 0, '2022-08-18 03:19:13', '2024-10-07 04:11:27'),
 (2, 'NBSC Band Sound Space', 'The NBSC Band is a dynamic and vibrant student organization at NBSC College, dedicated to cultivating musical talent and fostering a sense of community among its members. Established in 2010, the band has grown to become a staple of college events, performing at ceremonies, sports games, and various campus activities. The group welcomes students from all departments and years, encouraging collaboration and skill development across different musical genres, including classical, jazz, pop, and rock. The band practices regularly in the school\'s music hall, ensuring that members have ample opportunity to hone their craft and prepare for performances.\n\nIn addition to providing a platform for musical expression, the NBSC Band also emphasizes leadership and teamwork. Members have the opportunity to take on roles such as section leaders, event coordinators, and public relations officers, gaining valuable experience in organization and management. The band also participates in regional and national competitions, often earning accolades for their performances. Beyond the music, the NBSC Band fosters a supportive and inclusive environment, where students can build lasting friendships and develop a deep appreciation for the arts.', '', 'COVERPHOTO_NBSCBAND.png', 0, '2023-03-19 15:23:09', '2023-03-19 15:23:09'),
 (3, 'MAS-AMICUS', 'MAS-AMICUS, short for \"Mutual Aid System for Affiliates of the Medical Informatics Community in the United States,\" is a collaborative initiative aimed at fostering solidarity and support among medical informatics professionals across the country. Founded with the vision of enhancing professional development and knowledge sharing within the field of medical informatics, MAS-AMICUS provides a structured platform for members to engage in peer-to-peer learning, mentorship, and networking opportunities. Through its various programs and events, MAS-AMICUS strives to cultivate a community where members can exchange insights, discuss emerging trends, and address challenges in healthcare informatics.\n\nCentral to MAS-AMICUS\'s mission is the promotion of innovation and best practices in medical informatics. By facilitating dialogue and collaboration among its affiliates, MAS-AMICUS aims to drive advancements in healthcare technology and data management practices. Members benefit from access to resources such as workshops, webinars, and research forums that enable them to stay current with industry developments and contribute to the evolution of healthcare informatics standards. As a supportive network, MAS-AMICUS plays a pivotal role in empowering its members to navigate complexities within the healthcare landscape, ultimately enhancing patient care outcomes through the effective use of informatics solutions.', '', 'COVERPHOTO_MASAMICUS.png', 0, '2023-09-18 12:51:22', '2023-09-18 12:51:22'),
 (4, 'Muslim Student\'s Society', 'The Muslim Student\'s Society (MSS) at NBSC is a vibrant and inclusive community dedicated to fostering spiritual growth, cultural understanding, and social responsibility. We organize a range of activities, including thought-provoking discussions, cultural festivals, and interfaith dialogues, aimed at deepening knowledge and appreciation of Islamic values and traditions. Our events provide a platform for students to connect, share experiences, and engage in meaningful conversations, creating a supportive environment for personal and spiritual development. Beyond our internal activities, MSS is committed to giving back to the community through various outreach programs and charity initiatives. By participating in community service projects and fundraising events, members contribute to positive social change while building a strong sense of camaraderie. Joining MSS not only offers a chance to strengthen one\'s faith and cultural identity but also to make a tangible impact on the lives of others, enhancing both personal growth and community well-being.', '', 'COVERPHOTO_MUSLIMSTUDENT\'SSOCIETY.png', 0, '2023-11-18 12:51:22', '2023-11-18 12:51:22'),
@@ -89,7 +89,7 @@ INSERT INTO `tbl_clubs` (`club_id`, `clubName`, `information`, `keywords`, `cove
 (7, 'English Club', 'Join the English Club and immerse yourself in a vibrant community dedicated to the love of language and literature. Whether you\'re passionate about classic novels, contemporary poetry, or creative writing, our club offers a range of activities designed to spark your literary enthusiasm. Participate in engaging discussions, creative workshops, and exciting competitions that help you hone your writing and communication skills. Our members also enjoy exclusive access to author talks, book fairs, and literary events that enrich their understanding of the English language. Embrace the opportunity to connect with fellow students who share your interests and explore the endless possibilities that come with mastering English.  The English Club is not just about reading and writing; it\'s about building friendships and creating lasting memories. Join us for fun social events, including themed parties, movie nights, and group outings, all while improving your language skills. We offer mentorship and support for academic and personal growth, ensuring that every member feels valued and inspired. Take part in community service projects that use language to make a positive impact, and develop skills that will benefit you both academically and professionally. Become a part of a club where your passion for English can truly flourish and where your voice will be heard.', '', 'COVERPHOTO_ENGLSIHCLUB.png', 0, '2024-02-14 14:55:34', '2024-02-14 14:55:34'),
 (8, 'Math-Sci Club', 'The Math-Sci Club offers an exciting opportunity for students who are passionate about mathematics and science to dive deeper into these fascinating fields. Members can participate in engaging activities such as solving complex problems, conducting experiments, and exploring cutting-edge technologies. The club regularly hosts workshops, guest lectures, and competitions that provide hands-on experience and enhance problem-solving skills. By joining, students gain access to a community of like-minded peers and mentors who are dedicated to fostering a love for STEM. This is not just a club; it\'s a gateway to academic and career growth in the fields of math and science.  Being a part of the Math-Sci Club means you\'ll be involved in innovative projects and collaborative research that push the boundaries of traditional learning. Our members enjoy exclusive access to various resources, including specialized software and research opportunities. We also organize field trips to science museums, laboratories, and tech companies, offering real-world insights into the industries they aspire to join. Whether you\'re aiming for a career in engineering, research, or education, the Math-Sci Club provides a supportive environment to develop your skills and achieve your goals. Join us and turn your curiosity into expertise while making lifelong connections in the world of math and science.', '', 'COVERPHOTO_MATH-SCICLUB.png', 0, '2024-03-15 02:05:15', '2024-03-15 02:05:15'),
 (9, 'KAMFIL Club', 'The KAMFIL Club, which stands for \"Kabalikat ng Masisipag na Filipino\" or \"Companion of Diligent Filipinos,\" offers a vibrant and dynamic environment where students can engage in a range of exciting activities and make lasting friendships. As a member, you\'ll have the opportunity to participate in various workshops, seminars, and community service projects aimed at personal and professional development. Our club prides itself on fostering a collaborative atmosphere where your ideas are valued and you can take on leadership roles. Join us to enhance your skills, gain valuable experience, and be part of a supportive network of peers. Whether you\'re interested in developing new skills or contributing to meaningful causes, KAMFIL Club is the perfect place to start.  Being part of KAMFIL Club means you\'ll be involved in projects that make a real impact within our community and beyond. We provide numerous opportunities for networking with professionals, engaging in hands-on experiences, and working on projects that align with your interests. Our members enjoy exclusive access to events and resources designed to help you succeed both academically and personally. With a focus on growth and collaboration, KAMFIL Club is dedicated to helping you achieve your goals and make the most of your college experience. Discover the benefits of joining a club that values innovation, teamwork, and community.', '', 'COVERPHOTO_KAMFILCLUB.png', 0, '2024-03-15 02:05:15', '2024-03-15 02:05:15'),
-(10, 'Mountaineering Society', 'The Mountaineering Society is the perfect club for students seeking adventure and personal growth. Join us to explore breathtaking mountain trails, tackle thrilling climbs, and develop essential outdoor skills in a supportive community. Our activities cater to all skill levels, from beginners to seasoned hikers, ensuring everyone can enjoy the thrill of mountaineering safely. By becoming a member, you’ll not only challenge yourself but also make lasting friendships with fellow enthusiasts who share your passion for the great outdoors. Don’t miss out on this opportunity to push your limits and experience the world from a new perspective.  In addition to our regular hikes and climbs, the Mountaineering Society offers workshops on navigation, survival techniques, and environmental stewardship. Our experienced guides and instructors are dedicated to providing a comprehensive learning experience while ensuring your safety and enjoyment. We also host social events and team-building activities, creating a vibrant and inclusive environment. Whether you\\\'re looking to conquer new heights or simply connect with nature, the Mountaineering Society is your gateway to an exhilarating and rewarding experience. Join us and embark on your next adventure with a community that truly understands the spirit of mountaineering.', '', '67012fbcaf71e-COVERPHOTO_MOUNTAINEERINGSOCIETY.png', 0, '2024-05-15 02:05:15', '2024-10-05 12:23:24'),
+(10, 'Mountaineering Society', 'The Mountaineering Society is the perfect club for students seeking adventure and personal growth. Join us to explore breathtaking mountain trails, tackle thrilling climbs, and develop essential outdoor skills in a supportive community. Our activities cater to all skill levels, from beginners to seasoned hikers, ensuring everyone can enjoy the thrill of mountaineering safely. By becoming a member, you’ll not only challenge yourself but also make lasting friendships with fellow enthusiasts who share your passion for the great outdoors. Don’t miss out on this opportunity to push your limits and experience the world from a new perspective.  In addition to our regular hikes and climbs, the Mountaineering Society offers workshops on navigation, survival techniques, and environmental stewardship. Our experienced guides and instructors are dedicated to providing a comprehensive learning experience while ensuring your safety and enjoyment. We also host social events and team-building activities, creating a vibrant and inclusive environment. Whether you\\\'re looking to conquer new heights or simply connect with nature, the Mountaineering Society is your gateway to an exhilarating and rewarding experience. Join us and embark on your next adventure with a community that truly understands the spirit of mountaineering.', '', 'COVERPHOTO_MOUNTAINEERINGSOCIETY.png', 0, '2024-05-15 02:05:15', '2024-10-07 04:11:49'),
 (11, 'Debate Club', 'Join the Debate Club and sharpen your critical thinking skills while engaging in stimulating discussions on a wide range of topics. This club provides a dynamic platform for students to articulate their opinions, build strong arguments, and enhance public speaking abilities. Whether you\'re passionate about current events, politics, or social issues, the Debate Club offers an opportunity to explore and debate these subjects with peers. You\'ll gain valuable experience in research, teamwork, and persuasive communication that can benefit you in both academic and professional settings. By joining, you become part of a community that values intellectual growth and the exchange of diverse perspectives.  In addition to weekly debates and meetings, the Debate Club participates in local and national competitions, allowing members to showcase their skills on a larger stage. The club\'s supportive environment encourages members to practice and perfect their debating techniques, receive constructive feedback, and celebrate each other\'s successes. Joining the Debate Club means becoming a part of a network of like-minded individuals who are committed to learning and personal development. Embrace the challenge, develop lifelong skills, and make lasting friendships by joining the Debate Club today.', '', 'COVERPHOTO_DEBATECLUB.png', 0, '2024-08-17 01:53:24', '2024-08-17 01:53:24'),
 (12, 'Arts Society', 'The Arts Society is a vibrant and inclusive community dedicated to fostering creativity and artistic expression. Our club provides a dynamic platform for students to explore various art forms, from painting and sculpture to digital design and performance arts. By joining, you\'ll gain access to exclusive workshops, exhibitions, and collaborative projects that will help you refine your skills and build a strong portfolio. Whether you’re a seasoned artist or just starting out, our supportive environment encourages growth and self-expression. We believe in the power of art to inspire, connect, and transform lives, and we invite you to be a part of this exciting journey.  As a member of the Arts Society, you\'ll have the opportunity to work alongside passionate peers and experienced mentors who share your enthusiasm for the arts. Our club regularly hosts events such as art shows, open mic nights, and community outreach programs that not only showcase your talents but also engage with the broader community. Networking with fellow artists and participating in collaborative projects will expand your creative horizons and provide valuable experience. Join us to be part of a creative family that celebrates diversity, innovation, and artistic excellence. Your unique perspective and creativity will contribute to our vibrant community, making a lasting impact on both your personal development and the art world.', '', 'COVERPHOTO_ARTSSOCIETY.png', 0, '2024-08-17 01:53:24', '2024-08-17 01:53:24'),
 (13, 'Indigenous People Society', 'The Indigenous People Society offers a unique opportunity for students to engage with and support indigenous communities and cultures. Through various activities and initiatives, members learn about traditional practices, languages, and the rich heritage of indigenous peoples. The club organizes workshops, cultural events, and community outreach programs that foster a deeper understanding and appreciation of these vital cultures. Joining this society allows you to contribute to preserving and promoting indigenous traditions while gaining valuable insights and experiences. It’s an ideal way to make a meaningful impact and broaden your cultural horizons.  Being part of the Indigenous People Society connects you with a diverse group of passionate individuals who share an interest in social justice and cultural preservation. You will have the chance to collaborate on projects that address current issues facing indigenous communities, from education to environmental sustainability. The club also provides a platform for you to develop leadership and organizational skills through hands-on involvement in planning and executing events. By participating, you become an advocate for important causes and help drive positive change in the community. Join us to be part of a movement that celebrates and respects the rich tapestry of indigenous cultures.', '', 'COVERPHOTO_INDIGENOUSPEOPLESOCIETY.png', 0, '2024-08-17 01:53:24', '2024-08-17 01:53:24'),
@@ -211,8 +211,7 @@ INSERT INTO `tbl_clubs_and_moderators` (`clubmod_id`, `club_id`, `moderator_id`,
 (31, 5, 24250014, '2024-09-25 01:25:04', '2024-10-02 12:55:07'),
 (32, 10, 24250015, '2024-09-25 01:25:04', '2024-10-02 12:55:46'),
 (33, 13, 24250016, '2024-09-25 01:25:04', '2024-10-02 12:56:01'),
-(34, 17, 24250017, '2024-09-25 01:25:04', '2024-10-02 12:56:20'),
-(255, 22, 22230001, '2024-10-06 09:12:09', '2024-10-06 09:12:09');
+(34, 17, 24250017, '2024-09-25 01:25:04', '2024-10-02 12:56:20');
 
 -- --------------------------------------------------------
 
@@ -233,54 +232,51 @@ CREATE TABLE `tbl_club_recommendations` (
 --
 
 INSERT INTO `tbl_club_recommendations` (`recommendation_id`, `club_id`, `department`, `dateAdded`, `dateModified`) VALUES
-(1, 1, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(2, 2, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(3, 3, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(4, 4, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
+(1, 1, 'CCS', '2024-09-21 10:14:57', '2024-10-07 04:39:48'),
+(2, 2, 'TEP', '2024-09-21 10:14:57', '2024-10-07 04:39:55'),
 (5, 5, 'TEP', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
 (6, 6, 'TEP', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
 (7, 7, 'TEP', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
 (8, 8, 'TEP', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
 (9, 8, 'BSBA', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
 (10, 9, 'TEP', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(11, 10, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
 (12, 11, 'TEP', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(13, 12, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(14, 13, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(15, 14, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(16, 15, 'TEP', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(17, 16, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(18, 17, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(19, 18, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(20, 19, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
+(13, 12, 'TEP', '2024-09-21 10:14:57', '2024-10-07 04:42:44'),
+(14, 12, 'BSBA', '2024-09-21 10:14:57', '2024-10-07 04:43:02'),
+(15, 12, 'CCS', '2024-09-21 10:14:57', '2024-10-07 04:43:17'),
 (21, 21, 'TEP', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
 (22, 18, 'CCS', '2024-09-21 10:14:57', '2024-09-23 16:12:47'),
-(23, 23, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(24, 24, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(25, 25, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(26, 42, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(27, 43, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(28, 44, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
-(29, 45, 'ALL', '2024-09-21 10:14:57', '2024-09-21 10:14:57'),
+(25, 16, 'TEP', '2024-09-21 10:14:57', '2024-10-07 04:44:18'),
+(26, 16, 'BSBA', '2024-09-21 10:14:57', '2024-10-07 04:44:27'),
+(27, 16, 'CCS', '2024-09-21 10:14:57', '2024-10-07 04:44:34'),
 (31, 22, 'CCS', '2024-09-23 16:10:50', '2024-09-23 16:14:25'),
-(32, 7, 'CCS', '2024-09-23 16:10:50', '2024-09-23 16:10:50'),
-(33, 8, 'CCS', '2024-09-23 16:11:22', '2024-09-23 16:11:22'),
-(34, 10, 'CCS', '2024-09-23 16:11:22', '2024-09-23 16:11:22'),
 (35, 12, 'CCS', '2024-09-23 16:12:31', '2024-09-23 16:12:31'),
 (36, 16, 'CCS', '2024-09-23 16:12:31', '2024-09-23 16:12:31'),
 (37, 2, 'CCS', '2024-09-23 16:13:46', '2024-09-23 16:14:28'),
 (38, 1, 'BSBA', '2024-09-23 16:15:27', '2024-09-23 16:15:27'),
 (39, 2, 'BSBA', '2024-09-23 16:15:27', '2024-09-23 16:15:27'),
-(40, 6, 'BSBA', '2024-09-23 16:15:55', '2024-09-23 16:15:55'),
-(41, 7, 'BSBA', '2024-09-23 16:15:55', '2024-09-23 16:15:55'),
-(42, 10, 'BSBA', '2024-09-23 16:16:16', '2024-09-23 16:16:16'),
 (43, 12, 'BSBA', '2024-09-23 16:16:16', '2024-09-23 16:16:16'),
 (44, 16, 'BSBA', '2024-09-23 16:16:34', '2024-09-23 16:16:34'),
-(45, 17, 'BSBA', '2024-09-23 16:16:34', '2024-09-23 16:16:34'),
 (46, 18, 'BSBA', '2024-09-23 16:16:54', '2024-09-23 16:16:54'),
 (47, 19, 'BSBA', '2024-09-23 16:16:54', '2024-09-23 16:16:54'),
-(48, 23, 'BSBA', '2024-09-23 16:17:22', '2024-09-23 16:17:22'),
-(49, 42, 'BSBA', '2024-09-23 16:17:22', '2024-09-23 16:17:22');
+(49, 42, 'BSBA', '2024-09-23 16:17:22', '2024-09-23 16:17:22'),
+(52, 2, 'CCS', '2024-10-07 04:39:00', '2024-10-07 04:39:42'),
+(53, 1, 'TEP', '2024-10-07 04:39:10', '2024-10-07 04:39:10'),
+(54, 1, 'BSBA', '2024-10-07 04:39:16', '2024-10-07 04:39:16'),
+(55, 2, 'BSBA', '2024-10-07 04:40:09', '2024-10-07 04:40:09'),
+(63, 18, 'TEP', '2024-10-07 04:45:46', '2024-10-07 04:45:46'),
+(64, 18, 'BSBA', '2024-10-07 04:45:46', '2024-10-07 04:45:46'),
+(65, 18, 'CCS', '2024-10-07 04:46:00', '2024-10-07 04:46:00'),
+(66, 19, 'TEP', '2024-10-07 04:46:00', '2024-10-07 04:46:00'),
+(67, 19, 'BSBA', '2024-10-07 04:46:12', '2024-10-07 04:46:12'),
+(79, 42, 'TEP', '2024-10-07 04:47:38', '2024-10-07 04:47:38'),
+(84, 44, 'CCS', '2024-10-07 04:48:04', '2024-10-07 04:48:04'),
+(85, 44, 'TEP', '2024-10-07 04:48:17', '2024-10-07 04:48:17'),
+(86, 44, 'BSBA', '2024-10-07 04:48:17', '2024-10-07 04:48:17'),
+(90, 24250019, 'CCS', '2024-10-07 04:59:59', '2024-10-07 04:59:59'),
+(100, 24250020, 'CCS', '2024-10-07 05:03:19', '2024-10-07 05:03:19'),
+(101, 24250020, 'TEP', '2024-10-07 05:03:19', '2024-10-07 05:03:19'),
+(102, 24250020, 'BSBA', '2024-10-07 05:03:19', '2024-10-07 05:03:19');
 
 -- --------------------------------------------------------
 
@@ -376,8 +372,7 @@ CREATE TABLE `tbl_departure_requests` (
 --
 
 INSERT INTO `tbl_departure_requests` (`departure_id`, `reason`, `status`, `dateRequested`, `dateApproved`, `student_id`, `club_id`) VALUES
-(3, 'I decided to stop my study this academic year', 'pending', '2024-10-06 05:20:15', '2024-10-06 09:55:14', 20191124, 22),
-(10, 'I will be no longer active in this club due to priorities', 'pending', '2024-10-06 05:35:49', '2024-10-06 09:54:53', 20191124, 1),
+(3, 'Sorry. I decided to stop my study this academic year.', 'pending', '2024-10-07 07:50:55', '2024-10-06 09:55:14', 20191124, 22),
 (12, 'Confidential', 'approved', '2024-10-06 10:20:33', '2024-10-06 10:25:07', 111, 22);
 
 -- --------------------------------------------------------
@@ -614,9 +609,9 @@ CREATE TABLE `tbl_registration` (
 --
 
 INSERT INTO `tbl_registration` (`registration_id`, `student_id`, `question1`, `question2`, `question3`, `status`, `dateApplied`, `dateApproved`, `dateModified`, `club_id`) VALUES
-(1, 20191124, 'I want to join this club because it aligns with my interests and passions, and I believe it offers a great opportunity to connect with like-minded individuals. I am eager to contribute to meaningful projects and participate in activities that can make a positive impact within our community.', 'I have strong organizational and teamwork skills gained from previous group projects and volunteer experiences. Additionally, my background in [specific skill or subject relevant to the club, e.g., event planning, graphic design, coding] will allow me to contribute effectively to the club’s initiatives and activities.', 'I plan to prioritize my academic responsibilities by creating a schedule that allocates specific time blocks for studying and club activities. I will also communicate openly with club members about my availability and ensure that I remain committed to both my studies and the club’s events.', 'active', '2022-08-20 03:19:13', '2024-09-26 11:37:15', '2024-09-26 11:37:15', 1),
+(1, 20191124, 'I want to join this club because it aligns with my interests and passions, and I believe it offers a great opportunity to connect with like-minded individuals. I am eager to contribute to meaningful projects and participate in activities that can make a positive impact within our community.', 'I have strong organizational and teamwork skills gained from previous group projects and volunteer experiences. Additionally, my background in [specific skill or subject relevant to the club, e.g., event planning, graphic design, coding] will allow me to contribute effectively to the club’s initiatives and activities.', 'I plan to prioritize my academic responsibilities by creating a schedule that allocates specific time blocks for studying and club activities. I will also communicate openly with club members about my availability and ensure that I remain committed to both my studies and the club’s events.', 'active', '2022-08-20 03:19:13', '2022-09-20 03:19:13', '2024-10-07 18:19:07', 1),
 (2, 20201270, 'I want to join this club because it aligns with my interests and passions, and I believe it offers a great opportunity to connect with like-minded individuals. I am eager to contribute to meaningful projects and participate in activities that can make a positive impact within our community.', 'I have strong organizational and teamwork skills gained from previous group projects and volunteer experiences. Additionally, my background in [specific skill or subject relevant to the club, e.g., event planning, graphic design, coding] will allow me to contribute effectively to the club’s initiatives and activities.', 'I plan to prioritize my academic responsibilities by creating a schedule that allocates specific time blocks for studying and club activities. I will also communicate openly with club members about my availability and ensure that I remain committed to both my studies and the club’s events.', 'active', '2024-08-17 01:53:24', '2024-08-21 01:53:24', '2024-09-26 09:53:24', 16),
-(3, 20211521, 'I want to join this club because it aligns with my interests and passions, and I believe it offers a great opportunity to connect with like-minded individuals. I am eager to contribute to meaningful projects and participate in activities that can make a positive impact within our community.', 'I have strong organizational and teamwork skills gained from previous group projects and volunteer experiences. Additionally, my background in [specific skill or subject relevant to the club, e.g., event planning, graphic design, coding] will allow me to contribute effectively to the club’s initiatives and activities.', 'I plan to prioritize my academic responsibilities by creating a schedule that allocates specific time blocks for studying and club activities. I will also communicate openly with club members about my availability and ensure that I remain committed to both my studies and the club’s events.', 'active', '2024-08-20 01:53:24', '2024-08-21 01:53:24', '2024-09-26 09:53:24', 14),
+(3, 20211521, 'I want to join this club because it aligns with my interests and passions, and I believe it offers a great opportunity to connect with like-minded individuals. I am eager to contribute to meaningful projects and participate in activities that can make a positive impact within our community.', 'I have strong organizational and teamwork skills gained from previous group projects and volunteer experiences. Additionally, my background in [specific skill or subject relevant to the club, e.g., event planning, graphic design, coding] will allow me to contribute effectively to the club’s initiatives and activities.', 'I plan to prioritize my academic responsibilities by creating a schedule that allocates specific time blocks for studying and club activities. I will also communicate openly with club members about my availability and ensure that I remain committed to both my studies and the club’s events.', 'active', '2024-08-20 01:53:24', '2024-08-22 01:53:24', '2024-10-07 18:49:29', 14),
 (4, 20201179, 'I want to join this club because it aligns with my interests and passions, and I believe it offers a great opportunity to connect with like-minded individuals. I am eager to contribute to meaningful projects and participate in activities that can make a positive impact within our community.', 'I have strong organizational and teamwork skills gained from previous group projects and volunteer experiences. Additionally, my background in [specific skill or subject relevant to the club, e.g., event planning, graphic design, coding] will allow me to contribute effectively to the club’s initiatives and activities.', 'I plan to prioritize my academic responsibilities by creating a schedule that allocates specific time blocks for studying and club activities. I will also communicate openly with club members about my availability and ensure that I remain committed to both my studies and the club’s events.', 'active', '2023-04-19 15:23:09', '2023-04-23 15:23:09', '2024-09-26 09:53:24', 2),
 (5, 20191115, 'I want to join this club because it aligns with my interests and passions, and I believe it offers a great opportunity to connect with like-minded individuals. I am eager to contribute to meaningful projects and participate in activities that can make a positive impact within our community.', 'I have strong organizational and teamwork skills gained from previous group projects and volunteer experiences. Additionally, my background in [specific skill or subject relevant to the club, e.g., event planning, graphic design, coding] will allow me to contribute effectively to the club’s initiatives and activities.', 'I plan to prioritize my academic responsibilities by creating a schedule that allocates specific time blocks for studying and club activities. I will also communicate openly with club members about my availability and ensure that I remain committed to both my studies and the club’s events.', 'pending', '2024-09-15 09:20:15', '2024-09-15 09:20:15', '2024-09-26 09:53:24', 21),
 (6, 20201270, 'I want to join this club because it aligns with my interests and passions, and I believe it offers a great opportunity to connect with like-minded individuals. I am eager to contribute to meaningful projects and participate in activities that can make a positive impact within our community.', 'I have strong organizational and teamwork skills gained from previous group projects and volunteer experiences. Additionally, my background in [specific skill or subject relevant to the club, e.g., event planning, graphic design, coding] will allow me to contribute effectively to the club’s initiatives and activities.', 'I plan to prioritize my academic responsibilities by creating a schedule that allocates specific time blocks for studying and club activities. I will also communicate openly with club members about my availability and ensure that I remain committed to both my studies and the club’s events.', 'pending', '2022-08-20 03:19:13', '2022-08-20 03:19:13', '2024-09-26 09:53:24', 1),
@@ -728,7 +723,6 @@ CREATE TABLE `tbl_students` (
 --
 
 INSERT INTO `tbl_students` (`student_id`, `firstName`, `middleName`, `lastName`, `age`, `birthday`, `gender`, `instiEmail`, `password`, `phoneNumber`, `department`, `course`, `year`, `street`, `barangay`, `municipality`, `province`, `zipcode`, `profilePic`, `dateAdded`, `dateModified`) VALUES
-(8, 'sample', 'sample', 'sample', '1', '1111-11-11', 'Male', 'sample@gmail.com', '1', '1', 'BSBA', 'BSEE', '1st Year', 'Zone 1', 'Agusan Canyon', 'Baungon', 'Province 1', '8703', 'PROF_PIC.png', '2024-07-15 17:15:30', '2024-09-15 06:18:13'),
 (111, 'hey', '', '', '', '2000-11-11', 'Male', 'hey@gmail.com', '1', '', 'CCS', '', '1st Year', '', '', '', '', '', 'PROF_PIC.png', '2024-09-16 10:17:26', '2024-09-20 10:26:13'),
 (20190000, 'Sample', 'Sample', 'Sample', '32', '1992-09-09', 'Male', '20190000@nbsc.edu.ph', '1', '09614588546', 'BSBA', 'BSIT', '3rd Year', 'Zone 2', 'Diclum', 'Manolo Fortich', 'Province 1', '8703', 'PROF_PIC.png', '2024-07-19 17:14:25', '2024-09-15 06:25:42'),
 (20191111, 'Sample', 'Sample', 'Sample', 'Sample', '1111-11-11', 'Female', '20191111@nbsc.edu.ph', '1', '09111111111', 'TEP', 'BSED', '1st Year', 'Zone 3', 'Agusan Canyon', 'Manolo Fortich', 'Province 1', '8703', 'PROF_PIC.png', '2024-07-15 17:42:37', '2024-08-23 07:48:39'),
@@ -872,19 +866,19 @@ ALTER TABLE `tbl_admin`
 -- AUTO_INCREMENT for table `tbl_clubs`
 --
 ALTER TABLE `tbl_clubs`
-  MODIFY `club_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24250019;
+  MODIFY `club_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24250021;
 
 --
 -- AUTO_INCREMENT for table `tbl_clubs_and_moderators`
 --
 ALTER TABLE `tbl_clubs_and_moderators`
-  MODIFY `clubmod_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=256;
+  MODIFY `clubmod_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=259;
 
 --
 -- AUTO_INCREMENT for table `tbl_club_recommendations`
 --
 ALTER TABLE `tbl_club_recommendations`
-  MODIFY `recommendation_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `recommendation_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
 
 --
 -- AUTO_INCREMENT for table `tbl_club_requests`
@@ -902,7 +896,7 @@ ALTER TABLE `tbl_comments`
 -- AUTO_INCREMENT for table `tbl_departure_requests`
 --
 ALTER TABLE `tbl_departure_requests`
-  MODIFY `departure_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `departure_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `tbl_events`
@@ -932,7 +926,7 @@ ALTER TABLE `tbl_posts`
 -- AUTO_INCREMENT for table `tbl_registration`
 --
 ALTER TABLE `tbl_registration`
-  MODIFY `registration_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `registration_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `tbl_registration_old`
