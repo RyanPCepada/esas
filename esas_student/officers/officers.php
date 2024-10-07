@@ -72,7 +72,7 @@
         }
 
 
-        .slider-container {
+        /* .slider-container {
             width: 400px;
             margin: 60px auto;
             position: relative;
@@ -81,8 +81,8 @@
             border-radius: 10px;
             max-height: 550px; 
             max-height: auto; 
-        }
-
+        } */
+/* 
         .slide img {
             width: auto; 
             height: 100%;
@@ -142,10 +142,10 @@
         .mission-vision img {
             width: 50%;
             margin: 20px 0;
-        }
+        } */
 
 
-        .mission-vision, #csg, #sbo {
+        /* .mission-vision, #csg, #sbo {
             position: relative; 
         }
 
@@ -165,7 +165,9 @@
         #sbo .slider-container {
             position: relative;
             z-index: 2;
-        }
+        } 
+            
+         style="background-image: url('../images/NBSC_BLDG_FINAL_NO_WIRES_JPEG.jpg'); background-size: cover; background-position: center; height: 631px;" */
 
     </style>
 </head>
@@ -182,73 +184,16 @@
         <button onclick="showSection('sbo')">SBO Officers</button>
     </div>
 
-    <div id="menu" class="content mission-vision" style="background-image: url('../images/NBSC_BLDG_FINAL_NO_WIRES_JPEG.jpg'); background-size: cover; background-position: center; height: 631px;">
+    <div>
         <h2>Vision</h2>
         <p>Northern Bukidnon State College will be a college of choice, nationally recognized for having innovative and sustainable academic programs, research, extensions, and services that cultivate educational, personal, and professional growth to meet the needs of our students, our society, and the global community.</p>
         <h2>Mission</h2>
         <p>Northern Bukidnon State College is an accessible institution of higher education that provides quality educational opportunities to develop students into socially responsible, competent, and productive professionals.</p>
-    </div>
-
-
-    <div id="csg" class="content" style="background-image: url('../images/NBSC_BLDG_FINAL_NO_WIRES_JPEG.jpg'); background-size: cover; background-position: center; height: 631px;">
-        <div class="slider-container">
-            <div class="slides">
-                <div class="slide active">
+    
                     <img src="../images/OFFICERS_CSG.jpeg" alt="CSG Officers">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="sbo" class="content" style="background-image: url('../images/NBSC_BLDG_FINAL_NO_WIRES_JPEG.jpg'); background-size: cover; background-position: center; height: 631px;">
-        <div class="slider-container">
-            <div class="slides">
-                <div class="slide active">
                     <img src="../images/OFFICERS_SBO_TEP.png" alt="TEP SBO Officers">
-                </div>
-                <div class="slide">
                     <img src="../images/OFFICERS_SBO_BSBA.png" alt="BSBA SBO Officers">
-                </div>
-                <div class="slide">
-                    <img src="../images/OFFICERS_SBO_CCS.png" alt="CCS SBO Officers">
-                </div>
-            </div>
-            <div class="slider-buttons">
-                <button class="prev" onclick="changeSlide(-1, 'sbo')">&#10094;</button>
-                <button class="next" onclick="changeSlide(1, 'sbo')">&#10095;</button>
-            </div>
-        </div>
     </div>
-
-
-    <script>
-        let currentSlides = { sbo: 0, csg: 0 };
-
-        function showSection(sectionId) {
-            // Hide all content sections
-            var contents = document.getElementsByClassName('content');
-            for (var i = 0; i < contents.length; i++) {
-                contents[i].classList.remove('active');
-            }
-            // Show the selected section
-            document.getElementById(sectionId).classList.add('active');
-        }
-
-        function changeSlide(direction, section) {
-            const slides = document.querySelectorAll(`#${section} .slide`);
-            slides[currentSlides[section]].classList.remove('active');
-
-            currentSlides[section] = (currentSlides[section] + direction + slides.length) % slides.length;
-
-            slides[currentSlides[section]].classList.add('active');
-            document.querySelector(`#${section} .slides`).style.transform = `translateX(-${currentSlides[section] * 100}%)`;
-        }
-
-        // Show the menu section by default
-        showSection('menu');
-    </script>
-
-
 <footer style="background-color: #004d80; color: white; padding-bottom: 10px; text-align: center; font-size: 0.9em;">
     <div class="container" style="max-width: 1200px; margin: 0 auto;">
         <div class="row" style="display: flex; justify-content: space-between;">
