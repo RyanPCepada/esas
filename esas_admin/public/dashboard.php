@@ -441,144 +441,144 @@ try {
                             <div class="row card-row2 col-12" style="border: 1px solid transparent; margin: 0;">
 
                                 <!-- PIE CHART -->
-<div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
-    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-        <p>Total Students per Club</p>
-        <div style="height: auto; background-color: transparent;">
-            <?php
-            try {
-                // Your original PHP code for fetching the club data...
-                $selectedYear = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
-                $selectedMonth = isset($_GET['month']) ? intval($_GET['month']) : null;
+                                <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
+                                    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <p>Total Students per Club</p>
+                                        <div style="height: auto; background-color: transparent;">
+                                            <?php
+                                            try {
+                                                // Your original PHP code for fetching the club data...
+                                                $selectedYear = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                                $selectedMonth = isset($_GET['month']) ? intval($_GET['month']) : null;
 
-                $sql = "
-                    SELECT tc.clubName, COUNT(tr.student_id) AS member_count
-                    FROM tbl_registration tr
-                    JOIN tbl_clubs tc ON tr.club_id = tc.club_id
-                    WHERE tr.status = 'active'
-                ";
+                                                $sql = "
+                                                    SELECT tc.clubName, COUNT(tr.student_id) AS member_count
+                                                    FROM tbl_registration tr
+                                                    JOIN tbl_clubs tc ON tr.club_id = tc.club_id
+                                                    WHERE tr.status = 'active'
+                                                ";
 
-                if ($selectedYear) {
-                    $endDate = ($selectedYear + 1) . "-05-31";
-                    $sql .= " AND tr.dateApproved <= :endDate";
-                }
+                                                if ($selectedYear) {
+                                                    $endDate = ($selectedYear + 1) . "-05-31";
+                                                    $sql .= " AND tr.dateApproved <= :endDate";
+                                                }
 
-                if ($selectedMonth) {
-                    $sql .= " AND MONTH(tr.dateApproved) <= :month";
-                }
+                                                if ($selectedMonth) {
+                                                    $sql .= " AND MONTH(tr.dateApproved) <= :month";
+                                                }
 
-                $sql .= " GROUP BY tc.club_id ORDER BY member_count DESC";
+                                                $sql .= " GROUP BY tc.club_id ORDER BY member_count DESC";
 
-                $stmt = $pdo->prepare($sql);
+                                                $stmt = $pdo->prepare($sql);
 
-                if ($selectedYear) {
-                    $stmt->bindParam(':endDate', $endDate);
-                }
+                                                if ($selectedYear) {
+                                                    $stmt->bindParam(':endDate', $endDate);
+                                                }
 
-                if ($selectedMonth) {
-                    $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-                }
+                                                if ($selectedMonth) {
+                                                    $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                                }
 
-                $stmt->execute();
-                $club_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            } catch (PDOException $e) {
-                echo "Error: " . htmlspecialchars($e->getMessage());
-            }
+                                                $stmt->execute();
+                                                $club_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                            } catch (PDOException $e) {
+                                                echo "Error: " . htmlspecialchars($e->getMessage());
+                                            }
 
-            $clubs = [];
-            $counts = [];
-            $total_students = 0;
+                                            $clubs = [];
+                                            $counts = [];
+                                            $total_students = 0;
 
-            foreach ($club_data as $row) {
-                $clubs[] = $row['clubName'];
-                $counts[] = $row['member_count'];
-                $total_students += $row['member_count'];
-            }
+                                            foreach ($club_data as $row) {
+                                                $clubs[] = $row['clubName'];
+                                                $counts[] = $row['member_count'];
+                                                $total_students += $row['member_count'];
+                                            }
 
-            $percentages = [];
-            foreach ($counts as $count) {
-                $percentages[] = $total_students > 0 ? round(($count / $total_students) * 100) : 0;
-            }
+                                            $percentages = [];
+                                            foreach ($counts as $count) {
+                                                $percentages[] = $total_students > 0 ? round(($count / $total_students) * 100) : 0;
+                                            }
 
-            $labels_with_percentages = [];
-            foreach ($clubs as $index => $club) {
-                $labels_with_percentages[] = $percentages[$index] . '% ' . $club;
-            }
-            ?>
-            <!-- Canvas for the pie chart -->
-            <div style="display: flex; justify-content: center;">
-                <canvas id="pieChart"></canvas>
-            </div>
-            <p id="noDataMessage" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 35%;"><em>No students.</em></p>
-            <!-- Custom Legends -->
-            <div id="customLegend" style="margin-top: 15px; text-align: center;"></div>
+                                            $labels_with_percentages = [];
+                                            foreach ($clubs as $index => $club) {
+                                                $labels_with_percentages[] = $percentages[$index] . '% ' . $club;
+                                            }
+                                            ?>
+                                            <!-- Canvas for the pie chart -->
+                                            <div style="display: flex; justify-content: center;">
+                                                <canvas id="pieChart"></canvas>
+                                            </div>
+                                            <p id="noDataMessage" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 35%;"><em>No students.</em></p>
+                                            <!-- Custom Legends -->
+                                            <div id="customLegend" style="margin-top: 15px; text-align: center;"></div>
 
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <script>
-                const labelsWithPercentages = <?php echo json_encode($labels_with_percentages); ?>;
-                const counts = <?php echo json_encode($counts); ?>;
-                const ctx = document.getElementById('pieChart').getContext('2d');
-                const noDataMessage = document.getElementById('noDataMessage');
-                const customLegend = document.getElementById('customLegend');
+                                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                                            <script>
+                                                const labelsWithPercentages = <?php echo json_encode($labels_with_percentages); ?>;
+                                                const counts = <?php echo json_encode($counts); ?>;
+                                                const ctx = document.getElementById('pieChart').getContext('2d');
+                                                const noDataMessage = document.getElementById('noDataMessage');
+                                                const customLegend = document.getElementById('customLegend');
 
-                const backgroundColors = [
-                    'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
-                    'rgba(255, 105, 180, 0.8)',  // Hot Pink
-                    'rgba(255, 215, 0, 0.8)',    // Gold
-                    'rgba(0, 255, 255, 0.8)',    // Cyan
-                    'rgba(255, 165, 0, 0.8)',    // Orange
-                    'rgba(0, 255, 0, 0.8)'       // Lime Green
-                ];
+                                                const backgroundColors = [
+                                                    'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
+                                                    'rgba(255, 105, 180, 0.8)',  // Hot Pink
+                                                    'rgba(255, 215, 0, 0.8)',    // Gold
+                                                    'rgba(0, 255, 255, 0.8)',    // Cyan
+                                                    'rgba(255, 165, 0, 0.8)',    // Orange
+                                                    'rgba(0, 255, 0, 0.8)'       // Lime Green
+                                                ];
 
-                if (counts.length === 0 || labelsWithPercentages.length === 0) {
-                    document.getElementById('pieChart').style.display = 'none';
-                    noDataMessage.style.display = 'block';
-                } else {
-                    const pieChart = new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: labelsWithPercentages,
-                            datasets: [{
-                                data: counts,
-                                backgroundColor: backgroundColors,
-                                borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                    display: false // Disable the default legend
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(tooltipItem) {
-                                            return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
+                                                if (counts.length === 0 || labelsWithPercentages.length === 0) {
+                                                    document.getElementById('pieChart').style.display = 'none';
+                                                    noDataMessage.style.display = 'block';
+                                                } else {
+                                                    const pieChart = new Chart(ctx, {
+                                                        type: 'pie',
+                                                        data: {
+                                                            labels: labelsWithPercentages,
+                                                            datasets: [{
+                                                                data: counts,
+                                                                backgroundColor: backgroundColors,
+                                                                borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
+                                                                borderWidth: 1
+                                                            }]
+                                                        },
+                                                        options: {
+                                                            responsive: true,
+                                                            plugins: {
+                                                                legend: {
+                                                                    display: false // Disable the default legend
+                                                                },
+                                                                tooltip: {
+                                                                    callbacks: {
+                                                                        label: function(tooltipItem) {
+                                                                            return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    });
 
-                    // Generate custom legends manually
-                    let legendHtml = '';
-                    labelsWithPercentages.forEach((label, index) => {
-                        legendHtml += `
-                            <span style="display: inline-block; margin-right: 10px;">
-                                <span style="display: inline-block; width: 12px; height: 12px; background-color: ${backgroundColors[index]}; margin-right: 5px;"></span>
-                                ${label}
-                            </span>`;
-                    });
+                                                    // Generate custom legends manually
+                                                    let legendHtml = '';
+                                                    labelsWithPercentages.forEach((label, index) => {
+                                                        legendHtml += `
+                                                            <span style="display: inline-block; margin-right: 10px;">
+                                                                <span style="display: inline-block; width: 12px; height: 12px; background-color: ${backgroundColors[index]}; margin-right: 5px;"></span>
+                                                                ${label}
+                                                            </span>`;
+                                                    });
 
-                    customLegend.innerHTML = legendHtml;
-                }
-            </script>
-        </div>
-    </div>
-</div>
-<!-- PIE CHART END -->
+                                                    customLegend.innerHTML = legendHtml;
+                                                }
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- PIE CHART END -->
 
                                 <!-- OTHER CHARTS -->
                                 <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
