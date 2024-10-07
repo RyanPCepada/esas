@@ -179,13 +179,15 @@ try {
                 margin-left: 0px;
             }
             .card-body {
-                padding: 5px !important; 
+                padding: 0px !important; 
                 max-width: 100%; 
             }
             .card-img-only-all {
                 width: 315px;
                 height: 177px;
-                margin: 5px auto;
+                width: auto;
+                height: auto;
+                margin-top: 10px;
             }
             #departmentSelect {
                 width: 43% !important;
@@ -411,7 +413,7 @@ try {
                                     </div>
 
                                     <div class="row mainbar g-0">
-                                        <div class="row g-2 mt-0" id="allClubsContainer">
+                                        <div class="row g-0 mt-0" id="allClubsContainer">
                                             <!-- Club cards will be dynamically added here -->
                                         </div>
                                     </div>
