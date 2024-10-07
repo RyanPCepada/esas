@@ -153,11 +153,15 @@ try {
 
         @media (max-width: 768px) {
             .card-body {
-                padding: 10px; 
+                padding: 0px !important; 
                 max-width: 100%; 
             }
             .card-img-only {
-                margin: 10px auto;
+                width: 315px;
+                height: 177px;
+                width: auto;
+                height: 145px;
+                margin-top: 10px;
             }
             .date {
                 margin-left: 20px;
@@ -337,7 +341,7 @@ try {
                                     <div class="row g-0">
                                         <div class="d-flex align-items-center justify-content-end pb-3 mt-2 mb-3">
                                             <!-- <h2 class="text-muted mt-0 mb-0">My Club Requests</h2> -->
-                                            <a href="../esas_student/crud/club_requests/club_request_create.php" class="btn btn-primary" id="request-club-btn" style="width: 160px; border-radius: 3px;">
+                                            <a href="../esas_student/crud/club_requests/club_request_create.php" class="btn btn-primary" id="request-club-btn" style="width: 160px; border-radius: 3px; margin-right: 5px;">
                                                 Request for a Club
                                             </a>
                                         </div>
@@ -366,28 +370,28 @@ try {
                                         <div class="tab-content">
                                             <!-- All Club Request Tab -->
                                             <div class="tab-pane fade show active" id="nav-requestedclubs" role="tabpanel" aria-labelledby="nav-requestedclubs-tab">
-                                                <div class="row g-2 mt-0" id="allClubRequestContainer">
+                                                <div class="row g-0 mt-0" id="allClubRequestContainer">
                                                     <!-- All student clubs cards will be dynamically added here -->
                                                 </div>
                                             </div>
 
                                             <!-- Pending Club Request Tab -->
                                             <div class="tab-pane fade" id="nav-pendingclubs" role="tabpanel" aria-labelledby="nav-pendingclubs-tab">
-                                                <div class="row g-2 mt-0" id="pendingClubRequestContainer">
+                                                <div class="row g-0 mt-0" id="pendingClubRequestContainer">
                                                     <!-- All student pending clubs cards will be dynamically added here -->
                                                 </div>
                                             </div>
 
                                             <!-- Approved Club Request Tab -->
                                             <div class="tab-pane fade" id="nav-approvedclubs" role="tabpanel" aria-labelledby="nav-approvedclubs-tab">
-                                                <div class="row g-2 mt-0" id="approvedClubRequestContainer">
+                                                <div class="row g-0 mt-0" id="approvedClubRequestContainer">
                                                     <!-- All student approved clubs cards will be dynamically added here -->
                                                 </div>
                                             </div>
 
                                             <!-- Disapproved Club Request Tab -->
                                             <div class="tab-pane fade" id="nav-disapprovedclubs" role="tabpanel" aria-labelledby="nav-disapprovedclubs-tab">
-                                                <div class="row g-2 mt-0" id="disapprovedClubRequestContainer">
+                                                <div class="row g-0 mt-0" id="disapprovedClubRequestContainer">
                                                     <!-- All student disapproved clubs cards will be dynamically added here -->
                                                 </div>
                                             </div>
