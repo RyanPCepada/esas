@@ -372,10 +372,12 @@ try {
                                     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start mt-2 ms-2 me-1 mb-1 me-sm-2">
                                         <h3 class="text-muted">Student Club Organizations</h3>
                                         <div class="officers-link mt-0 mt-sm-0 me-1 me-sm-4">
-                                            <a href="../esas_student/officers/csg_officers.php" class="d-inline-block">
+                                            <!-- <a href="../esas_student/officers/csg_officers.php" class="d-inline-block">
                                                 <i class="fas fa-user-tie"></i> CSG Officers</a>
                                             <a href="../esas_student/officers/sbo_officers.php" class="ms-2 d-inline-block">
-                                                <i class="fas fa-user-tie"></i> SBO Officers</a>
+                                                <i class="fas fa-user-tie"></i> SBO Officers</a> -->
+                                            <a href="../esas_student/officers/officers.php" class="ms-2 d-inline-block">
+                                                <i class="fas fa-user-tie"></i> CSG and SBO Officers</a>
                                         </div>
                                     </div>
 
