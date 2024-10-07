@@ -138,7 +138,7 @@ try {
                 </div>
                 <div class="p-3 d-flex justify-content-end">
                     <button class="btn btn-outline-info btn-sm mt-2">
-                        <a class="text-dark" style="text-decoration: none;" href="../../home.php">Go Back</a>
+                        <a class="text-dark" style="text-decoration: none;" href="../../home.php?club_id=<?php echo $_GET['club_id']; ?>">Go Back</a>
                     </button>
                 </div> 
             <?php endif; ?>
