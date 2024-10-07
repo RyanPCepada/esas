@@ -8,7 +8,7 @@ date_default_timezone_set('Asia/Manila');
 $student_id = $_SESSION['student_id'];
 
 try {
-    // Use the existing PDO instance from config.php
+    // Use the existing PDO instance from config.php 
     global $pdo;
 
     // Prepare and execute the SQL statement
@@ -111,8 +111,8 @@ try {
         }
 
         /* Officer Section */
-        .officer-section {
-            padding: 40px 20px;
+        .csg-officer-section, .sbo-officer-section {
+            padding: 20px 10px;
             text-align: center;
         }
         .officer-section h2 {
@@ -140,7 +140,7 @@ try {
             margin: 20px 0;
         }
         .officer-label {
-            font-size: 1.4em;
+            font-size: 40px;
             color: #004d80;
             font-weight: bold;
             margin-bottom: 10px;
@@ -158,6 +158,46 @@ try {
                 padding: 10px;
                 font-size: 14px;
             }
+            .parallax1, .parallax2 {
+                height: 50vw !important;
+                background-image: url('../images/NBSC_BLDG_FINAL_NO_WIRES_JPG.jpg') !important;
+                background-position: 52.5% !important;
+            }
+            .parallax1 h1, .parallax2 h1 {
+                font-size: 50px !important;
+            }
+            .officer-label {
+                font-size: 30px;
+            }
+        }
+
+
+        
+        .parallax1 {
+        height: 40vw !important;
+        background-image: url('../images/COVERPHOTO_DEFAULT.png');
+        background-position: 50%;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+        color: white;
+        display: flex;
+        align-items: center;
+        }
+        .parallax2 {
+        height: 40vw;
+        background-image: url('../images/COVERPHOTO_DEFAULT.png');
+        background-position: 50%;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+        color: white;
+        display: flex;
+        align-items: center;
+        }
+        .parallax1 h1, .parallax2 h1 {
+            font-size: 100px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7); /* Adjust the values as needed */
         }
 
 
@@ -182,52 +222,70 @@ try {
                 </div>
             </nav>
 
-    <!-- Header -->
-    <!-- <div class="header">
-        <h1>
-            <img src="../../assets/img/SAS_LOGO.png" alt="eSAS Logo" style="height: 1in; vertical-align: middle;">
-            eSAS
-        </h1>
-    </div> -->
+            <!-- Header -->
+            <!-- <div class="header">
+                <h1>
+                    <img src="../../assets/img/SAS_LOGO.png" alt="eSAS Logo" style="height: 1in; vertical-align: middle;">
+                    eSAS
+                </h1>
+            </div> -->
 
-    <!-- Navigation Bar -->
-    <div class="nav-bar">
-        <button onclick="showSection('mission-vision')">Mission & Vision</button>
-        <button onclick="showSection('csg')">CSG Officers</button>
-        <button onclick="showSection('sbo')">SBO Officers</button>
-    </div>
+            <!-- Navigation Bar -->
+            <div class="nav-bar">
+                <button onclick="showSection('mission-vision')"><!-- Mission & Vision --></button>
+                <button onclick="showSection('csg')"><!-- CSG Officers --></button>
+                <button onclick="showSection('sbo')"><!-- SBO Officers --></button>
+            </div>
 
-    <!-- Mission and Vision Section -->
-    <div class="mission-vision">
-        <h2>Vision</h2>
-        <p>Northern Bukidnon State College will be a college of choice, nationally recognized for having innovative and sustainable academic programs, research, extensions, and services that cultivate educational, personal, and professional growth to meet the needs of our students, our society, and the global community.</p>
-        <h2>Mission</h2>
-        <p>Northern Bukidnon State College is an accessible institution of higher education that provides quality educational opportunities to develop students into socially responsible, competent, and productive professionals.</p>
-    </div>
-
-
+            <!-- Mission and Vision Section -->
+            <div class="mission-vision">
+                <h2>Vision</h2>
+                <p>Northern Bukidnon State College will be a college of choice, nationally recognized for having innovative and sustainable academic programs, research, extensions, and services that cultivate educational, personal, and professional growth to meet the needs of our students, our society, and the global community.</p>
+                <h2>Mission</h2>
+                <p>Northern Bukidnon State College is an accessible institution of higher education that provides quality educational opportunities to develop students into socially responsible, competent, and productive professionals.</p>
+            </div>
 
 
-    <!-- Officer Sections -->
-    <div class="officer-section">
-        <div class="officer-row">
-            <div class="officer-label">CSG Officers</div>
-            <img src="../images/OFFICERS_CSG.jpeg" alt="CSG Officers">
-        </div>
+            <!-- PARRALAX 1 -->
+            <div class="container-fluid">
+                <div class="parallax1 text-center d-flex align-items-center justify-content-center">
+                    <h1><small class="text-warning">The</small><em>CSG OFFICERS</em></h1>
+                </div>
+            </div>
+            <!-- END PARRALAX 1 -->
 
+            <!-- CSG Officer Sections -->
+            <div class="csg-officer-section">
+                <div class="officer-row">
+                    <!-- <div class="officer-label">CSG Officers</div> -->
+                    <img src="../images/OFFICERS_CSG.jpeg" alt="CSG Officers">
+                </div>
+            </div>
 
+            <!-- PARRALAX 2 -->
+            <div class="container-fluid">
+                <div class="parallax2 text-center d-flex align-items-center justify-content-center">
+                    <h1><small class="text-warning">The</small><em>SBO OFFICERS</em></h1>
+                </div>
+            </div>
+            <!-- END PARRALAX 2 -->
 
+            <!-- SBO Officer Sections -->
+            <div class="sbo-officer-section">
+                <div class="officer-row">
+                    <div class="officer-label">TEP</div>
+                    <img src="../images/OFFICERS_SBO_TEP.png" alt="TEP SBO Officers">
+                </div>
+                <div class="officer-row">
+                    <div class="officer-label">BSBA</div>
+                    <img src="../images/OFFICERS_SBO_BSBA.png" alt="BSBA SBO Officers">
+                </div>
+                <div class="officer-row">
+                    <div class="officer-label">CCS</div>
+                    <img src="../images/OFFICERS_SBO_CCS.png" alt="CCS SBO Officers">
+                </div>
+            </div>
 
-        <h2>SBO Officers</h2>
-        <div class="officer-row">
-            <div class="officer-label">TEP SBO Officers</div>
-            <img src="../images/OFFICERS_SBO_TEP.png" alt="TEP SBO Officers">
-        </div>
-        <div class="officer-row">
-            <div class="officer-label">BSBA SBO Officers</div>
-            <img src="../images/OFFICERS_SBO_BSBA.png" alt="BSBA SBO Officers">
-        </div>
-    </div>
         </div>
     </div>
 
@@ -238,7 +296,7 @@ try {
 </body>
 </html>
 
-<footer style="background-color: #004d80; color: white; padding-bottom: 10px; text-align: center; font-size: 0.9em;">
+<footer style="background-color: #004d80; color: white; padding: 15px 10px; text-align: center; font-size: 0.9em;">
     <div class="container" style="max-width: 1200px; margin: 0 auto;">
         <div class="row" style="display: flex; justify-content: space-between;">
             <div class="col-md-4" style="flex: 1; margin-bottom: 10px;">
