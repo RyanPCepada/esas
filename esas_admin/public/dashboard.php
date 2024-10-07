@@ -121,6 +121,10 @@ try {
             }
         }
 
+        #pieChart {
+            width: 90% !important;
+            height: auto !important;
+        }
     </style>
 </head>
 <body>
@@ -187,8 +191,8 @@ try {
             
             <!-- MAINPAGE BAR -->
             <div class="col-12 col-md-10 bg-lgrey auto-scroll">
-                <div class="row g-0 h-100">
-                    <div class="row g-0 p-4 px-2 pt-2 h-100">
+                <div class="row g-0">
+                    <div class="row g-0 p-4 px-2 pt-2">
                         <div class="row align-items-center mb-2">
                             <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
                             <div class="col-auto">
@@ -437,153 +441,144 @@ try {
                             <div class="row card-row2 col-12" style="border: 1px solid transparent; margin: 0;">
 
                                 <!-- PIE CHART -->
-                                <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
-                                    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <p>Total Students per Club</p>
-                                        <div style="height: 365px; background-color: transparent;">
-                                            <?php
-                                            try {
-                                                // Get the selected school year and/or month
-                                                $selectedYear = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
-                                                $selectedMonth = isset($_GET['month']) ? intval($_GET['month']) : null;
+<div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
+    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+        <p>Total Students per Club</p>
+        <div style="height: auto; background-color: transparent;">
+            <?php
+            try {
+                // Your original PHP code for fetching the club data...
+                $selectedYear = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                $selectedMonth = isset($_GET['month']) ? intval($_GET['month']) : null;
 
-                                                // SQL Query to get cumulative data per club up to the selected year and month
-                                                $sql = "
-                                                    SELECT tc.clubName, COUNT(tr.student_id) AS member_count
-                                                    FROM tbl_registration tr
-                                                    JOIN tbl_clubs tc ON tr.club_id = tc.club_id
-                                                    WHERE tr.status = 'active'
-                                                ";
+                $sql = "
+                    SELECT tc.clubName, COUNT(tr.student_id) AS member_count
+                    FROM tbl_registration tr
+                    JOIN tbl_clubs tc ON tr.club_id = tc.club_id
+                    WHERE tr.status = 'active'
+                ";
 
-                                                // Apply cumulative conditions based on year and month
-                                                if ($selectedYear) {
-                                                    // Use the end of May of the following year for the cumulative count
-                                                    $endDate = ($selectedYear + 1) . "-05-31";  // May 31st of the following year
-                                                    $sql .= " AND tr.dateApproved <= :endDate";
-                                                }
+                if ($selectedYear) {
+                    $endDate = ($selectedYear + 1) . "-05-31";
+                    $sql .= " AND tr.dateApproved <= :endDate";
+                }
 
-                                                if ($selectedMonth) {
-                                                    // Apply the selected month for further narrowing down within the year
-                                                    $sql .= " AND MONTH(tr.dateApproved) <= :month";
-                                                }
+                if ($selectedMonth) {
+                    $sql .= " AND MONTH(tr.dateApproved) <= :month";
+                }
 
-                                                $sql .= " GROUP BY tc.club_id ORDER BY member_count DESC";
+                $sql .= " GROUP BY tc.club_id ORDER BY member_count DESC";
 
-                                                // Prepare and execute the query
-                                                $stmt = $pdo->prepare($sql);
+                $stmt = $pdo->prepare($sql);
 
-                                                if ($selectedYear) {
-                                                    $stmt->bindParam(':endDate', $endDate);
-                                                }
+                if ($selectedYear) {
+                    $stmt->bindParam(':endDate', $endDate);
+                }
 
-                                                if ($selectedMonth) {
-                                                    $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-                                                }
+                if ($selectedMonth) {
+                    $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                }
 
-                                                $stmt->execute();
-                                                $club_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $stmt->execute();
+                $club_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                echo "Error: " . htmlspecialchars($e->getMessage());
+            }
 
-                                            } catch (PDOException $e) {
-                                                echo "Error: " . htmlspecialchars($e->getMessage());
-                                            }
+            $clubs = [];
+            $counts = [];
+            $total_students = 0;
 
-                                            // Prepare data for the pie chart
-                                            $clubs = [];
-                                            $counts = [];
-                                            $total_students = 0;
+            foreach ($club_data as $row) {
+                $clubs[] = $row['clubName'];
+                $counts[] = $row['member_count'];
+                $total_students += $row['member_count'];
+            }
 
-                                            foreach ($club_data as $row) {
-                                                $clubs[] = $row['clubName'];
-                                                $counts[] = $row['member_count'];
-                                                $total_students += $row['member_count'];
-                                            }
+            $percentages = [];
+            foreach ($counts as $count) {
+                $percentages[] = $total_students > 0 ? round(($count / $total_students) * 100) : 0;
+            }
 
-                                            // Calculate percentages for each club
-                                            $percentages = [];
-                                            foreach ($counts as $count) {
-                                                $percentages[] = $total_students > 0 ? round(($count / $total_students) * 100) : 0;
-                                            }
+            $labels_with_percentages = [];
+            foreach ($clubs as $index => $club) {
+                $labels_with_percentages[] = $percentages[$index] . '% ' . $club;
+            }
+            ?>
+            <!-- Canvas for the pie chart -->
+            <div style="display: flex; justify-content: center;">
+                <canvas id="pieChart"></canvas>
+            </div>
+            <p id="noDataMessage" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 35%;"><em>No students.</em></p>
+            <!-- Custom Legends -->
+            <div id="customLegend" style="margin-top: 15px; text-align: center;"></div>
 
-                                            // Combine percentages and club names
-                                            $labels_with_percentages = [];
-                                            foreach ($clubs as $index => $club) {
-                                                $labels_with_percentages[] = $percentages[$index] . '% ' . $club;
-                                            }
-                                            ?>
-                                            <!-- Canvas for the pie chart -->
-                                            <canvas id="pieChart" style="height: 100%; margin: auto;"></canvas>
-                                            <p id="noDataMessage" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 35%;"><em>No students.</em></p>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                const labelsWithPercentages = <?php echo json_encode($labels_with_percentages); ?>;
+                const counts = <?php echo json_encode($counts); ?>;
+                const ctx = document.getElementById('pieChart').getContext('2d');
+                const noDataMessage = document.getElementById('noDataMessage');
+                const customLegend = document.getElementById('customLegend');
 
-                                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                                            <script>
-                                                // Fetching data from PHP arrays
-                                                const labelsWithPercentages = <?php echo json_encode($labels_with_percentages); ?>;
-                                                const counts = <?php echo json_encode($counts); ?>;
+                const backgroundColors = [
+                    'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
+                    'rgba(255, 105, 180, 0.8)',  // Hot Pink
+                    'rgba(255, 215, 0, 0.8)',    // Gold
+                    'rgba(0, 255, 255, 0.8)',    // Cyan
+                    'rgba(255, 165, 0, 0.8)',    // Orange
+                    'rgba(0, 255, 0, 0.8)'       // Lime Green
+                ];
 
-                                                const ctx = document.getElementById('pieChart').getContext('2d');
-                                                const noDataMessage = document.getElementById('noDataMessage');
-                                                
-                                                // Check if there's any data to display
-                                                if (counts.length === 0 || labelsWithPercentages.length === 0) {
-                                                    // No data, hide the canvas and show the message
-                                                    document.getElementById('pieChart').style.display = 'none';
-                                                    noDataMessage.style.display = 'block';
-                                                } else {
-                                                    // Render Pie Chart using Chart.js
-                                                    const pieChart = new Chart(ctx, {
-                                                        type: 'pie',
-                                                        data: {
-                                                            labels: labelsWithPercentages,  // Club names with percentages
-                                                            datasets: [{
-                                                                label: 'Cumulative Registered Students per Club',
-                                                                data: counts,  // Member count per club
-                                                                backgroundColor: [
-                                                                    'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
-                                                                    'rgba(255, 105, 180, 0.8)',   // Hot Pink
-                                                                    'rgba(255, 215, 0, 0.8)',     // Gold
-                                                                    'rgba(0, 255, 255, 0.8)',     // Cyan
-                                                                    'rgba(255, 165, 0, 0.8)',     // Orange
-                                                                    'rgba(0, 255, 0, 0.8)'        // Lime Green
-                                                                ],
-                                                                borderColor: [
-                                                                    'rgba(65, 105, 225, 1)',     // Royal Blue border
-                                                                    'rgba(255, 105, 180, 1)',     // Hot Pink border
-                                                                    'rgba(255, 215, 0, 1)',       // Gold border
-                                                                    'rgba(0, 255, 255, 1)',       // Cyan border
-                                                                    'rgba(255, 165, 0, 1)',       // Orange border
-                                                                    'rgba(0, 255, 0, 1)'          // Lime Green border
-                                                                ],
-                                                                borderWidth: 1
-                                                            }]
-                                                        },
-                                                        options: {
-                                                            responsive: true,
-                                                            plugins: {
-                                                                legend: {
-                                                                    position: 'top',
-                                                                    labels: {
-                                                                        usePointStyle: true, // Use custom point style
-                                                                        pointStyle: 'rect',  // Set point style to square
-                                                                    }
-                                                                },
-                                                                tooltip: {
-                                                                    callbacks: {
-                                                                        label: function(tooltipItem) {
-                                                                            return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    });
-                                                }
-                                            </script>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- PIE CHART END -->
+                if (counts.length === 0 || labelsWithPercentages.length === 0) {
+                    document.getElementById('pieChart').style.display = 'none';
+                    noDataMessage.style.display = 'block';
+                } else {
+                    const pieChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labelsWithPercentages,
+                            datasets: [{
+                                data: counts,
+                                backgroundColor: backgroundColors,
+                                borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false // Disable the default legend
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(tooltipItem) {
+                                            return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
 
+                    // Generate custom legends manually
+                    let legendHtml = '';
+                    labelsWithPercentages.forEach((label, index) => {
+                        legendHtml += `
+                            <span style="display: inline-block; margin-right: 10px;">
+                                <span style="display: inline-block; width: 12px; height: 12px; background-color: ${backgroundColors[index]}; margin-right: 5px;"></span>
+                                ${label}
+                            </span>`;
+                    });
 
+                    customLegend.innerHTML = legendHtml;
+                }
+            </script>
+        </div>
+    </div>
+</div>
+<!-- PIE CHART END -->
 
                                 <!-- OTHER CHARTS -->
                                 <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
