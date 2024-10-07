@@ -186,11 +186,11 @@ try {
                 width: 315px;
                 height: 177px;
                 width: auto;
-                height: auto;
+                height: 145px;
                 margin-top: 10px;
             }
             #departmentSelect {
-                width: 43% !important;
+                width: 30% !important;
             }
             .table-striped {
                 margin-top: 10px;
@@ -397,7 +397,7 @@ try {
                                                                     <option value="CCS">For CCS</option>
                                                                 </optgroup>
                                                             </select>
-                                                            <input id="clubSearch" class="form-control" type="search" placeholder="Search for clubs here..." aria-label="Search">
+                                                            <input id="clubSearch" class="form-control" type="search" placeholder="Search for clubs..." aria-label="Search">
                                                         </div>
                                                         <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
                                                             <h6 id="rowCountDisplay">Showing 0 / 0 Clubs</h6>

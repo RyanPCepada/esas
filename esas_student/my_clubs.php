@@ -151,11 +151,15 @@ try {
 
         @media (max-width: 768px) {
             .card-body {
-                padding: 10px; 
+                padding: 0px !important; 
                 max-width: 100%; 
             }
             .card-img-only {
-                margin: 10px auto;
+                width: 315px;
+                height: 177px;
+                width: auto;
+                height: 145px;
+                margin-top: 10px;
             }
             .date {
                 margin-left: 20px;
@@ -358,21 +362,21 @@ try {
                                         <div class="tab-content">
                                             <!-- Registered Clubs Tab -->
                                             <div class="tab-pane fade show active" id="nav-activeclubs" role="tabpanel" aria-labelledby="nav-activeclubs-tab">
-                                                <div class="row g-2 mt-0" id="activeClubsContainer">
+                                                <div class="row g-0 mt-0" id="activeClubsContainer">
                                                     <!-- All student clubs cards will be dynamically added here -->
                                                 </div>
                                             </div>
 
                                             <!-- Pending Approval Clubs Tab -->
                                             <div class="tab-pane fade" id="nav-pendingclubs" role="tabpanel" aria-labelledby="nav-pendingclubs-tab">
-                                                <div class="row g-2 mt-0" id="pendingClubsContainer">
+                                                <div class="row g-0 mt-0" id="pendingClubsContainer">
                                                     <!-- All student pending clubs cards will be dynamically added here -->
                                                 </div>
                                             </div>
 
                                             <!-- Disapproved Clubs Tab -->
                                             <div class="tab-pane fade" id="nav-disapprovedclubs" role="tabpanel" aria-labelledby="nav-disapprovedclubs-tab">
-                                                <div class="row g-2 mt-0" id="disapprovedClubsContainer">
+                                                <div class="row g-0 mt-0" id="disapprovedClubsContainer">
                                                     <!-- All student disapproved clubs cards will be dynamically added here -->
                                                 </div>
                                             </div>
