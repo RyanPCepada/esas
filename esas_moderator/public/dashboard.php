@@ -120,6 +120,11 @@ try {
                 width: 7% !important;
             }
         }
+        
+        #pieChart {
+            width: 90% !important;
+            height: auto !important;
+        }
     </style>
 </head>
 <body>
@@ -260,7 +265,7 @@ try {
                                 </div>
 
                                 <!-- Display selected club name or default club name -->
-                                <div class="clubname-display text-center" style="width: 540px;">
+                                <div class="clubname-display text-center" style="width: 450px;">
                                     <?php
                                     // Change: Check if a club is selected via the URL
                                     $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use the default club ID if not set
@@ -553,7 +558,7 @@ try {
                                 <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <p>Total Students per Department</p>
-                                        <div style="height: 365px; background-color: transparent;">
+                                        <div style="height: auto; background-color: transparent;">
                                             <?php
                                             try {
                                                 // Get the selected club_id and school_year from the URL
@@ -628,20 +633,55 @@ try {
                                             foreach ($departments as $index => $department) {
                                                 $labels_with_percentages[] = $percentages[$index] . '% ' . $department;
                                             }
+
+                                            // Define colors for the pie chart based on department names
+                                            $colors = [
+                                                'TEP' => 'rgba(65, 105, 225, 0.8)',  // Bright Royal Blue for TEP
+                                                'BSBA' => 'rgba(255, 255, 0, 0.8)',   // Yellow for BSBA
+                                                'CCS' => 'rgba(128, 128, 0, 0.8)',    // Olive Green for CCS
+                                            ];
+
+                                            // Create an array to hold background colors for the pie chart
+                                            $backgroundColors = [];
+                                            foreach ($department_data as $row) {
+                                                $department = $row['department'];
+                                                // Assign the defined color or a default if not defined
+                                                $backgroundColors[] = isset($colors[$department]) ? $colors[$department] : 'rgba(200, 200, 200, 0.8)'; // Gray for other departments
+                                            }
+
                                             ?>
                                             <!-- Canvas for the pie chart -->
                                             <canvas id="pieChart" style="height: 100%; margin: auto;"></canvas>
                                             <p id="noDataMessage" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 35%;"><em>No students.</em></p>
+
+                                            <div id="customLegend" style="margin-top: 15px; width: 100%; margin-left: auto; margin-right: auto; text-align: center; display: flex; flex-wrap: nowrap; justify-content: center; overflow-x: auto;">
+                                                <?php
+                                                // Display custom legend with percentages
+                                                foreach ($departments as $index => $department) {
+                                                    // Get the color for the department, or use a default color if not found
+                                                    $color = isset($colors[$department]) ? $colors[$department] : 'rgba(200, 200, 200, 0.8)'; // Gray for undefined departments
+                                                    
+                                                    // Use the corresponding percentage for the current department
+                                                    $percentage = $percentages[$index] ?? 0; // Get percentage, default to 0 if not found
+                                                    
+                                                    echo '<div style="display: flex; align-items: center; margin: 0 5px;">'; // Reduced vertical margin for legend items
+                                                    echo '<div style="width: 12px; height: 12px; background-color: ' . $color . '; margin-right: 5px;"></div>';
+                                                    echo '<span>' . number_format($percentage, 2) . '% ' . $department . '</span>'; // Display percentage with two decimal places
+                                                    echo '</div>';
+                                                }
+                                                ?>
+                                            </div>
 
                                             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                                             <script>
                                                 // Fetching data from PHP arrays
                                                 const labelsWithPercentages = <?php echo json_encode($labels_with_percentages); ?>;
                                                 const counts = <?php echo json_encode($counts); ?>;
+                                                const backgroundColors = <?php echo json_encode($backgroundColors); ?>; // Pass background colors to JavaScript
 
                                                 const ctx = document.getElementById('pieChart').getContext('2d');
                                                 const noDataMessage = document.getElementById('noDataMessage');
-                                                
+
                                                 // Check if there's any data to display
                                                 if (counts.length === 0 || labelsWithPercentages.length === 0) {
                                                     // No data, hide the canvas and show the message
@@ -656,22 +696,8 @@ try {
                                                             datasets: [{
                                                                 label: 'Members per Department',
                                                                 data: counts,  // Member count per department
-                                                                backgroundColor: [
-                                                                    'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
-                                                                    'rgba(255, 105, 180, 0.8)',   // Hot Pink (complementary color)
-                                                                    'rgba(255, 215, 0, 0.8)',     // Gold (bright and vibrant)
-                                                                    'rgba(0, 255, 255, 0.8)',     // Cyan (bright contrasting color)
-                                                                    'rgba(255, 165, 0, 0.8)',     // Orange (bright and warm)
-                                                                    'rgba(0, 255, 0, 0.8)'        // Lime Green (bright and fresh)
-                                                                ],
-                                                                borderColor: [
-                                                                    'rgba(65, 105, 225, 1)',     // Royal Blue border
-                                                                    'rgba(255, 105, 180, 1)',     // Hot Pink border
-                                                                    'rgba(255, 215, 0, 1)',       // Gold border
-                                                                    'rgba(0, 255, 255, 1)',       // Cyan border
-                                                                    'rgba(255, 165, 0, 1)',       // Orange border
-                                                                    'rgba(0, 255, 0, 1)'          // Lime Green border
-                                                                ],
+                                                                backgroundColor: backgroundColors, // Use defined background colors
+                                                                borderColor: backgroundColors.map(color => color.replace('0.8', '1')), // Set border colors to fully opaque
                                                                 borderWidth: 1
                                                             }]
                                                         },
@@ -679,11 +705,7 @@ try {
                                                             responsive: true,
                                                             plugins: {
                                                                 legend: {
-                                                                    position: 'top',
-                                                                    labels: {
-                                                                        boxWidth: 12,  // Set square shape
-                                                                        padding: 20    // Add spacing between labels and box
-                                                                    }
+                                                                    display: false, // Hide default legend
                                                                 },
                                                                 tooltip: {
                                                                     callbacks: {
@@ -696,14 +718,13 @@ try {
                                                         }
                                                     });
                                                 }
+
                                             </script>
 
                                         </div>
                                     </div>
                                 </div>
                                 <!-- PIE CHART END -->
-
-
 
 
 
