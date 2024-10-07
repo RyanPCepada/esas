@@ -1,32 +1,77 @@
+<?php
+session_start();
+require_once "../../config.php";
+
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
+$student_id = $_SESSION['student_id'];
+
+try {
+    // Use the existing PDO instance from config.php
+    global $pdo;
+
+    // Prepare and execute the SQL statement
+    $sql = "SELECT firstName, middleName, lastName FROM tbl_students WHERE student_id = :student_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    // Fetch the result
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check if a result was found
+    if ($result) {
+        $firstName = strtoupper($result['firstName']);
+        $middleName = strtoupper($result['middleName']);
+        $lastName = strtoupper($result['lastName']);
+    } else {
+        // Handle the case where no data is found
+        $firstName = $middleName = $lastName = "UNKNOWN";
+    }
+
+} catch (PDOException $e) {
+    // Handle database connection or query error
+    die("Database error: " . $e->getMessage());
+}
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
     <title>eSAS - Officers</title>
+    <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
+    <script src="../../assets/js/jquery-3.6.0.js"></script>
+    <link href="../../assets/css/styles.css" rel="stylesheet" />
+    <link href="../../assets/img/nbsclogo.png" rel="icon">
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(120deg, #ffffff 0%, #f4f4f4 100%);
-            background-attachment: fixed;
+            background: #f4f4f4;
         }
+        /* Header design */
         .header {
             background-color: #004d80;
             color: white;
             text-align: left;
-            padding: 20px;
-            padding-left: 40px;
+            padding: 20px 40px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            position: relative;
         }
         .header h1 {
             margin: 0;
             font-size: 2em;
         }
-        .header p {
-            margin: 5px 0 0;
-            font-size: 1.2em;
-        }
+
+        /* Navigation Bar */
         .nav-bar {
             background-color: #2980b9;
             overflow: hidden;
@@ -39,8 +84,6 @@
             border: none;
             color: white;
             padding: 14px 20px;
-            text-align: center;
-            text-decoration: none;
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
@@ -48,152 +91,153 @@
         .nav-bar button:hover {
             background-color: #3498db;
         }
-        
-        .mission-vision h2, .mission-vision p {
+
+        /* Mission and Vision Section */
+        .mission-vision {
+            background-color: #3498db;
+            padding: 40px 20px;
+            text-align: center;
             color: white;
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 1), 
-                        -2px -2px 10px rgba(0, 0, 0, 1); 
+        }
+        .mission-vision h2 {
+            margin-top: 0;
+            font-size: 2em;
+        }
+        .mission-vision p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin: 20px auto;
             max-width: 800px;
-            margin: 0 auto;
+        }
+
+        /* Officer Section */
+        .officer-section {
+            padding: 40px 20px;
             text-align: center;
         }
-
-        .mission-vision h2{
-            margin-top: 40px;
+        .officer-section h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
         }
-
-        .mission-vision {
-            padding: 40px 20px;
-        }
-
-        .mission-vision p {
-            font-size: 24px; 
-            line-height: 1.6; 
-        }
-
-
-        /* .slider-container {
-            width: 400px;
-            margin: 60px auto;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(166, 240, 176, 0.733);
-            border-radius: 10px;
-            max-height: 550px; 
-            max-height: auto; 
-        } */
-/* 
-        .slide img {
-            width: auto; 
-            height: 100%;
-            border-radius: 10px;
-            object-fit: cover;
-        }
-
-        .slides {
+        .officer-row {
+            margin: 0 auto;
+            max-width: 900px;
             display: flex;
-            transition: transform 0.5s ease-in-out;
-        }
-        .slide {
-            min-width: 100%;
-            box-sizing: border-box;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-        .slide.active {
-            opacity: 1;
-        }
-        .slide img {
-            width: 100%;
-            border-radius: 10px;
-        }
-        .slider-buttons {
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            transform: translateY(-50%);
-        }
-        .prev, .next {
-            background-color: rgba(0, 0, 0, 0.5);
-            border: none;
-            color: white;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 50%;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s;
         }
-        .prev:hover, .next:hover {
-            background-color: rgba(0, 0, 0, 0.7);
+        .officer-row:nth-child(even) {
+            background-color: #f7f7f7;
         }
-        .content {
-            padding: 20px;
-            display: none;
-            font-size: 24px;
-        }
-        .content.active {
+        .officer-row img {
+            max-width: 100%;
+            height: auto;
             display: block;
-        }
-        .mission-vision {
-            text-align: center;
-            padding: 20px;
-        }
-        .mission-vision img {
-            width: 50%;
             margin: 20px 0;
-        } */
-
-
-        /* .mission-vision, #csg, #sbo {
-            position: relative; 
+        }
+        .officer-label {
+            font-size: 1.4em;
+            color: #004d80;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
 
-        .mission-vision::before, #csg::before, #sbo::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.3);
-            z-index: 1; 
+        /* Ensure responsiveness */
+        @media screen and (max-width: 768px) {
+            .officer-row {
+                padding: 20px 10px;
+            }
+            .mission-vision p {
+                font-size: 1em;
+            }
+            .nav-bar button {
+                padding: 10px;
+                font-size: 14px;
+            }
         }
 
-        .mission-vision h2, .mission-vision p,
-        #csg .slider-container,
-        #sbo .slider-container {
-            position: relative;
-            z-index: 2;
-        } 
-            
-         style="background-image: url('../images/NBSC_BLDG_FINAL_NO_WIRES_JPEG.jpg'); background-size: cover; background-position: center; height: 631px;" */
 
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1 style="display: flex; align-items: center; gap: 10px;">
-            <img src="../../assets/img/SAS_LOGO.png" style="height: .5in; display: block;">
+    
+    <div class="container-fluid">
+        <div class="row g-0 h-100">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
+                <a class="navbar-brand ps-2" href="#">
+                    <img src="../../assets/img/nbsclogo.png" style="height: 0.3in;">
+                    NBSC SIS</a>
+                </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse hide" id="main_nav">
+                    <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
+                        <?php include '../nav/nav_main.php' ?>
+                    </div>
+                </div>
+            </nav>
+
+    <!-- Header -->
+    <!-- <div class="header">
+        <h1>
+            <img src="../../assets/img/SAS_LOGO.png" alt="eSAS Logo" style="height: 1in; vertical-align: middle;">
             eSAS
         </h1>
-    </div>
+    </div> -->
+
+    <!-- Navigation Bar -->
     <div class="nav-bar">
-        <button onclick="showSection('menu')">Mission & Vision</button>
+        <button onclick="showSection('mission-vision')">Mission & Vision</button>
         <button onclick="showSection('csg')">CSG Officers</button>
         <button onclick="showSection('sbo')">SBO Officers</button>
     </div>
 
-    <div>
+    <!-- Mission and Vision Section -->
+    <div class="mission-vision">
         <h2>Vision</h2>
         <p>Northern Bukidnon State College will be a college of choice, nationally recognized for having innovative and sustainable academic programs, research, extensions, and services that cultivate educational, personal, and professional growth to meet the needs of our students, our society, and the global community.</p>
         <h2>Mission</h2>
         <p>Northern Bukidnon State College is an accessible institution of higher education that provides quality educational opportunities to develop students into socially responsible, competent, and productive professionals.</p>
-    
-                    <img src="../images/OFFICERS_CSG.jpeg" alt="CSG Officers">
-                    <img src="../images/OFFICERS_SBO_TEP.png" alt="TEP SBO Officers">
-                    <img src="../images/OFFICERS_SBO_BSBA.png" alt="BSBA SBO Officers">
     </div>
+
+
+
+
+    <!-- Officer Sections -->
+    <div class="officer-section">
+        <div class="officer-row">
+            <div class="officer-label">CSG Officers</div>
+            <img src="../images/OFFICERS_CSG.jpeg" alt="CSG Officers">
+        </div>
+
+
+
+
+        <h2>SBO Officers</h2>
+        <div class="officer-row">
+            <div class="officer-label">TEP SBO Officers</div>
+            <img src="../images/OFFICERS_SBO_TEP.png" alt="TEP SBO Officers">
+        </div>
+        <div class="officer-row">
+            <div class="officer-label">BSBA SBO Officers</div>
+            <img src="../images/OFFICERS_SBO_BSBA.png" alt="BSBA SBO Officers">
+        </div>
+    </div>
+        </div>
+    </div>
+
+    <!-- <?php include 'assets/components/modals.php' ?> -->
+    <script src="../assets/js/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/global_script.js"></script>
+</body>
+</html>
+
 <footer style="background-color: #004d80; color: white; padding-bottom: 10px; text-align: center; font-size: 0.9em;">
     <div class="container" style="max-width: 1200px; margin: 0 auto;">
         <div class="row" style="display: flex; justify-content: space-between;">
@@ -227,7 +271,3 @@
         <p class="mb-0" style="font-size: 1em;">©eSAS2024. All rights reserved.</p>
     </div>
 </footer>
-
-
-</body>
-</html>
