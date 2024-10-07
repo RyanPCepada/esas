@@ -148,18 +148,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(":clubName", $clubName);
             $stmt->bindParam(":information", $information);
             $stmt->bindParam(":coverPhoto", $coverPhoto);
-
+    
             if ($stmt->execute()) {
                 $clubId = $pdo->lastInsertId();
                 $selectedModerator = $_POST["moderator"];
                 $newModeratorId = null;
-
+    
                 if ($selectedModerator == "add_new_moderator") {
                     $newModeratorId = $_POST['newModeratorId'];
                 } else {
                     $newModeratorId = $selectedModerator;
                 }
-
+    
                 if (!empty($newModeratorId)) {
                     $sql3 = "INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id, dateAdded) 
                              VALUES (:clubId, :moderatorId, NOW())";
@@ -169,7 +169,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $stmt3->execute();
                     }
                 }
-
+    
+                // Process department recommendations
+                if (isset($_POST['departments'])) {
+                    $departments = $_POST['departments'];
+                    $recommendationSql = "INSERT INTO tbl_club_recommendations (club_id, department, dateAdded) VALUES (:clubId, :department, NOW())";
+    
+                    foreach ($departments as $department) {
+                        if ($stmt4 = $pdo->prepare($recommendationSql)) {
+                            $stmt4->bindParam(":clubId", $clubId);
+                            $stmt4->bindParam(":department", $department);
+                            $stmt4->execute();
+                        }
+                    }
+                }
+    
                 header("location: ../../all_clubs.php");
                 exit();
             } else {
@@ -178,6 +192,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         unset($stmt);
     }
+    
     unset($pdo);
 }
 ?>
@@ -238,6 +253,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <input type="hidden" name="hiddenCoverPhoto" id="hiddenCoverPhoto" value="<?php echo htmlspecialchars($coverPhoto); ?>">
                     </div>
                     <hr>
+
+                    <div class="form-group mb-2">
+                        <label>Recommend to Departments<p class="text-muted"><em>(Check all that applies)</em></label>
+                        
+                        <div>
+                            <input type="checkbox" name="departments[]" value="TEP" id="tep">
+                            <label for="tep">TEP</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="departments[]" value="BSBA" id="bsba">
+                            <label for="bsba">BSBA</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="departments[]" value="CCS" id="ccs">
+                            <label for="ccs">CCS</label>
+                        </div>
+                    </div>
 
 
 
