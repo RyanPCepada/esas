@@ -239,6 +239,22 @@ $student_id = isset($_GET['student_id']) ? $_GET['student_id'] : '';
                         <img id="coverPhotoPreview" src="<?php echo !empty($coverPhoto) ? '/esas/esas_student/images/' . htmlspecialchars($coverPhoto) : '#'; ?>" alt="Cover Photo Preview" style="display: <?php echo !empty($coverPhoto) ? 'block' : 'none'; ?>;">
                         <input type="hidden" name="hiddenCoverPhoto" id="hiddenCoverPhoto" value="<?php echo htmlspecialchars($coverPhoto); ?>">
                     </div>
+                    <br>
+                    <div class="form-group mb-2">
+                        <label>Recommend to Departments<p class="text-muted"><em>(Check all that applies)</em></label>
+                        <div>
+                            <input type="checkbox" name="departments[]" value="TEP" id="tep">
+                            <label for="tep">TEP</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="departments[]" value="BSBA" id="bsba">
+                            <label for="bsba">BSBA</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="departments[]" value="CCS" id="ccs">
+                            <label for="ccs">CCS</label>
+                        </div>
+                    </div>
                     <hr>
                     <div class="form-group mb-2">
                         <label>Add Moderator</label>
@@ -257,22 +273,6 @@ $student_id = isset($_GET['student_id']) ? $_GET['student_id'] : '';
                         </select>
                     </div>
 
-                    <div class="form-group mb-2">
-                        <label>Recommend to Departments<p class="text-muted"><em>(Check all that applies)</em></label>
-                        
-                        <div>
-                            <input type="checkbox" name="departments[]" value="TEP" id="tep">
-                            <label for="tep">TEP</label>
-                        </div>
-                        <div>
-                            <input type="checkbox" name="departments[]" value="BSBA" id="bsba">
-                            <label for="bsba">BSBA</label>
-                        </div>
-                        <div>
-                            <input type="checkbox" name="departments[]" value="CCS" id="ccs">
-                            <label for="ccs">CCS</label>
-                        </div>
-                    </div>
                     <hr>
 
                     <input type="submit" class="btn btn-primary" value="Submit">
