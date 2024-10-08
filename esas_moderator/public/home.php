@@ -306,7 +306,7 @@ unset($pdo);
 
         @media (max-width: 767px) {
             .btn-custom  {
-                font-size: 10px;
+                font-size: 12px;
                 border: 1px solid #ddd !important;
             }
         }
