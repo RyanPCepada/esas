@@ -112,7 +112,7 @@
 
                                 // Only show the edit button if the comment's student_id matches the current user's student_id
                                 const showEllipsisButton = comment.student_id == currentStudentId ? `
-                                    <div class="dropdown">
+                                    <div class="comment-dropdown">
                                         <i class="fas fa-ellipsis-v ellipsis comment-ellipsis" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
                                         <div class="dropdown-menu">
                                             <button class="dropdown-item" data-comment-id="${comment.comment_id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">

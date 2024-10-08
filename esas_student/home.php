@@ -289,7 +289,7 @@ try {
         }
 
         .comment:hover {
-            background-color: #f7f7f7; /* Light background when hovering over the comment row */
+            background-color: #e0e0e0; /* Light background when hovering over the comment row */
         }
 
         .comment-ellipsis {
@@ -305,7 +305,7 @@ try {
         }
 
         .comment-ellipsis:hover {
-            background-color: lightgrey;
+            background-color: #f5f5f5;
         }
 
         .dropdown .dropdown-menu {
@@ -376,9 +376,9 @@ try {
 
 
 
-        /* .event-ellipsis:hover {
+        .departure-ellipsis:hover {
             background-color: lightgrey;
-        } */
+        }
 
         .dropdown {
             display: none; /* Hidden by default */
@@ -424,7 +424,7 @@ try {
                     <button class="btn btn-custom" onclick="showContent('events')">Events</button>
                     <button class="btn btn-custom" onclick="showContent('chats')">Chats</button>
 
-                    <div class="event-ellipsis text-center" style="cursor: pointer; width: 22px; height: 22px; border-radius: 50%;" onclick="toggleDropdown()">
+                    <div class="departure-ellipsis text-center" style="cursor: pointer; width: 22px; height: 22px; border-radius: 50%;" onclick="toggleDropdown()">
                         <i class="fas fa-ellipsis-v" style="color: #666;"></i>
                     </div>
 
@@ -435,6 +435,7 @@ try {
                             <a href="#" onclick="openDepartureModal()">Request for Departure</a>
                         <?php endif; ?>
                     </div>
+                    
                 </div>
 
 
