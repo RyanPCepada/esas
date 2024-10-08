@@ -53,11 +53,11 @@ try {
     <link href="../../assets/css/styles.css" rel="stylesheet" />
     <link href="../../assets/img/nbsclogo.png" rel="icon">
     <style>
-        body {
+        /* body {
             margin: 0;
             font-family: Arial, sans-serif;
             background: #f4f4f4;
-        }
+        } */
         /* Header design */
         .header {
             background-color: #004d80;
@@ -212,17 +212,18 @@ try {
         <div class="row g-0 h-100">
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
-                    <img src="../../assets/img/nbsclogo.png" style="height: 0.3in;">
-                    NBSC SIS</a>
+                    <img src="../../assets/img/SAS_LOGO.png" alt="eSAS Logo" style="height: .4in; vertical-align: middle;">
+                    <!-- <img src="../../assets/img/nbsclogo.png" style="height: 0.3in;"> NBSC SIS -->
+                    </a>
                 </button>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
+                <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse hide" id="main_nav">
                     <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
-                        <?php include '../nav/nav_main.php' ?>
+                        <php include '../nav/nav_main.php' ?>
                     </div>
-                </div>
+                </div> -->
             </nav>
 
             <!-- Header -->
@@ -235,9 +236,11 @@ try {
 
             <!-- Navigation Bar -->
             <div class="nav-bar">
-                <button onclick="showSection('mission-vision')"><!-- Mission & Vision --></button>
-                <button onclick="showSection('csg')"><!-- CSG Officers --></button>
-                <button onclick="showSection('sbo')"><!-- SBO Officers --></button>
+                <!-- <button onclick="showSection('mission-vision')"><!-- Mission & Vision --</button>
+                <button onclick="showSection('csg')"><!-- CSG Officers --</button>
+                <button onclick="showSection('sbo')"><!-- SBO Officers --</button> -->
+
+                <h5 class="text-light p-3"><em>College Student Government and Student Body Organization Officers</em></h5>
             </div>
 
             <!-- Mission and Vision Section -->
