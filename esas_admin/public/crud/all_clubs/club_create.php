@@ -252,7 +252,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <img id="coverPhotoPreview" src="#" alt="" style="display: none;">
                         <input type="hidden" name="hiddenCoverPhoto" id="hiddenCoverPhoto" value="<?php echo htmlspecialchars($coverPhoto); ?>">
                     </div>
-                    <hr>
+                    <br>
 
                     <div class="form-group mb-2">
                         <label>Recommend to Departments<p class="text-muted"><em>(Check all that applies)</em></label>

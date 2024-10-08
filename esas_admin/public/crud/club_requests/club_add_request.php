@@ -259,6 +259,21 @@ $student_id = isset($_GET['student_id']) ? $_GET['student_id'] : '';
                     <div class="form-group mb-2">
                         <label>Add Moderator</label>
                         <select name="moderator" id="moderatorSelect" class="form-control">
+                            <option value="">-- Select From Existing Moderators --</option>
+                            <optgroup label="">
+                                <?php foreach ($moderators as $moderator): ?>
+                                    <option value="<?php echo htmlspecialchars($moderator['moderator_id']); ?>">
+                                        <?php echo htmlspecialchars($moderator['moderator_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- DROPDOWN FOR ADDING EXISTING OR "NEW" MODERATOR COMMENTED TEMPORARILY 
+                    <div class="form-group mb-2">
+                        <label>Add Moderator</label>
+                        <select name="moderator" id="moderatorSelect" class="form-control">
                             <option value="">-- Select From Existing Moderators or Add New --</option>
                             <optgroup label="">
                                 <?php foreach ($moderators as $moderator): ?>
@@ -271,7 +286,7 @@ $student_id = isset($_GET['student_id']) ? $_GET['student_id'] : '';
                                 <option value="add_new_moderator" style="font-weight: bold;">+ Add New Moderator</option>
                             </optgroup>
                         </select>
-                    </div>
+                    </div> -->
 
                     <hr>
 
