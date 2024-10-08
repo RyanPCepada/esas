@@ -256,7 +256,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <div class="form-group mb-2">
                         <label>Recommend to Departments<p class="text-muted"><em>(Check all that applies)</em></label>
-                        
                         <div>
                             <input type="checkbox" name="departments[]" value="TEP" id="tep">
                             <label for="tep">TEP</label>
@@ -273,8 +272,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 
+                    <hr>
                     
-                    <!-- <div class="form-group mb-2">
+                    <div class="form-group mb-2">
+                        <label>Add Moderator</label>
+                        <select name="moderator" id="moderatorSelect" class="form-control">
+                            <option value="">-- Select From Existing Moderators --</option>
+                            <optgroup label="">
+                                <?php foreach ($moderators as $moderator): ?>
+                                    <option value="<?php echo htmlspecialchars($moderator['moderator_id']); ?>">
+                                        <?php echo htmlspecialchars($moderator['moderator_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- DROPDOWN FOR ADDING EXISTING OR "NEW" MODERATOR COMMENTED TEMPORARILY 
+                    <div class="form-group mb-2">
                         <label>Add Moderator</label>
                         <select name="moderator" id="moderatorSelect" class="form-control">
                             <option value="">-- Select From Existing Moderators or Add New --</option>
@@ -290,9 +305,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </optgroup>
                         </select>
                     </div> -->
-
-
-
 
 
                     <input type="submit" class="btn btn-primary" value="Submit">
