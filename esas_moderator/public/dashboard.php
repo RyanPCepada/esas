@@ -907,141 +907,139 @@ try {
 
                                     
                                         <!-- Year Level Numbers -->
-<div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
-    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-        <p>Total Year Level Count</p>
-        <div style="height: 150px; background-color: transparent;">
-            <div>
-                <canvas id="studentBarChart"></canvas>
-            </div>
-            <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
+                                        <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                                <p>Total Year Level Count</p>
+                                                <div style="height: 150px; background-color: transparent;">
+                                                    <?php
+                                                    // Get the selected club_id and school_year from the URL 
+                                                    $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
+                                                    $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
 
-            <?php
-            // Get the selected club_id and school_year from the URL 
-            $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
-            $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
+                                                    try {
+                                                        // Extract start and end years from selected school year
+                                                        list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+                                                        
+                                                        // Adjust the end date to July 31 of the end year
+                                                        $endDate = "$endYear-07-31";
 
-            try {
-                // Extract start and end years from selected school year
-                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+                                                        // SQL Query to fetch year level counts, filtered by moderator, club_id, and school year
+                                                        $sql = "
+                                                        SELECT s.year, COUNT(DISTINCT s.student_id) AS count
+                                                        FROM tbl_students s
+                                                        JOIN tbl_registration r ON s.student_id = r.student_id
+                                                        JOIN tbl_clubs_and_moderators cm ON r.club_id = cm.club_id
+                                                        WHERE r.status = 'active'
+                                                        AND cm.moderator_id = :moderator_id
+                                                        AND r.club_id = :club_id
+                                                        AND r.dateApproved <= :endDate
+                                                        GROUP BY s.year";
 
-                // SQL Query to fetch year level counts, filtered by moderator, club_id, and school year
-                $sql = "
-                SELECT s.year, COUNT(DISTINCT s.student_id) AS count
-                FROM tbl_students s
-                JOIN tbl_registration r ON s.student_id = r.student_id
-                JOIN tbl_clubs_and_moderators cm ON r.club_id = cm.club_id
-                WHERE r.status = 'active'
-                AND cm.moderator_id = :moderator_id
-                AND r.club_id = :club_id
-                AND r.dateApproved BETWEEN :start_date AND :end_date
-                GROUP BY s.year";
+                                                        // Prepare and execute the query
+                                                        $stmtCounts = $pdo->prepare($sql);
+                                                        $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                                        $stmtCounts->bindParam(':club_id', $selectedClubId, PDO::PARAM_INT);
+                                                        $stmtCounts->bindParam(':endDate', $endDate); // Bind the end date
+                                                        $stmtCounts->execute();
 
-                // Prepare and execute the query
-                $stmtCounts = $pdo->prepare($sql);
-                $stmtCounts->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-                $stmtCounts->bindParam(':club_id', $selectedClubId, PDO::PARAM_INT);
+                                                        // Fetch the results into an associative array
+                                                        $yearData = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
 
-                // Bind the start and end date based on the school year
-                $startDate = $startYear . '-08-01'; // Assuming school year starts in August
-                $endDate = $endYear . '-07-31'; // Assuming school year ends in July
-                $stmtCounts->bindParam(':start_date', $startDate);
-                $stmtCounts->bindParam(':end_date', $endDate);
+                                                        // Initialize arrays for years and counts
+                                                        $years = ['1', '2', '3', '4']; // Ensure all years are included
+                                                        $counts = [0, 0, 0, 0]; // Initialize with zeros
 
-                $stmtCounts->execute();
+                                                        // Populate the counts array based on fetched data
+                                                        foreach ($yearData as $row) {
+                                                            $year = (int)$row['year']; // Ensure $year is an integer
+                                                            $count = (int)$row['count']; // Ensure $count is an integer
 
-                // Fetch the results into an associative array
-                $yearData = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
+                                                            // Check if $year is within the valid range
+                                                            if ($year >= 1 && $year <= 4) {
+                                                                $counts[$year - 1] += $count; // Sum counts for each year
+                                                            }
+                                                        }
 
-                // Initialize arrays for years and counts
-                $years = ['1', '2', '3', '4']; // Ensure all years are included
-                $counts = [0, 0, 0, 0]; // Initialize with zeros
+                                                        // SQL Query to get the total student count from tbl_students
+                                                        $sqlTotalStudents = "
+                                                        SELECT COUNT(DISTINCT student_id) AS total_student_count
+                                                        FROM tbl_students";
 
-                // Populate the counts array based on fetched data
-                foreach ($yearData as $row) {
-                    $year = (int)$row['year']; // Ensure $year is an integer
-                    $count = (int)$row['count']; // Ensure $count is an integer
+                                                        $stmtTotalStudents = $pdo->prepare($sqlTotalStudents);
+                                                        $stmtTotalStudents->execute();
+                                                        $totalStudentCount = (int)$stmtTotalStudents->fetchColumn();
 
-                    // Check if $year is within the valid range
-                    if ($year >= 1 && $year <= 4) {
-                        $counts[$year - 1] = $count;
-                    }
-                }
+                                                    } catch (PDOException $e) {
+                                                        echo "Error: " . $e->getMessage();
+                                                    }
+                                                    ?>
 
-                // SQL Query to get the total student count from tbl_students
-                $sqlTotalStudents = "
-                SELECT COUNT(DISTINCT student_id) AS total_student_count
-                FROM tbl_students";
+                                                    <!-- Include Chart.js -->
+                                                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-                $stmtTotalStudents = $pdo->prepare($sqlTotalStudents);
-                $stmtTotalStudents->execute();
-                $totalStudentCount = $stmtTotalStudents->fetchColumn();
+                                                    <!-- Canvas for the bar chart -->
+                                                    <div style="max-width: 100%; overflow: hidden;">
+                                                        <canvas id="studentBarChart" style="max-width: 100%; height: 150px;"></canvas>
+                                                    </div>
+                                                    
+                                                    <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
 
-            } catch (PDOException $e) {
-                echo "Error: " . $e->getMessage();
-            }
-            ?>
+                                                    <script>
+                                                        // PHP arrays passed into JavaScript
+                                                        const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+                                                        const dataCounts = <?php echo json_encode($counts); ?>;
+                                                        const totalStudentCount = <?php echo $totalStudentCount; ?>; // Get the total student count
 
-            <!-- Include Chart.js -->
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                                                        // Check if there is no data to display
+                                                        const hasDataYearLevels = dataCounts.some(count => count > 0);
 
-            <script>
-                // PHP arrays passed into JavaScript
-                const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
-                const dataCounts = <?php echo json_encode($counts); ?>;
-                const totalStudentCount = <?php echo $totalStudentCount; ?>; // Get the total student count
+                                                        // Show or hide the "No Data" message based on data availability
+                                                        const studentBarChartElement = document.getElementById('studentBarChart');
+                                                        const noDataMessageYearLevels = document.getElementById('noDataMessageYearLevels');
 
-                // Check if there is no data to display
-                const hasDataYearLevels = dataCounts.some(count => count > 0);
+                                                        if (!hasDataYearLevels) {
+                                                            studentBarChartElement.style.display = 'none';
+                                                            noDataMessageYearLevels.style.display = 'block';
+                                                        } else {
+                                                            // Data for the chart
+                                                            const data = {
+                                                                labels: labels,
+                                                                datasets: [{
+                                                                    data: dataCounts, // Dynamic data from PHP
+                                                                    backgroundColor: ['blue', 'orange', 'green', 'red'], // Colors for bars
+                                                                }]
+                                                            };
 
-                // Show or hide the "No Data" message based on data availability
-                const studentBarChartElement = document.getElementById('studentBarChart');
-                const noDataMessageYearLevels = document.getElementById('noDataMessageYearLevels');
+                                                            // Configurations for the chart with total student count as the peak limit
+                                                            const config = {
+                                                                type: 'bar',
+                                                                data: data,
+                                                                options: {
+                                                                    responsive: true, // Ensure the chart resizes with the container
+                                                                    maintainAspectRatio: false, // Allow chart to adjust height and width dynamically
+                                                                    scales: {
+                                                                        y: {
+                                                                            beginAtZero: true,
+                                                                            suggestedMax: totalStudentCount // Set the total student count as the maximum y-axis value
+                                                                        }
+                                                                    },
+                                                                    plugins: {
+                                                                        legend: {
+                                                                            display: false // Remove the legend
+                                                                        }
+                                                                    }
+                                                                }
+                                                            };
 
-                if (!hasDataYearLevels) {
-                    studentBarChartElement.style.display = 'none';
-                    noDataMessageYearLevels.style.display = 'block';
-                } else {
-                    // Data for the chart
-                    const data = {
-                        labels: labels,
-                        datasets: [{
-                            data: dataCounts, // Dynamic data from PHP
-                            backgroundColor: ['blue', 'orange', 'green', 'red'], // Colors for bars
-                        }]
-                    };
+                                                            // Render the chart
+                                                            new Chart(studentBarChartElement, config);
+                                                        }
+                                                    </script>
 
-                    // Configurations for the chart with total student count as the peak limit
-                    const config = {
-                        type: 'bar',
-                        data: data,
-                        options: {
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    suggestedMax: totalStudentCount // Set the total student count as the maximum y-axis value
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    display: false // Remove the legend
-                                }
-                            }
-                        }
-                    };
-
-                    // Render the chart
-                    const studentBarChart = new Chart(
-                        studentBarChartElement,
-                        config
-                    );
-                }
-            </script>
-
-        </div>
-    </div>
-</div>
-
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- YEAR LEVEL COUNT END -->
 
 
                                         <!-- Student Gender --> 
