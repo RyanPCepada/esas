@@ -101,10 +101,10 @@ try {
         }
         .mission-vision h2 {
             margin-top: 0;
-            font-size: 2em;
+            font-size: 2.5em;
         }
         .mission-vision p {
-            font-size: 1.2em;
+            font-size: 1.5em;
             line-height: 1.6;
             margin: 20px auto;
             max-width: 800px;
@@ -151,6 +151,9 @@ try {
             .officer-row {
                 padding: 20px 10px;
             }
+            .mission-vision h2 {
+                font-size: 1.8em;
+            }
             .mission-vision p {
                 font-size: 1em;
             }
@@ -164,7 +167,7 @@ try {
                 background-position: 52.5% !important;
             }
             .parallax1 h1, .parallax2 h1 {
-                font-size: 50px !important;
+                font-size: 40px !important;
             }
             .officer-label {
                 font-size: 30px;
