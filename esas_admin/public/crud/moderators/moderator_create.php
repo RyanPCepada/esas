@@ -173,17 +173,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" required>
                         <span class="invalid-feedback"><?php echo $password_err; ?></span>
                     </div>
-                    <div class="form-group mb-2">
+
+                    <!-- <div class="form-group mb-2">
                         <label>Assign to a Club</label>
                         <select name="club" class="form-control">
                             <option value="">-- Select a Club (Optional) --</option>
-                            <?php foreach ($clubs as $club): ?>
-                                <option value="<?php echo htmlspecialchars($club['club_id']); ?>">
-                                    <?php echo htmlspecialchars($club['clubName']); ?>
+                            <php foreach ($clubs as $club): ?>
+                                <option value="<php echo htmlspecialchars($club['club_id']); ?>">
+                                    <php echo htmlspecialchars($club['clubName']); ?>
                                 </option>
-                            <?php endforeach; ?>
+                            <php endforeach; ?>
                         </select>
-                    </div>
+                    </div> -->
+
                     <input type="submit" class="btn btn-primary" value="Submit">
                     <a href="../../moderators.php" class="btn btn-secondary">Cancel</a>
                 </form>
