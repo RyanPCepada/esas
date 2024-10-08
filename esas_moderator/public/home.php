@@ -309,6 +309,9 @@ unset($pdo);
                 font-size: 12px;
                 border: 1px solid #ddd !important;
             }
+            #addEventBtn {
+                margin-left: -25px !important;
+            }
         }
 
 
