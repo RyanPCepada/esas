@@ -122,7 +122,7 @@ try {
         }
         
         #pieChart {
-            width: 90% !important;
+            width: 81% !important;
             height: auto !important;
         }
     </style>
@@ -558,7 +558,7 @@ try {
                                 <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <p>Total Students per Department</p>
-                                        <div style="height: auto; background-color: transparent;">
+                                        <div style="height: 370px; background-color: transparent;">
                                             <?php
                                             try {
                                                 // Get the selected club_id and school_year from the URL
