@@ -172,7 +172,7 @@ try {
         @media (max-width: 767px) {
             
             .mainbar {
-                padding: 16px;
+                padding: 10px;
             }
             .mainbar h2 {
                 margin-bottom: 16px;
@@ -190,9 +190,9 @@ try {
                 margin-top: 10px;
 
                 /* temporary manipulation, can't figure out the reason of card padding behaviour */
-                width: 280px !important;
+                /* width: 280px !important;
                 height: 157px;
-                margin-left: -6px;
+                margin-left: -6px; */
             }
             #departmentSelect {
                 width: 30% !important;
