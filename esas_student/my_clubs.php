@@ -149,7 +149,7 @@ try {
         }
 
 
-        @media (max-width: 768px) {
+        @media (max-width: 767px) {
             .card-body {
                 padding: 0px !important; 
                 max-width: 100%; 

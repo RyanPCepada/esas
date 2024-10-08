@@ -169,7 +169,7 @@ try {
         }
 
 
-        @media (max-width: 768px) {
+        @media (max-width: 767px) {
             
             .mainbar {
                 padding: 16px;
@@ -188,6 +188,11 @@ try {
                 width: auto;
                 height: 145px;
                 margin-top: 10px;
+
+                /* temporary manipulation, can't figure out the reason of card padding behaviour */
+                width: 280px !important;
+                height: 157px;
+                margin-left: -6px;
             }
             #departmentSelect {
                 width: 30% !important;
