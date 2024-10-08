@@ -179,7 +179,7 @@ function fetchEvents() {
                 eventList.innerHTML = `
                     <div style="text-align: center; margin-top: 30px;">
                         <i class="fas fa-calendar-times" style="font-size: 50px; color: #ff6b6b;"></i>
-                        <p style="color: #666; margin-top: 10px;">No upcoming events.<br>Please stay tuned!</p>
+                        <p style="color: #666; margin-top: 10px;">No posted upcoming events.<br>Click the <em class="text-primary">PLUS</em> icon to create!</p>
                     </div>
                 `;
                 document.getElementById('calendar').style.display = 'none'; // Hide calendar
