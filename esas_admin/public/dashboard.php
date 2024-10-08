@@ -146,9 +146,9 @@ try {
                 </div>
             </nav>
             <!-- LEFT SIDEBAR -->
-            <div class="col-12 col-md-2 ps-0 pt-3 border-end">
+            <div class="col-12 col-md-2 pt-3 border-end">
 
-            <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
+            <div class="d-flex flex-column flex-shrink-0 px-2 bg-body-tertiary">
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li>
                         <a href="../../esas_admin/public/dashboard.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="all-clubs">
