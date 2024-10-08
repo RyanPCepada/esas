@@ -21,19 +21,19 @@ if (isset($_POST['action']) && $_POST['action'] == 'add_moderator') {
     $firstName = trim($_POST['firstName']);
     $middleInitial = trim($_POST['middleInitial']);
     $lastName = trim($_POST['lastName']);
-    $moderator_id = trim($_POST['moderator_id']);
+    $email = trim($_POST['email']);
     $password = trim($_POST['password']); // No hashing
 
     // Set the profile picture to default
     $profilePic = PROF_PIC_DEFAULT;
 
-    $sql2 = "INSERT INTO tbl_moderators (firstName, middleName, lastName, moderator_id, password, profilePic, dateAdded) 
-             VALUES (:firstName, :middleInitial, :lastName, :moderator_id, :password, :profilePic, NOW())";
+    $sql2 = "INSERT INTO tbl_moderators (firstName, middleName, lastName, email, password, profilePic, dateAdded) 
+             VALUES (:firstName, :middleInitial, :lastName, :email, :password, :profilePic, NOW())";
     if ($stmt2 = $pdo->prepare($sql2)) {
         $stmt2->bindParam(":firstName", $firstName);
         $stmt2->bindParam(":middleInitial", $middleInitial);
         $stmt2->bindParam(":lastName", $lastName);
-        $stmt2->bindParam(":moderator_id", $moderator_id);
+        $stmt2->bindParam(":email", $email);
         $stmt2->bindParam(":password", $password); // No hashing
         $stmt2->bindParam(":profilePic", $profilePic); // Bind the default profile picture
 
@@ -61,75 +61,71 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (isset($_FILES['coverPhoto']) && $_FILES['coverPhoto']['name']) {
-    // File was uploaded
-    $coverPhotoName = $_FILES['coverPhoto']['name'];
-    $coverPhotoSize = $_FILES['coverPhoto']['size'];
-    $coverPhotoTmpName = $_FILES['coverPhoto']['tmp_name'];
+        // File was uploaded
+        $coverPhotoName = $_FILES['coverPhoto']['name'];
+        $coverPhotoSize = $_FILES['coverPhoto']['size'];
+        $coverPhotoTmpName = $_FILES['coverPhoto']['tmp_name'];
 
-    $validImageExtensions = ['jpg', 'jpeg', 'png'];
-    $imageExtension = strtolower(pathinfo($coverPhotoName, PATHINFO_EXTENSION));
+        $validImageExtensions = ['jpg', 'jpeg', 'png'];
+        $imageExtension = strtolower(pathinfo($coverPhotoName, PATHINFO_EXTENSION));
 
-    if (!in_array($imageExtension, $validImageExtensions)) {
-        $coverPhoto_err = "Invalid image extension. Only JPG, JPEG, and PNG are allowed.";
-    } elseif ($coverPhotoSize > 10000000) {
-        $coverPhoto_err = "Image size is too large (max 10MB).";
-    } else {
-        // Generate a unique name for the cover photo
-        $newCoverPhotoName = 'club_' . uniqid() . '.' . $imageExtension;
-        $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_admin/images/';
-        $uploadPath = $uploadDir . $newCoverPhotoName;
-
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
-
-        if (move_uploaded_file($coverPhotoTmpName, $uploadPath)) {
-            // Successful upload, use the new image name
-            $coverPhoto = $newCoverPhotoName;
+        if (!in_array($imageExtension, $validImageExtensions)) {
+            $coverPhoto_err = "Invalid image extension. Only JPG, JPEG, and PNG are allowed.";
+        } elseif ($coverPhotoSize > 10000000) {
+            $coverPhoto_err = "Image size is too large (max 10MB).";
         } else {
-            $coverPhoto_err = "Failed to upload image.";
+            // Generate a unique name for the cover photo
+            $newCoverPhotoName = 'club_' . uniqid() . '.' . $imageExtension;
+            $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_admin/images/';
+            $uploadPath = $uploadDir . $newCoverPhotoName;
+
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            if (move_uploaded_file($coverPhotoTmpName, $uploadPath)) {
+                // Successful upload, use the new image name
+                $coverPhoto = $newCoverPhotoName;
+            } else {
+                $coverPhoto_err = "Failed to upload image.";
+            }
         }
-    }
-} else {
-    // No new file uploaded, use the hidden field value
-    $coverPhoto = $_POST['hiddenCoverPhoto']; // Keep the old cover photo
-
-    // Construct the destination path for the admin images
-    $adminImagesDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_admin/images/';
-    $adminCoverPhotoPath = $adminImagesDir . $coverPhoto;
-
-    // Check if the existing cover photo file exists in the student images directory
-    if (file_exists($adminCoverPhotoPath)) {
+    } else {
+        // No new file uploaded, use the hidden field value
+        $coverPhoto = $_POST['hiddenCoverPhoto']; // Keep the old cover photo
+        
+        // Construct the path for the existing cover photo in the student images directory
+        $existingCoverPhotoPath = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_student/images/' . $coverPhoto;
+        
         // Construct the destination path for the admin images
+        $adminImagesDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_admin/images/';
         $adminCoverPhotoPath = $adminImagesDir . $coverPhoto;
 
-        // Copy the existing file to the admin images directory
-        if (!file_exists($adminCoverPhotoPath)) {
+        // Check if the existing cover photo file exists in the student images directory
+        if (file_exists($existingCoverPhotoPath)) {
             // Only copy if it doesn't already exist in admin images
-            copy($existingCoverPhotoPath, $adminCoverPhotoPath);
+            if (!file_exists($adminCoverPhotoPath)) {
+                copy($existingCoverPhotoPath, $adminCoverPhotoPath);
+            }
+        } else {
+            $coverPhoto_err = "Existing cover photo does not exist.";
         }
-    } else {
-        $coverPhoto_err = "Existing cover photo does not exist.";
     }
-}
 
-// If no cover photo is uploaded and no previous one exists, use a default image
-if (empty($coverPhoto)) {
-    $coverPhoto = COVERPHOTO_DEFAULT; // You can set your own default image path here
-}
+    // If no cover photo is uploaded and no previous one exists, use a default image
+    if (empty($coverPhoto)) {
+        $coverPhoto = COVERPHOTO_DEFAULT; // You can set your own default image path here
+    }
 
-    
+    $founder_id = isset($_POST['founder_id']) ? $_POST['founder_id'] : null; // Fetch the value from POST
 
-$founder_id = isset($_POST['founder_id']) ? $_POST['founder_id'] : null; // Fetch the value from POST
-
-if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err) && !empty($founder_id)) {
-    $sql = "INSERT INTO tbl_clubs (clubName, information, coverPhoto, founder_id, dateAdded) VALUES (:clubName, :information, :coverPhoto, :founder_id, NOW())";
-    if ($stmt = $pdo->prepare($sql)) {
-        $stmt->bindParam(":clubName", $clubName);
-        $stmt->bindParam(":information", $information);
-        $stmt->bindParam(":coverPhoto", $coverPhoto);
-        $stmt->bindParam(":founder_id", $founder_id); // Ensure this is not null
-
+    if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err) && !empty($founder_id)) {
+        $sql = "INSERT INTO tbl_clubs (clubName, information, coverPhoto, founder_id, dateAdded) VALUES (:clubName, :information, :coverPhoto, :founder_id, NOW())";
+        if ($stmt = $pdo->prepare($sql)) {
+            $stmt->bindParam(":clubName", $clubName);
+            $stmt->bindParam(":information", $information);
+            $stmt->bindParam(":coverPhoto", $coverPhoto);
+            $stmt->bindParam(":founder_id", $founder_id); // Ensure this is not null
 
             if ($stmt->execute()) {
                 $clubId = $pdo->lastInsertId();
@@ -152,6 +148,20 @@ if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err) &&
                     }
                 }
 
+                // Process department recommendations
+                if (isset($_POST['departments'])) {
+                    $departments = $_POST['departments'];
+                    $recommendationSql = "INSERT INTO tbl_club_recommendations (club_id, department, dateAdded) VALUES (:clubId, :department, NOW())";
+
+                    foreach ($departments as $department) {
+                        if ($stmt4 = $pdo->prepare($recommendationSql)) {
+                            $stmt4->bindParam(":clubId", $clubId);
+                            $stmt4->bindParam(":department", $department);
+                            $stmt4->execute();
+                        }
+                    }
+                }
+
                 header("location: ../../all_clubs.php");
                 exit();
             } else {
@@ -163,6 +173,7 @@ if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err) &&
 
     unset($pdo);
 }
+
 // $clubName = isset($_GET['clubName']) ? htmlspecialchars($_GET['clubName']) : '';
 // $coverPhoto = isset($_GET['coverPhoto']) ? htmlspecialchars($_GET['coverPhoto']) : '';
 $clubName = isset($_GET['clubName']) ? $_GET['clubName'] : '';
@@ -179,7 +190,7 @@ $student_id = isset($_GET['student_id']) ? $_GET['student_id'] : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Add Club Request</title>
+    <title>eSAS - Add Club</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
@@ -228,12 +239,39 @@ $student_id = isset($_GET['student_id']) ? $_GET['student_id'] : '';
                         <img id="coverPhotoPreview" src="<?php echo !empty($coverPhoto) ? '/esas/esas_student/images/' . htmlspecialchars($coverPhoto) : '#'; ?>" alt="Cover Photo Preview" style="display: <?php echo !empty($coverPhoto) ? 'block' : 'none'; ?>;">
                         <input type="hidden" name="hiddenCoverPhoto" id="hiddenCoverPhoto" value="<?php echo htmlspecialchars($coverPhoto); ?>">
                     </div>
+                    <br>
+                    <div class="form-group mb-2">
+                        <label>Recommend to Departments<p class="text-muted"><em>(Check all that applies)</em></label>
+                        <div>
+                            <input type="checkbox" name="departments[]" value="TEP" id="tep">
+                            <label for="tep">TEP</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="departments[]" value="BSBA" id="bsba">
+                            <label for="bsba">BSBA</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="departments[]" value="CCS" id="ccs">
+                            <label for="ccs">CCS</label>
+                        </div>
+                    </div>
                     <hr>
+                    <div class="form-group mb-2">
+                        <label>Add Moderator</label>
+                        <select name="moderator" id="moderatorSelect" class="form-control">
+                            <option value="">-- Select From Existing Moderators --</option>
+                            <optgroup label="">
+                                <?php foreach ($moderators as $moderator): ?>
+                                    <option value="<?php echo htmlspecialchars($moderator['moderator_id']); ?>">
+                                        <?php echo htmlspecialchars($moderator['moderator_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        </select>
+                    </div>
 
-
-
-
-                    <!-- <div class="form-group mb-2">
+                    <!-- DROPDOWN FOR ADDING EXISTING OR "NEW" MODERATOR COMMENTED TEMPORARILY 
+                    <div class="form-group mb-2">
                         <label>Add Moderator</label>
                         <select name="moderator" id="moderatorSelect" class="form-control">
                             <option value="">-- Select From Existing Moderators or Add New --</option>
@@ -250,8 +288,7 @@ $student_id = isset($_GET['student_id']) ? $_GET['student_id'] : '';
                         </select>
                     </div> -->
 
-
-                    
+                    <hr>
 
                     <input type="submit" class="btn btn-primary" value="Submit">
                     <a href="javascript:window.history.back();" class="btn btn-secondary">Cancel</a>
@@ -286,8 +323,8 @@ $student_id = isset($_GET['student_id']) ? $_GET['student_id'] : '';
                         <input type="text" name="lastName" class="form-control underline-input" required>
                     </div>
                     <div class="form-group mb-2">
-                        <label>Moderator ID:</label>
-                        <input type="moderator_id" name="moderator_id" class="form-control underline-input" required>
+                        <label>Email:</label>
+                        <input type="email" name="email" class="form-control underline-input" required>
                     </div>
                     <div class="form-group mb-2">
                         <label>Temporary Password:</label>
