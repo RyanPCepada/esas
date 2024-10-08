@@ -594,47 +594,62 @@ try {
                                                 <p id="noDataMessageSY" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;"><em>No students.</em></p>
 
                                                 <?php
-                                                try {
-                                                    // Fetch the count of members per academic year
-                                                    $sql = "
-                                                        SELECT CONCAT(YEAR(r.dateApproved), '-', YEAR(r.dateApproved) + 1) AS academicYear, COUNT(DISTINCT s.student_id) AS memberCount
-                                                        FROM tbl_students s
-                                                        JOIN tbl_registration r ON s.student_id = r.student_id
-                                                        WHERE r.status = 'active'
-                                                        GROUP BY academicYear
-                                                        ORDER BY academicYear ASC
-                                                    ";
-                                                    $stmt = $pdo->prepare($sql);
-                                                    $stmt->execute();
-                                                    $registryPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    // Fetch the count of members per academic year
+    $sql = "
+        SELECT 
+            CONCAT(
+                CASE 
+                    WHEN MONTH(r.dateApproved) >= 8 
+                    THEN YEAR(r.dateApproved) 
+                    ELSE YEAR(r.dateApproved) - 1 
+                END, 
+                '-', 
+                CASE 
+                    WHEN MONTH(r.dateApproved) >= 8 
+                    THEN YEAR(r.dateApproved) + 1 
+                    ELSE YEAR(r.dateApproved) 
+                END
+            ) AS academicYear,
+            COUNT(s.student_id) AS memberCount -- Count the number of students for each academic year
+        FROM tbl_students s
+        JOIN tbl_registration r ON s.student_id = r.student_id
+        WHERE r.status = 'active'
+        GROUP BY academicYear -- Group by academic year
+        ORDER BY academicYear ASC;
+    ";
 
-                                                    // Initialize arrays for chart data
-                                                    $academicYears = [];
-                                                    $memberCountsPerSY = [];
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $registryPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    // Populate the arrays with data
-                                                    foreach ($registryPerSYData as $row) {
-                                                        $academicYears[] = $row['academicYear'];  // Academic year
-                                                        $memberCountsPerSY[] = $row['memberCount'];  // Number of members for each year
-                                                    }
+    // Initialize arrays for chart data
+    $academicYears = [];
+    $memberCountsPerSY = [];
 
-                                                    // Fetch the total number of students for max value
-                                                    $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
-                                                    $totalStudentsStmt->execute();
-                                                    $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
-                                                    $totalStudentCount = $totalStudentsData ? (int)$totalStudentsData['totalCount'] : 0;
+    // Populate the arrays with data
+    foreach ($registryPerSYData as $row) {
+        $academicYears[] = $row['academicYear'];  // Just the academic year
+        $memberCountsPerSY[] = $row['memberCount'];  // Number of members for each academic year
+    }
 
-                                                    // Function to round up to the nearest even number
-                                                    function roundUpToEven($number) {
-                                                        return $number % 2 === 0 ? $number : $number + 1;
-                                                    }
+    // Fetch the total number of students for max value
+    $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
+    $totalStudentsStmt->execute();
+    $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
+    $totalStudentCount = $totalStudentsData ? (int)$totalStudentsData['totalCount'] : 0;
 
-                                                    // Adjust max value to nearest even number
-                                                    $maxMemberCount = roundUpToEven($totalStudentCount);
-                                                } catch (PDOException $e) {
-                                                    echo "Error: " . $e->getMessage();
-                                                }
-                                                ?>
+    // Function to round up to the nearest even number
+    function roundUpToEven($number) {
+        return $number % 2 === 0 ? $number : $number + 1;
+    }
+
+    // Adjust max value to nearest even number
+    $maxMemberCount = roundUpToEven($totalStudentCount);
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+}
+?>
 
                                                 <!-- Include Chart.js -->
                                                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
