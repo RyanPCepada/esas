@@ -167,7 +167,7 @@ try {
                 background-position: 52.5% !important;
             }
             .parallax1 h1, .parallax2 h1 {
-                font-size: 40px !important;
+                font-size: 45px !important;
             }
             .officer-label {
                 font-size: 30px;
