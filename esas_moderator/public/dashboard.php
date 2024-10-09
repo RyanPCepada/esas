@@ -175,6 +175,11 @@ try {
                                 <i class="fas fa-door-open"></i> Departure Requests
                             </a>
                         </li>
+                        <li>
+                            <a href="../../esas_moderator/public/reports.php" class="nav-link left-sidebar text-dark" id="reports">
+                                <i class="fas fa-file-alt"></i> Reports
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
@@ -558,7 +563,7 @@ try {
                                 <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <p>Total Students per Department</p>
-                                        <div style="height: 370px; background-color: transparent;">
+                                        <div style="height: auto; background-color: transparent;">
                                             <?php
                                             try {
                                                 // Get the selected club_id and school_year from the URL

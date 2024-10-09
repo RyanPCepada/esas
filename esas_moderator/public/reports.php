@@ -5,21 +5,21 @@ require_once "../../config.php";  // Assuming this file holds your PDO connectio
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-if (!isset($_SESSION['admin_id'])) {
+if (!isset($_SESSION['moderator_id'])) {
     echo "Admin ID is not set in the session.";
     exit;
 }
 
-$admin_id = $_SESSION['admin_id']; // Get admin ID from session
+$moderator_id = $_SESSION['moderator_id']; // Get admin ID from session
 
 try {
     // Use the existing PDO instance from config.php
     global $pdo;
 
     // Prepare and execute the SQL statement
-    $sql = "SELECT email FROM tbl_admin WHERE admin_id = :admin_id";
+    $sql = "SELECT email FROM tbl_moderators WHERE moderator_id = :moderator_id";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':admin_id', $admin_id, PDO::PARAM_INT);
+    $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
     $stmt->execute();
     
     // Fetch the result
@@ -115,7 +115,7 @@ try {
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
                     <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
-                    eSAS - Admin</a>
+                    eSAS - Moderator</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
                     <span class="navbar-toggler-icon"></span>
@@ -131,33 +131,33 @@ try {
 
             <div class="d-flex flex-column flex-shrink-0 px-2 bg-body-tertiary">
                 <ul class="nav nav-pills flex-column mb-auto">
+                        <li>
+                            <a href="../../esas_moderator/public/dashboard.php" class="nav-link left-sidebar text-dark" id="dashboard">
+                                <i class="fas fa-chart-line"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="../../esas_moderator/public/my_clubs.php" class="nav-link left-sidebar text-dark" id="my-clubs">
+                                <i class="fas fa-university"></i> My Clubs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="../../esas_moderator/public/students.php" class="nav-link left-sidebar text-dark" id="students">
+                                <i class="fas fa-users"></i> Students
+                            </a>
+                        </li>
+                        <li>
+                            <a href="../../esas_moderator/public/pending_approvals.php" class="nav-link left-sidebar text-dark" id="pending-approvals">
+                                <i class="fas fa-hourglass-half"></i> Pending Approvals
+                            </a>
+                        </li>
+                        <li>
+                            <a href="../../esas_moderator/public/departure_requests.php" class="nav-link left-sidebar text-dark" id="departure-requests">
+                                <i class="fas fa-door-open"></i> Departure Requests
+                            </a>
+                        </li>
                     <li>
-                        <a href="../../esas_admin/public/dashboard.php" class="nav-link left-sidebar text-dark" id="dashboard">
-                            <i class="fas fa-chart-line"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="../../esas_admin/public/all_clubs.php" class="nav-link left-sidebar text-dark" id="all-clubs">
-                            <i class="fas fa-university"></i> All Clubs
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="../../esas_admin/public/moderators.php" class="nav-link left-sidebar text-dark" id="moderators">
-                            <i class="fa fa-user-shield"></i> Moderators
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="../../esas_admin/public/students.php" class="nav-link left-sidebar text-dark" id="students">
-                            <i class="fas fa-users"></i> Students
-                        </a>
-                    </li>
-                    <li>
-                        <a href="../../esas_admin/public/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
-                            <i class="fas fa-envelope"></i> Club Requests
-                        </a>
-                    </li>
-                    <li>
-                        <a href="../../esas_admin/public/reports.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="reports">
+                        <a href="../../esas_moderator/public/reports.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="reports">
                             <i class="fas fa-file-alt"></i> Reports
                         </a>
                     </li>
@@ -168,7 +168,6 @@ try {
             <!-- LEFT SIDEBAR END -->
 
 
-            
             
             <!-- MAINPAGE BAR -->
             <div class="col-12 col-md-10 bg-lgrey auto-scroll">
@@ -184,14 +183,13 @@ try {
                                     <div class="col-md-4">
                                         <select id="reportType" class="form-control">
                                             <option value="">Select Report Type</option>
-                                            <option value="all_clubs">All Clubs Records</option>
-                                            <option value="all_moderators">All Moderators Records</option>
-                                            <option value="student_profiles">Student Profiles</option>
-                                            <option value="clubs_and_moderators_overview">Overview of Clubs and Moderators</option>
-                                            <option value="clubs_and_students_overview">Overview of Clubs and Students</option>
-                                            <option value="club_activity_summary">Club Activity Summary</option>
-                                            <option value="student_club_requests">Student Club Requests</option>
-                                            <option value="student_registration_status">Student Registration Status</option>
+                                            <option value="moderator_clubs_summary">Summary of Clubs You Manage</option>
+                                            <option value="club_student_counts">Number of Students per Club</option>
+                                            <option value="pending_approvals">Pending Club Requests</option>
+                                            <option value="approved_disapproved_requests">Approved and Disapproved Requests</option>
+                                            <option value="moderator_events">Events You Manage</option>
+                                            <option value="pending_departure_requests">Pending Departure Requests</option>
+                                            <option value="club_notifications">Club Notifications</option>
                                         </select>
                                     </div>
 
@@ -206,9 +204,7 @@ try {
                                         <button id="generateReport" class="btn btn-primary">Generate Report</button>
                                         <button id="printReport" class="btn btn-secondary"><i class="fas fa-print"></i> Print Report</button>
                                     </div>
-
                                 </div>
-
 
                                 <table>
                                     <tr>
@@ -221,14 +217,9 @@ try {
                                     </tr>
                                 </table>
 
-
-
                                 <div class="mt-1" id="reportContent">
                                     <!-- Dynamically generated table will be inserted here -->
                                 </div>
-
-
-
                             </div>
                             <!-- ALL STUDENT TABLE END -->
 
@@ -279,37 +270,33 @@ function generateTitleAndDescription(reportType) {
     let reportDescription = '';
 
     switch (reportType) {
-        case 'all_clubs':
-            reportTitle = "All Clubs Records";
-            reportDescription = "This report provides a comprehensive overview of all registered clubs, including their names, cover photos, and dates of establishment.";
+        case 'moderator_clubs_summary':
+            reportTitle = "Summary of Clubs You Manage";
+            reportDescription = "This report provides a summary of all clubs managed by you, including the total number of clubs and the students registered in each.";
             break;
-        case 'all_moderators':
-            reportTitle = "All Moderators Records";
-            reportDescription = "This report lists all moderators along with their personal details such as full name, gender, contact information, department, and the date they were assigned to their respective clubs.";
+        case 'club_student_counts':
+            reportTitle = "Number of Students per Club";
+            reportDescription = "This report shows the total number of students registered in each of your clubs.";
             break;
-        case 'student_profiles':
-            reportTitle = "Student Profiles";
-            reportDescription = "This report contains detailed profiles of all students, including their student ID, full name, contact information, department, course, and academic year.";
+        case 'pending_approvals':
+            reportTitle = "Pending Club Requests";
+            reportDescription = "This report lists all the pending student registration requests in the clubs you manage.";
             break;
-        case 'clubs_and_moderators_overview':
-            reportTitle = "Overview of Clubs and Moderators";
-            reportDescription = "This report provides a summary of all clubs and their respective moderators, showcasing which moderators are assigned to which clubs.";
+        case 'approved_disapproved_requests':
+            reportTitle = "Approved and Disapproved Requests";
+            reportDescription = "This report provides a summary of the approved and disapproved registration requests for your clubs.";
             break;
-        case 'clubs_and_students_overview':
-            reportTitle = "Overview of Clubs and Students";
-            reportDescription = "This report gives an overview of club memberships, showing the number of students participating in each club along with relevant student information.";
+        case 'moderator_events':
+            reportTitle = "Events Managed by You";
+            reportDescription = "This report lists all the events managed by you.";
             break;
-        case 'club_activity_summary':
-            reportTitle = "Club Activity Summary";
-            reportDescription = "This report summarizes all the activities and goals of each club, highlighting their purpose and contributions within the institution.";
+        case 'pending_departure_requests':
+            reportTitle = "Pending Departure Requests";
+            reportDescription = "This report lists all pending requests from students wanting to leave your clubs.";
             break;
-        case 'student_club_requests':
-            reportTitle = "Student Club Requests";
-            reportDescription = "This report lists the clubs proposed by students, including their goals, objectives, and activities they plan to undertake.";
-            break;
-        case 'student_registration_status':
-            reportTitle = "Student Registration Status";
-            reportDescription = "This report shows the current registration status of students for different clubs, including whether they have been approved, disapproved, or are still pending.";
+        case 'club_notifications':
+            reportTitle = "Club Notifications";
+            reportDescription = "This report provides a summary of notifications related to your clubs.";
             break;
         default:
             reportTitle = "Report";
@@ -319,7 +306,6 @@ function generateTitleAndDescription(reportType) {
     document.getElementById('reportTitle').innerText = reportTitle;
     document.getElementById('reportDescription').innerText = reportDescription;
 }
-
 function fetchReportData(reportType, startDate, endDate) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '../apis/fetch-report-api.php', true);
@@ -333,6 +319,14 @@ function fetchReportData(reportType, startDate, endDate) {
 
     xhr.send(`reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`);
 }
+document.getElementById('generateReport').addEventListener('click', function () {
+    const reportType = document.getElementById('reportType').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    generateTitleAndDescription(reportType);
+    fetchReportData(reportType, startDate, endDate);
+});
 
 document.getElementById('printReport').addEventListener('click', function () {
     const printContent = document.getElementById('reportContent').innerHTML;

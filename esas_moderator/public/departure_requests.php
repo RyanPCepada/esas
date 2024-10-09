@@ -169,6 +169,11 @@ try {
                                 <i class="fas fa-door-open"></i> Departure Requests
                             </a>
                         </li>
+                        <li>
+                            <a href="../../esas_moderator/public/reports.php" class="nav-link left-sidebar text-dark" id="reports">
+                                <i class="fas fa-file-alt"></i> Reports
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
