@@ -271,17 +271,22 @@ document.getElementById('generateReport').addEventListener('click', function () 
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
 
-    // Validate that a report type and club are selected
+    // Validate that a report type, club, and date range are selected
     if (!reportType || !clubId) {
         alert('Please select a report type and a club.');
+        return;
+    }
+    
+    if (startDate && endDate && startDate > endDate) {
+        alert('Start Date cannot be after End Date.');
         return;
     }
 
     // Dynamically generate title and description
     generateTitleAndDescription(reportType);
 
-    // Fetch and display report data
-    fetchReportData(reportType, clubId, startDate, endDate); // Pass clubId to the function
+    // Fetch and display report data, pass start and end dates
+    fetchReportData(reportType, clubId, startDate, endDate); // Pass the dates as well
 });
 
 function generateTitleAndDescription(reportType) {
@@ -319,7 +324,7 @@ function generateTitleAndDescription(reportType) {
 }
 
 
-function fetchReportData(reportType, clubId, startDate, endDate) { // Accept clubId as a parameter
+function fetchReportData(reportType, clubId, startDate, endDate) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '../apis/fetch-report-api.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -332,7 +337,6 @@ function fetchReportData(reportType, clubId, startDate, endDate) { // Accept clu
 
     // Send reportType, clubId, startDate, and endDate in the request
     xhr.send(`reportType=${reportType}&club_id=${clubId}&startDate=${startDate}&endDate=${endDate}`);
-
 }
 
 // Print report functionality

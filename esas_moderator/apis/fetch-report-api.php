@@ -8,49 +8,69 @@ date_default_timezone_set('Asia/Manila');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $reportType = $_POST['reportType'];
     $club_id = $_POST['club_id'];  // Assuming the club_id of the current club is passed
-    $startDate = $_POST['startDate'] ?? null; // Assuming you may not need these for all reports
-    $endDate = $_POST['endDate'] ?? null;
+    $startDate = $_POST['startDate'] ?? null; // Fetch start date if provided
+    $endDate = $_POST['endDate'] ?? null; // Fetch end date if provided
 
     // Fetch data based on report type for a specific club
     switch ($reportType) {
         case 'club_students_list':
-            // Fetch basic information and profile pictures of students who are members of the club
+            // Fetch basic information of students in the club
             $query = "SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail 
-                    FROM tbl_students s 
-                    JOIN tbl_registration r ON s.student_id = r.student_id 
-                    WHERE r.status = 'active' AND r.club_id = :club_id";
+                      FROM tbl_students s 
+                      JOIN tbl_registration r ON s.student_id = r.student_id 
+                      WHERE r.status = 'active' AND r.club_id = :club_id";
+            // Apply date filters if provided
+            if ($startDate && $endDate) {
+                $query .= " AND r.dateApplied BETWEEN :startDate AND :endDate";
+            }
             break;
 
         case 'pending_approvals':
-            // Fetch basic information and profile pictures of students with pending application approvals
+            // Fetch students with pending application approvals
             $query = "SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail 
-                    FROM tbl_students s 
-                    JOIN tbl_registration r ON s.student_id = r.student_id 
-                    WHERE r.status = 'pending' AND r.club_id = :club_id";
+                      FROM tbl_students s 
+                      JOIN tbl_registration r ON s.student_id = r.student_id 
+                      WHERE r.status = 'pending' AND r.club_id = :club_id";
+            // Apply date filters if provided
+            if ($startDate && $endDate) {
+                $query .= " AND r.dateApplied BETWEEN :startDate AND :endDate";
+            }
             break;
 
         case 'disapproved_applications':
-            // Fetch basic information and profile pictures of students with disapproved applications
+            // Fetch disapproved applications
             $query = "SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail 
-                    FROM tbl_students s 
-                    JOIN tbl_registration r ON s.student_id = r.student_id 
-                    WHERE r.status = 'disapproved' AND r.club_id = :club_id";
+                      FROM tbl_students s 
+                      JOIN tbl_registration r ON s.student_id = r.student_id 
+                      WHERE r.status = 'disapproved' AND r.club_id = :club_id";
+            // Apply date filters if provided
+            if ($startDate && $endDate) {
+                $query .= " AND r.dateApplied BETWEEN :startDate AND :endDate";
+            }
             break;
 
         case 'pending_departure_requests':
-            // Fetch basic information and profile pictures of students who have departed
+            // Fetch pending departure requests
             $query = "SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail 
-                    FROM tbl_students s 
-                    JOIN tbl_departure_requests d ON s.student_id = d.student_id 
-                    WHERE d.status = 'departed' AND d.club_id = :club_id";
+                      FROM tbl_students s 
+                      JOIN tbl_departure_requests d ON s.student_id = d.student_id 
+                      WHERE d.status = 'departed' AND d.club_id = :club_id";
+            // Apply date filters if provided
+            if ($startDate && $endDate) {
+                $query .= " AND d.dateRequested BETWEEN :startDate AND :endDate";
+            }
             break;
 
         case 'upcoming_events':
             // Fetch upcoming events for the current club
             $query = "SELECT title, date, time, location 
-                    FROM tbl_events 
-                    WHERE club_id = :club_id AND date >= CURDATE() 
-                    ORDER BY date ASC";
+                      FROM tbl_events 
+                      WHERE club_id = :club_id AND date >= CURDATE()";
+            // Apply date filters if provided
+            if ($startDate && $endDate) {
+                $query .= " AND date BETWEEN :startDate AND :endDate";
+            }
+            $query .= " ORDER BY date ASC";
             break;
 
         default:
@@ -58,9 +78,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
     }
 
-    // Bind parameters
+    // Prepare and bind parameters
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(':club_id', $club_id);
+    
+    // Bind date parameters if they are provided
+    if ($startDate && $endDate) {
+        $stmt->bindParam(':startDate', $startDate);
+        $stmt->bindParam(':endDate', $endDate);
+    }
 
     // Execute the query
     $stmt->execute();
@@ -97,6 +123,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo '<p class="text-danger"><em>No data found for the selected report.</em></p>';
     }
-
 }
 ?>
