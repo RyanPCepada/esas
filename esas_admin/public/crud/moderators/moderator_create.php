@@ -7,8 +7,8 @@ date_default_timezone_set('Asia/Manila');
 // Define the default profile picture constant
 define('PROF_PIC_DEFAULT', 'PROF_PIC.png'); 
 
-$firstName = $middleInitial = $lastName = $password = "";
-$firstName_err = $middleInitial_err = $lastName_err = $password_err = "";
+$firstName = $middleName = $lastName = $password = "";
+$firstName_err = $middleName_err = $lastName_err = $password_err = "";
 $clubs = [];
 
 // Fetch clubs for selection
@@ -54,11 +54,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $firstName = $input_firstName;
     }
 
-    $input_middleInitial = trim($_POST["middleInitial"]);
-    if (empty($input_middleInitial)) {
-        $middleInitial_err = "Please enter the middle initial.";
+    $input_middleName = trim($_POST["middleName"]);
+    if (empty($input_middleName)) {
+        $middleName_err = "Please enter the middle name.";
     } else {
-        $middleInitial = $input_middleInitial;
+        $middleName = $input_middleName;
     }
 
     $input_lastName = trim($_POST["lastName"]);
@@ -83,12 +83,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Set default profile picture
     $profilePic = PROF_PIC_DEFAULT;
 
-    if (empty($firstName_err) && empty($middleInitial_err) && empty($lastName_err) && empty($password_err)) {
+    if (empty($firstName_err) && empty($middleName_err) && empty($lastName_err) && empty($password_err)) {
         $sql = "INSERT INTO tbl_moderators (firstName, middleName, lastName, moderator_id, password, profilePic, dateAdded) 
-                VALUES (:firstName, :middleInitial, :lastName, :moderator_id, :password, :profilePic, NOW())";
+                VALUES (:firstName, :middleName, :lastName, :moderator_id, :password, :profilePic, NOW())";
         if ($stmt = $pdo->prepare($sql)) {
             $stmt->bindParam(":firstName", $firstName);
-            $stmt->bindParam(":middleInitial", $middleInitial);
+            $stmt->bindParam(":middleName", $middleName);
             $stmt->bindParam(":lastName", $lastName);
             $stmt->bindParam(":moderator_id", $moderator_id);
             $stmt->bindParam(":password", $password);
@@ -126,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, name-scale=1.0">
     <title>eSAS - Add Moderator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
@@ -159,9 +159,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <span class="invalid-feedback"><?php echo $firstName_err; ?></span>
                     </div>
                     <div class="form- mb-2">
-                        <label>Middle Initial</label>
-                        <input type="text" name="middleInitial" maxlength="1" class="form-control <?php echo (!empty($middleInitial_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $middleInitial; ?>" required>
-                        <span class="invalid-feedback"><?php echo $middleInitial_err; ?></span>
+                        <label>Middle Name</label>
+                        <input type="text" name="middleName" class="form-control <?php echo (!empty($middleName_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $middleName; ?>" required>
+                        <span class="invalid-feedback"><?php echo $middleName_err; ?></span>
                     </div>
                     <div class="form-group mb-2">
                         <label>Last Name</label>

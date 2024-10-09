@@ -83,10 +83,7 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
 // Handle approval or disapproval
 if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprove'])) {
     $newStatus = $_POST["action"] === 'approve' ? 'approved' : 'disapproved'; // Changed to lowercase
-    $dateDecided = null; // Default to null for disapproval
-    if ($newStatus === 'approved') {
-        $dateDecided = date('Y-m-d H:i:s'); // Get current date and time
-    }
+    $dateDecided = ($newStatus === 'approved') ? date('Y-m-d H:i:s') : null; // Get current date and time if approved, null if disapproved
 
     $updateSql = "UPDATE tbl_club_requests 
                    SET status = :status, 
@@ -95,7 +92,13 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
     if ($updateStmt = $pdo->prepare($updateSql)) {
         $updateStmt->bindParam(":status", $newStatus);
-        $updateStmt->bindParam(":dateDecided", $dateDecided);
+        // Use a conditional binding for dateDecided
+        if ($newStatus === 'approved') {
+            $updateStmt->bindParam(":dateDecided", $dateDecided); // Bind actual date
+        } else {
+            $nullValue = null; // Bind NULL explicitly for disapproved
+            $updateStmt->bindParam(":dateDecided", $nullValue, PDO::PARAM_NULL);
+        }
         $updateStmt->bindParam(":request_id", $request_id, PDO::PARAM_INT);
 
         if ($updateStmt->execute()) {
