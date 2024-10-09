@@ -10,43 +10,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $startDate = $_POST['startDate'];
     $endDate = $_POST['endDate'];
 
+    // Initialize query variable
+    $query = "";
+
     // Fetch data based on report type
     switch ($reportType) {
         case 'all_clubs':
-            $query = "SELECT coverPhoto, clubName, dateAdded FROM tbl_clubs";
+            $query = "SELECT clubName AS 'Club Name', dateAdded AS 'Date Added' FROM tbl_clubs";
             break;
 
         case 'all_moderators':
-            $query = "SELECT CONCAT(firstName, ' ', lastName) AS fullName, gender, email, phoneNumber, department, dateAdded FROM tbl_moderators";
+            $query = "SELECT moderator_id AS 'Moderator ID', CONCAT(firstName, ' ', lastName) AS 'Full Name', gender AS 'Gender', email AS 'Email', phoneNumber AS 'Phone Number', department AS 'Department', dateAdded AS 'Date Added' FROM tbl_moderators";
             break;
 
         case 'student_profiles':
-            $query = "SELECT student_id, CONCAT(firstName, ' ', lastName) AS fullName, gender, instiEmail, phoneNumber, department, year FROM tbl_students";
+            $query = "SELECT student_id AS 'Student ID', CONCAT(firstName, ' ', lastName) AS 'Full Name', gender AS 'Gender', instiEmail AS 'Institutional Email', phoneNumber AS 'Phone Number', department AS 'Department', year AS 'Year' FROM tbl_students";
             break;
 
-        case 'clubs_and_moderators_overview':
-            $query = "SELECT c.clubName, CONCAT(m.firstName, ' ', m.lastName) AS moderatorName, m.email, cm.dateAdded FROM tbl_clubs c JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id";
+        case 'moderators_and_clubs_overview':
+            $query = "SELECT CONCAT(m.firstName, ' ', m.lastName) AS 'Moderator Full Name', c.clubName AS 'Club Name', m.email AS 'Email', cm.dateAdded AS 'Date Added' FROM tbl_clubs c JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id";
             break;
 
-        case 'clubs_and_students_overview':
-            $query = "SELECT c.clubName, CONCAT(s.firstName, ' ', s.lastName) AS studentName, s.instiEmail, s.year FROM tbl_clubs c JOIN tbl_registration r ON c.club_id = r.club_id JOIN tbl_students s ON r.student_id = s.student_id";
-            break;
-
-        case 'club_activity_summary':
-            $query = "SELECT clubName, description, activities, dateRequested, status FROM tbl_club_requests";
+        case 'students_and_clubs_overview':
+            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS 'Student Full Name', c.clubName AS 'Club Name', s.instiEmail AS 'Institutional Email', s.year AS 'Year' FROM tbl_clubs c JOIN tbl_registration r ON c.club_id = r.club_id JOIN tbl_students s ON r.student_id = s.student_id WHERE status = 'active'";
             break;
 
         case 'student_club_requests':
-            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS studentName, cr.clubName, cr.description, cr.activities, cr.dateRequested, cr.status FROM tbl_club_requests cr JOIN tbl_students s ON cr.student_id = s.student_id";
-            break;            
+            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS 'Student Name', cr.clubName AS 'Club Name', cr.status AS 'Status', cr.dateRequested AS 'Date Requested', cr.dateDecided AS 'Date Decided', cr.status AS 'Status' FROM tbl_club_requests cr JOIN tbl_students s ON cr.student_id = s.student_id";
+            break;
 
         case 'student_registration_status':
-            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS studentName, c.clubName, r.status, r.dateApproved FROM tbl_registration r JOIN tbl_students s ON r.student_id = s.student_id JOIN tbl_clubs c ON r.club_id = c.club_id";
+            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS 'Student Name', c.clubName AS 'Club Name', r.status AS 'Status', r.dateApproved AS 'Date Approved' FROM tbl_registration r JOIN tbl_students s ON r.student_id = s.student_id JOIN tbl_clubs c ON r.club_id = c.club_id";
             break;
 
         default:
             echo 'Invalid report type selected.';
             exit;
+    }
+
+    // Add date filtering if startDate and endDate are provided
+    if (!empty($startDate) && !empty($endDate)) {
+        // Ensure the dates are in the correct format for SQL
+        $startDate = date('Y-m-d', strtotime($startDate));
+        $endDate = date('Y-m-d', strtotime($endDate));
+
+        switch ($reportType) {
+            case 'all_clubs':
+            case 'all_moderators':
+            case 'student_profiles':
+                // Assuming dateAdded is the field to filter for all clubs and moderators
+                $query .= " WHERE dateAdded BETWEEN '$startDate' AND '$endDate'";
+                break;
+                
+            case 'clubs_and_moderators_overview':
+                $query .= " WHERE cm.dateAdded BETWEEN '$startDate' AND '$endDate'";
+                break;
+
+            case 'clubs_and_students_overview':
+            case 'student_registration_status':
+                // Assuming registration date is relevant for students
+                $query .= " WHERE r.dateApproved BETWEEN '$startDate' AND '$endDate'";
+                break;
+
+            case 'club_activity_summary':
+                $query .= " WHERE dateRequested BETWEEN '$startDate' AND '$endDate'";
+                break;
+
+            case 'student_club_requests':
+                $query .= " WHERE cr.dateRequested BETWEEN '$startDate' AND '$endDate'";
+                break;
+        }
     }
 
     // Execute query and return results
@@ -71,22 +104,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo "<td><img src='$imagePath' alt='Image' style='width: 100px; height: 57px; object-fit: cover;'></td>";
                 } 
                 // Check if the field is a date and format it as Month Day, Year
-                elseif (strpos($key, 'date') !== false || strpos($key, 'Added') !== false || strpos($key, 'Requested') !== false || strpos($key, 'Approved') !== false) {
-                    // Format date as Month Day, Year
-                    $formattedDate = date('F j, Y', strtotime($value));
-                    echo "<td>$formattedDate</td>";
+                elseif (strpos($key, 'date') !== false || strpos($key, 'Added') !== false || strpos($key, 'Requested') !== false || strpos($key, 'Approved') !== false || strpos($key, 'Decided') !== false) {
+                    // Check if the date is '0000-00-00 00:00:00' or empty
+                    if ($value === '0000-00-00 00:00:00' || empty($value)) {
+                        echo "<td></td>";  // Display empty cell
+                    } else {
+                        // Format date as Month Day, Year
+                        $formattedDate = date('F j, Y', strtotime($value));
+                        echo "<td>$formattedDate</td>";
+                    }
                 } else {
                     // For other fields, just display the value
                     echo "<td>$value</td>";
                 }
             }
             echo "</tr>";
-        }
+        }        
         echo "</tbody></table>";
     } else {
         echo '<p class="text-danger"><em>No data found for the selected report.</em></p>';
     }
-
-    
 }
 ?>

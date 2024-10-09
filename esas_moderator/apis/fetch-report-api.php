@@ -15,10 +15,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     switch ($reportType) {
         case 'club_students_list':
             // Fetch basic information of students in the club
-            $query = "SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail 
-                      FROM tbl_students s 
-                      JOIN tbl_registration r ON s.student_id = r.student_id 
-                      WHERE r.status = 'active' AND r.club_id = :club_id";
+            $query = "SELECT s.student_id AS 'Student ID', s.firstName AS 'First Name', 
+                            s.middleName AS 'Middle Name', s.lastName AS 'Last Name', 
+                            s.instiEmail AS 'Institutional Email' 
+                    FROM tbl_students s 
+                    JOIN tbl_registration r ON s.student_id = r.student_id 
+                    WHERE r.status = 'active' AND r.club_id = :club_id";
             // Apply date filters if provided
             if ($startDate && $endDate) {
                 $query .= " AND r.dateApplied BETWEEN :startDate AND :endDate";
@@ -27,10 +29,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'pending_approvals':
             // Fetch students with pending application approvals
-            $query = "SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail 
-                      FROM tbl_students s 
-                      JOIN tbl_registration r ON s.student_id = r.student_id 
-                      WHERE r.status = 'pending' AND r.club_id = :club_id";
+            $query = "SELECT s.student_id AS 'Student ID', s.firstName AS 'First Name', 
+                            s.middleName AS 'Middle Name', s.lastName AS 'Last Name', 
+                            s.instiEmail AS 'Institutional Email' 
+                    FROM tbl_students s 
+                    JOIN tbl_registration r ON s.student_id = r.student_id 
+                    WHERE r.status = 'pending' AND r.club_id = :club_id";
             // Apply date filters if provided
             if ($startDate && $endDate) {
                 $query .= " AND r.dateApplied BETWEEN :startDate AND :endDate";
@@ -39,10 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'disapproved_applications':
             // Fetch disapproved applications
-            $query = "SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail 
-                      FROM tbl_students s 
-                      JOIN tbl_registration r ON s.student_id = r.student_id 
-                      WHERE r.status = 'disapproved' AND r.club_id = :club_id";
+            $query = "SELECT s.student_id AS 'Student ID', s.firstName AS 'First Name', 
+                            s.middleName AS 'Middle Name', s.lastName AS 'Last Name', 
+                            s.instiEmail AS 'Institutional Email' 
+                    FROM tbl_students s 
+                    JOIN tbl_registration r ON s.student_id = r.student_id 
+                    WHERE r.status = 'disapproved' AND r.club_id = :club_id";
             // Apply date filters if provided
             if ($startDate && $endDate) {
                 $query .= " AND r.dateApplied BETWEEN :startDate AND :endDate";
@@ -51,10 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'pending_departure_requests':
             // Fetch pending departure requests
-            $query = "SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail 
-                      FROM tbl_students s 
-                      JOIN tbl_departure_requests d ON s.student_id = d.student_id 
-                      WHERE d.status = 'departed' AND d.club_id = :club_id";
+            $query = "SELECT s.student_id AS 'Student ID', s.firstName AS 'First Name', 
+                            s.middleName AS 'Middle Name', s.lastName AS 'Last Name', 
+                            s.instiEmail AS 'Institutional Email' 
+                    FROM tbl_students s 
+                    JOIN tbl_departure_requests d ON s.student_id = d.student_id 
+                    WHERE d.status = 'departed' AND d.club_id = :club_id";
             // Apply date filters if provided
             if ($startDate && $endDate) {
                 $query .= " AND d.dateRequested BETWEEN :startDate AND :endDate";
@@ -63,9 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'upcoming_events':
             // Fetch upcoming events for the current club
-            $query = "SELECT title, date, time, location 
-                      FROM tbl_events 
-                      WHERE club_id = :club_id AND date >= CURDATE()";
+            $query = "SELECT title AS 'Event Title', date AS 'Event Date', 
+                            time AS 'Event Time', location AS 'Event Location' 
+                    FROM tbl_events 
+                    WHERE club_id = :club_id AND date >= CURDATE()";
             // Apply date filters if provided
             if ($startDate && $endDate) {
                 $query .= " AND date BETWEEN :startDate AND :endDate";

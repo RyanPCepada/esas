@@ -187,9 +187,8 @@ try {
                                             <option value="all_clubs">All Clubs Records</option>
                                             <option value="all_moderators">All Moderators Records</option>
                                             <option value="student_profiles">Student Profiles</option>
-                                            <option value="clubs_and_moderators_overview">Overview of Clubs and Moderators</option>
-                                            <option value="clubs_and_students_overview">Overview of Clubs and Students</option>
-                                            <option value="club_activity_summary">Club Activity Summary</option>
+                                            <option value="moderators_and_clubs_overview">Overview of Moderators and Clubs</option>
+                                            <option value="students_and_clubs_overview">Overview of Students and Clubs</option>
                                             <option value="student_club_requests">Student Club Requests</option>
                                             <option value="student_registration_status">Student Registration Status</option>
                                         </select>
@@ -206,9 +205,7 @@ try {
                                         <button id="generateReport" class="btn btn-primary">Generate Report</button>
                                         <button id="printReport" class="btn btn-secondary"><i class="fas fa-print"></i> Print Report</button>
                                     </div>
-
                                 </div>
-
 
                                 <table>
                                     <tr>
@@ -221,13 +218,9 @@ try {
                                     </tr>
                                 </table>
 
-
-
                                 <div class="mt-3" id="reportContent">
                                     <!-- Dynamically generated table will be inserted here -->
                                 </div>
-
-
 
                             </div>
                             <!-- ALL STUDENT TABLE END -->
@@ -238,6 +231,7 @@ try {
 
                         </div>
                         <!-- THE MAIN PAGE END -->
+
 
                     </div>
                 </div>
@@ -291,17 +285,13 @@ function generateTitleAndDescription(reportType) {
             reportTitle = "Student Profiles";
             reportDescription = "This report contains detailed profiles of all students, including their student ID, full name, contact information, department, course, and academic year.";
             break;
-        case 'clubs_and_moderators_overview':
-            reportTitle = "Overview of Clubs and Moderators";
-            reportDescription = "This report provides a summary of all clubs and their respective moderators, showcasing which moderators are assigned to which clubs.";
+        case 'moderators_and_clubs_overview':
+            reportTitle = "Overview of Moderators and Clubs";
+            reportDescription = "This report provides a summary of all moderators and their respective clubs, showcasing which moderators are assigned to which clubs.";
             break;
-        case 'clubs_and_students_overview':
-            reportTitle = "Overview of Clubs and Students";
+        case 'students_and_clubs_overview':
+            reportTitle = "Overview of Students and Clubs";
             reportDescription = "This report gives an overview of club memberships, showing the number of students participating in each club along with relevant student information.";
-            break;
-        case 'club_activity_summary':
-            reportTitle = "Club Activity Summary";
-            reportDescription = "This report summarizes all the activities and goals of each club, highlighting their purpose and contributions within the institution.";
             break;
         case 'student_club_requests':
             reportTitle = "Student Club Requests";
