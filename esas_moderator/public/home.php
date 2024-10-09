@@ -391,13 +391,30 @@ unset($pdo);
                                         <h4 class="mb-0">Share Something Exciting!</h4>
                                     </div>
                                     <div class="card-body">
-                                        <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>">
-                                            <div class="form-group">
+                                        <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>" enctype="multipart/form-data">
+                                            <div class="form-group mb-0">
                                                 <label for="postContent">What's on your mind?</label>
                                                 <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
                                                 <span class="text-danger"><?php echo $postContent_err; ?></span>
                                             </div>
-                                            <div class="d-flex justify-content-between align-items-center">
+
+                                            <!-- Icon Buttons for Uploading Images, Files, and Videos -->
+                                            <div class="form-group d-flex justify-content-end mt-0 mb-0">
+                                                <button type="button" class="btn btn-outline px-1 py-0 m-1" id="imageUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
+                                                    <i class="fa fa-image text-info"></i>
+                                                    <input type="file" name="images[]" id="imageUpload" accept="image/*" multiple style="display: none;">
+                                                </button>
+                                                <button type="button" class="btn btn-outline px-1 py-0 m-1" id="fileUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
+                                                    <i class="fa fa-file text-info"></i>
+                                                    <input type="file" name="files[]" id="fileUpload" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" multiple style="display: none;">
+                                                </button>
+                                                <button type="button" class="btn btn-outline px-1 py-0 m-1" id="videoUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
+                                                    <i class="fa fa-video text-info"></i>
+                                                    <input type="file" name="videos[]" id="videoUpload" accept="video/*" multiple style="display: none;">
+                                                </button>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between align-items-center mt-0">
                                                 <button type="submit" class="btn btn-primary" style="border-radius: 3px;"><i class="fa fa-paper-plane"></i> Post</button>
                                                 <div class="text-muted ml-2">
                                                     <p>Let your club members know what's happening!</p>
@@ -408,6 +425,7 @@ unset($pdo);
                                 </div>
                             </div>
                         </div>
+
                         <br><hr>
                         <!-- Post List -->
                         <div class="post_list">

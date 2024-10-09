@@ -1,66 +1,67 @@
 <?php
 require_once "../../config.php";  // Database connection
+session_start();
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $reportType = $_POST['reportType'];
-    $startDate = $_POST['startDate'];
-    $endDate = $_POST['endDate'];
+    $club_id = $_POST['club_id'];  // Assuming the club_id of the current club is passed
+    $startDate = $_POST['startDate'] ?? null; // Assuming you may not need these for all reports
+    $endDate = $_POST['endDate'] ?? null;
 
-    // Fetch data based on report type for moderators
+    // Fetch data based on report type for a specific club
     switch ($reportType) {
-        case 'moderator_clubs_summary':
-            $query = "SELECT clubName, dateAdded FROM tbl_clubs WHERE moderator_id = :moderator_id";
-            break;
-
-        case 'club_student_counts':
-            $query = "SELECT c.clubName, COUNT(r.student_id) AS studentCount FROM tbl_clubs c 
-                      JOIN tbl_registration r ON c.club_id = r.club_id 
-                      WHERE c.moderator_id = :moderator_id GROUP BY c.club_id";
+        case 'club_students_list':
+            // Fetch basic information and profile pictures of students who are members of the club
+            $query = "SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail 
+                    FROM tbl_students s 
+                    JOIN tbl_registration r ON s.student_id = r.student_id 
+                    WHERE r.status = 'active' AND r.club_id = :club_id";
             break;
 
         case 'pending_approvals':
-            $query = "SELECT s.firstName, s.lastName, s.instiEmail, r.dateAdded FROM tbl_students s 
-                      JOIN tbl_registration r ON s.student_id = r.student_id 
-                      JOIN tbl_clubs c ON r.club_id = c.club_id 
-                      WHERE r.status = 'Pending' AND c.moderator_id = :moderator_id";
+            // Fetch basic information and profile pictures of students with pending application approvals
+            $query = "SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail 
+                    FROM tbl_students s 
+                    JOIN tbl_registration r ON s.student_id = r.student_id 
+                    WHERE r.status = 'pending' AND r.club_id = :club_id";
             break;
 
-        case 'approved_disapproved_requests':
-            $query = "SELECT s.firstName, s.lastName, s.instiEmail, r.status, r.dateApproved FROM tbl_students s 
-                      JOIN tbl_registration r ON s.student_id = r.student_id 
-                      JOIN tbl_clubs c ON r.club_id = c.club_id 
-                      WHERE r.status IN ('Approved', 'Disapproved') AND c.moderator_id = :moderator_id";
-            break;
-
-        case 'moderator_events':
-            $query = "SELECT eventName, eventDate FROM tbl_events WHERE moderator_id = :moderator_id";
+        case 'disapproved_applications':
+            // Fetch basic information and profile pictures of students with disapproved applications
+            $query = "SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail 
+                    FROM tbl_students s 
+                    JOIN tbl_registration r ON s.student_id = r.student_id 
+                    WHERE r.status = 'disapproved' AND r.club_id = :club_id";
             break;
 
         case 'pending_departure_requests':
-            $query = "SELECT s.firstName, s.lastName, s.instiEmail, d.dateRequested FROM tbl_students s 
-                      JOIN tbl_departure_requests d ON s.student_id = d.student_id 
-                      JOIN tbl_clubs c ON d.club_id = c.club_id 
-                      WHERE d.status = 'Pending' AND c.moderator_id = :moderator_id";
+            // Fetch basic information and profile pictures of students who have departed
+            $query = "SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail 
+                    FROM tbl_students s 
+                    JOIN tbl_departure_requests d ON s.student_id = d.student_id 
+                    WHERE d.status = 'departed' AND d.club_id = :club_id";
             break;
 
-        case 'club_notifications':
-            $query = "SELECT notificationContent, dateSent FROM tbl_notifications WHERE club_id IN 
-                      (SELECT club_id FROM tbl_clubs WHERE moderator_id = :moderator_id)";
+        case 'upcoming_events':
+            // Fetch upcoming events for the current club
+            $query = "SELECT title, date, time, location 
+                    FROM tbl_events 
+                    WHERE club_id = :club_id AND date >= CURDATE() 
+                    ORDER BY date ASC";
             break;
 
         default:
-            echo 'Invalid report type selected.';
+            echo '<div class="alert alert-danger"><p><em>Invalid report type selected.</em></p></div>';
             exit;
     }
 
-    // Bind moderator_id dynamically (assuming it's stored in the session)
-    $moderator_id = $_SESSION['moderator_id'];  // Modify based on your authentication method
+    // Bind parameters
     $stmt = $pdo->prepare($query);
-    $stmt->bindParam(':moderator_id', $moderator_id);
-    
+    $stmt->bindParam(':club_id', $club_id);
+
     // Execute the query
     $stmt->execute();
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -75,11 +76,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($data as $row) {
             echo "<tr>";
             foreach ($row as $key => $value) {
-                // Format date fields
-                if (strpos($key, 'date') !== false || strpos($key, 'Added') !== false || strpos($key, 'Approved') !== false) {
+                // Check if the column is for profilePic and display the image
+                if ($key === 'profilePic') {
+                    // Assuming images are stored in a specific directory for students
+                    $imagePath = '/esas/esas_student/images/' . $value;
+                    echo "<td><img src='$imagePath' alt='Profile Image' style='width: 35px; height: 35px; border-radius: 50%;'></td>";
+                } 
+                // Format date fields if applicable
+                elseif (strpos($key, 'date') !== false) {
                     $formattedDate = date('F j, Y', strtotime($value));
                     echo "<td>$formattedDate</td>";
                 } else {
+                    // For other fields, just display the value
                     echo "<td>$value</td>";
                 }
             }
@@ -87,7 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         echo "</tbody></table>";
     } else {
-        echo "<p>No data found for the selected report.</p>";
+        echo '<p class="text-danger"><em>No data found for the selected report.</em></p>';
     }
+
 }
 ?>

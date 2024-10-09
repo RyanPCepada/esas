@@ -223,7 +223,7 @@ try {
 
 
 
-                                <div class="mt-1" id="reportContent">
+                                <div class="mt-3" id="reportContent">
                                     <!-- Dynamically generated table will be inserted here -->
                                 </div>
 

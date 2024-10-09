@@ -6,32 +6,38 @@ require_once "../../config.php";  // Assuming this file holds your PDO connectio
 date_default_timezone_set('Asia/Manila');
 
 if (!isset($_SESSION['moderator_id'])) {
-    echo "Admin ID is not set in the session.";
+    echo "Moderator ID is not set in the session.";
     exit;
 }
 
-$moderator_id = $_SESSION['moderator_id']; // Get admin ID from session
+$moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 
 try {
     // Use the existing PDO instance from config.php
     global $pdo;
 
-    // Prepare and execute the SQL statement
+    // Fetch moderator email
     $sql = "SELECT email FROM tbl_moderators WHERE moderator_id = :moderator_id";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
     $stmt->execute();
-    
-    // Fetch the result
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Check if a result was found
     if ($result) {
         $email = strtoupper($result['email']);
     } else {
-        // Handle the case where no data is found
         $email = "UNKNOWN";
     }
+
+    // Fetch clubs handled by the moderator using tbl_clubs_and_moderators table
+    $clubSql = "SELECT c.club_id, c.clubName 
+                FROM tbl_clubs c
+                INNER JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                WHERE cm.moderator_id = :moderator_id";
+    $clubStmt = $pdo->prepare($clubSql);
+    $clubStmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+    $clubStmt->execute();
+    $clubs = $clubStmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
     // Handle database connection or query error
@@ -39,6 +45,7 @@ try {
 }
 
 ?>
+
 
 
 
@@ -174,38 +181,47 @@ try {
                 <div class="row g-0 h-100">
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
 
-                        <!-- THE MAIN PAGE START -->
+                        <!-- THE MAIN PAGE START --> 
                         <div class="card p-2">
-
                             <!-- ALL STUDENT TABLE START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 <div class="row mb-3">
-                                    <div class="col-md-4">
+                                    <!-- Report Type Dropdown -->
+                                    <div class="col-md-2">
                                         <select id="reportType" class="form-control">
                                             <option value="">Select Report Type</option>
-                                            <option value="moderator_clubs_summary">Summary of Clubs You Manage</option>
-                                            <option value="club_student_counts">Number of Students per Club</option>
-                                            <option value="pending_approvals">Pending Club Requests</option>
-                                            <option value="approved_disapproved_requests">Approved and Disapproved Requests</option>
-                                            <option value="moderator_events">Events You Manage</option>
+                                            <option value="club_students_list">List of Students in Club</option>
+                                            <option value="pending_approvals">Pending Club Application Approvals</option>
+                                            <option value="disapproved_applications">Disapproved Student Applications</option>
                                             <option value="pending_departure_requests">Pending Departure Requests</option>
-                                            <option value="club_notifications">Club Notifications</option>
+                                            <option value="upcoming_events">Upcoming Events</option>
                                         </select>
                                     </div>
 
+                                    <!-- Club Dropdown -->
+                                    <div class="col-md-2">
+                                        <select id="clubSelect" class="form-control">
+                                            <option value="">Select Club</option>
+                                            <?php foreach ($clubs as $club): ?>
+                                                <option value="<?= $club['club_id']; ?>"><?= $club['clubName']; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+
+                                    <!-- Date Inputs and Buttons -->
                                     <div class="col-md-2">
                                         <input type="text" id="startDate" class="form-control" placeholder="Start Date" onfocus="(this.type='date')">
                                     </div>
                                     <div class="col-md-2">
                                         <input type="text" id="endDate" class="form-control" placeholder="End Date" onfocus="(this.type='date')">
                                     </div>
-                                    
                                     <div class="text-end col-md-4">
                                         <button id="generateReport" class="btn btn-primary">Generate Report</button>
                                         <button id="printReport" class="btn btn-secondary"><i class="fas fa-print"></i> Print Report</button>
                                     </div>
                                 </div>
 
+                                <!-- Report Title and Description -->
                                 <table>
                                     <tr>
                                         <td class="label"><strong>Report Title:</strong></td>
@@ -217,7 +233,7 @@ try {
                                     </tr>
                                 </table>
 
-                                <div class="mt-1" id="reportContent">
+                                <div class="mt-3" id="reportContent">
                                     <!-- Dynamically generated table will be inserted here -->
                                 </div>
                             </div>
@@ -229,6 +245,7 @@ try {
 
                         </div>
                         <!-- THE MAIN PAGE END -->
+
 
                     </div>
                 </div>
@@ -250,11 +267,13 @@ try {
     <script>
 document.getElementById('generateReport').addEventListener('click', function () {
     const reportType = document.getElementById('reportType').value;
+    const clubId = document.getElementById('clubSelect').value; // Get the selected club ID
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
 
-    if (!reportType) {
-        alert('Please select a report type.');
+    // Validate that a report type and club are selected
+    if (!reportType || !clubId) {
+        alert('Please select a report type and a club.');
         return;
     }
 
@@ -262,7 +281,7 @@ document.getElementById('generateReport').addEventListener('click', function () 
     generateTitleAndDescription(reportType);
 
     // Fetch and display report data
-    fetchReportData(reportType, startDate, endDate);
+    fetchReportData(reportType, clubId, startDate, endDate); // Pass clubId to the function
 });
 
 function generateTitleAndDescription(reportType) {
@@ -270,43 +289,37 @@ function generateTitleAndDescription(reportType) {
     let reportDescription = '';
 
     switch (reportType) {
-        case 'moderator_clubs_summary':
-            reportTitle = "Summary of Clubs You Manage";
-            reportDescription = "This report provides a summary of all clubs managed by you, including the total number of clubs and the students registered in each.";
-            break;
-        case 'club_student_counts':
-            reportTitle = "Number of Students per Club";
-            reportDescription = "This report shows the total number of students registered in each of your clubs.";
+        case 'club_students_list':
+            reportTitle = "List of Students in Club";
+            reportDescription = "This report shows the basic information of all students registered in this club.";
             break;
         case 'pending_approvals':
-            reportTitle = "Pending Club Requests";
-            reportDescription = "This report lists all the pending student registration requests in the clubs you manage.";
+            reportTitle = "Pending Club Application Approvals";
+            reportDescription = "This report lists all the basic information of students whose applications are pending for this club.";
             break;
-        case 'approved_disapproved_requests':
-            reportTitle = "Approved and Disapproved Requests";
-            reportDescription = "This report provides a summary of the approved and disapproved registration requests for your clubs.";
-            break;
-        case 'moderator_events':
-            reportTitle = "Events Managed by You";
-            reportDescription = "This report lists all the events managed by you.";
+        case 'disapproved_applications':
+            reportTitle = "Disapproved Student Applications";
+            reportDescription = "This report provides a summary of the basic information of students whose applications were disapproved for this club.";
             break;
         case 'pending_departure_requests':
             reportTitle = "Pending Departure Requests";
-            reportDescription = "This report lists all pending requests from students wanting to leave your clubs.";
+            reportDescription = "This report lists all pending requests from students wanting to leave this club.";
             break;
-        case 'club_notifications':
-            reportTitle = "Club Notifications";
-            reportDescription = "This report provides a summary of notifications related to your clubs.";
+        case 'upcoming_events':
+            reportTitle = "Upcoming Events";
+            reportDescription = "This report displays all upcoming events organized by this club.";
             break;
         default:
             reportTitle = "Report";
-            reportDescription = "This is a dynamically generated report.";
+            reportDescription = "This is a dynamically generated report for this club.";
     }
 
     document.getElementById('reportTitle').innerText = reportTitle;
     document.getElementById('reportDescription').innerText = reportDescription;
 }
-function fetchReportData(reportType, startDate, endDate) {
+
+
+function fetchReportData(reportType, clubId, startDate, endDate) { // Accept clubId as a parameter
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '../apis/fetch-report-api.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -317,17 +330,12 @@ function fetchReportData(reportType, startDate, endDate) {
         }
     };
 
-    xhr.send(`reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`);
+    // Send reportType, clubId, startDate, and endDate in the request
+    xhr.send(`reportType=${reportType}&club_id=${clubId}&startDate=${startDate}&endDate=${endDate}`);
+
 }
-document.getElementById('generateReport').addEventListener('click', function () {
-    const reportType = document.getElementById('reportType').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
 
-    generateTitleAndDescription(reportType);
-    fetchReportData(reportType, startDate, endDate);
-});
-
+// Print report functionality
 document.getElementById('printReport').addEventListener('click', function () {
     const printContent = document.getElementById('reportContent').innerHTML;
     const originalContent = document.body.innerHTML;
@@ -337,6 +345,7 @@ document.getElementById('printReport').addEventListener('click', function () {
     document.body.innerHTML = originalContent;
 });
 </script>
+
 
 
 </body>
