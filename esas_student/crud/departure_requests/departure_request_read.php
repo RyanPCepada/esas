@@ -146,14 +146,19 @@ try {
     </div>
 </div>
 
-<!-- Departure Request Modal -->
+<!-- Departure Request Edit Modal -->
 <div id="departureModal" class="modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
     <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
-        <p class="mt-3">Edit reason:</p>
+        <span style="color: red; font-weight: bold;">Edit Departure Reason</span>
+        <p>Please select your reason for leaving the club:</p>
         <form id="departureRequestForm" action="/esas/esas_student/crud/departure_requests/departure_request_update.php" method="POST">
             <div class="form-group">
-                <textarea id="reasonInput" name="reason" class="form-control" rows="3" placeholder="Share your reason..." required></textarea>
+                <label><input type="radio" name="departureReason" value="Drop" required> Drop</label><br>
+                <label><input type="radio" name="departureReason" value="Graduate" required> Graduate</label><br>
+                <label><input type="radio" name="departureReason" value="Others" onchange="toggleOtherReasonInput(this)"> Others:</label>
+                <input type="text" id="otherReasonInput" class="form-control" style="display:none;" placeholder="Please specify..." oninput="validateOtherReason()">
             </div>
+            <input type="hidden" id="reasonInput" name="reason" value="<?php echo htmlspecialchars($request['reason']); ?>">
             <input type="hidden" id="clubIdInput" name="club_id" value="<?php echo $club_id; ?>">
             <button type="submit" class="btn btn-danger mb-1">Save Changes</button>
             <button type="button" class="btn btn-secondary mb-1" onclick="closeDepartureModal()">Cancel</button>
@@ -168,20 +173,43 @@ function closeDepartureModal() {
 
 function showEditModal(clubId, reason) {
     document.getElementById('clubIdInput').value = clubId;
-    document.getElementById('reasonInput').value = reason;
+
+    // Set the radio buttons based on the reason
+    const reasonInputs = document.getElementsByName('departureReason');
+    reasonInputs.forEach(input => {
+        input.checked = (input.value === reason);
+        // Also update the hidden reason input based on the selected value
+        if (input.checked) {
+            document.getElementById('reasonInput').value = input.value;
+        }
+    });
+
+    // Show the other reason input if applicable
+    const otherReasonInput = document.getElementById('otherReasonInput');
+    if (reason === 'Others') {
+        otherReasonInput.style.display = 'block';
+    } else {
+        otherReasonInput.style.display = 'none';
+    }
+
     document.getElementById('departureModal').style.display = 'block';
 }
 
-function withdrawRequest(clubId, clubName) {
-    const confirmDelete = confirm(`Are you sure you want to withdraw your departure request from ${clubName}?`);
 
-    if (confirmDelete) {
-        // Redirect to the PHP file for deletion with the club ID as a parameter
-        window.location.href = `departure_request_delete.php?club_id=${clubId}`;
-    }
+function toggleOtherReasonInput(radio) {
+    const otherReasonInput = document.getElementById('otherReasonInput');
+    otherReasonInput.style.display = (radio.value === 'Others') ? 'block' : 'none';
+}
+
+function validateOtherReason() {
+    const otherReasonInput = document.getElementById('otherReasonInput');
+    const reasonInputs = document.getElementsByName('departureReason');
+    const othersSelected = Array.from(reasonInputs).some(input => input.value === 'Others' && otherReasonInput.value.trim() === '');
+
+    // Disable submit button if 'Others' is selected but no input is provided
+    document.querySelector('button[type="submit"]').disabled = othersSelected;
 }
 </script>
-
 
 </body>
 </html>
