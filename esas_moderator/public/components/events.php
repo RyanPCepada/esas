@@ -11,11 +11,20 @@
         </button>
     </div>
     <div class="col-5 d-flex justify-content-end">
-        <button type="button" class="btn text-dark btn-outline-info py-1 mb-3" id="viewOtherEvenstBtn" style="border-radius: 50px;">
+        <button type="button" class="btn text-dark btn-outline-info py-1 mb-3" id="viewOtherEventsBtn" style="border-radius: 50px;">
             Check Other Events
         </button>
     </div>
 </div>
+
+<script>
+    // Redirect to events-all-clubs.php when the button is clicked
+    document.getElementById('viewOtherEventsBtn').addEventListener('click', function() {
+        window.location.href = '../../esas_moderator/public/components/events_all_clubs.php'; // Update this path as needed
+    });
+</script>
+
+
 
 
 

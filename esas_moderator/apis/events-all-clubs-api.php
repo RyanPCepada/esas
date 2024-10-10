@@ -14,8 +14,8 @@ switch ($method) {
     case 'GET':
         // Fetch all events from all clubs
         $stmt = $pdo->query('
-            SELECT e.*, 
-                   c.clubName 
+            SELECT e.event_id, e.title, e.date, e.timeStarts, e.timeEnds, e.location,
+                c.clubName 
             FROM tbl_events e
             LEFT JOIN tbl_clubs c ON e.club_id = c.club_id
             ORDER BY e.date, e.timeStarts
