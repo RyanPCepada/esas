@@ -569,3 +569,302 @@ document.addEventListener('DOMContentLoaded', loadSelectedContent);
 </footer> -->
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+
+
+
+<div class="wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="">
+                <div class="cover-photo-container mb-3">
+                    <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
+                </div>
+                <div class="overlay-text">
+                    <div class="d-flex align-items-center">
+                        <h3><?php echo htmlspecialchars($clubName); ?></h3>
+                    </div>
+                </div>
+
+
+                <!-- Buttons for Posts, Events, Chats --
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-custom" onclick="showContent('posts')">Posts</button>
+                    <button class="btn btn-custom" onclick="showContent('events')">Events</button>
+                    <button class="btn btn-custom" onclick="showContent('chats')">Chats</button>
+                </div>
+
+                <!-- Content Section --
+                <div id="slideContent">
+                    <hr>
+                    <!-- DEFAULT POSTS DISPLAY --
+                    <div id="posts">
+                        <!-- Post Form --
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card" id="card_post">
+                                    <div class="card-header bg-info text-white d-flex align-items-center" style="position: relative; z-index: 1;">
+                                        <img src="../icons/ICON_ANNOUNCEMENT.png" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
+                                        <h4 class="mb-0">Share Something Exciting!</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>" enctype="multipart/form-data">
+                                        <div class="form-group mb-0">
+    <label for="postContent">What's on your mind?</label>
+    <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
+    <span class="text-danger"><?php echo $postContent_err; ?></span>
+</div>
+
+<!-- Preview Section (Now above the upload buttons) -->
+<div id="attachmentPreview" class="d-flex flex-wrap mt-3"></div>
+
+<!-- Icon Buttons for Uploading Images, Files, and Videos --
+<div class="form-group d-flex justify-content-end mt-0 mb-0">
+    <button type="button" class="btn btn-outline px-1 py-0 m-1" id="imageUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
+        <i class="fa fa-image text-info"></i>
+        <input type="file" name="images[]" id="imageUpload" accept="image/*" multiple style="display: none;">
+    </button>
+    <button type="button" class="btn btn-outline px-1 py-0 m-1" id="fileUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
+        <i class="fa fa-file text-info"></i>
+        <input type="file" name="files[]" id="fileUpload" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" multiple style="display: none;">
+    </button>
+    <button type="button" class="btn btn-outline px-1 py-0 m-1" id="videoUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
+        <i class="fa fa-video text-info"></i>
+        <input type="file" name="videos[]" id="videoUpload" accept="video/*" multiple style="display: none;">
+    </button>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-0">
+    <button type="submit" class="btn btn-primary" style="border-radius: 3px;"><i class="fa fa-paper-plane"></i> Post</button>
+    <div class="text-muted ml-2">
+        <p>Let your club members know what's happening!</p>
+    </div>
+</div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br><hr>
+                        <!-- Post List --
+                        <div class="post_list">
+                            <div>
+                                <?php include '../public/components/posts_and_comments.php' ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EVENTS DISPLAY --
+                    <div id="events" class="p-0" style="display: none;"> <!-- style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: none;"-->
+                        <?php include '../public/components/events.php' ?>
+                    </div>
+
+                    <!-- CHATS DISPLAY --
+                    <div id="chats" class="p-0" style="display: none;">
+                        <div class="chatbox-section">
+                            <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
+                            <div class="chatbox" id="chatbox">
+                                <!-- Example Chat Interface --
+                                <div class="messages">
+                                    <!-- Messages will be displayed here --
+                                </div>
+                                <input type="text" id="chatInput" placeholder="Type a message..." class="form-control">
+                                <button id="sendMessage" class="btn btn-primary mt-2">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-2 text-center align-items-center justify-content-center">
+                    <a href="../public/my_clubs.php" class="btn btn-secondary">Go Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Button event handlers for file input clicks
+    document.getElementById('imageUploadBtn').addEventListener('click', function() {
+        document.getElementById('imageUpload').click();
+    });
+
+    document.getElementById('fileUploadBtn').addEventListener('click', function() {
+        document.getElementById('fileUpload').click();
+    });
+
+    document.getElementById('videoUploadBtn').addEventListener('click', function() {
+        document.getElementById('videoUpload').click();
+    });
+
+    // Variables to store selected files
+    let selectedImages = [];
+    let selectedFiles = [];
+    let selectedVideos = [];
+
+    // Utility function to preview attachments
+    function previewAttachments() {
+        const previewContainer = document.getElementById('attachmentPreview');
+        previewContainer.innerHTML = ''; // Clear the preview section
+
+        // Display selected images
+        selectedImages.forEach(image => {
+            const imgElement = document.createElement('img');
+            imgElement.src = URL.createObjectURL(image);
+            imgElement.classList.add('img-thumbnail', 'm-2');
+            imgElement.style.width = '150px';
+            previewContainer.appendChild(imgElement);
+        });
+
+        // Display selected files
+        selectedFiles.forEach(file => {
+            const fileElement = document.createElement('img');
+            if (file.name.endsWith('.pdf')) {
+                fileElement.src = '/esas/esas_student/icons/ICON_PDF.png'; // Use appropriate icon
+            } else if (file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+                fileElement.src = '/esas/esas_student/icons/ICON_WORD.png'; // Use appropriate icon
+            }
+            fileElement.classList.add('img-thumbnail', 'm-2');
+            fileElement.style.width = '100px'; // Set icon size
+            previewContainer.appendChild(fileElement);
+        });
+
+        // Display selected videos
+        selectedVideos.forEach(video => {
+            const videoElement = document.createElement('video');
+            videoElement.src = URL.createObjectURL(video);
+            videoElement.controls = true;
+            videoElement.classList.add('img-thumbnail', 'm-2');
+            videoElement.style.width = '150px';
+            previewContainer.appendChild(videoElement);
+        });
+    }
+
+    // Image upload handler
+    document.getElementById('imageUpload').addEventListener('change', function(event) {
+        selectedImages = [...selectedImages, ...event.target.files];
+        previewAttachments();
+        localStorage.setItem('selectedImages', JSON.stringify(selectedImages.map(f => f.name))); // Store file names to localStorage
+    });
+
+    // File upload handler
+    document.getElementById('fileUpload').addEventListener('change', function(event) {
+        selectedFiles = [...selectedFiles, ...event.target.files];
+        previewAttachments();
+        localStorage.setItem('selectedFiles', JSON.stringify(selectedFiles.map(f => f.name))); // Store file names to localStorage
+    });
+
+    // Video upload handler
+    document.getElementById('videoUpload').addEventListener('change', function(event) {
+        selectedVideos = [...selectedVideos, ...event.target.files];
+        previewAttachments();
+        localStorage.setItem('selectedVideos', JSON.stringify(selectedVideos.map(f => f.name))); // Store file names to localStorage
+    });
+
+    // Retrieve saved files from localStorage on page load
+    window.onload = function() {
+        const savedImages = JSON.parse(localStorage.getItem('selectedImages') || '[]');
+        const savedFiles = JSON.parse(localStorage.getItem('selectedFiles') || '[]');
+        const savedVideos = JSON.parse(localStorage.getItem('selectedVideos') || '[]');
+
+        if (savedImages.length > 0) {
+            selectedImages = savedImages.map(name => new File([], name)); // Mock file objects with just names for preview
+        }
+
+        if (savedFiles.length > 0) {
+            selectedFiles = savedFiles.map(name => new File([], name)); // Mock file objects with just names for preview
+        }
+
+        if (savedVideos.length > 0) {
+            selectedVideos = savedVideos.map(name => new File([], name)); // Mock file objects with just names for preview
+        }
+
+        previewAttachments(); // Display saved attachments
+    };
+
+</script>
+
+
+
+<!-- JavaScript to switch between Posts, Events, and Chats --
+<script>
+function showContent(contentId) {
+    // Hide all content sections
+    document.getElementById('posts').style.display = 'none';
+    document.getElementById('events').style.display = 'none';
+    document.getElementById('chats').style.display = 'none';
+
+    // Show the selected content section
+    document.getElementById(contentId).style.display = 'block';
+
+    // Save the selected section in localStorage
+    localStorage.setItem('selectedContent', contentId);
+}
+
+// Function to load the selected section from localStorage on page load
+function loadSelectedContent() {
+    const selectedContent = localStorage.getItem('selectedContent');
+
+    // If a section is saved, display it; otherwise, default to posts
+    if (selectedContent) {
+        showContent(selectedContent);
+    } else {
+        showContent('posts'); // Default to posts if nothing is saved
+    }
+}
+
+// Call loadSelectedContent on page load
+document.addEventListener('DOMContentLoaded', loadSelectedContent);
+</script>
+
+
+
+<!-- <?php include 'assets/components/modals.php' ?> --
+<script src="../../assets/js/jquery.dataTables.min.js"></script>
+<script src="../../assets/js/bootstrap.bundle.min.js"></script>
+<script src="../../assets/js/global_script.js"></script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var icon = document.getElementById("icon_announcement");
+
+            function triggerAnimation() {
+                icon.style.animation = "none"; // Reset the animation
+                icon.offsetHeight; // Trigger a reflow to restart the animation
+                icon.style.animation = "zoomAndWave 1.2s ease-in-out"; // Apply the animation
+
+                setTimeout(function() {
+                    icon.style.animationPlayState = "paused"; // Pause the animation after it completes
+                }, 1200);
+            }
+
+            // Trigger the animation every 5 seconds
+            setInterval(triggerAnimation, 5000);
+            
+            // Initial trigger
+            triggerAnimation();
+        });
+    </script>
+    
+</body>
+
+
+</html>
+
+    -->
