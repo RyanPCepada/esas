@@ -297,7 +297,12 @@ function showEventDetails(event_id) {
                 }
 
                 document.getElementById('eventDate').innerText = displayDate; // Set the formatted date
-                document.getElementById('eventTime').innerText = formatTime(event.time); // Use the new formatTime function
+
+                // Format and display start and end times
+                const timeStarts = formatTime(event.timeStarts); // Format start time
+                const timeEnds = formatTime(event.timeEnds); // Format end time
+                document.getElementById('eventTime').innerText = `${timeStarts} - ${timeEnds}`; // Display both start and end times
+
                 document.getElementById('eventLocation').innerText = event.location;
                 document.getElementById('eventLink').href = event.registrationLink;
                 document.getElementById('eventLinkText').innerText = event.registrationLink; // Display the link text
@@ -335,11 +340,13 @@ window.onload = fetchEvents;
                 <h6 id="eventTitle" style="color: #007bff;"></h6>
                 <p id="eventDescription" style="margin-bottom: 1rem;"></p>
                 <p><strong>Date:</strong> <span id="eventDate" style="color: #666;"></span></p>
-                <p><strong>Time:</strong> <span id="eventTime" style="color: #666;"></span></p>
+                <p><strong>Time:</strong> <span id="eventTime" style="color: #666;"></span></p> <!-- Updated for start & end times -->
                 <p><strong>Location:</strong> <span id="eventLocation" style="color: #666;"></span></p>
-                <p><strong>Registration Link:</strong> <a id="eventLink" href="#" target="_blank" style="color: #007bff;"> 
-                    <span id="eventLinkText"></span>
-                </a></p> <!-- Display the link text -->
+                <p><strong>Registration Link:</strong> 
+                    <a id="eventLink" href="#" target="_blank" style="color: #007bff;">
+                        <span id="eventLinkText"></span>
+                    </a>
+                </p> <!-- Display the link text -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

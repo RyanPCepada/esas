@@ -189,7 +189,7 @@ try {
                                     <!-- Report Type Dropdown -->
                                     <div class="col-md-2">
                                         <select id="reportType" class="form-control">
-                                            <option value="">Select Report Type</option>
+                                            <option value="">-- Select Report Type --</option>
                                             <option value="club_students_list">List of Students in Club</option>
                                             <option value="pending_approvals">Pending Club Application Approvals</option>
                                             <option value="disapproved_applications">Disapproved Student Applications</option>

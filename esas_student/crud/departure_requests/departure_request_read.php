@@ -146,15 +146,25 @@ try {
     </div>
 </div>
 
-<!-- Departure Request Modal -->
+<!-- Departure Request Edit Modal -->
 <div id="departureModal" class="modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
     <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
-        <p class="mt-3">Edit reason:</p>
+        <span style="color: red; font-weight: bold;">Edit Departure Reason</span>
+        <p>Please select your reason for leaving the club:</p>
         <form id="departureRequestForm" action="/esas/esas_student/crud/departure_requests/departure_request_update.php" method="POST">
             <div class="form-group">
-                <textarea id="reasonInput" name="reason" class="form-control" rows="3" placeholder="Share your reason..." required></textarea>
+                <label><input type="radio" name="departureReason" value="Drop" required> Drop</label><br>
+                <label><input type="radio" name="departureReason" value="Graduate" required> Graduate</label><br>
+                <label>
+                    <input type="radio" name="departureReason" value="Others" onchange="toggleOtherReasonInput(this)"> Others:
+                </label>
+                <input type="text" id="otherReasonInput" class="form-control" style="display:none;" placeholder="Please specify..." oninput="validateOtherReason()">
             </div>
+
+            <!-- Club ID passed with the form -->
             <input type="hidden" id="clubIdInput" name="club_id" value="<?php echo $club_id; ?>">
+
+            <!-- Submit and Cancel buttons -->
             <button type="submit" class="btn btn-danger mb-1">Save Changes</button>
             <button type="button" class="btn btn-secondary mb-1" onclick="closeDepartureModal()">Cancel</button>
         </form>
@@ -162,15 +172,74 @@ try {
 </div>
 
 <script>
-function closeDepartureModal() {
-    document.getElementById('departureModal').style.display = 'none';
+function toggleOtherReasonInput(radio) {
+    const otherReasonInput = document.getElementById('otherReasonInput');
+    
+    if (radio.value === 'Others') {
+        otherReasonInput.style.display = 'block';
+        otherReasonInput.name = 'departureReason';  // Set the name to 'departureReason'
+        otherReasonInput.required = true;           // Make the "Others" input required
+    } else {
+        otherReasonInput.style.display = 'none';
+        otherReasonInput.name = '';                 // Remove the name when not selected
+        otherReasonInput.required = false;          // Remove required attribute
+    }
 }
 
 function showEditModal(clubId, reason) {
     document.getElementById('clubIdInput').value = clubId;
-    document.getElementById('reasonInput').value = reason;
+    const reasonInputs = document.getElementsByName('departureReason');
+    const otherReasonInput = document.getElementById('otherReasonInput');
+
+    reasonInputs.forEach(input => {
+        if (input.value === reason) {
+            input.checked = true;
+            toggleOtherReasonInput(input);  // Ensure correct behavior on modal open
+        }
+    });
+
+    if (reason !== 'Drop' && reason !== 'Graduate') {
+        document.querySelector('input[value="Others"]').checked = true;
+        toggleOtherReasonInput(document.querySelector('input[value="Others"]'));
+        otherReasonInput.value = reason;
+    } else {
+        otherReasonInput.style.display = 'none';  // Hide 'Others' input if not relevant
+        otherReasonInput.value = '';
+    }
+
     document.getElementById('departureModal').style.display = 'block';
 }
+
+// Capture the form submission event and display the selected reason
+document.getElementById('departureRequestForm').addEventListener('submit', function(event) {
+    // Prevent the form from submitting immediately
+    event.preventDefault();
+
+    let selectedReason;
+    const reasonRadio = document.querySelector('input[name="departureReason"]:checked');
+    const otherReasonInput = document.getElementById('otherReasonInput');
+
+    if (reasonRadio.value === 'Others' && otherReasonInput.value !== '') {
+        selectedReason = otherReasonInput.value;  // Use the custom reason if "Others" is selected
+    } else {
+        selectedReason = reasonRadio.value;  // Use the selected radio button value
+    }
+
+    // Display the selected reason in an alert
+    // alert('Departure reason updated successfully!');
+
+    // Add the selected reason to the form's hidden input (for submission)
+    const reasonInput = document.createElement('input');
+    reasonInput.type = 'hidden';
+    reasonInput.name = 'reason';
+    reasonInput.value = selectedReason;
+
+    event.target.appendChild(reasonInput);
+
+    // Allow the form to submit after showing the alert
+    event.target.submit();  // Proceed with form submission
+});
+
 
 function withdrawRequest(clubId, clubName) {
     const confirmDelete = confirm(`Are you sure you want to withdraw your departure request from ${clubName}?`);
@@ -179,6 +248,11 @@ function withdrawRequest(clubId, clubName) {
         // Redirect to the PHP file for deletion with the club ID as a parameter
         window.location.href = `departure_request_delete.php?club_id=${clubId}`;
     }
+}
+
+
+function closeDepartureModal() {
+    document.getElementById('departureModal').style.display = 'none';
 }
 </script>
 

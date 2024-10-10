@@ -502,7 +502,10 @@ try {
         <p>Could you please provide a reason for leaving the club?</p>
         <form id="departureRequestForm" onsubmit="submitDepartureRequest(event)">
             <div class="form-group">
-                <textarea id="reasonInput" class="form-control" rows="3" placeholder="Share your reason..." required></textarea>
+                <label><input type="radio" name="departureReason" value="Drop" required> Drop</label><br>
+                <label><input type="radio" name="departureReason" value="Graduate" required> Graduate</label><br>
+                <label><input type="radio" name="departureReason" value="Others" onchange="toggleOtherReasonInput(this)"> Others:</label>
+                <input type="text" id="otherReasonInput" class="form-control" style="display:none;" placeholder="Please specify..." oninput="validateOtherReason()">
             </div>
             <input type="hidden" id="clubIdInput" name="club_id" value="<?php echo $club_id; ?>">
             <button type="submit" class="btn btn-danger mb-1">Submit Departure Request</button>
@@ -510,7 +513,6 @@ try {
         </form>
     </div>
 </div>
-
 
 <!-- JavaScript to switch between Posts, Events, and Chats -->
 <script>
@@ -561,10 +563,37 @@ function openDepartureModal() {
     document.getElementById('departureModal').style.display = 'block';
 }
 
+function toggleOtherReasonInput(radio) {
+    const otherReasonInput = document.getElementById('otherReasonInput');
+    if (radio.value === 'Others') {
+        otherReasonInput.style.display = 'block';
+        otherReasonInput.setAttribute('required', 'required'); // Set input as required
+    } else {
+        otherReasonInput.style.display = 'none';
+        otherReasonInput.removeAttribute('required'); // Remove required attribute
+    }
+}
+
+function validateOtherReason() {
+    const otherReasonInput = document.getElementById('otherReasonInput');
+    const reasonInputs = document.getElementsByName('departureReason');
+    const othersSelected = Array.from(reasonInputs).some(input => input.value === 'Others' && otherReasonInput.value.trim() === '');
+    
+    // Disable submit button if 'Others' is selected but no input is provided
+    document.querySelector('button[type="submit"]').disabled = othersSelected;
+}
+
 function submitDepartureRequest(event) {
     event.preventDefault(); // Prevent the default form submission
 
-    const reason = document.getElementById('reasonInput').value; // Get reason from input
+    const reasonInputs = document.getElementsByName('departureReason');
+    let reason = Array.from(reasonInputs).find(input => input.checked)?.value || '';
+
+    // If "Others" is selected, use the input field value
+    if (reason === 'Others') {
+        reason = document.getElementById('otherReasonInput').value.trim();
+    }
+
     const club_id = document.getElementById('clubIdInput').value; // Get club ID from input
 
     const xhr = new XMLHttpRequest();

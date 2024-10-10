@@ -1,16 +1,30 @@
 <div class="events-section">
 
 <div class="row d-flex align-items-center">
-    <div class="col-11">
+    <div class="col-5 d-flex justify-content-start">
         <h5 class="text-muted mb-3" style="font-size: 1.2em;">Upcoming Events</h5>
     </div>
-    <div class="col-1">
+    <div class="col-2 d-flex justify-content-center">
         <button type="button" class="btn btn-info p-0" id="addEventBtn" data-toggle="modal" data-target="#addEventModal"
             style="color: white; width: 30px; height: 30px; margin-top: -20px; border-radius: 10%; padding: 0;">
             <i class="fas fa-plus"></i>
         </button>
     </div>
+    <div class="col-5 d-flex justify-content-end">
+        <button type="button" class="btn text-dark btn-outline-info py-1 mb-3" id="viewOtherEventsBtn" style="border-radius: 50px;">
+            Check Other Events
+        </button>
+    </div>
 </div>
+
+<script>
+    // Redirect to events-all-clubs.php when the button is clicked
+    document.getElementById('viewOtherEventsBtn').addEventListener('click', function() {
+        window.location.href = '../../esas_moderator/public/components/events_all_clubs.php'; // Update this path as needed
+    });
+</script>
+
+
 
 
 
@@ -325,7 +339,12 @@ function showEventDetails(event_id) {
                 }
 
                 document.getElementById('eventDate').innerText = displayDate; // Set the formatted date
-                document.getElementById('eventTime').innerText = formatTime(event.time); // Use the new formatTime function
+
+                // Format and display start and end times
+                const timeStarts = formatTime(event.timeStarts); // Format start time
+                const timeEnds = formatTime(event.timeEnds); // Format end time
+                document.getElementById('eventTime').innerText = `${timeStarts} - ${timeEnds}`; // Display both start and end times
+
                 document.getElementById('eventLocation').innerText = event.location;
                 document.getElementById('eventLink').href = event.registrationLink;
                 document.getElementById('eventLinkText').innerText = event.registrationLink; // Display the link text
@@ -338,7 +357,6 @@ function showEventDetails(event_id) {
             console.error('Error fetching event details:', error);
         });
 }
-
 
 
 
@@ -364,11 +382,13 @@ window.onload = fetchEvents;
                 <h6 id="eventTitle" style="color: #007bff;"></h6>
                 <p id="eventDescription" style="margin-bottom: 1rem;"></p>
                 <p><strong>Date:</strong> <span id="eventDate" style="color: #666;"></span></p>
-                <p><strong>Time:</strong> <span id="eventTime" style="color: #666;"></span></p>
+                <p><strong>Time:</strong> <span id="eventTime" style="color: #666;"></span></p> <!-- Updated for start & end times -->
                 <p><strong>Location:</strong> <span id="eventLocation" style="color: #666;"></span></p>
-                <p><strong>Registration Link:</strong> <a id="eventLink" href="#" target="_blank" style="color: #007bff;"> 
-                    <span id="eventLinkText"></span>
-                </a></p> <!-- Display the link text -->
+                <p><strong>Registration Link:</strong> 
+                    <a id="eventLink" href="#" target="_blank" style="color: #007bff;">
+                        <span id="eventLinkText"></span>
+                    </a>
+                </p> <!-- Display the link text -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -376,8 +396,6 @@ window.onload = fetchEvents;
         </div>
     </div>
 </div>
-
-
 
 
 <!-- Modal for Adding Events -->
@@ -408,8 +426,12 @@ window.onload = fetchEvents;
                         <input type="date" class="form-control" id="eventDate" name="date" required>
                     </div>
                     <div class="form-group mb-2">
-                        <label for="eventTime">Time</label>
-                        <input type="time" class="form-control" id="eventTime" name="time" required>
+                        <label for="eventTimeStarts">Start Time</label>
+                        <input type="time" class="form-control" id="eventTimeStarts" name="timeStarts" required>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="eventTimeEnds">End Time</label>
+                        <input type="time" class="form-control" id="eventTimeEnds" name="timeEnds" required>
                     </div>
                     <div class="form-group mb-2">
                         <label for="eventLocation">Location</label>
@@ -427,6 +449,7 @@ window.onload = fetchEvents;
 </div>
 
 
+
 <!-- Modal for Editing Events -->
 <div class="modal fade" id="editEventModal" tabindex="-1" role="dialog" aria-labelledby="editEventModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -442,6 +465,7 @@ window.onload = fetchEvents;
                     <input type="hidden" name="club_id" value="<?php echo $club_id; ?>">
                     <input type="hidden" name="moderator_id" value="<?php echo $moderator_id; ?>">
                     <input type="hidden" name="event_id" id="editEventId">
+                    
                     <div class="form-group mb-2">
                         <label for="editEventTitle">Title</label>
                         <input type="text" class="form-control" id="editEventTitle" name="title" required>
@@ -455,8 +479,12 @@ window.onload = fetchEvents;
                         <input type="date" class="form-control" id="editEventDate" name="date" required>
                     </div>
                     <div class="form-group mb-2">
-                        <label for="editEventTime">Time</label>
-                        <input type="time" class="form-control" id="editEventTime" name="time" required>
+                        <label for="editEventTimeStarts">Start Time</label>
+                        <input type="time" class="form-control" id="editEventTimeStarts" name="timeStarts" required>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label for="editEventTimeEnds">End Time</label>
+                        <input type="time" class="form-control" id="editEventTimeEnds" name="timeEnds" required>
                     </div>
                     <div class="form-group mb-2">
                         <label for="editEventLocation">Location</label>
@@ -472,6 +500,7 @@ window.onload = fetchEvents;
         </div>
     </div>
 </div>
+
 
 
 <!-- Delete Confirmation Modal -->
@@ -510,11 +539,15 @@ function editEvent(event_id) {
         .then(response => response.json())
         .then(event => {
             // Populate the edit modal fields
-            document.getElementById('editEventId').value = event.event_id; // Assuming the event object contains an 'id' field
+            document.getElementById('editEventId').value = event.event_id; // Assuming the event object contains an 'event_id' field
             document.getElementById('editEventTitle').value = event.title;
             document.getElementById('editEventDescription').value = event.description;
             document.getElementById('editEventDate').value = event.date.split('T')[0]; // Format date correctly
-            document.getElementById('editEventTime').value = event.time; // Make sure this is the correct format
+            
+            // Populate the new time fields
+            document.getElementById('editEventTimeStarts').value = event.timeStarts; // Assuming this field exists in the event object
+            document.getElementById('editEventTimeEnds').value = event.timeEnds; // Assuming this field exists in the event object
+
             document.getElementById('editEventLocation').value = event.location;
             document.getElementById('editRegistrationLink').value = event.registrationLink;
 
@@ -525,6 +558,7 @@ function editEvent(event_id) {
             console.error('Error fetching event details:', error);
         });
 }
+
 
 let eventToDelete = null;
 

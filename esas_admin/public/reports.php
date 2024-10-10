@@ -183,7 +183,7 @@ try {
                                 <div class="row mb-3">
                                     <div class="col-md-4">
                                         <select id="reportType" class="form-control">
-                                            <option value="">Select Report Type</option>
+                                            <option value="">-- Select Report Type --</option>
                                             <option value="all_clubs">All Clubs Records</option>
                                             <option value="all_moderators">All Moderators Records</option>
                                             <option value="student_profiles">Student Profiles</option>

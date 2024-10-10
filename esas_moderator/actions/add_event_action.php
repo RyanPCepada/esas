@@ -10,15 +10,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $description = $_POST['description'];
     $date = $_POST['date'];
-    $time = $_POST['time'];
+    $timeStarts = $_POST['timeStarts']; // Updated to timeStarts
+    $timeEnds = $_POST['timeEnds'];     // Added timeEnds
     $location = $_POST['location'];
     $registrationLink = $_POST['registrationLink'];
     $club_id = $_POST['club_id'];
     $moderator_id = $_POST['moderator_id'];
 
+    // Get current date and time for dateAdded and dateModified
+    $currentDateTime = date('Y-m-d H:i:s');
+
     // Insert into tbl_events using PDO
-    $sql = "INSERT INTO tbl_events (title, description, date, time, location, registrationLink, club_id, moderator_id) 
-            VALUES (:title, :description, :date, :time, :location, :registrationLink, :club_id, :moderator_id)";
+    $sql = "INSERT INTO tbl_events (title, description, date, timeStarts, timeEnds, location, registrationLink, dateAdded, dateModified, club_id, moderator_id) 
+            VALUES (:title, :description, :date, :timeStarts, :timeEnds, :location, :registrationLink, :dateAdded, :dateModified, :club_id, :moderator_id)";
     
     try {
         $stmt = $pdo->prepare($sql);
@@ -26,9 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':title' => $title,
             ':description' => $description,
             ':date' => $date,
-            ':time' => $time,
+            ':timeStarts' => $timeStarts,
+            ':timeEnds' => $timeEnds,
             ':location' => $location,
             ':registrationLink' => $registrationLink,
+            ':dateAdded' => $currentDateTime,       // Set dateAdded to the current datetime
+            ':dateModified' => $currentDateTime,    // Set dateModified to the current datetime
             ':club_id' => $club_id,
             ':moderator_id' => $moderator_id
         ]);

@@ -13,14 +13,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $description = $_POST['description'];
     $date = $_POST['date'];
-    $time = $_POST['time'];
+    $timeStarts = $_POST['timeStarts']; // Separate start time
+    $timeEnds = $_POST['timeEnds']; // Separate end time
     $location = $_POST['location'];
     $registrationLink = $_POST['registrationLink'];
     
     // Update tbl_events using PDO
     $sql = "UPDATE tbl_events 
             SET title = :title, description = :description, date = :date, 
-                time = :time, location = :location, registrationLink = :registrationLink 
+                timeStarts = :timeStarts, timeEnds = :timeEnds, location = :location, 
+                registrationLink = :registrationLink, club_id = :club_id, moderator_id = :moderator_id, dateModified = NOW()
             WHERE event_id = :event_id"; // Ensure the WHERE clause matches the correct field name
     
     try {
@@ -30,9 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':title' => $title,
             ':description' => $description,
             ':date' => $date,
-            ':time' => $time,
+            ':timeStarts' => $timeStarts,
+            ':timeEnds' => $timeEnds,
             ':location' => $location,
-            ':registrationLink' => $registrationLink
+            ':registrationLink' => $registrationLink,
+            ':club_id' => $club_id,
+            ':moderator_id' => $moderator_id
         ]);
 
         // Redirect to home.php after successful update

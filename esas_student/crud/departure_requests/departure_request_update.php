@@ -18,7 +18,7 @@ if (!isset($_POST['club_id'], $_POST['reason'])) {
 }
 
 $club_id = $_POST['club_id'];
-$reason = $_POST['reason'];
+$reason = $_POST['reason'];  // Get the reason passed from the form
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -57,7 +57,7 @@ try {
 
     if ($updateStmt->execute()) {
         // Redirect to the home page with the club_id in the URL
-        $redirect_url = '/esas/esas_student/crud/departure_requests/departure_request_read.php?club_id=' . urlencode($club_id);
+        $redirect_url = '/esas/esas_student/crud/departure_requests/departure_request_read.php?club_id=' . urlencode($club_id) . "&reason=" . urlencode($reason);
         header("Location: $redirect_url");
         exit();
     } else {

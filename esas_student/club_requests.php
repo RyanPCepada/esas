@@ -573,7 +573,8 @@ $(document).on('click', '#deleteButton', function(e) {
                         // Optionally, reload the page or close the modal
                         window.location.reload(); // You can also redirect to another page
                     } else {
-                        alert('Failed to delete the club request.');
+                        // alert('Failed to delete the club request.');
+                        window.location.reload();
                     }
                 },
                 error: function() {

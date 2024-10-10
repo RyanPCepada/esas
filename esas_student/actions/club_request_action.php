@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             die("Invalid cover photo type or file too large. Only JPG, JPEG, PNG, GIF under 10MB allowed.");
         }
-    } else {
+    }else {
         die("Please upload a cover photo.");
     }
 
