@@ -181,13 +181,12 @@ try {
                         </a>
                     </li>
                     <br>
-                        Others
-                        
-                        <li>
-                            <a href="../../esas_admin/public/officers_charts.php" class="nav-link left-sidebar text-dark" id="reports">
-                                <i class="fas fa-user-tie"></i> CSG & SBO Officers
-                            </a>
-                        </li>
+                    Others
+                    <li>
+                        <a href="../../esas_admin/public/officers_charts.php" class="nav-link left-sidebar text-dark" id="officers_charts">
+                            <i class="fas fa-user-tie"></i> CSG & SBO Officers
+                        </a>
+                    </li>
                 </ul>
             </div>
 

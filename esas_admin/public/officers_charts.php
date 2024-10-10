@@ -202,8 +202,14 @@ try {
                         </a>
                     </li>
                     <li>
-                        <a href="../../esas_admin/public/reports.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="reports">
+                        <a href="../../esas_admin/public/reports.php" class="nav-link left-sidebar text-dark" id="reports">
                             <i class="fas fa-file-alt"></i> Reports
+                        </a>
+                    </li>
+                    Others
+                    <li>
+                        <a href="../../esas_admin/public/officers_charts.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="officers_charts">
+                            <i class="fas fa-user-tie"></i> CSG & SBO Officers
                         </a>
                     </li>
                 </ul>
@@ -216,61 +222,55 @@ try {
             
             
             <!-- MAINPAGE BAR -->  
-<div class="col-12 col-md-10 bg-lgrey auto-scroll">
-    <div class="row g-0 h-100">
-        <div class="row g-0 p-4 px-2 pt-2 h-100">
-            
-            <div class="card p-2">
-                <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+            <div class="col-12 col-md-10 bg-lgrey auto-scroll">
+                <div class="row g-0 h-100">
+                    <div class="row g-0 p-4 px-2 pt-2 h-100">
+                        
+                        <div class="card p-2">
+                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
 
 
-                        <!-- Officers Charts -->
-                        <h4 class="text-muted mb-3">Officers Charts</h4> <!-- This remains left-aligned -->
+                                    <!-- Officers Charts -->
+                                    <h4 class="text-muted mb-3">Officers Charts</h4> <!-- This remains left-aligned -->
 
-                    <div class="mt-1 mb-3 d-flex justify-content-center align-items-center">
+                                <div class="mt-1 mb-3 d-flex justify-content-center align-items-center">
 
 
-                        <div class="">
-                        <?php 
-// Loop through charts and display the latest for each organizationType and department
-foreach ($officer_charts as $chart) {
-    echo "<div class='chart-entry'>";
-    
-    // Move the dash "-" before the department name
-    echo "<h5>" . htmlspecialchars($chart['organizationType']) . " Officers" . 
-         (!empty($chart['department']) ? " - " . htmlspecialchars($chart['department']) : "") . "</h5>";
-    
-    // Display the chart image
-    $imageUrl = '/esas/esas_admin/images/' . htmlspecialchars($chart['chart']);
-    echo "<img src='$imageUrl' 
-          alt='" . htmlspecialchars($chart['organizationType']) . " Chart' class='chart-img' />";
+                                    <div class="">
+                                    <?php 
+                                    // Loop through charts and display the latest for each organizationType and department
+                                    foreach ($officer_charts as $chart) {
+                                        echo "<div class='chart-entry'>";
+                                        
+                                        // Move the dash "-" before the department name
+                                        echo "<h5>" . htmlspecialchars($chart['organizationType']) . " Officers" . 
+                                            (!empty($chart['department']) ? " - " . htmlspecialchars($chart['department']) : "") . "</h5>";
+                                        
+                                        // Display the chart image
+                                        $imageUrl = '/esas/esas_admin/images/' . htmlspecialchars($chart['chart']);
+                                        echo "<img src='$imageUrl' 
+                                            alt='" . htmlspecialchars($chart['organizationType']) . " Chart' class='chart-img' />";
 
-    // Change the Edit link to a Change button
-    echo "<button type='button' class='change-button' onclick='openModal(" . htmlspecialchars($chart['chart_id']) . ", \"$imageUrl\", \"" . htmlspecialchars($chart['organizationType']) . "\", \"" . htmlspecialchars($chart['department']) . "\")'>Change</button>"; // Updated button
-    echo "</div>";
-}
+                                        // Change the Edit link to a Change button
+                                        echo "<button type='button' class='change-button' onclick='openModal(" . htmlspecialchars($chart['chart_id']) . ", \"$imageUrl\", \"" . htmlspecialchars($chart['organizationType']) . "\", \"" . htmlspecialchars($chart['department']) . "\")'>Change</button>"; // Updated button
+                                        echo "</div>";
+                                    }
 
-?>
+                                    ?>
 
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-<!-- MAINPAGE BAR END -->
+            <!-- MAINPAGE BAR END -->
 
 
         </div>
     </div>
 </div>
-
-
-
-        </div>
-    </div>
-
 
 
 
