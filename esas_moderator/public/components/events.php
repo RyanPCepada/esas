@@ -1,13 +1,18 @@
 <div class="events-section">
 
 <div class="row d-flex align-items-center">
-    <div class="col-11">
+    <div class="col-5 d-flex justify-content-start">
         <h5 class="text-muted mb-3" style="font-size: 1.2em;">Upcoming Events</h5>
     </div>
-    <div class="col-1">
+    <div class="col-2 d-flex justify-content-center">
         <button type="button" class="btn btn-info p-0" id="addEventBtn" data-toggle="modal" data-target="#addEventModal"
             style="color: white; width: 30px; height: 30px; margin-top: -20px; border-radius: 10%; padding: 0;">
             <i class="fas fa-plus"></i>
+        </button>
+    </div>
+    <div class="col-5 d-flex justify-content-end">
+        <button type="button" class="btn text-dark btn-outline-info py-1 mb-3" id="viewOtherEvenstBtn" style="border-radius: 50px;">
+            Check Other Events
         </button>
     </div>
 </div>
