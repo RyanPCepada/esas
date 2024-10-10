@@ -267,50 +267,50 @@ try {
             </div>
 
 
-<!-- PARRALAX 1 -->
-<div class="container-fluid">
-    <div class="parallax1 text-center d-flex align-items-center justify-content-center">
-        <h1><small class="text-warning">The</small><em>CSG OFFICERS</em></h1>
-    </div>
-</div>
-<!-- END PARRALAX 1 -->
+            <!-- PARRALAX 1 -->
+            <div class="container-fluid">
+                <div class="parallax1 text-center d-flex align-items-center justify-content-center">
+                    <h1><small class="text-warning">The</small><em>CSG OFFICERS</em></h1>
+                </div>
+            </div>
+            <!-- END PARRALAX 1 -->
 
-<!-- CSG Officer Sections -->
-<div class="csg-officer-section">
-    <div class="officer-row">
-        <?php
-        // Display CSG Officers Chart
-        foreach ($officerCharts as $chart) {
-            if (strtoupper($chart['organizationType']) === 'CSG') {
-                echo '<img src="/esas/esas_admin/images/' . htmlspecialchars($chart['chart']) . '" alt="CSG Officers">';
-            }
-        }
-        ?>
-    </div>
-</div>
+            <!-- CSG Officer Sections -->
+            <div class="csg-officer-section">
+                <div class="officer-row">
+                    <?php
+                    // Display CSG Officers Chart
+                    foreach ($officerCharts as $chart) {
+                        if (strtoupper($chart['organizationType']) === 'CSG') {
+                            echo '<img src="/esas/esas_admin/images/' . htmlspecialchars($chart['chart']) . '" alt="CSG Officers">';
+                        }
+                    }
+                    ?>
+                </div>
+            </div>
 
-<!-- PARRALAX 2 -->
-<div class="container-fluid">
-    <div class="parallax2 text-center d-flex align-items-center justify-content-center">
-        <h1><small class="text-warning">The</small><em>SBO OFFICERS</em></h1>
-    </div>
-</div>
-<!-- END PARRALAX 2 -->
+            <!-- PARRALAX 2 -->
+            <div class="container-fluid">
+                <div class="parallax2 text-center d-flex align-items-center justify-content-center">
+                    <h1><small class="text-warning">The</small><em>SBO OFFICERS</em></h1>
+                </div>
+            </div>
+            <!-- END PARRALAX 2 -->
 
-<!-- SBO Officer Sections -->
-<div class="sbo-officer-section">
-    <?php
-    // Display SBO Officers Charts
-    foreach ($officerCharts as $chart) {
-        if (strtoupper($chart['organizationType']) === 'SBO') {
-            echo '<div class="officer-row">';
-            echo '<div class="officer-label">' . htmlspecialchars($chart['department']) . '</div>';
-            echo '<img src="/esas/esas_admin/images/' . htmlspecialchars($chart['chart']) . '" alt="' . htmlspecialchars($chart['department']) . ' SBO Officers">';
-            echo '</div>';
-        }
-    }
-    ?>
-</div>
+            <!-- SBO Officer Sections -->
+            <div class="sbo-officer-section">
+                <?php
+                // Display SBO Officers Charts
+                foreach ($officerCharts as $chart) {
+                    if (strtoupper($chart['organizationType']) === 'SBO') {
+                        echo '<div class="officer-row">';
+                        echo '<div class="officer-label">' . htmlspecialchars($chart['department']) . '</div>';
+                        echo '<img src="/esas/esas_admin/images/' . htmlspecialchars($chart['chart']) . '" alt="' . htmlspecialchars($chart['department']) . ' SBO Officers">';
+                        echo '</div>';
+                    }
+                }
+                ?>
+            </div>
 
 
         </div>
