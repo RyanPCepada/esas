@@ -37,31 +37,6 @@ try {
 
 
 
-
-
-try {
-    // Fetch SBO-CCS Officers
-    $sboCCSStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'SBO' AND department = 'CCS'");
-    $sboCCSStmt->execute();
-    $sboCCSOfficers = $sboCCSStmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Fetch SBO-TEP Officers
-    $sboTEPStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'SBO' AND department = 'TEP'");
-    $sboTEPStmt->execute();
-    $sboTEPOfficers = $sboTEPStmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Fetch SBO-BSBA Officers
-    $sboBSBAStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'SBO' AND department = 'BSBA'");
-    $sboBSBAStmt->execute();
-    $sboBSBAOfficers = $sboBSBAStmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Fetch CSG Officers
-    $csgStmt = $pdo->prepare("SELECT firstName, middleName, lastName, position, profilePic FROM tbl_officers WHERE type = 'CSG'");
-    $csgStmt->execute();
-    $csgOfficers = $csgStmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
-}
 ?>
 
 

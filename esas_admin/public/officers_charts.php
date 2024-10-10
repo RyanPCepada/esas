@@ -300,7 +300,7 @@ foreach ($officer_charts as $chart) {
                         <img id="newChartImage" src="" alt="New Chart" class="img-fluid" style="border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5); display: none; max-width: 300px; max-height: 300px;" />
                     </div>
                 </div>
-                <form id="changeForm" action="edit_chart.php" method="POST" enctype="multipart/form-data" class="mt-3">
+                <form id="changeForm" action="/esas/esas_admin/public/crud/officers_charts/chart_update.php" method="POST" enctype="multipart/form-data" class="mt-3">
                     <input type="hidden" name="chart_id" id="chart_id" value="" />
                     <label for="chart_image">Upload New Image:</label>
                     <input type="file" name="chart_image" id="chart_image" required onchange="previewImage(event)" />
