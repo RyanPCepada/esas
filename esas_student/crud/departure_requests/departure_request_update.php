@@ -18,7 +18,7 @@ if (!isset($_POST['club_id'], $_POST['reason'])) {
 }
 
 $club_id = $_POST['club_id'];
-$reason = $_POST['departureReason'];
+$reason = $_POST['reason'];  // Get the reason passed from the form
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');

@@ -155,11 +155,16 @@ try {
             <div class="form-group">
                 <label><input type="radio" name="departureReason" value="Drop" required> Drop</label><br>
                 <label><input type="radio" name="departureReason" value="Graduate" required> Graduate</label><br>
-                <label><input type="radio" name="departureReason" value="Others" onchange="toggleOtherReasonInput(this)"> Others:</label>
+                <label>
+                    <input type="radio" name="departureReason" value="Others" onchange="toggleOtherReasonInput(this)"> Others:
+                </label>
                 <input type="text" id="otherReasonInput" class="form-control" style="display:none;" placeholder="Please specify..." oninput="validateOtherReason()">
             </div>
-            <input type="hidden" id="reasonInput" name="reason" value="<?php echo htmlspecialchars($request['reason']); ?>">
+
+            <!-- Club ID passed with the form -->
             <input type="hidden" id="clubIdInput" name="club_id" value="<?php echo $club_id; ?>">
+
+            <!-- Submit and Cancel buttons -->
             <button type="submit" class="btn btn-danger mb-1">Save Changes</button>
             <button type="button" class="btn btn-secondary mb-1" onclick="closeDepartureModal()">Cancel</button>
         </form>
@@ -167,49 +172,79 @@ try {
 </div>
 
 <script>
-function closeDepartureModal() {
-    document.getElementById('departureModal').style.display = 'none';
+function toggleOtherReasonInput(radio) {
+    const otherReasonInput = document.getElementById('otherReasonInput');
+    
+    if (radio.value === 'Others') {
+        otherReasonInput.style.display = 'block';
+        otherReasonInput.name = 'departureReason';  // Set the name to 'departureReason'
+        otherReasonInput.required = true;           // Make the "Others" input required
+    } else {
+        otherReasonInput.style.display = 'none';
+        otherReasonInput.name = '';                 // Remove the name when not selected
+        otherReasonInput.required = false;          // Remove required attribute
+    }
 }
 
 function showEditModal(clubId, reason) {
     document.getElementById('clubIdInput').value = clubId;
-
-    // Set the radio buttons based on the reason
     const reasonInputs = document.getElementsByName('departureReason');
+    const otherReasonInput = document.getElementById('otherReasonInput');
+
     reasonInputs.forEach(input => {
-        input.checked = (input.value === reason);
-        // Also update the hidden reason input based on the selected value
-        if (input.checked) {
-            document.getElementById('reasonInput').value = input.value;
+        if (input.value === reason) {
+            input.checked = true;
+            toggleOtherReasonInput(input);  // Ensure correct behavior on modal open
         }
     });
 
-    // Show the other reason input if applicable
-    const otherReasonInput = document.getElementById('otherReasonInput');
-    if (reason === 'Others') {
-        otherReasonInput.style.display = 'block';
+    if (reason !== 'Drop' && reason !== 'Graduate') {
+        document.querySelector('input[value="Others"]').checked = true;
+        toggleOtherReasonInput(document.querySelector('input[value="Others"]'));
+        otherReasonInput.value = reason;
     } else {
-        otherReasonInput.style.display = 'none';
+        otherReasonInput.style.display = 'none';  // Hide 'Others' input if not relevant
+        otherReasonInput.value = '';
     }
 
     document.getElementById('departureModal').style.display = 'block';
 }
 
+// Capture the form submission event and display the selected reason
+document.getElementById('departureRequestForm').addEventListener('submit', function(event) {
+    // Prevent the form from submitting immediately
+    event.preventDefault();
 
-function toggleOtherReasonInput(radio) {
+    let selectedReason;
+    const reasonRadio = document.querySelector('input[name="departureReason"]:checked');
     const otherReasonInput = document.getElementById('otherReasonInput');
-    otherReasonInput.style.display = (radio.value === 'Others') ? 'block' : 'none';
-}
 
-function validateOtherReason() {
-    const otherReasonInput = document.getElementById('otherReasonInput');
-    const reasonInputs = document.getElementsByName('departureReason');
-    const othersSelected = Array.from(reasonInputs).some(input => input.value === 'Others' && otherReasonInput.value.trim() === '');
+    if (reasonRadio.value === 'Others' && otherReasonInput.value !== '') {
+        selectedReason = otherReasonInput.value;  // Use the custom reason if "Others" is selected
+    } else {
+        selectedReason = reasonRadio.value;  // Use the selected radio button value
+    }
 
-    // Disable submit button if 'Others' is selected but no input is provided
-    document.querySelector('button[type="submit"]').disabled = othersSelected;
+    // Display the selected reason in an alert
+    // alert('Departure reason updated successfully!');
+
+    // Add the selected reason to the form's hidden input (for submission)
+    const reasonInput = document.createElement('input');
+    reasonInput.type = 'hidden';
+    reasonInput.name = 'reason';
+    reasonInput.value = selectedReason;
+
+    event.target.appendChild(reasonInput);
+
+    // Allow the form to submit after showing the alert
+    event.target.submit();  // Proceed with form submission
+});
+
+function closeDepartureModal() {
+    document.getElementById('departureModal').style.display = 'none';
 }
 </script>
+
 
 </body>
 </html>
