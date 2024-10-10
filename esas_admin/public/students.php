@@ -141,6 +141,7 @@ try {
                             <i class="fas fa-file-alt"></i> Reports
                         </a>
                     </li>
+                    <br>
                     Others
                     <li>
                         <a href="../../esas_admin/public/officers_charts.php" class="nav-link left-sidebar text-dark" id="officers_charts">
