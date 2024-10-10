@@ -240,6 +240,17 @@ document.getElementById('departureRequestForm').addEventListener('submit', funct
     event.target.submit();  // Proceed with form submission
 });
 
+
+function withdrawRequest(clubId, clubName) {
+    const confirmDelete = confirm(`Are you sure you want to withdraw your departure request from ${clubName}?`);
+
+    if (confirmDelete) {
+        // Redirect to the PHP file for deletion with the club ID as a parameter
+        window.location.href = `departure_request_delete.php?club_id=${clubId}`;
+    }
+}
+
+
 function closeDepartureModal() {
     document.getElementById('departureModal').style.display = 'none';
 }
