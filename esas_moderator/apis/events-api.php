@@ -40,7 +40,7 @@ switch ($method) {
                 FROM tbl_events e
                 LEFT JOIN tbl_clubs c ON e.club_id = c.club_id
                 WHERE e.club_id = ?
-                ORDER BY e.date, e.time
+                ORDER BY e.date, e.timeStarts
             ');
             $stmt->execute([$club_id]);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -53,7 +53,7 @@ switch ($method) {
                        c.clubName 
                 FROM tbl_events e
                 LEFT JOIN tbl_clubs c ON e.club_id = c.club_id
-                ORDER BY e.date, e.time
+                ORDER BY e.date, e.timeStarts
             ');
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
