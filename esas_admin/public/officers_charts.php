@@ -231,8 +231,10 @@ try {
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
 
 
+                                <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
                                     <!-- Officers Charts -->
                                     <h4 class="text-muted mb-3">Officers Charts</h4> <!-- This remains left-aligned -->
+                                </div>
 
                                 <div class="mt-1 mb-3 d-flex justify-content-center align-items-center">
 
