@@ -35,8 +35,23 @@ try {
     die("Database error: " . $e->getMessage());
 }
 
-?>
+try {
+    // Use the existing PDO instance from config.php 
+    global $pdo;
 
+    // Prepare and execute the SQL statement to fetch officer charts
+    $sql = "SELECT chart_id, chart, organizationType, department FROM tbl_officers_charts";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    
+    // Fetch all results
+    $officerCharts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    // Handle database connection or query error
+    die("Database error: " . $e->getMessage());
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -252,45 +267,51 @@ try {
             </div>
 
 
-            <!-- PARRALAX 1 -->
-            <div class="container-fluid">
-                <div class="parallax1 text-center d-flex align-items-center justify-content-center">
-                    <h1><small class="text-warning">The</small><em>CSG OFFICERS</em></h1>
-                </div>
-            </div>
-            <!-- END PARRALAX 1 -->
+<!-- PARRALAX 1 -->
+<div class="container-fluid">
+    <div class="parallax1 text-center d-flex align-items-center justify-content-center">
+        <h1><small class="text-warning">The</small><em>CSG OFFICERS</em></h1>
+    </div>
+</div>
+<!-- END PARRALAX 1 -->
 
-            <!-- CSG Officer Sections -->
-            <div class="csg-officer-section">
-                <div class="officer-row">
-                    <!-- <div class="officer-label">CSG Officers</div> -->
-                    <img src="../images/OFFICERS_CSG.jpeg" alt="CSG Officers">
-                </div>
-            </div>
+<!-- CSG Officer Sections -->
+<div class="csg-officer-section">
+    <div class="officer-row">
+        <?php
+        // Display CSG Officers Chart
+        foreach ($officerCharts as $chart) {
+            if (strtoupper($chart['organizationType']) === 'CSG') {
+                echo '<img src="/esas/esas_admin/images/' . htmlspecialchars($chart['chart']) . '" alt="CSG Officers">';
+            }
+        }
+        ?>
+    </div>
+</div>
 
-            <!-- PARRALAX 2 -->
-            <div class="container-fluid">
-                <div class="parallax2 text-center d-flex align-items-center justify-content-center">
-                    <h1><small class="text-warning">The</small><em>SBO OFFICERS</em></h1>
-                </div>
-            </div>
-            <!-- END PARRALAX 2 -->
+<!-- PARRALAX 2 -->
+<div class="container-fluid">
+    <div class="parallax2 text-center d-flex align-items-center justify-content-center">
+        <h1><small class="text-warning">The</small><em>SBO OFFICERS</em></h1>
+    </div>
+</div>
+<!-- END PARRALAX 2 -->
 
-            <!-- SBO Officer Sections -->
-            <div class="sbo-officer-section">
-                <div class="officer-row">
-                    <div class="officer-label">TEP</div>
-                    <img src="../images/OFFICERS_SBO_TEP.png" alt="TEP SBO Officers">
-                </div>
-                <div class="officer-row">
-                    <div class="officer-label">BSBA</div>
-                    <img src="../images/OFFICERS_SBO_BSBA.png" alt="BSBA SBO Officers">
-                </div>
-                <div class="officer-row">
-                    <div class="officer-label">CCS</div>
-                    <img src="../images/OFFICERS_SBO_CCS.png" alt="CCS SBO Officers">
-                </div>
-            </div>
+<!-- SBO Officer Sections -->
+<div class="sbo-officer-section">
+    <?php
+    // Display SBO Officers Charts
+    foreach ($officerCharts as $chart) {
+        if (strtoupper($chart['organizationType']) === 'SBO') {
+            echo '<div class="officer-row">';
+            echo '<div class="officer-label">' . htmlspecialchars($chart['department']) . '</div>';
+            echo '<img src="/esas/esas_admin/images/' . htmlspecialchars($chart['chart']) . '" alt="' . htmlspecialchars($chart['department']) . ' SBO Officers">';
+            echo '</div>';
+        }
+    }
+    ?>
+</div>
+
 
         </div>
     </div>
