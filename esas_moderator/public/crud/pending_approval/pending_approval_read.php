@@ -111,6 +111,23 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
         // Execute the update statement
         if ($updateStmt->execute()) {
+            // Check the current active memberships after approval
+            if ($newStatus === 'active') {
+                // Count how many clubs the student is currently "active" in
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
+                $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+                $stmt->execute();
+                $clubsCount = $stmt->fetchColumn();
+
+                // If the student already has 2 active memberships, update the status of other pending registrations
+                if ($clubsCount >= 2) {
+                    $updatePendingSql = "UPDATE tbl_registration SET status = 'maxed' WHERE student_id = :student_id AND status = 'pending'";
+                    $updatePendingStmt = $pdo->prepare($updatePendingSql);
+                    $updatePendingStmt->bindParam(':student_id', $param_student_id, PDO::PARAM_INT);
+                    $updatePendingStmt->execute();
+                }
+            }
+
             header("location: ../../pending_approvals.php");
             exit();
         } else {
@@ -120,7 +137,6 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     }
     unset($updateStmt);
 }
-
 
     
 // Fetch the student's registration status for the current club
