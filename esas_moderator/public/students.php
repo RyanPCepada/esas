@@ -304,14 +304,31 @@ try {
 
                             <!-- ALL STUDENT TABLE START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+                                
                                 <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
                                     <thead>
                                         <tr>
-                                            <th>
-                                                <input id="studentSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                                            </th>
-                                            <th class="text-center" colspan="8">
-                                                <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6>
+                                            <th colspan="9">
+                                                <div class="row">
+                                                    <!-- Dropdown for filtering by status -->
+                                                    <div class="col-12 col-md-8 d-flex align-items-center">
+                                                        <select id="statusSelect" class="form-select me-2" style="width: 20%;">
+                                                            <optgroup label="Select Club Request Status">
+                                                                <option value="" selected>All</option>
+                                                                <option value="active">Active</option>
+                                                                <option value="inactive">Inactive</option>
+                                                                <option value="departed">Departed</option>
+                                                                <option value="disapproved">Disapproved</option>
+                                                            </optgroup>
+                                                        </select>
+                                                        <!-- Search input -->
+                                                        <input id="studentSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                                                    </div>
+                                                    <!-- Row count display -->
+                                                    <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
+                                                        <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6>
+                                                    </div>
+                                                </div>
                                             </th>
                                         </tr>
                                     </thead>
@@ -326,24 +343,27 @@ try {
 
                                     // SQL query to fetch cumulative students with "active" status in the selected club
                                     $sql = "SELECT 
-                                                s.student_id,
-                                                s.firstName,
-                                                s.middleName,
-                                                s.lastName,
-                                                s.age,
-                                                s.gender,
-                                                s.instiEmail,
-                                                s.phoneNumber,
-                                                s.department,
-                                                s.course,
-                                                s.year,
-                                                s.profilePic,
-                                                s.dateAdded AS student_dateAdded,
-                                                GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
-                                            FROM tbl_students s
-                                            LEFT JOIN tbl_registration r ON s.student_id = r.student_id
-                                            LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
-                                            WHERE r.status = 'active'";
+                                        s.student_id,
+                                        s.firstName,
+                                        s.middleName,
+                                        s.lastName,
+                                        s.age,
+                                        s.gender,
+                                        s.instiEmail,
+                                        s.phoneNumber,
+                                        s.department,
+                                        s.course,
+                                        s.year,
+                                        s.profilePic,
+                                        s.dateAdded AS student_dateAdded,
+                                        r.status AS status,  -- Include the status here
+                                        GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
+                                    FROM tbl_students s
+                                    LEFT JOIN tbl_registration r ON s.student_id = r.student_id
+                                    LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
+                                    WHERE r.status IN ('active', 'inactive', 'departed', 'disapproved')";
+
+
 
                                     // Check if club ID is set and add to the query
                                     if ($selectedClubId) {
@@ -379,7 +399,7 @@ try {
 
                                     if ($totalRows > 0) {
                                         echo '
-                                        <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                                        <table class="table table-bordered table-striped" style="background-color: #f9f9f9;" id="studentTable">
                                             <thead>
                                                 <tr>
                                                     <th>Student ID</th>
@@ -390,6 +410,7 @@ try {
                                                     <th>Email</th>
                                                     <th>Phone</th>
                                                     <th>Course</th>
+                                                    <th>Status</th>
                                                     <th>Actions</th>
                                                 </tr>
                                             </thead>
@@ -405,11 +426,12 @@ try {
                                             $email = htmlspecialchars($row['instiEmail']);
                                             $phoneNumber = htmlspecialchars($row['phoneNumber']);
                                             $course = htmlspecialchars($row['course']);
+                                            $status = htmlspecialchars($row['status']);
 
                                             $rowCount++;
 
                                             echo '
-                                            <tr class="student-row">
+                                            <tr class="student-row" data-status="' . htmlspecialchars($row['status']) . '"> 
                                                 <td>' . $student_id . '</td>
                                                 <td class="text-center p-1">
                                                     <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
@@ -422,10 +444,9 @@ try {
                                                 <td>' . $email . '</td>
                                                 <td>' . $phoneNumber . '</td>
                                                 <td>' . $course . '</td>
+                                                <td>' . $status . '</td>
                                                 <td class="text-center">
                                                     <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($selectedClubId) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                    <!-- <a href="../public/crud/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                    <a href="../public/crud/student_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a> -->
                                                 </td>
                                             </tr>';
                                         }
@@ -443,7 +464,6 @@ try {
                                     </script>";
                                 ?>
 
-
                             </div>
                             <!-- ALL STUDENT TABLE END -->
 
@@ -458,8 +478,28 @@ try {
                                     const rowCountDisplay = document.getElementById('rowCountDisplay');
                                     const noResultsMessage = document.getElementById('noResultsMessage');
                                     const totalRows = studentRows.length;
+                                    const statusSelect = document.getElementById('statusSelect');
 
                                     rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`;
+
+                                    // Filter by status
+                                    statusSelect.addEventListener('change', function () {
+                                        const selectedStatus = this.value.toLowerCase();
+                                        let visibleRowCount = 0;
+
+                                        studentRows.forEach(function (row) {
+                                            const rowStatus = row.getAttribute('data-status').toLowerCase();
+                                            if (!selectedStatus || rowStatus === selectedStatus) {
+                                                row.style.display = '';
+                                                visibleRowCount++;
+                                            } else {
+                                                row.style.display = 'none';
+                                            }
+                                        });
+
+                                        rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
+                                        noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
+                                    });
 
                                     searchInput.addEventListener('input', function () {
                                         const searchTerm = searchInput.value.trim().toLowerCase();
@@ -477,7 +517,11 @@ try {
                                                 }
                                             });
 
-                                            if (rowContainsTerm) {
+                                            const selectedStatus = statusSelect.value.toLowerCase();
+                                            const rowStatus = row.getAttribute('data-status').toLowerCase();
+
+                                            // Check if the row matches the search term and the selected status
+                                            if (rowContainsTerm && (!selectedStatus || rowStatus === selectedStatus)) {
                                                 row.style.display = '';
                                                 visibleRowCount++;
                                             } else {
@@ -489,6 +533,7 @@ try {
                                         noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
                                     });
 
+                                    // Highlight matching text
                                     function highlightText(cell, term) {
                                         const textNodes = getTextNodes(cell);
                                         let found = false;
@@ -508,6 +553,7 @@ try {
                                         return found;
                                     }
 
+                                    // Get text nodes for highlighting
                                     function getTextNodes(element) {
                                         let textNodes = [];
                                         function recurse(node) {
@@ -521,11 +567,13 @@ try {
                                         return textNodes;
                                     }
 
+                                    // Remove highlights from text
                                     function removeHighlight(html) {
                                         return html.replace(/<span[^>]*style="[^"]*background-color:[^"]*"[^>]*>(.*?)<\/span>/gi, '$1');
                                     }
                                 });
                             </script>
+
 
                         </div>
                         <!-- THE MAIN PAGE END -->
