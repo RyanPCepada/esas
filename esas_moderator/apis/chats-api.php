@@ -1,67 +1,60 @@
 <?php
 require_once '../../config.php';
+session_start();
 
-// Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
-
-// Set the content type to JSON
 header('Content-Type: application/json');
 
-// Handle HTTP methods
 $method = $_SERVER['REQUEST_METHOD'];
 
-switch($method) {
-    case 'GET':
-        // Fetch chats for a specific club
-        if (isset($_GET['club_id'])) {
-            $club_id = $_GET['club_id'];
+try {
+    $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : 0; 
 
-            $stmt = $pdo->prepare("
-                SELECT c.message, c.dateAdded, s.firstName, s.lastName, s.profilePic, m.firstName AS modFirstName, m.lastName AS modLastName, m.profilePic AS modProfilePic
-                FROM tbl_chats c
-                LEFT JOIN tbl_students s ON c.student_id = s.student_id
-                LEFT JOIN tbl_moderators m ON c.moderator_id = m.moderator_id
-                WHERE c.club_id = :club_id
-                ORDER BY c.dateAdded ASC
-            ");
-            $stmt->execute(['club_id' => $club_id]);
-            $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($club_id === 0) {
+        echo json_encode(['error' => 'Invalid club ID']);
+        exit;
+    }
 
-            echo json_encode($chats);
+    $current_moderator_id = isset($_SESSION['moderator_id']) ? intval($_SESSION['moderator_id']) : 0;
+
+    // Fetch all participants (moderators and students) with their latest messages
+    $participantsQuery = "
+        SELECT 
+            m.moderator_id AS id, m.firstName AS moderator_firstName, m.lastName AS moderator_lastName, 
+            m.profilePic AS moderator_profilePic, 'moderator' AS role, c.message, c.dateAdded
+        FROM tbl_moderators m
+        LEFT JOIN tbl_chats c ON c.moderator_id = m.moderator_id AND c.club_id = :club_id
+        WHERE m.moderator_id != :current_moderator_id AND m.moderator_id IN (SELECT moderator_id FROM tbl_clubs_and_moderators WHERE club_id = :club_id)
+
+        UNION ALL
+
+        SELECT 
+            s.student_id AS id, s.firstName AS student_firstName, s.lastName AS student_lastName, 
+            s.profilePic AS student_profilePic, 'student' AS role, c.message, c.dateAdded
+        FROM tbl_students s
+        LEFT JOIN tbl_chats c ON c.student_id = s.student_id AND c.club_id = :club_id
+        WHERE s.student_id IN (SELECT student_id FROM tbl_registration WHERE club_id = :club_id AND status = 'active')
+    ";
+
+    $stmt = $pdo->prepare($participantsQuery);
+    $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+    $stmt->bindParam(':current_moderator_id', $current_moderator_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Format dateAdded field for all participants
+    foreach ($participants as &$participant) {
+        if ($participant['dateAdded']) {
+            $date = new DateTime($participant['dateAdded']);
+            $participant['dateAdded'] = $date->format('M d, Y | h:i A');
         } else {
-            echo json_encode(['error' => 'club_id is required']);
+            $participant['dateAdded'] = null;
         }
-        break;
+    }
 
-    case 'POST':
-        // Post a new chat message
-        $data = json_decode(file_get_contents('php://input'), true);
+    echo json_encode(['participants' => $participants]);
 
-        if (isset($data['message'], $data['club_id'], $data['student_id'])) {
-            $message = $data['message'];
-            $club_id = $data['club_id'];
-            $student_id = $data['student_id'];
-            $moderator_id = $data['moderator_id'] ?? null; // Optional for moderators
-
-            $stmt = $pdo->prepare("
-                INSERT INTO tbl_chats (message, student_id, moderator_id, club_id, dateAdded, dateModified)
-                VALUES (:message, :student_id, :moderator_id, :club_id, NOW(), NOW())
-            ");
-            $stmt->execute([
-                'message' => $message,
-                'student_id' => $student_id,
-                'moderator_id' => $moderator_id,
-                'club_id' => $club_id
-            ]);
-
-            echo json_encode(['success' => 'Message sent successfully']);
-        } else {
-            echo json_encode(['error' => 'Required fields: message, club_id, student_id']);
-        }
-        break;
-
-    default:
-        echo json_encode(['error' => 'Invalid request method']);
-        break;
+} catch (PDOException $e) {
+    echo json_encode(['error' => $e->getMessage()]);
 }
 ?>
