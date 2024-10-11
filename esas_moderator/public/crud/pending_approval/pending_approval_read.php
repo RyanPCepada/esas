@@ -143,6 +143,7 @@ $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
 $stmt->execute();
 $disapprovedCount = $stmt->fetchColumn();
 
+
 ?>
 
 <!DOCTYPE html>
