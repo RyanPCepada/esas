@@ -159,16 +159,16 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const clubId = "<?php echo isset($_GET['club_id']) ? $_GET['club_id'] : 0; ?>"; // Get the club_id dynamically
-    const modal = document.getElementById('chatModal'); // Reference to the modal
-    const modalChatsContent = document.getElementById('modal-chats-content'); // Reference to the chat content in modal
+    const clubId = "<?php echo isset($_GET['club_id']) ? $_GET['club_id'] : 0; ?>"; 
+    const modal = document.getElementById('chatModal'); 
+    const modalChatsContent = document.getElementById('modal-chats-content'); 
 
     function fetchChats() {
         fetch(`/esas/esas_moderator/apis/chats-api.php?club_id=${clubId}`)
             .then(response => response.json())
             .then(data => {
                 const chatList = document.getElementById('chatList');
-                chatList.innerHTML = ''; // Clear existing chat list
+                chatList.innerHTML = ''; 
 
                 if (data.error) {
                     chatList.innerHTML = `<p class="text-danger">${data.error}</p>`;
@@ -200,7 +200,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             departmentClass = 'chat-default';
                     }
 
-                    // Determine the image source based on moderator status
                     const imageSrc = student.is_moderator 
                         ? `/esas/esas_moderator/images/${student.profilePic}` 
                         : `/esas/esas_student/images/${student.profilePic}`;
@@ -217,7 +216,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                     </span>
                                     <span class="message-date">${messageDate}</span>
                                 </div>
-                                <div class="message">${message} ${student.student_id}</div>
+                                <div class="message">${message}</div>
+                                <!-- ${student.student_id} -->
                             </div>
                         </div>
                     `;
@@ -225,26 +225,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     chatList.innerHTML += chatItemHTML;
                 });
 
-                // Add event listeners for chat items to open modal
                 document.querySelectorAll('.chat-item').forEach(item => {
                     item.addEventListener('click', function () {
-                        // Remove 'active' class from previously active item
                         document.querySelectorAll('.chat-item').forEach(chat => chat.classList.remove('active'));
-                        this.classList.add('active'); // Add 'active' class to clicked item
+                        this.classList.add('active'); 
 
-                        const studentId = this.getAttribute('data-student-id'); // Get student ID
-                        const currentModeratorId = "<?php echo isset($_SESSION['moderator_id']) ? $_SESSION['moderator_id'] : '0'; ?>"; // Get the moderator ID dynamically
-                        const studentFullName = this.getAttribute('data-fullname'); // Get student full name
-                        const studentPic = this.querySelector('.chat-avatar img').src; // Get student avatar
+                        const studentId = this.getAttribute('data-student-id'); 
+                        const currentModeratorId = "<?php echo isset($_SESSION['moderator_id']) ? $_SESSION['moderator_id'] : '0'; ?>"; 
+                        const studentFullName = this.getAttribute('data-fullname'); 
+                        const studentPic = this.querySelector('.chat-avatar img').src; 
 
-                        // Update modal header
-                        modal.querySelector('.modal-student-avatar img').src = studentPic; // Set student pic
-                        modal.querySelector('#modal-student-name').innerText = studentFullName; // Set student name
+                        modal.querySelector('.modal-student-avatar img').src = studentPic; 
+                        modal.querySelector('#modal-student-name').innerText = studentFullName; 
 
-                        // Remove existing department classes
                         modal.querySelector('.modal-header').classList.remove('chat-tep', 'chat-bsba', 'chat-ccs', 'chat-default');
 
-                        // Set the department class for the modal header based on the clicked item
                         let departmentClass = this.getAttribute('data-department') === 'TEP' ? 'chat-tep' :
                                              this.getAttribute('data-department') === 'BSBA' ? 'chat-bsba' :
                                              this.getAttribute('data-department') === 'CCS' ? 'chat-ccs' :
@@ -252,21 +247,17 @@ document.addEventListener('DOMContentLoaded', function () {
                                              
                         modal.querySelector('.modal-header').classList.add(departmentClass);
 
-                        // Fetch chat messages for the selected student
                         fetch(`/esas/esas_moderator/apis/chats-modal-api.php?student_id=${studentId}`)
                             .then(response => response.json())
                             .then(data => {
-                                modalChatsContent.innerHTML = ''; // Clear existing content
+                                modalChatsContent.innerHTML = ''; 
 
-                                // Check for errors in the response
                                 if (data.error) {
                                     modalChatsContent.innerHTML = `<p class="text-danger">${data.error}</p>`;
                                     return;
                                 }
 
-                                // Populate chat messages
                                 data.forEach(chat => {
-                                    // Determine the message class based on sender ID
                                     const messageClass = chat.sender_id == currentModeratorId ? 'message-right' : 'message-left';
                                     const messageHTML = `
                                         <div class="chat-message ${messageClass}">
@@ -276,18 +267,18 @@ document.addEventListener('DOMContentLoaded', function () {
                                     `;
                                     modalChatsContent.innerHTML += messageHTML;
                                 });
+
+                                modalChatsContent.scrollTop = modalChatsContent.scrollHeight; // Scroll to the bottom of the chat
                             })
                             .catch(error => {
                                 console.error('Error fetching chat messages:', error);
                             });
 
-                        // Function to format the date
                         function formatDate(dateString) {
                             const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
                             return new Date(dateString).toLocaleString(undefined, options);
                         }
 
-                        // Show the modal with the slide-up effect
                         modal.classList.add('show');
                     });
                 });
@@ -297,23 +288,17 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    // Fetch chats when the page loads
     fetchChats();
 
-    // Close modal when clicking the 'X' button
     document.querySelector('.close-modal').addEventListener('click', function () {
         modal.classList.remove('show');
     });
 
-    // Send message when the send button is clicked
     document.getElementById('send-message-btn').addEventListener('click', function () {
         const messageInput = document.getElementById('message-input');
         const message = messageInput.value.trim();
         const recipientId = document.querySelector('.chat-item.active') ? 
-            document.querySelector('.chat-item.active').getAttribute('data-student-id') : null; // Get the recipient ID
-
-        console.log('Message:', message);
-        console.log('Recipient ID:', recipientId);
+            document.querySelector('.chat-item.active').getAttribute('data-student-id') : null; 
 
         if (message === '') {
             alert('Please enter a message.');
@@ -325,7 +310,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Send the message using fetch
         fetch('../actions/send_chat_action.php', {
             method: 'POST',
             headers: {
@@ -338,13 +322,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.error) {
                 alert(data.error);
             } else {
-                // Optionally, you can update the modal chats content to reflect the newly sent message
-                modalChatsContent.innerHTML += `
+                const messageHTML = `
                     <div class="chat-message message-right">
                         <p>${message}</p>
                         <span class="chat-date">${formatDate(new Date().toISOString())}</span>
                     </div>
                 `;
+                modalChatsContent.innerHTML += messageHTML;
+                modalChatsContent.scrollTop = modalChatsContent.scrollHeight; // Scroll to the bottom of the chat
                 messageInput.value = ''; // Clear the input field
             }
         })
@@ -352,7 +337,13 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error sending message:', error);
         });
     });
+
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        return new Date(dateString).toLocaleString(undefined, options);
+    }
 });
+
 
 </script>
 
