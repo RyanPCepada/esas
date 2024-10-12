@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="chat-content">
                                 <div class="chat-header">
                                     <span class="student-name">
-                                        ${fullName}${student.is_moderator ? '<span class="moderator-shield">    <i class="fas fa-shield-alt text-danger"></i></span>' : ''}
+                                        ${fullName}${student.is_moderator ? '<span class="moderator-shield"> <i class="fas fa-shield-alt text-danger"></i></span>' : ''}
                                     </span>
                                     <span class="message-date">${messageDate}</span>
                                 </div>
@@ -228,6 +228,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Add event listeners for chat items to open modal
                 document.querySelectorAll('.chat-item').forEach(item => {
                     item.addEventListener('click', function () {
+                        // Remove 'active' class from previously active item
+                        document.querySelectorAll('.chat-item').forEach(chat => chat.classList.remove('active'));
+                        this.classList.add('active'); // Add 'active' class to clicked item
+
                         const studentId = this.getAttribute('data-student-id'); // Get student ID
                         const currentModeratorId = "<?php echo isset($_SESSION['moderator_id']) ? $_SESSION['moderator_id'] : '0'; ?>"; // Get the moderator ID dynamically
                         const studentFullName = this.getAttribute('data-fullname'); // Get student full name
@@ -305,15 +309,24 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('send-message-btn').addEventListener('click', function () {
         const messageInput = document.getElementById('message-input');
         const message = messageInput.value.trim();
-        const recipientId = document.querySelector('.chat-item.active').getAttribute('data-student-id'); // Get the recipient ID
+        const recipientId = document.querySelector('.chat-item.active') ? 
+            document.querySelector('.chat-item.active').getAttribute('data-student-id') : null; // Get the recipient ID
+
+        console.log('Message:', message);
+        console.log('Recipient ID:', recipientId);
 
         if (message === '') {
             alert('Please enter a message.');
             return;
         }
 
+        if (!recipientId) {
+            alert('Please select a recipient.');
+            return;
+        }
+
         // Send the message using fetch
-        fetch('/esas/esas_moderator/actions/send_chat_action.php', {
+        fetch('../actions/send_chat_action.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -340,6 +353,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
 </script>
 
 
