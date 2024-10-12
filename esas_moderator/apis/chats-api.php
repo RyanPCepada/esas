@@ -24,7 +24,7 @@ try {
         exit;
     }
 
-    // Query to fetch active students in the specified club along with their latest message
+    // Query to fetch active students and other moderators in the specified club
     $stmt = $pdo->prepare("
         SELECT 
             s.student_id, 
@@ -48,6 +48,31 @@ try {
             AND r.status = 'active'
         GROUP BY 
             s.student_id 
+
+        UNION 
+
+        SELECT 
+            m.moderator_id AS student_id, 
+            m.firstName, 
+            m.middleName, 
+            m.lastName, 
+            m.department,
+            m.profilePic,
+            MAX(c.message) AS message,  -- Get the latest message
+            MAX(c.dateAdded) AS messageDate -- Get the date of the latest message
+        FROM 
+            tbl_moderators m
+        JOIN 
+            tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id 
+        LEFT JOIN 
+            tbl_chats c ON (m.moderator_id = c.sender_id OR m.moderator_id = c.recipient_id)
+            AND c.club_id = :club_id
+            AND c.recipient_id = :moderator_id -- Ensure chats where the current moderator is the recipient
+        WHERE 
+            cm.club_id = :club_id 
+            AND m.moderator_id != :moderator_id -- Exclude the current moderator
+        GROUP BY 
+            m.moderator_id 
         ORDER BY 
             messageDate DESC  -- Order by the date of the latest message
     ");
@@ -58,16 +83,16 @@ try {
         'moderator_id' => $moderator_id
     ]);
 
-    // Fetch all active students
+    // Fetch all active students and other moderators
     $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Check if any students are found
+    // Check if any students or moderators are found
     if (!$students) {
-        echo json_encode(['message' => 'No active students found for this club.']);
+        echo json_encode(['message' => 'No active students or moderators found for this club.']);
         exit;
     }
 
-    // Format the messageDate for each student
+    // Format the messageDate for each student or moderator
     foreach ($students as &$student) {
         if ($student['messageDate']) {
             $dateTime = new DateTime($student['messageDate']);
@@ -86,10 +111,9 @@ try {
         }
     }
 
-    // Return the students data as JSON
+    // Return the students and moderators data as JSON
     echo json_encode($students);
 } catch (PDOException $e) {
     echo json_encode(['error' => $e->getMessage()]);
 }
-
 ?>
