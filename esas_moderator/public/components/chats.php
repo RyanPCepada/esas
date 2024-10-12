@@ -139,102 +139,6 @@
 
 
 
-/* Modal styling - Center-bottom popup */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; 
-    z-index: 1000; /* On top */
-    left: 70%; /* Center horizontally */
-    top: 30%; /* Fixed at the bottom */
-    width: 350px; /* Adjust width for a smaller, more compact size */
-    max-height: 450px; /* Limit height */
-    background-color: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Softer shadow for depth */
-    transition: bottom 0.4s ease; /* Slide up transition */
-    border-radius: 10px 10px 0 0; /* Rounded top corners */
-    padding: 15px; /* Adjust padding for a more compact look */
-    overflow-y: auto; /* Enable scroll if content overflows */
-    transform: translateX(-50%); /* Center horizontally */
-}
-
-/* Visible state */
-.modal.show {
-    display: block; /* Show modal */
-    bottom: 20px; /* Visible at the bottom with a margin */
-}
-
-
-/* Modal header */
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 16px;
-    font-weight: bold;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-/* Close button */
-.close-modal {
-    cursor: pointer;
-    font-size: 20px;
-    line-height: 1;
-    color: #999;
-}
-
-/* Modal body */
-.modal-body {
-    padding-top: 10px;
-    font-size: 14px;
-    color: #333;
-}
-
-.modal-student-avatar img {
-    width: 40px;  /* Set the width to 40 pixels */
-    height: 40px; /* Set the height to 40 pixels */
-    border-radius: 50%; /* Optional: makes the image circular */
-    object-fit: cover; /* Ensures the image covers the area without distortion */
-}
-#modal-student-name {
-    margin-left: 10px;
-    line-height: 1.2;
-}
-/* Department-specific modal header styles */
-.modal-header-tep {
-    background-color: #f0ad4e; /* Example color for TEP */
-    color: #fff; /* Text color */
-}
-
-.modal-header-bsba {
-    background-color: #5bc0de; /* Example color for BSBA */
-    color: #fff; /* Text color */
-}
-
-.modal-header-ccs {
-    background-color: #d9534f; /* Example color for CCS */
-    color: #fff; /* Text color */
-}
-
-/* Default modal header style */
-.modal-header-default {
-    background-color: #007bff; /* Default color */
-    color: #fff; /* Text color */
-}
-
-/* Responsive adjustments for mobile */
-@media (max-width: 600px) {
-    .modal {
-        width: 95%;
-        top: 30%;
-        left: 50%;
-        right: 0;
-        max-height: 400px; /* Limit height */
-        border-radius: 0;
-    }
-}
-
-
 
 </style>
 
@@ -250,8 +154,10 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const clubId = "<?php echo isset($_GET['club_id']) ? $_GET['club_id'] : 0; ?>"; // Get the club_id dynamically
+    const modal = document.getElementById('chatModal'); // Reference to the modal
+    const modalChatsContent = document.getElementById('modal-chats-content'); // Reference to the chat content in modal
 
     function fetchChats() {
         fetch(`/esas/esas_moderator/apis/chats-api.php?club_id=${clubId}`)
@@ -291,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
 
                     const chatItemHTML = `
-                        <div class="chat-item ${departmentClass}" data-fullname="${fullName}" data-message="${message}" data-department="${student.department}">
+                        <div class="chat-item ${departmentClass}" data-fullname="${fullName}" data-student-id="${student.student_id}" data-department="${student.department}">
                             <div class="chat-avatar">
                                 <img src="/esas/esas_student/images/${student.profilePic}" alt="${fullName}" />
                             </div>
@@ -310,37 +216,63 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Add event listeners for chat items to open modal
                 document.querySelectorAll('.chat-item').forEach(item => {
-                    item.addEventListener('click', function() {
-                        const modal = document.getElementById('chatModal');
-                        const studentName = this.getAttribute('data-fullname');
-                        const message = this.getAttribute('data-message');
-                        const profilePic = this.querySelector('.chat-avatar img').src; // Get the profile picture URL
-                        const department = this.getAttribute('data-department'); // Get the department
+                    item.addEventListener('click', function () {
+                        const studentId = this.getAttribute('data-student-id'); // Get student ID
+                        const studentFullName = this.getAttribute('data-fullname'); // Get student full name
+                        const studentPic = this.querySelector('.chat-avatar img').src; // Get student avatar
 
-                        // Set modal content
-                        document.getElementById('modal-student-name').textContent = studentName;
-                        document.getElementById('modal-student-message').textContent = message;
-                        document.getElementById('modal-student-pic').src = profilePic; // Set the profile picture in modal
+                        // Update modal header
+                        modal.querySelector('.modal-student-avatar img').src = studentPic; // Set student pic
+                        modal.querySelector('#modal-student-name').innerText = studentFullName; // Set student name
 
                         // Remove existing department classes
                         modal.querySelector('.modal-header').classList.remove('chat-tep', 'chat-bsba', 'chat-ccs', 'chat-default');
 
-                        // Add the department class for the modal header
-                        let departmentClass = '';
-                        switch (department) {
-                            case 'TEP':
-                                departmentClass = 'chat-tep';
-                                break;
-                            case 'BSBA':
-                                departmentClass = 'chat-bsba';
-                                break;
-                            case 'CCS':
-                                departmentClass = 'chat-ccs';
-                                break;
-                            default:
-                                departmentClass = 'chat-default';
-                        }
+                        // Set the department class for the modal header based on the clicked item
+                        let departmentClass = this.getAttribute('data-department') === 'TEP' ? 'chat-tep' :
+                                             this.getAttribute('data-department') === 'BSBA' ? 'chat-bsba' :
+                                             this.getAttribute('data-department') === 'CCS' ? 'chat-ccs' :
+                                             'chat-default';
+                                             
                         modal.querySelector('.modal-header').classList.add(departmentClass);
+
+                        // Assuming you have a variable that holds the current moderator ID
+                        const currentModeratorId = '22230001'; // Replace with the actual ID of the current moderator
+
+                        // Fetch chat messages for the selected student
+                        fetch(`/esas/esas_moderator/apis/chats-modal-api.php?student_id=${studentId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                modalChatsContent.innerHTML = ''; // Clear existing content
+
+                                // Check for errors in the response
+                                if (data.error) {
+                                    modalChatsContent.innerHTML = `<p class="text-danger">${data.error}</p>`;
+                                    return;
+                                }
+
+                                // Populate chat messages
+                                data.forEach(chat => {
+                                    // Determine the message class based on sender ID
+                                    const messageClass = chat.sender_id == currentModeratorId ? 'message-right' : 'message-left';
+                                    const messageHTML = `
+                                        <div class="chat-message ${messageClass}">
+                                            <p>${chat.message}</p>
+                                            <span class="chat-date">${formatDate(chat.dateAdded)}</span>
+                                        </div>
+                                    `;
+                                    modalChatsContent.innerHTML += messageHTML;
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error fetching chat messages:', error);
+                            });
+
+                        // Function to format the date
+                        function formatDate(dateString) {
+                            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                            return new Date(dateString).toLocaleString(undefined, options);
+                        }
 
                         // Show the modal with the slide-up effect
                         modal.classList.add('show');
@@ -356,12 +288,13 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchChats();
 
     // Close modal when clicking the 'X' button
-    document.querySelector('.close-modal').addEventListener('click', function() {
-        const modal = document.getElementById('chatModal');
+    document.querySelector('.close-modal').addEventListener('click', function () {
         modal.classList.remove('show');
     });
 });
+
 </script>
+
 
 <!-- Modal Structure -->
 <div id="chatModal" class="modal">
@@ -372,10 +305,201 @@ document.addEventListener('DOMContentLoaded', function() {
         <span id="modal-student-name">Student Name</span>
         <span class="close-modal">&times;</span>
     </div>
-    <div class="modal-body">
-        <p id="modal-student-message">Message Content</p>
+    <div class="modal-body auto-scroll">
+        <!-- Include all chats here -->
+        <div id="modal-chats-content">
+            <?php include '../public/components/chats_modal.php'; ?>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input type="text" id="message-input" placeholder="Type your message here..." />
+        <button id="send-message-btn">Send</button>
     </div>
 </div>
+
+<style>
+.modal {
+    display: none;
+    position: fixed; 
+    z-index: 1000; 
+    left: 70%; 
+    top: 31%; 
+    width: 350px; 
+    max-height: 450px; 
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); 
+    transition: bottom 0.4s ease; 
+    border-radius: 10px 10px 0 0; 
+    /* padding: 15px;  */
+    transform: translateX(-50%); 
+    overflow-y: hidden; 
+}
+
+.modal.show {
+    display: block; 
+    bottom: 20px; 
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+}
+
+.modal-body {
+    padding-top: 10px;
+    font-size: 14px;
+    color: #333;
+    max-height: 300px; 
+    overflow-y: auto; 
+}
+
+.modal-student-avatar img {
+    width: 40px;  
+    height: 40px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+}
+
+#modal-student-name {
+    margin-left: 10px;
+    line-height: 1.2;
+}
+
+.modal-header-tep {
+    background-color: #f0ad4e; 
+    color: #fff; 
+}
+
+.modal-header-bsba {
+    background-color: #5bc0de; 
+    color: #fff; 
+}
+
+.modal-header-ccs {
+    background-color: #d9534f; 
+    color: #fff; 
+}
+
+.modal-header-default {
+    background-color: #007bff; 
+    color: #fff; 
+}
+
+.close-modal {
+    font-size: 1.5em;
+    cursor: pointer;
+}
+@media (max-width: 600px) {
+    .modal {
+        width: 95%;
+        top: 20%;
+        left: 50%;
+        right: 0;
+        max-height: 450px; 
+        border-radius: 0;
+    }
+}
+
+
+
+
+
+
+
+
+
+.chat-message {
+    max-width: 60%; /* Limit the width of chat messages */
+    padding: 10px;  /* Add some padding */
+    margin: 5px;    /* Space between messages */
+    border-radius: 10px; /* Rounded corners */
+}
+.chat-message p {
+    font-size: 1.2em;
+}
+
+.message-left {
+    background-color: #f1f1f1; /* Light background for student messages */
+    align-self: flex-start; /* Align to the left */
+    margin: 10px;
+}
+
+.message-right {
+    background-color: #007bff; /* Primary color for moderator messages */
+    color: white; /* White text for better contrast */
+    margin: 10px 0;
+    margin-left: 40%;
+}
+
+.chat-date {
+    font-size: 0.8em; /* Smaller font for date */
+    color: #666; /* Light gray color for the date in general */
+    margin-top: 0px; /* Space between message and date */
+}
+.message-right .chat-date {
+    font-size: 0.8em; /* Smaller font for date */
+    color: #e0e0e0 !important; /* Lighter gray for better contrast */
+    /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); */
+}
+
+/* Additional styles to create a flex container for messages */
+.modal-chats-content {
+    display: flex; /* Use flexbox */
+    flex-direction: column; /* Stack messages vertically */
+    overflow-y: auto; /* Enable scrolling if content is too long */
+    height: 400px; /* Set a height for the chat area */
+}
+
+
+
+
+
+
+
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid #ccc; 
+    background-color: #fff; 
+    position: sticky; 
+    bottom: 0; 
+    z-index: 10; 
+}
+
+#message-input {
+    flex: 1; 
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px; 
+    font-size: 14px;
+}
+
+#send-message-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff; 
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#send-message-btn:hover {
+    background-color: #0056b3; 
+}
+</style>
+
+
+
 
 
  
