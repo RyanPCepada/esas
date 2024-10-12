@@ -200,16 +200,21 @@ document.addEventListener('DOMContentLoaded', function () {
                             departmentClass = 'chat-default';
                     }
 
+                    // Determine the image source based on moderator status
+                    const imageSrc = student.is_moderator 
+                        ? `/esas/esas_moderator/images/${student.profilePic}` 
+                        : `/esas/esas_student/images/${student.profilePic}`;
+
                     const chatItemHTML = `
                         <div class="chat-item ${departmentClass}" data-fullname="${fullName}" data-student-id="${student.student_id}" data-department="${student.department}">
                             <div class="chat-avatar">
-                                <img src="/esas/esas_student/images/${student.profilePic}" alt="${fullName}" />
+                                <img src="${imageSrc}" alt="${fullName}" />
                             </div>
                             <div class="chat-content">
                                 <div class="chat-header">
                                     <span class="student-name">
-                                        ${fullName}${student.is_moderator ? '<span class="moderator-shield">    <i class="fas fa-shield-alt text-danger"></i></span>'
-                                        : ''}</span>
+                                        ${fullName}${student.is_moderator ? '<span class="moderator-shield">    <i class="fas fa-shield-alt text-danger"></i></span>' : ''}
+                                    </span>
                                     <span class="message-date">${messageDate}</span>
                                 </div>
                                 <div class="message">${message} ${student.student_id}</div>
@@ -219,7 +224,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     chatList.innerHTML += chatItemHTML;
                 });
-
 
                 // Add event listeners for chat items to open modal
                 document.querySelectorAll('.chat-item').forEach(item => {
@@ -243,9 +247,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                              'chat-default';
                                              
                         modal.querySelector('.modal-header').classList.add(departmentClass);
-
-                        // Assuming you have a variable that holds the current moderator ID
-                        // const currentModeratorId = '22230001'; // Replace with the actual ID of the current moderator
 
                         // Fetch chat messages for the selected student
                         fetch(`/esas/esas_moderator/apis/chats-modal-api.php?student_id=${studentId}`)
