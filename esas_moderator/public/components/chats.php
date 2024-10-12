@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     fetchChats();
 
-    document.querySelector('.close-modal').addEventListener('click', function () {
+    document.querySelector('.modal-close-btn').addEventListener('click', function () {
         modal.classList.remove('show');
     });
 
@@ -363,7 +363,9 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="modal-student-info">
             <span id="modal-student-name">Student Name</span>
         </div>
-        <span class="close-modal">&times;</span>
+        <div class="modal-close-btn">
+            <span id="close-modal">&times;</span>
+        </div>
     </div>
     <div class="modal-body auto-scroll">
         <!-- Include all chats here -->
@@ -403,7 +405,7 @@ document.addEventListener('DOMContentLoaded', function () {
 .modal-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Aligns items at the start */
+    align-items: center; /* Aligns items at the start */
     font-size: 16px;
     font-weight: bold;
     padding-bottom: 10px;
@@ -436,11 +438,26 @@ document.addEventListener('DOMContentLoaded', function () {
     margin-left: 0px;
 }
 
-.close-modal {
-    font-size: 1.5em;
-    cursor: pointer;
-    align-self: flex-start; /* Aligns the close button at the start of the flex container */
+.modal-close-btn {
+    display: flex;                    
+    align-items: center;           
+    justify-content: center;             
+    width: 25px;                      
+    height: 25px;        
+    padding: 0px;             
+    font-size: 1.5em;          
+    cursor: pointer;                  
+    border-radius: 50%;               
+    background-color: transparent;    
 }
+
+.modal-close-btn:hover {
+    background-color: white;          
+}
+#close-modal {
+    margin-top: -5px;
+}
+
 
 
 
