@@ -468,17 +468,7 @@ try {
 
                     <!-- CHATS DISPLAY -->
                     <div id="chats" class="p-0" style="display: none;">
-                        <div class="chatbox-section">
-                            <label class="text-muted" style="font-size: 15px;"><em>Start a conversation with your moderator(s) and fellow club members!</em></label>
-                            <div class="chatbox" id="chatbox">
-                                <!-- Example Chat Interface -->
-                                <div class="messages">
-                                    <!-- Messages will be displayed here -->
-                                </div>
-                                <input type="text" id="chatInput" placeholder="Type a message..." class="form-control">
-                                <button id="sendMessage" class="btn btn-primary mt-2">Send</button>
-                            </div>
-                        </div>
+                        <?php include '../public/components/chats.php' ?>
                     </div>
 
                 </div>
