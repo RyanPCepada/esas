@@ -34,7 +34,8 @@ try {
             s.department,
             s.profilePic,
             MAX(c.message) AS message,  -- Get the latest message
-            MAX(c.dateAdded) AS messageDate -- Get the date of the latest message
+            MAX(c.dateAdded) AS messageDate, -- Get the date of the latest message
+            0 AS is_moderator -- Mark this row as a student
         FROM 
             tbl_students s 
         JOIN 
@@ -59,7 +60,8 @@ try {
             m.department,
             m.profilePic,
             MAX(c.message) AS message,  -- Get the latest message
-            MAX(c.dateAdded) AS messageDate -- Get the date of the latest message
+            MAX(c.dateAdded) AS messageDate, -- Get the date of the latest message
+            1 AS is_moderator -- Mark this row as a moderator
         FROM 
             tbl_moderators m
         JOIN 

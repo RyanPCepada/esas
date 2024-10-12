@@ -181,42 +181,45 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 data.forEach(student => {
-                    const fullName = `${student.firstName} ${student.middleName ? student.middleName + ' ' : ''}${student.lastName}`;
-                    const message = student.message ? student.message : ''; // Show message if exists
-                    const messageDate = student.messageDate ? student.messageDate : ''; // Use formatted date from API
+    const fullName = `${student.firstName} ${student.middleName ? student.middleName + ' ' : ''}${student.lastName}`;
+    const message = student.message ? student.message : '';
+    const messageDate = student.messageDate ? student.messageDate : '';
 
-                    let departmentClass = '';
-                    switch (student.department) {
-                        case 'TEP':
-                            departmentClass = 'chat-tep';
-                            break;
-                        case 'BSBA':
-                            departmentClass = 'chat-bsba';
-                            break;
-                        case 'CCS':
-                            departmentClass = 'chat-ccs';
-                            break;
-                        default:
-                            departmentClass = 'chat-default';
-                    }
+    let departmentClass = '';
+    switch (student.department) {
+        case 'TEP':
+            departmentClass = 'chat-tep';
+            break;
+        case 'BSBA':
+            departmentClass = 'chat-bsba';
+            break;
+        case 'CCS':
+            departmentClass = 'chat-ccs';
+            break;
+        default:
+            departmentClass = 'chat-default';
+    }
 
-                    const chatItemHTML = `
-                        <div class="chat-item ${departmentClass}" data-fullname="${fullName}" data-student-id="${student.student_id}" data-department="${student.department}">
-                            <div class="chat-avatar">
-                                <img src="/esas/esas_student/images/${student.profilePic}" alt="${fullName}" />
-                            </div>
-                            <div class="chat-content">
-                                <div class="chat-header">
-                                    <span class="student-name">${fullName}</span>
-                                    <span class="message-date">${messageDate}</span>
-                                </div>
-                                <div class="message">${message} ${student.student_id}</div>
-                            </div>
-                        </div>
-                    `;
+    const chatItemHTML = `
+        <div class="chat-item ${departmentClass}" data-fullname="${fullName}" data-student-id="${student.student_id}" data-department="${student.department}">
+            <div class="chat-avatar">
+                <img src="/esas/esas_student/images/${student.profilePic}" alt="${fullName}" />
+            </div>
+            <div class="chat-content">
+                <div class="chat-header">
+                    <span class="student-name">
+                        ${fullName}${student.is_moderator ? '<span class="moderator-shield">    <i class="fas fa-shield-alt text-danger"></i></span>'
+                        : ''}</span>
+                    <span class="message-date">${messageDate}</span>
+                </div>
+                <div class="message">${message} ${student.student_id}</div>
+            </div>
+        </div>
+    `;
 
-                    chatList.innerHTML += chatItemHTML;
-                });
+    chatList.innerHTML += chatItemHTML;
+});
+
 
                 // Add event listeners for chat items to open modal
                 document.querySelectorAll('.chat-item').forEach(item => {
