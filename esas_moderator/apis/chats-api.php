@@ -5,6 +5,14 @@ session_start();
 date_default_timezone_set('Asia/Manila');
 header('Content-Type: application/json');
 
+// Ensure the moderator ID is set in the session
+if (isset($_SESSION['moderator_id'])) {
+    $moderator_id = $_SESSION['moderator_id'];
+} else {
+    echo json_encode(['error' => 'Moderator not logged in.']);
+    exit;
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
@@ -32,7 +40,9 @@ try {
         JOIN 
             tbl_registration r ON s.student_id = r.student_id 
         LEFT JOIN 
-            tbl_chats c ON s.student_id = c.student_id AND c.club_id = :club_id 
+            tbl_chats c ON (s.student_id = c.sender_id OR s.student_id = c.recipient_id) 
+            AND c.club_id = :club_id
+            AND c.recipient_id = :moderator_id  -- Ensure chats where the moderator is the recipient
         WHERE 
             r.club_id = :club_id 
             AND r.status = 'active'
@@ -43,7 +53,10 @@ try {
     ");
 
     // Bind parameters and execute the query
-    $stmt->execute(['club_id' => $club_id]);
+    $stmt->execute([
+        'club_id' => $club_id,
+        'moderator_id' => $moderator_id
+    ]);
 
     // Fetch all active students
     $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -78,4 +91,5 @@ try {
 } catch (PDOException $e) {
     echo json_encode(['error' => $e->getMessage()]);
 }
+
 ?>
