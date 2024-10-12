@@ -162,9 +162,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const clubId = "<?php echo isset($_GET['club_id']) ? $_GET['club_id'] : 0; ?>"; 
     const modal = document.getElementById('chatModal'); 
     const modalChatsContent = document.getElementById('modal-chats-content'); 
+    const currentStudentId = "<?php echo isset($_SESSION['student_id']) ? $_SESSION['student_id'] : '0'; ?>"; // Get student_id from session
 
     function fetchChats() {
-        fetch(`/esas/esas_moderator/apis/chats-api.php?club_id=${clubId}`)
+        // Update endpoint to fetch chats using student_id
+        fetch(`/esas/esas_student/apis/chats-api.php?club_id=${clubId}&student_id=${currentStudentId}`)
             .then(response => response.json())
             .then(data => {
                 const chatList = document.getElementById('chatList');
@@ -217,7 +219,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <span class="message-date">${messageDate}</span>
                                 </div>
                                 <div class="message">${message}</div>
-                                <!-- ${student.student_id} -->
                             </div>
                         </div>
                     `;
@@ -231,7 +232,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         this.classList.add('active'); 
 
                         const studentId = this.getAttribute('data-student-id'); 
-                        const currentModeratorId = "<?php echo isset($_SESSION['moderator_id']) ? $_SESSION['moderator_id'] : '0'; ?>"; 
                         const studentFullName = this.getAttribute('data-fullname'); 
                         const studentPic = this.querySelector('.chat-avatar img').src; 
 
@@ -247,7 +247,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                              
                         modal.querySelector('.modal-header').classList.add(departmentClass);
 
-                        fetch(`/esas/esas_moderator/apis/chats-modal-api.php?student_id=${studentId}`)
+                        // Change API to fetch chats for the student_id
+                        fetch(`/esas/esas_student/apis/chats-modal-api.php?student_id=${studentId}`)
                             .then(response => response.json())
                             .then(data => {
                                 modalChatsContent.innerHTML = ''; 
@@ -258,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
 
                                 data.forEach(chat => {
-                                    const messageClass = chat.sender_id == currentModeratorId ? 'message-right' : 'message-left';
+                                    const messageClass = chat.sender_id == currentStudentId ? 'message-right' : 'message-left'; // Use currentStudentId
                                     const messageHTML = `
                                         <div class="chat-message ${messageClass}">
                                             <p>${chat.message}</p>
@@ -370,7 +371,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <div class="modal-body auto-scroll">
         <!-- Include all chats here -->
         <div id="modal-chats-content">
-            <?php include '../public/components/chats_modal.php'; ?>
+            <?php include './components/chats_modal.php'; ?>
         </div>
     </div>
     <div class="modal-footer">

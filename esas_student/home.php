@@ -468,7 +468,7 @@ try {
 
                     <!-- CHATS DISPLAY -->
                     <div id="chats" class="p-0" style="display: none;">
-                        <?php include '../public/components/chats.php' ?>
+                        <?php include './components/chats.php' ?>
                     </div>
 
                 </div>
