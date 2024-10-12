@@ -360,7 +360,9 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="modal-student-avatar">
             <img id="modal-student-pic" src="" alt="Student Avatar" />
         </div>
-        <span id="modal-student-name">Student Name</span>
+        <div class="modal-student-info">
+            <span id="modal-student-name">Student Name</span>
+        </div>
         <span class="close-modal">&times;</span>
     </div>
     <div class="modal-body auto-scroll">
@@ -401,13 +403,46 @@ document.addEventListener('DOMContentLoaded', function () {
 .modal-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start; /* Aligns items at the start */
     font-size: 16px;
     font-weight: bold;
     padding-bottom: 10px;
     border-bottom: 1px solid #ddd;
     position: sticky;
 }
+
+.modal-student-avatar img {
+    width: 40px;  
+    height: 40px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    margin-right: 10px; /* Add margin to space out the name */
+}
+
+.modal-student-info {
+    width: 240px;
+    display: flex;
+    align-items: flex-start; /* Aligns items at the start */
+    flex-direction: column; /* Stack the name if it wraps */
+}
+
+#modal-student-name {
+    font-size: 1.2em;
+    line-height: 1.2;
+    white-space: nowrap; /* Prevents the name from wrapping to the next line */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds an ellipsis if text overflows */
+    max-width: 240px; /* Adjust this value to prevent overflow */
+    margin-left: 0px;
+}
+
+.close-modal {
+    font-size: 1.5em;
+    cursor: pointer;
+    align-self: flex-start; /* Aligns the close button at the start of the flex container */
+}
+
+
 
 .modal-body {
     padding-top: 10px;
@@ -417,17 +452,6 @@ document.addEventListener('DOMContentLoaded', function () {
     overflow-y: auto; 
 }
 
-.modal-student-avatar img {
-    width: 40px;  
-    height: 40px; 
-    border-radius: 50%; 
-    object-fit: cover; 
-}
-
-#modal-student-name {
-    margin-left: 10px;
-    line-height: 1.2;
-}
 
 .modal-header-tep {
     background-color: #f0ad4e; 
@@ -449,10 +473,6 @@ document.addEventListener('DOMContentLoaded', function () {
     color: #fff; 
 }
 
-.close-modal {
-    font-size: 1.5em;
-    cursor: pointer;
-}
 @media (max-width: 600px) {
     .modal {
         width: 95%;
