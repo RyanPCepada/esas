@@ -68,6 +68,10 @@
 /* Chat content container */
 .chat-content {
     flex-grow: 1;
+    width: 80%;
+    word-wrap: break-word !important; /* Ensure long words break and wrap within the box */
+    overflow-wrap: break-word !important; /* This works the same way as word-wrap */
+    white-space: normal !important; /* Allow the message to wrap to a new line when necessary */
 }
 
 /* Chat header with name and date */
@@ -419,6 +423,9 @@ document.addEventListener('DOMContentLoaded', function () {
     padding: 10px;  /* Add some padding */
     margin: 5px;    /* Space between messages */
     border-radius: 10px; /* Rounded corners */
+    word-wrap: break-word; /* Ensure long words break and wrap within the box */
+    overflow-wrap: break-word; /* This works the same way as word-wrap */
+    white-space: normal; /* Allow the message to wrap to a new line when necessary */
 }
 .chat-message p {
     font-size: 1.2em;
