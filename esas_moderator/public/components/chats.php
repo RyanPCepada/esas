@@ -300,9 +300,53 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('.close-modal').addEventListener('click', function () {
         modal.classList.remove('show');
     });
-});
 
+    // Send message when the send button is clicked
+    document.getElementById('send-message-btn').addEventListener('click', function () {
+        const messageInput = document.getElementById('message-input');
+        const message = messageInput.value.trim();
+        const recipientId = document.querySelector('.chat-item.active').getAttribute('data-student-id'); // Get the recipient ID
+
+        if (message === '') {
+            alert('Please enter a message.');
+            return;
+        }
+
+        // Send the message using fetch
+        fetch('/esas/esas_moderator/actions/send_chat_action.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `message=${encodeURIComponent(message)}&recipient_id=${recipientId}&club_id=${clubId}`,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                // Optionally, you can update the modal chats content to reflect the newly sent message
+                modalChatsContent.innerHTML += `
+                    <div class="chat-message message-right">
+                        <p>${message}</p>
+                        <span class="chat-date">${formatDate(new Date().toISOString())}</span>
+                    </div>
+                `;
+                messageInput.value = ''; // Clear the input field
+            }
+        })
+        .catch(error => {
+            console.error('Error sending message:', error);
+        });
+    });
+});
 </script>
+
+
+
+
+
+<!-- ADDING FORM FOR SENDING MESSAGE FROM THE MODAL -->
 
 
 <!-- Modal Structure -->
