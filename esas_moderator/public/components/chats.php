@@ -181,50 +181,51 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 data.forEach(student => {
-    const fullName = `${student.firstName} ${student.middleName ? student.middleName + ' ' : ''}${student.lastName}`;
-    const message = student.message ? student.message : '';
-    const messageDate = student.messageDate ? student.messageDate : '';
+                    const fullName = `${student.firstName} ${student.middleName ? student.middleName + ' ' : ''}${student.lastName}`;
+                    const message = student.message ? student.message : '';
+                    const messageDate = student.messageDate ? student.messageDate : '';
 
-    let departmentClass = '';
-    switch (student.department) {
-        case 'TEP':
-            departmentClass = 'chat-tep';
-            break;
-        case 'BSBA':
-            departmentClass = 'chat-bsba';
-            break;
-        case 'CCS':
-            departmentClass = 'chat-ccs';
-            break;
-        default:
-            departmentClass = 'chat-default';
-    }
+                    let departmentClass = '';
+                    switch (student.department) {
+                        case 'TEP':
+                            departmentClass = 'chat-tep';
+                            break;
+                        case 'BSBA':
+                            departmentClass = 'chat-bsba';
+                            break;
+                        case 'CCS':
+                            departmentClass = 'chat-ccs';
+                            break;
+                        default:
+                            departmentClass = 'chat-default';
+                    }
 
-    const chatItemHTML = `
-        <div class="chat-item ${departmentClass}" data-fullname="${fullName}" data-student-id="${student.student_id}" data-department="${student.department}">
-            <div class="chat-avatar">
-                <img src="/esas/esas_student/images/${student.profilePic}" alt="${fullName}" />
-            </div>
-            <div class="chat-content">
-                <div class="chat-header">
-                    <span class="student-name">
-                        ${fullName}${student.is_moderator ? '<span class="moderator-shield">    <i class="fas fa-shield-alt text-danger"></i></span>'
-                        : ''}</span>
-                    <span class="message-date">${messageDate}</span>
-                </div>
-                <div class="message">${message} ${student.student_id}</div>
-            </div>
-        </div>
-    `;
+                    const chatItemHTML = `
+                        <div class="chat-item ${departmentClass}" data-fullname="${fullName}" data-student-id="${student.student_id}" data-department="${student.department}">
+                            <div class="chat-avatar">
+                                <img src="/esas/esas_student/images/${student.profilePic}" alt="${fullName}" />
+                            </div>
+                            <div class="chat-content">
+                                <div class="chat-header">
+                                    <span class="student-name">
+                                        ${fullName}${student.is_moderator ? '<span class="moderator-shield">    <i class="fas fa-shield-alt text-danger"></i></span>'
+                                        : ''}</span>
+                                    <span class="message-date">${messageDate}</span>
+                                </div>
+                                <div class="message">${message} ${student.student_id}</div>
+                            </div>
+                        </div>
+                    `;
 
-    chatList.innerHTML += chatItemHTML;
-});
+                    chatList.innerHTML += chatItemHTML;
+                });
 
 
                 // Add event listeners for chat items to open modal
                 document.querySelectorAll('.chat-item').forEach(item => {
                     item.addEventListener('click', function () {
                         const studentId = this.getAttribute('data-student-id'); // Get student ID
+                        const currentModeratorId = "<?php echo isset($_SESSION['moderator_id']) ? $_SESSION['moderator_id'] : '0'; ?>"; // Get the moderator ID dynamically
                         const studentFullName = this.getAttribute('data-fullname'); // Get student full name
                         const studentPic = this.querySelector('.chat-avatar img').src; // Get student avatar
 
@@ -244,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         modal.querySelector('.modal-header').classList.add(departmentClass);
 
                         // Assuming you have a variable that holds the current moderator ID
-                        const currentModeratorId = '22230001'; // Replace with the actual ID of the current moderator
+                        // const currentModeratorId = '22230001'; // Replace with the actual ID of the current moderator
 
                         // Fetch chat messages for the selected student
                         fetch(`/esas/esas_moderator/apis/chats-modal-api.php?student_id=${studentId}`)
