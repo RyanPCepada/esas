@@ -196,7 +196,10 @@
     border-radius: 50%; /* Optional: makes the image circular */
     object-fit: cover; /* Ensures the image covers the area without distortion */
 }
-
+#modal-student-name {
+    margin-left: 10px;
+    line-height: 1.2;
+}
 /* Department-specific modal header styles */
 .modal-header-tep {
     background-color: #f0ad4e; /* Example color for TEP */
