@@ -241,10 +241,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         modal.querySelector('.modal-header').classList.remove('chat-tep', 'chat-bsba', 'chat-ccs', 'chat-default');
 
                         let departmentClass = this.getAttribute('data-department') === 'TEP' ? 'chat-tep' :
-                                             this.getAttribute('data-department') === 'BSBA' ? 'chat-bsba' :
-                                             this.getAttribute('data-department') === 'CCS' ? 'chat-ccs' :
-                                             'chat-default';
-                                             
+                                            this.getAttribute('data-department') === 'BSBA' ? 'chat-bsba' :
+                                            this.getAttribute('data-department') === 'CCS' ? 'chat-ccs' :
+                                            'chat-default';
+                                            
                         modal.querySelector('.modal-header').classList.add(departmentClass);
 
                         fetch(`/esas/esas_moderator/apis/chats-modal-api.php?student_id=${studentId}`)
@@ -269,6 +269,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                 });
 
                                 modalChatsContent.scrollTop = modalChatsContent.scrollHeight; // Scroll to the bottom of the chat
+
+                                // Add this line to scroll to the #scroll-bottom div
+                                document.getElementById('scroll-bottom').scrollIntoView({ behavior: 'smooth' });
+
                             })
                             .catch(error => {
                                 console.error('Error fetching chat messages:', error);
@@ -282,6 +286,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         modal.classList.add('show');
                     });
                 });
+
             })
             .catch(error => {
                 console.error('Error fetching chats:', error);
@@ -372,6 +377,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div id="modal-chats-content">
             <?php include '../public/components/chats_modal.php'; ?>
         </div>
+        <div class="scroll-bottom" id="scroll-bottom"></div>
     </div>
     <div class="modal-footer">
         <input type="text" id="message-input" placeholder="Type your message here..." />
