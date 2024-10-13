@@ -382,49 +382,54 @@ unset($pdo);
                     <!-- DEFAULT POSTS DISPLAY -->
                     <div id="posts">
                         <!-- Post Form -->
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card" id="card_post">
-                                    <div class="card-header bg-info text-white d-flex align-items-center" style="position: relative; z-index: 1;">
-                                        <img src="../icons/ICON_ANNOUNCEMENT.png" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
-                                        <h4 class="mb-0">Share Something Exciting!</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>" enctype="multipart/form-data">
-                                            <div class="form-group mb-0">
-                                                <label for="postContent">What's on your mind?</label>
-                                                <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
-                                                <span class="text-danger"><?php echo $postContent_err; ?></span>
-                                            </div>
+<div class="row">
+    <div class="col-12">
+        <div class="card" id="card_post">
+            <div class="card-header bg-info text-white d-flex align-items-center" style="position: relative; z-index: 1;">
+                <img src="../icons/ICON_ANNOUNCEMENT.png" class="d-inline-block align-top" id="icon_announcement" alt="Announcement Icon">
+                <h4 class="mb-0">Share Something Exciting!</h4>
+            </div>
+            <div class="card-body">
+                <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>" enctype="multipart/form-data">
+                    <div class="form-group mb-0">
+                        <label for="postContent">What's on your mind?</label>
+                        <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
+                        <span class="text-danger"><?php echo $postContent_err; ?></span>
+                    </div>
 
-                                            <!-- Icon Buttons for Uploading Images, Files, and Videos -->
-                                            <div class="form-group d-flex justify-content-end mt-0 mb-0">
-                                                <button type="button" class="btn btn-outline px-1 py-0 m-1" id="imageUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
-                                                    <i class="fa fa-image text-info"></i>
-                                                    <input type="file" name="images[]" id="imageUpload" accept="image/*" multiple style="display: none;">
-                                                </button>
-                                                <button type="button" class="btn btn-outline px-1 py-0 m-1" id="fileUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
-                                                    <i class="fa fa-file text-info"></i>
-                                                    <input type="file" name="files[]" id="fileUpload" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" multiple style="display: none;">
-                                                </button>
-                                                <button type="button" class="btn btn-outline px-1 py-0 m-1" id="videoUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
-                                                    <i class="fa fa-video text-info"></i>
-                                                    <input type="file" name="videos[]" id="videoUpload" accept="video/*" multiple style="display: none;">
-                                                </button>
-                                            </div>
+                    <!-- Previews for selected images and files -->
+                    <div class="form-group mt-2">
+                        <div id="imagePreview" class="d-flex flex-wrap mb-2"></div>
+                        <div id="filePreview" class="d-flex flex-column"></div>
+                    </div>
 
-                                            <div class="d-flex justify-content-between align-items-center mt-0">
-                                                <button type="submit" class="btn btn-primary" style="border-radius: 3px;"><i class="fa fa-paper-plane"></i> Post</button>
-                                                <div class="text-muted ml-2">
-                                                    <p>Let your club members know what's happening!</p>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- Icon Buttons for Uploading Images and Files -->
+                    <div class="form-group d-flex justify-content-end mt-0 mb-0">
+                        <!-- Image Upload Trigger -->
+                        <button type="button" class="btn btn-outline px-1 py-0 m-1" id="imageUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
+                            <i class="fa fa-image text-info"></i>
+                            <input type="file" name="images[]" id="imageUpload" accept="image/*" multiple style="display: none;">
+                        </button>
+                        <!-- File Upload Trigger -->
+                        <button type="button" class="btn btn-outline px-1 py-0 m-1" id="fileUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
+                            <i class="fa fa-file text-info"></i>
+                            <input type="file" name="files[]" id="fileUpload" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" multiple style="display: none;">
+                        </button>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-0">
+                        <button type="submit" class="btn btn-primary" style="border-radius: 3px;">
+                            <i class="fa fa-paper-plane"></i> Post
+                        </button>
+                        <div class="text-muted ml-2">
+                            <p>Let your club members know what's happening!</p>
                         </div>
-
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
                         <br><hr>
                         <!-- Post List -->
                         <div class="post_list">
@@ -452,6 +457,234 @@ unset($pdo);
         </div>
     </div>
 </div>
+
+
+
+
+<script>
+// Helper function to store selected files (images and non-images) in session storage
+function saveSelectedFilesToSession(type, files) {
+    const storedFiles = JSON.parse(sessionStorage.getItem(type)) || [];
+    const updatedFiles = [...storedFiles, ...files];
+    sessionStorage.setItem(type, JSON.stringify(updatedFiles));
+}
+
+// Helper function to get stored files from session storage
+function getSelectedFilesFromSession(type) {
+    return JSON.parse(sessionStorage.getItem(type)) || [];
+}
+
+// Helper function to get the correct file icon based on file extension
+function getFileIcon(fileExtension) {
+    let fileIcon;
+    switch (fileExtension) {
+        case 'pdf':
+            fileIcon = '/esas/esas_student/icons/ICON_PDF.png';
+            break;
+        case 'doc':
+        case 'docx':
+            fileIcon = '/esas/esas_student/icons/ICON_WORD.png';
+            break;
+        default:
+            fileIcon = '/esas/esas_student/icons/ICON_FILE.png'; // Default file icon
+    }
+    return fileIcon;
+}
+
+// Helper function to render the stored images and files on page load
+function renderStoredPreviews() {
+    const imagePreview = document.getElementById('imagePreview');
+    const filePreview = document.getElementById('filePreview');
+
+    // Clear previous previews
+    imagePreview.innerHTML = '';
+    filePreview.innerHTML = '';
+
+    // Render stored image files
+    const storedImages = getSelectedFilesFromSession('images');
+    storedImages.forEach((image, index) => {
+        const imgContainer = document.createElement('div');
+        imgContainer.style.position = 'relative';
+        const img = document.createElement('img');
+        img.src = image;
+        img.style.width = '100px';
+        img.style.height = '100px';
+        img.style.margin = '5px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '5px';
+        
+        // Create remove button
+        const removeBtn = document.createElement('button');
+        removeBtn.innerText = 'X';
+        removeBtn.style.position = 'absolute';
+        removeBtn.style.top = '0';
+        removeBtn.style.right = '0';
+        removeBtn.style.backgroundColor = 'lightgrey'; // Changed to light grey
+        removeBtn.style.color = 'black'; // Changed to black text
+        removeBtn.style.border = 'none';
+        removeBtn.style.borderRadius = '50%'; // Make it round
+        removeBtn.style.width = '20px'; // Set width
+        removeBtn.style.height = '20px'; // Set height
+        removeBtn.style.cursor = 'pointer';
+        
+        // Add click event to remove image
+        removeBtn.addEventListener('click', function() {
+            // Remove the image from session storage
+            storedImages.splice(index, 1);
+            sessionStorage.setItem('images', JSON.stringify(storedImages));
+            renderStoredPreviews(); // Re-render previews
+        });
+
+        imgContainer.appendChild(img);
+        imgContainer.appendChild(removeBtn);
+        imagePreview.appendChild(imgContainer);
+    });
+
+    // Render stored file names (non-image files)
+    const storedFiles = getSelectedFilesFromSession('files');
+    storedFiles.forEach((file, index) => {
+        const fileExtension = file.split('.').pop().toLowerCase(); // Get file extension
+        const fileIcon = getFileIcon(fileExtension); // Get the correct file icon
+
+        const div = document.createElement('div');
+        div.className = 'file-item';
+        div.style.marginBottom = '5px';
+        div.style.position = 'relative';
+        div.innerHTML = `<img src="${fileIcon}" style="width: 20px; height: 20px; margin-right: 5px;"> ${file}`;
+
+        // Create remove button
+const removeBtn = document.createElement('button');
+removeBtn.innerText = 'x';
+removeBtn.style.fontSize = '10px';
+removeBtn.style.position = 'absolute';
+removeBtn.style.top = '0';
+removeBtn.style.right = '0';
+removeBtn.style.backgroundColor = 'lightgrey'; // Changed to light grey
+removeBtn.style.color = 'black'; // Changed to black text
+removeBtn.style.border = 'none';
+removeBtn.style.borderRadius = '50%'; // Make it round
+removeBtn.style.width = '15px'; // Set width
+removeBtn.style.height = '15px'; // Set height
+removeBtn.style.cursor = 'pointer';
+removeBtn.style.display = 'flex'; // Add flex display
+removeBtn.style.alignItems = 'center'; // Center vertically
+removeBtn.style.justifyContent = 'center'; // Center horizontally
+
+
+        // Add click event to remove file
+        removeBtn.addEventListener('click', function() {
+            // Remove the file from session storage
+            storedFiles.splice(index, 1);
+            sessionStorage.setItem('files', JSON.stringify(storedFiles));
+            renderStoredPreviews(); // Re-render previews
+        });
+
+        div.appendChild(removeBtn);
+        filePreview.appendChild(div);
+    });
+}
+
+// Trigger image and file upload inputs
+document.getElementById('imageUploadBtn').addEventListener('click', function() {
+    document.getElementById('imageUpload').click();
+});
+
+document.getElementById('fileUploadBtn').addEventListener('click', function() {
+    document.getElementById('fileUpload').click();
+});
+
+// Image preview and persist images in session storage
+document.getElementById('imageUpload').addEventListener('change', function() {
+    const imagePreview = document.getElementById('imagePreview');
+    const files = this.files;
+
+    if (files) {
+        const imageArray = [];
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.width = '100px';
+                img.style.height = '100px';
+                img.style.margin = '5px';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '5px';
+                imagePreview.appendChild(img);
+                // Save the base64 image data to the array
+                imageArray.push(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Store selected images in session storage
+        saveSelectedFilesToSession('images', imageArray);
+    }
+});
+
+// File preview (non-image files) and persist file names in session storage
+document.getElementById('fileUpload').addEventListener('change', function() {
+    const filePreview = document.getElementById('filePreview');
+    const files = this.files;
+
+    if (files) {
+        const fileArray = [];
+        Array.from(files).forEach(file => {
+            const fileExtension = file.name.split('.').pop().toLowerCase(); // Get file extension
+            const fileIcon = getFileIcon(fileExtension); // Get the correct file icon
+
+            const div = document.createElement('div');
+            div.className = 'file-item';
+            div.style.marginBottom = '5px';
+            div.style.position = 'relative';
+            div.innerHTML = `<img src="${fileIcon}" style="width: 20px; height: 20px; margin-right: 5px;"> ${file.name}`;
+
+            // Create remove button
+const removeBtn = document.createElement('button');
+removeBtn.innerText = 'x';
+removeBtn.style.fontSize = '10px';
+removeBtn.style.position = 'absolute';
+removeBtn.style.top = '0';
+removeBtn.style.right = '0';
+removeBtn.style.backgroundColor = 'lightgrey'; // Changed to light grey
+removeBtn.style.color = 'black'; // Changed to black text
+removeBtn.style.border = 'none';
+removeBtn.style.borderRadius = '50%'; // Make it round
+removeBtn.style.width = '15px'; // Set width
+removeBtn.style.height = '15px'; // Set height
+removeBtn.style.cursor = 'pointer';
+removeBtn.style.display = 'flex'; // Add flex display
+removeBtn.style.alignItems = 'center'; // Center vertically
+removeBtn.style.justifyContent = 'center'; // Center horizontally
+
+
+            // Add click event to remove file
+            removeBtn.addEventListener('click', function() {
+                // Remove the file from session storage
+                fileArray.splice(index, 1);
+                sessionStorage.setItem('files', JSON.stringify(fileArray));
+                renderStoredPreviews(); // Re-render previews
+            });
+
+            div.appendChild(removeBtn);
+            filePreview.appendChild(div);
+            // Save file names to the array
+            fileArray.push(file.name);
+        });
+
+        // Store selected files in session storage
+        saveSelectedFilesToSession('files', fileArray);
+    }
+});
+
+// Render previews from session storage on page load
+window.addEventListener('load', function() {
+    renderStoredPreviews();
+});
+
+</script>
+
+
 
 <!-- JavaScript to switch between Posts, Events, and Chats -->
 <script>
