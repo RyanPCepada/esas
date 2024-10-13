@@ -66,6 +66,73 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Get the ID of the inserted post
             $post_id = $pdo->lastInsertId();
 
+            // Handle file uploads
+            // Define directories and allowed types
+            $photoTargetDir = "/esas/esas_moderator/images/";
+            $allowedImageTypes = ['jpg', 'jpeg', 'png', 'gif'];
+            $fileTargetDir = "/esas/esas_moderator/request_letters/";
+            $allowedFileTypes = ['pdf', 'doc', 'docx'];
+            $uploads = $_FILES['attachments']; // Assuming 'attachments' is the name for input files
+
+            // Process each file
+foreach ($uploads['name'] as $key => $fileName) {
+    if ($uploads['error'][$key] == 0) {
+        $fileSize = $uploads['size'][$key];
+        $fileTmpName = $uploads['tmp_name'][$key];
+        $fileType = pathinfo($fileName, PATHINFO_EXTENSION);
+        
+        // Determine file type for handling
+        if (in_array(strtolower($fileType), $allowedImageTypes)) {
+            // Handle image file
+            $newFileName = uniqid() . "." . $fileType; 
+            $targetFilePath = $_SERVER['DOCUMENT_ROOT'] . $photoTargetDir . $newFileName;
+
+            if (move_uploaded_file($fileTmpName, $targetFilePath)) {
+                // Insert into tbl_posts_attachments
+                $attachmentType = 'photo';
+                $sql = "INSERT INTO tbl_posts_attachments (attachmentType, attachmentFileName, dateUploaded, post_id, moderator_id, club_id) VALUES (:attachmentType, :attachmentFileName, NOW(), :post_id, :moderator_id, :club_id)";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(":attachmentType", $attachmentType);
+                $stmt->bindParam(":attachmentFileName", $newFileName);
+                $stmt->bindParam(":post_id", $post_id, PDO::PARAM_INT);
+                $stmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT);
+                $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+                
+                if (!$stmt->execute()) {
+                    error_log("Failed to insert photo attachment: " . print_r($stmt->errorInfo(), true));
+                }
+            } else {
+                error_log("Failed to move uploaded file to $targetFilePath");
+            }
+        } elseif (in_array(strtolower($fileType), $allowedFileTypes)) {
+            // Handle document file
+            $newFileName = uniqid() . "." . $fileType; 
+            $targetFilePath = $_SERVER['DOCUMENT_ROOT'] . $fileTargetDir . $newFileName;
+
+            if (move_uploaded_file($fileTmpName, $targetFilePath)) {
+                // Insert into tbl_posts_attachments
+                $attachmentType = 'doc';
+                $sql = "INSERT INTO tbl_posts_attachments (attachmentType, attachmentFileName, dateUploaded, post_id, moderator_id, club_id) VALUES (:attachmentType, :attachmentFileName, NOW(), :post_id, :moderator_id, :club_id)";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(":attachmentType", $attachmentType);
+                $stmt->bindParam(":attachmentFileName", $newFileName);
+                $stmt->bindParam(":post_id", $post_id, PDO::PARAM_INT);
+                $stmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT);
+                $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+                
+                if (!$stmt->execute()) {
+                    error_log("Failed to insert document attachment: " . print_r($stmt->errorInfo(), true));
+                }
+            } else {
+                error_log("Failed to move uploaded document to $targetFilePath");
+            }
+        }
+    } else {
+        error_log("Error uploading file: " . print_r($uploads['error'][$key], true));
+    }
+}
+
+
             // Notify all students registered in the club
             $sql = "SELECT student_id FROM tbl_registration WHERE club_id = :club_id AND status = 'active'";
             $stmt = $pdo->prepare($sql);
