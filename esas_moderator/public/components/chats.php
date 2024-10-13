@@ -272,6 +272,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                                 // Add this line to scroll to the #scroll-bottom div
                                 document.getElementById('scroll-bottom').scrollIntoView({ behavior: 'smooth' });
+                                document.getElementById('scroll-bottom').scrollIntoView({ behavior: 'auto' });
+
 
                             })
                             .catch(error => {
