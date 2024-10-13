@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <span id="close-modal">&times;</span>
         </div>
     </div>
-    <div class="modal-body auto-scroll">
+    <div class="chats-modal-body auto-scroll">
         <!-- Include all chats here -->
         <div id="modal-chats-content">
             <?php include '../public/components/chats_modal.php'; ?>
@@ -469,7 +469,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-.modal-body {
+.chats-modal-body {
     padding-top: 10px;
     font-size: 14px;
     color: #333;
