@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 modalChatsContent.scrollTop = modalChatsContent.scrollHeight; // Scroll to the bottom of the chat
                 messageInput.value = ''; // Clear the input field
             }
-        })
+        }) 
         .catch(error => {
             console.error('Error sending message:', error);
         });
@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 <!-- Modal Structure -->
-<div id="chatModal" class="modal">
+<div id="chatModal" class="chats-modal">
     <div class="modal-header">
         <div class="modal-student-avatar">
             <img id="modal-student-pic" src="" alt="Student Avatar" />
@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 
 <style>
-.modal {
+.chats-modal {
     display: none;
     position: fixed; 
     z-index: 1000; 
@@ -397,9 +397,9 @@ document.addEventListener('DOMContentLoaded', function () {
     overflow-y: hidden; 
 }
 
-.modal.show {
+.chats-modal.show {
     display: block; 
-    bottom: 20px; 
+    bottom: 0px; 
 }
 
 .modal-header {
@@ -491,7 +491,7 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 
 @media (max-width: 600px) {
-    .modal {
+    .chats-modal {
         width: 95%;
         top: 20%;
         left: 50%;
