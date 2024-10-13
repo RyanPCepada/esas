@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 data.forEach(student => {
                     const fullName = `${student.firstName} ${student.middleName ? student.middleName + ' ' : ''}${student.lastName}`;
-                    const message = student.message ? student.message : '';
+                    const message = student.message ? student.message : `<em class="text-primary">Start a conversation with ${student.firstName} now!</em>`;
                     const messageDate = student.messageDate ? student.messageDate : '';
 
                     let departmentClass = '';

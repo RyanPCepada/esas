@@ -159,9 +159,9 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const clubId = "<?php echo isset($_GET['club_id']) ? $_GET['club_id'] : 0; ?>"; 
-    const modal = document.getElementById('chatModal'); 
-    const modalChatsContent = document.getElementById('modal-chats-content'); 
+    const clubId = "<?php echo isset($_GET['club_id']) ? $_GET['club_id'] : 0; ?>";
+    const modal = document.getElementById('chatModal');
+    const modalChatsContent = document.getElementById('modal-chats-content');
     const currentStudentId = "<?php echo isset($_SESSION['student_id']) ? $_SESSION['student_id'] : '0'; ?>"; // Get student_id from session
 
     function fetchChats() {
@@ -182,10 +182,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
 
+                // Loop through the list of students/messages
                 data.forEach(student => {
+                    if (student.student_id == currentStudentId) return; // Exclude the current student
+
                     const fullName = `${student.firstName} ${student.middleName ? student.middleName + ' ' : ''}${student.lastName}`;
-                    const message = student.message ? student.message : '';
-                    const messageDate = student.messageDate ? student.messageDate : '';
+                    const message = student.message ? student.message : `<em class="text-primary">Start a conversation with ${student.firstName} now!</em>`;
+                    const messageDate = student.messageDate ? student.messageDate : 'No date';
 
                     let departmentClass = '';
                     switch (student.department) {
@@ -226,6 +229,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     chatList.innerHTML += chatItemHTML;
                 });
 
+                // Add click event to open modal for specific chat
                 document.querySelectorAll('.chat-item').forEach(item => {
                     item.addEventListener('click', function () {
                         document.querySelectorAll('.chat-item').forEach(chat => chat.classList.remove('active'));
@@ -235,16 +239,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         const studentFullName = this.getAttribute('data-fullname'); 
                         const studentPic = this.querySelector('.chat-avatar img').src; 
 
-                        modal.querySelector('.modal-student-avatar img').src = studentPic; 
+                        modal.querySelector('.modal-student-avatar img').src = studentPic;
                         modal.querySelector('#modal-student-name').innerText = studentFullName; 
 
                         modal.querySelector('.modal-header').classList.remove('chat-tep', 'chat-bsba', 'chat-ccs', 'chat-default');
-
                         let departmentClass = this.getAttribute('data-department') === 'TEP' ? 'chat-tep' :
                                              this.getAttribute('data-department') === 'BSBA' ? 'chat-bsba' :
                                              this.getAttribute('data-department') === 'CCS' ? 'chat-ccs' :
                                              'chat-default';
-                                             
+
                         modal.querySelector('.modal-header').classList.add(departmentClass);
 
                         // Change API to fetch chats for the student_id
@@ -258,8 +261,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                     return;
                                 }
 
+                                // Display chats, aligning based on sender (left or right)
                                 data.forEach(chat => {
-                                    const messageClass = chat.sender_id == currentStudentId ? 'message-right' : 'message-left'; // Use currentStudentId
+                                    const messageClass = chat.sender_id == currentStudentId ? 'message-right' : 'message-left';
                                     const messageHTML = `
                                         <div class="chat-message ${messageClass}">
                                             <p>${chat.message}</p>
@@ -275,11 +279,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                 console.error('Error fetching chat messages:', error);
                             });
 
-                        function formatDate(dateString) {
-                            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-                            return new Date(dateString).toLocaleString(undefined, options);
-                        }
-
                         modal.classList.add('show');
                     });
                 });
@@ -291,15 +290,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     fetchChats();
 
+    // Close modal button
     document.querySelector('.modal-close-btn').addEventListener('click', function () {
         modal.classList.remove('show');
     });
 
+    // Send message logic
     document.getElementById('send-message-btn').addEventListener('click', function () {
         const messageInput = document.getElementById('message-input');
         const message = messageInput.value.trim();
         const recipientId = document.querySelector('.chat-item.active') ? 
-            document.querySelector('.chat-item.active').getAttribute('data-student-id') : null; 
+            document.querySelector('.chat-item.active').getAttribute('data-student-id') : null;
 
         if (message === '') {
             alert('Please enter a message.');
@@ -344,7 +345,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return new Date(dateString).toLocaleString(undefined, options);
     }
 });
-
 
 </script>
 
