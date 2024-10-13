@@ -58,3 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode(['error' => 'Invalid request method.']);
 }
 ?>
+
+<!-- FIXED -->
+<!-- FOR RECOMMIT PURPOSES DUE TO AN ACCIDENTAL CLICK -->
