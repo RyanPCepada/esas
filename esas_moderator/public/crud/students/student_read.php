@@ -96,19 +96,20 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
         }
     }
     
-    // Check if the student is active in any club
-    $isActive = false; // Default to inactive
+    // Check if the student is active or inactive in any club
+    $isActiveOrInactive = false; // Default to not showing the button
 
-    $statusSql = "SELECT status FROM tbl_registration WHERE student_id = :student_id AND status = 'active' LIMIT 1";
+    $statusSql = "SELECT status FROM tbl_registration WHERE student_id = :student_id AND (status = 'active' OR status = 'inactive') LIMIT 1";
     if ($statusStmt = $pdo->prepare($statusSql)) {
         $statusStmt->bindParam(":student_id", $student_id);
         if ($statusStmt->execute()) {
             $statusRow = $statusStmt->fetch(PDO::FETCH_ASSOC);
-            if ($statusRow && $statusRow['status'] === 'active') {
-                $isActive = true; // Student is active
+            if ($statusRow && ($statusRow['status'] === 'active' || $statusRow['status'] === 'inactive')) {
+                $isActiveOrInactive = true; // Student is active or inactive
             }
         }
     }
+
 
     // Close statement and connection after all queries
     unset($stmt);
@@ -191,12 +192,12 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                     </div>
                 </div>
                 <div class="card-footer text-center">
-    <?php if ($isActive): ?>
-        <a href="student_update.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $_GET['club_id']; ?>" class="btn btn-warning">Update</a>
-    <?php endif; ?>
-    <a href="student_delete.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $_GET['club_id']; ?>" class="btn btn-danger">Delete</a>
-    <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
-</div>
+                    <?php if ($isActiveOrInactive): ?>
+                        <a href="student_update.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $_GET['club_id']; ?>" class="btn btn-warning">Update</a>
+                    <?php endif; ?>
+                    <a href="student_delete.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $_GET['club_id']; ?>" class="btn btn-danger">Delete</a>
+                    <a href="../../students.php" class="btn btn-secondary">Go Back</a>
+                </div>
             </div>
         </div>
 
