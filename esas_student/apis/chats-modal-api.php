@@ -11,17 +11,21 @@ if (!isset($_SESSION['student_id'])) {
     exit;
 }
 
-$studentId = $_SESSION['student_id']; // Assuming you store the logged-in student ID in the session
-$studentId = isset($_GET['student_id']) ? intval($_GET['student_id']) : 0; // Get the student_id from the request
+$loggedInStudentId = $_SESSION['student_id']; // The logged-in student (current session)
+$studentId = isset($_GET['student_id']) ? intval($_GET['student_id']) : 0; // Get the selected student ID from the request
 
 if ($studentId > 0) {
-    // Fetch chat messages
+    // Fetch chat messages between the logged-in student and the selected student
     $query = "SELECT * FROM tbl_chats 
-              WHERE (sender_id = :student_id AND recipient_id = :student_id)
-                 OR (sender_id = :student_id AND recipient_id = :student_id)
+              WHERE (sender_id = :loggedInStudentId AND recipient_id = :studentId)
+                 OR (sender_id = :studentId AND recipient_id = :loggedInStudentId)
               ORDER BY dateAdded ASC";
+    
     $stmt = $pdo->prepare($query);
-    $stmt->execute(['student_id' => $studentId, 'student_id' => $studentId]);
+    $stmt->execute([
+        'loggedInStudentId' => $loggedInStudentId,
+        'studentId' => $studentId
+    ]);
 
     $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
