@@ -233,25 +233,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.querySelectorAll('.chat-item').forEach(item => {
                     item.addEventListener('click', function () {
                         document.querySelectorAll('.chat-item').forEach(chat => chat.classList.remove('active'));
-                        this.classList.add('active'); 
+                        this.classList.add('active');
 
                         const studentId = this.getAttribute('data-student-id'); 
+                        const currentStudentId = "<?php echo isset($_SESSION['student_id']) ? $_SESSION['student_id'] : '0'; ?>"; // Changed this line
                         const studentFullName = this.getAttribute('data-fullname'); 
-                        const studentPic = this.querySelector('.chat-avatar img').src; 
+                        const studentPic = this.querySelector('.chat-avatar img').src;
 
-                        modal.querySelector('.modal-student-avatar img').src = studentPic;
+                        modal.querySelector('.modal-student-avatar img').src = studentPic; 
                         modal.querySelector('#modal-student-name').innerText = studentFullName; 
 
                         modal.querySelector('.modal-header').classList.remove('chat-tep', 'chat-bsba', 'chat-ccs', 'chat-default');
+
                         let departmentClass = this.getAttribute('data-department') === 'TEP' ? 'chat-tep' :
-                                             this.getAttribute('data-department') === 'BSBA' ? 'chat-bsba' :
-                                             this.getAttribute('data-department') === 'CCS' ? 'chat-ccs' :
-                                             'chat-default';
+                                            this.getAttribute('data-department') === 'BSBA' ? 'chat-bsba' :
+                                            this.getAttribute('data-department') === 'CCS' ? 'chat-ccs' :
+                                            'chat-default';
 
                         modal.querySelector('.modal-header').classList.add(departmentClass);
 
-                        // Change API to fetch chats for the student_id
-                        fetch(`/esas/esas_student/apis/chats-modal-api.php?student_id=${studentId}`)
+                        fetch(`/esas/esas_student/apis/chats-modal-api.php?student_id=${currentStudentId}&chat_student_id=${studentId}`) // Added query parameter for chat student ID
                             .then(response => response.json())
                             .then(data => {
                                 modalChatsContent.innerHTML = ''; 
@@ -261,7 +262,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                     return;
                                 }
 
-                                // Display chats, aligning based on sender (left or right)
                                 data.forEach(chat => {
                                     const messageClass = chat.sender_id == currentStudentId ? 'message-right' : 'message-left';
                                     const messageHTML = `
@@ -279,9 +279,15 @@ document.addEventListener('DOMContentLoaded', function () {
                                 console.error('Error fetching chat messages:', error);
                             });
 
+                        function formatDate(dateString) {
+                            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                            return new Date(dateString).toLocaleString(undefined, options);
+                        }
+
                         modal.classList.add('show');
                     });
                 });
+
             })
             .catch(error => {
                 console.error('Error fetching chats:', error);
