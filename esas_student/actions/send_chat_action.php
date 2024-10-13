@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $clubId = isset($_POST['club_id']) ? intval($_POST['club_id']) : 0; // Add club_id if needed
 
     // Get the sender ID from the session
-    $senderId = isset($_SESSION['moderator_id']) ? intval($_SESSION['moderator_id']) : 0;
+    $senderId = isset($_SESSION['student_id']) ? intval($_SESSION['student_id']) : 0; // Changed this line
 
     // Validate inputs
     if (empty($message)) {
