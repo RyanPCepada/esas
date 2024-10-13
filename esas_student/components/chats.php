@@ -274,6 +274,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                 });
 
                                 modalChatsContent.scrollTop = modalChatsContent.scrollHeight; // Scroll to the bottom of the chat
+                            
+                                // Add this line to scroll to the #scroll-bottom div
+                                document.getElementById('scroll-bottom').scrollIntoView({ behavior: 'smooth' });
+                                
                             })
                             .catch(error => {
                                 console.error('Error fetching chat messages:', error);
@@ -379,6 +383,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div id="modal-chats-content">
             <?php include './components/chats_modal.php'; ?>
         </div>
+        <div class="scroll-bottom" id="scroll-bottom"></div>
     </div>
     <div class="modal-footer">
         <input type="text" id="message-input" placeholder="Type your message here..." />
