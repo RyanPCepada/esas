@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        fetch('../actions/send_chat_action.php', {
+        fetch('./actions/send_chat_action.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
