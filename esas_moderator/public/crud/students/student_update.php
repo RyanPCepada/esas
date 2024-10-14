@@ -50,6 +50,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Attempt to execute the prepared statement
         if ($stmt->execute()) {
+            // Prepare to log the activity
+            $activity = "You updated " . htmlspecialchars($student['firstName'] . ' ' . $student['lastName']) . " status into " . htmlspecialchars($status);
+
+            // Insert activity log
+            $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, student_id, admin_id, moderator_id) 
+                        VALUES (:activity, NOW(), :student_id, :admin_id, :moderator_id)";
+            $logStmt = $pdo->prepare($logSql);
+            $logStmt->bindParam(":activity", $activity);
+            $logStmt->bindParam(":student_id", $student_id);
+            $logStmt->bindParam(":admin_id", $admin_id); // Replace with the actual admin ID
+            $logStmt->bindParam(":moderator_id", $moderator_id); // Replace with the actual moderator ID
+            $logStmt->execute(); // Execute the logging statement
+
             // Status updated successfully
             header("Location: student_read.php?student_id=$student_id&club_id=$club_id"); // Redirect to the correct page
             exit(); // Always use exit() after header redirection
@@ -60,11 +73,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     // Close statement
     unset($stmt);
-
+    unset($logStmt); // Close log statement if used
     // Close connection
     unset($pdo);
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
