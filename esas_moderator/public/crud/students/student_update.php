@@ -1,6 +1,13 @@
 <?php 
 // Database connection
 require_once "../../../../config.php";
+session_start();
+
+if (!isset($_SESSION['moderator_id'])) {
+    die("You are not logged in.");
+}
+
+$moderator_id = $_SESSION['moderator_id'];
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
