@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include '../config.php';
@@ -26,6 +25,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $admin_result = checkAdmin($pdo, $email, $password);
     if ($admin_result) {
         $_SESSION['admin_id'] = $admin_result['admin_id'];
+
+        // Log the activity
+        $activity = "You logged in to your account";
+        $admin_id = $_SESSION['admin_id'];
+        $dateAdded = date('Y-m-d H:i:s'); // Current date and time
+
+        $insertActivityQuery = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id) VALUES (:activity, :dateAdded, :admin_id)";
+        $activityStmt = $pdo->prepare($insertActivityQuery);
+        $activityStmt->execute([
+            'activity' => $activity,
+            'dateAdded' => $dateAdded,
+            'admin_id' => $admin_id
+        ]);
+
         // Redirect to clubs.php upon successful login
         echo "<script>alert('Logged in successfully!');</script>";
         echo "<script>window.location.href = '/esas/esas_admin/public/dashboard.php';</script>";
@@ -36,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+
 
 
 <!DOCTYPE html>
