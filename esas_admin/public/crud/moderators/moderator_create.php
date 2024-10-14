@@ -1,8 +1,16 @@
 <?php
+session_start();
 require_once "../../../../config.php";
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
+
+if (!isset($_SESSION['admin_id'])) {
+    echo "Admin ID is not set in the session.";
+    exit;
+}
+
+$admin_id = $_SESSION['admin_id']; // Get admin ID from session
 
 // Define the default profile picture constant
 define('PROF_PIC_DEFAULT', 'PROF_PIC.png'); 
@@ -99,29 +107,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $fullName = $firstName . ' ' . $middleName . ' ' . $lastName;
 
                 // Insert activity log
-                $sqlLog = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, NOW(), :moderator_id)";
+                $sqlLog = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id) 
+                VALUES (:activity, NOW(), :admin_id, :moderator_id)";
                 if ($logStmt = $pdo->prepare($sqlLog)) {
                     $activity = "You added $fullName to the moderators list.";
                     $logStmt->bindParam(":activity", $activity);
+                    $logStmt->bindParam(":admin_id", $admin_id); // Use the admin_id from the session
                     $logStmt->bindParam(":moderator_id", $moderator_id);
-                    $logStmt->execute();
-                }
 
-                $newModeratorId = $pdo->lastInsertId();
+                    if ($logStmt->execute()) {
+                        // Insert into clubs and moderators
+                        if (!empty($_POST["club"])) {
+                            $selectedClubId = $_POST["club"];
+                            $sql2 = "INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id, dateAdded) 
+                                     VALUES (:clubId, :moderatorId, NOW())";
+                            if ($stmt2 = $pdo->prepare($sql2)) {
+                                $stmt2->bindParam(":clubId", $selectedClubId);
+                                $stmt2->bindParam(":moderatorId", $moderator_id); // Use $moderator_id here
+                                $stmt2->execute();
+                            }
+                        }
 
-                if (!empty($_POST["club"])) {
-                    $selectedClubId = $_POST["club"];
-                    $sql2 = "INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id, dateAdded) 
-                             VALUES (:clubId, :moderatorId, NOW())";
-                    if ($stmt2 = $pdo->prepare($sql2)) {
-                        $stmt2->bindParam(":clubId", $selectedClubId);
-                        $stmt2->bindParam(":moderatorId", $newModeratorId);
-                        $stmt2->execute();
+                        // Redirect to moderators page
+                        header("location: ../../moderators.php"); 
+                        exit();
+                    } else {
+                        echo "Failed to log the activity.";
                     }
                 }
-
-                header("location: ../../moderators.php"); 
-                exit();
             } else {
                 echo "Oops! Something went wrong. Please try again later.";
             }
@@ -131,6 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     unset($pdo);
 }
 ?>
+
 
 
 
