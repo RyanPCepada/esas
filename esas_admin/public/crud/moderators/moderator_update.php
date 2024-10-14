@@ -29,8 +29,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Assign the moderator to the selected club
     try {
+        // Fetch the club name before inserting
+        $stmt = $pdo->prepare("SELECT clubName FROM tbl_clubs WHERE club_id = ?");
+        $stmt->execute([$club_id]);
+        $club = $stmt->fetch(PDO::FETCH_ASSOC);
+        $clubName = htmlspecialchars($club['clubName']);
+
+        // Insert the assignment
         $stmt = $pdo->prepare("INSERT INTO tbl_clubs_and_moderators (club_id, moderator_id, dateAdded) VALUES (?, ?, NOW())");
         $stmt->execute([$club_id, $moderator_id]);
+
+        // Log the activity
+        $activity = "You assigned $moderatorName to $clubName";
+        $admin_id = $_SESSION['admin_id']; // Assuming admin ID is stored in session
+        $student_id = null; // Replace with actual student ID if necessary
+
+        $logStmt = $pdo->prepare("INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (?, NOW(), ?, ?, ?)");
+        $logStmt->execute([$activity, $admin_id, $moderator_id, $student_id]);
 
         // Redirect back to the moderator update page with a success message
         $_SESSION['message'] = 'Moderator assigned successfully!';
@@ -43,6 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
+
 
 
 
