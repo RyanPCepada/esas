@@ -152,11 +152,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err)) {
-        $sql = "INSERT INTO tbl_clubs (clubName, information, coverPhoto, dateAdded) VALUES (:clubName, :information, :coverPhoto, NOW())";
+        $sql = "INSERT INTO tbl_clubs (clubName, information, coverPhoto, founder_id, dateAdded) VALUES (:clubName, :information, :coverPhoto, :admin_id, NOW())";
         if ($stmt = $pdo->prepare($sql)) {
             $stmt->bindParam(":clubName", $clubName);
             $stmt->bindParam(":information", $information);
             $stmt->bindParam(":coverPhoto", $coverPhoto);
+            $stmt->bindParam(":admin_id", $adminId);
             
             if ($stmt->execute()) {
                 $clubId = $pdo->lastInsertId();
