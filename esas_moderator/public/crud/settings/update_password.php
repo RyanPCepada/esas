@@ -36,6 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $updateStmt = $pdo->prepare($updateSql);
 
         if ($updateStmt->execute([$newPassword, $moderator_id])) { // No hashing here
+            // Log the password change activity
+            $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
+            $logStmt = $pdo->prepare($logSql);
+            $logStmt->execute([
+                'activity' => 'You changed your password',
+                'dateAdded' => date('Y-m-d H:i:s'), // current timestamp
+                'moderator_id' => $moderator_id
+            ]);
+            
             $response['success'] = "Password updated successfully!";
         } else {
             // Get error information for debugging
@@ -46,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     exit; // Prevent further execution
 }
 ?>
+
 
 <h4 class="text-muted mb-3">Update Password</h4>
 <form id="updatePasswordForm">
