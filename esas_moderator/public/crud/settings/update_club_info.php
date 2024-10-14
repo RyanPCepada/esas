@@ -57,6 +57,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     
     $updateStmt = $pdo->prepare($updateSql);
     if ($updateStmt->execute([$clubName, $information, $fileName ?? null, $clubId])) {
+        // Log the activity after a successful update
+        $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
+        $logStmt = $pdo->prepare($logSql);
+        $logStmt->execute([
+            'activity' => "You updated $clubName information",
+            'dateAdded' => date('Y-m-d H:i:s'),
+            'moderator_id' => $moderator_id
+        ]);
+
         echo "Club information updated successfully!";
         header("location: ../../../settings.php");
         exit();
@@ -65,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     }
 }
 ?>
+
 
 <h4 class="text-muted mb-3">Update Club Information</h4>
 
