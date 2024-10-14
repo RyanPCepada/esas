@@ -161,13 +161,34 @@ if (!empty($_POST['recommendedDepartments'])) {
                 $stmt->bindParam(":clubId", $clubId);
 
                 if ($stmt->execute()) {
-                    // Handle moderator association
-                    if (!empty($_POST['moderator'])) { // Check if there are selected moderators
+                    // Log the activity
+                    $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (:activity, NOW(), :adminId, :moderatorId, :studentId)";
+                    if ($logStmt = $pdo->prepare($logSql)) {
+                        // Prepare the activity message
+                        $activityMessage = "You updated {$clubName} information";
+                        
+                        // Bind parameters
+                        $logStmt->bindParam(":activity", $activityMessage);
+                        // Replace with actual admin, moderator, and student IDs as applicable
+                        $adminId = null; // Replace with actual admin ID if available
+                        $moderatorId = $currentModeratorId; // Use the current moderator ID
+                        $studentId = null; // Replace with actual student ID if available
+
+                        $logStmt->bindParam(":adminId", $adminId);
+                        $logStmt->bindParam(":moderatorId", $moderatorId);
+                        $logStmt->bindParam(":studentId", $studentId);
+
+                        // Execute the log insert
+                        $logStmt->execute();
+                    }
+
+                    // Handle moderator association (unchanged)
+                    if (!empty($_POST['moderator'])) {
                         foreach ($_POST['moderator'] as $index => $moderatorId) {
                             if ($moderatorId === 'none') {
                                 // Get the current moderator ID for this dropdown
                                 $currentModeratorId = $currentModerators[$index]['moderator_id'];
-                                
+
                                 // Delete the specific moderator association
                                 $deleteSql = "DELETE FROM tbl_clubs_and_moderators WHERE club_id = :clubId AND moderator_id = :moderatorId";
                                 if ($deleteStmt = $pdo->prepare($deleteSql)) {
