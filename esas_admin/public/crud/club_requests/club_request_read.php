@@ -120,7 +120,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
             if ($logStmt = $pdo->prepare($logSql)) {
                 $logStmt->bindParam(":activity", $activity);
                 $logStmt->bindParam(":dateAdded", date('Y-m-d H:i:s')); // Log current date and time
-                $logStmt->bindParam(":admin_id", $admin_id, PDO::PARAM_INT); // Replace with actual admin ID
+                $logStmt->bindParam(":admin_id", $adminId, PDO::PARAM_INT); // Replace with actual admin ID
                 $logStmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT); // Replace with actual moderator ID
                 $logStmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
 
