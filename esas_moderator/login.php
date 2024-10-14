@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include '../config.php';
@@ -20,12 +19,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute(['moderator_id' => $moderator_id, 'password' => $password]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    // Function to insert activity log
+    function insertActivityLog($pdo, $moderator_id) {
+        $query = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([
+            'activity' => 'You logged in to your account',
+            'dateAdded' => date('Y-m-d H:i:s'), // current timestamp
+            'moderator_id' => $moderator_id
+        ]);
+    }
     
     // Assuming $pdo is correctly initialized in your config.php
     
     $moderator_result = checkModerator($pdo, $moderator_id, $password);
     if ($moderator_result) {
         $_SESSION['moderator_id'] = $moderator_result['moderator_id'];
+        
+        // Insert the activity log after successful login
+        insertActivityLog($pdo, $moderator_result['moderator_id']);
+
         // Redirect to clubs.php upon successful login
         echo "<script>alert('Logged in successfully!');</script>";
         echo "<script>window.location.href = '/esas/esas_moderator/public/dashboard.php';</script>";
@@ -36,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+
 
 
 <!DOCTYPE html>
