@@ -5,6 +5,14 @@ session_start();
 // Include the configuration file
 require_once '../../../../config.php';
 
+// Ensure the moderator ID is set in the session
+if (isset($_SESSION['admin_id'])) {
+    $adminId = $_SESSION['admin_id'];
+} else {
+    echo json_encode(['error' => 'Admin not logged in.']);
+    exit;
+}
+
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
@@ -60,6 +68,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(":chartId", $chart_id);
             
             if ($stmt->execute()) {
+                // Determine the organization type for the activity log
+                $sql = "SELECT organizationType FROM tbl_officers_charts WHERE chart_id = :chartId";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(":chartId", $chart_id);
+                $stmt->execute();
+                $organizationType = $stmt->fetchColumn();
+
+                // Determine the correct organization type for the message
+                if ($organizationType === 'SBO') {
+                    $activityMessage = "You updated the SBO Officers chart";
+                } elseif ($organizationType === 'CSG') {
+                    $activityMessage = "You updated the CSG Officers chart";
+                } else {
+                    $activityMessage = "You updated the Officers chart";
+                }
+
+                // Activity logging
+                $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id) VALUES (:activity, NOW(), :adminId)";
+                if ($logStmt = $pdo->prepare($logSql)) {
+                    $logStmt->bindParam(":activity", $activityMessage);
+                    $logStmt->bindParam(":adminId", $adminId);
+                    $logStmt->execute(); // Execute the log insert
+                }
+                
                 $_SESSION['success_message'] = "Chart updated successfully!";
                 header("location: ../../officers_charts.php");
                 exit;
