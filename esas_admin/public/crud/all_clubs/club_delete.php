@@ -1,4 +1,4 @@
-<?php
+<?php 
 // Process delete operation after confirmation
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -11,11 +11,19 @@ if (isset($_POST["club_id"]) && !empty($_POST["club_id"])) {
     $pdo->beginTransaction();
 
     try {
+        // Fetch the club name before deletion
+        $sql_select = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
+        $stmt_select = $pdo->prepare($sql_select);
+        $stmt_select->bindParam(":club_id", $param_club_id);
+        $param_club_id = trim($_POST["club_id"]);
+        $stmt_select->execute();
+        $club = $stmt_select->fetch();
+        $club_name = $club['clubName'];
+
         // Prepare a delete statement for the clubs table
         $sql = "DELETE FROM tbl_clubs WHERE club_id = :club_id";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(":club_id", $param_club_id);
-        $param_club_id = trim($_POST["club_id"]);
         $stmt->execute();
 
         // Prepare a delete statement for the clubs_and_moderators table
@@ -23,6 +31,24 @@ if (isset($_POST["club_id"]) && !empty($_POST["club_id"])) {
         $stmt2 = $pdo->prepare($sql2);
         $stmt2->bindParam(":club_id", $param_club_id);
         $stmt2->execute();
+
+        // Log the activity into tbl_activity_logs
+        $sql_log = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, student_id) 
+                    VALUES (:activity, :dateAdded, :admin_id, :student_id)";
+        $stmt_log = $pdo->prepare($sql_log);
+        $activity_msg = "You deleted " . $club_name . " from the clubs list";
+        $stmt_log->bindParam(":activity", $activity_msg);
+        $stmt_log->bindParam(":dateAdded", $dateAdded);
+        $stmt_log->bindParam(":admin_id", $admin_id); // Assuming you have the admin ID
+        $stmt_log->bindParam(":student_id", $student_id); // Assuming you have the student ID or set to NULL
+
+        // Get the current date and time
+        $dateAdded = date('Y-m-d H:i:s');
+        // Set the admin_id and student_id accordingly
+        $admin_id = 1; // Replace with actual admin ID
+        $student_id = NULL; // Set NULL if not applicable
+
+        $stmt_log->execute();
 
         // Commit the transaction
         $pdo->commit();
@@ -36,10 +62,12 @@ if (isset($_POST["club_id"]) && !empty($_POST["club_id"])) {
         echo "Oops! Something went wrong. Please try again later.";
     }
 
-    // Close statement
+    // Close statements
     unset($stmt);
     unset($stmt2);
-    
+    unset($stmt_log);
+    unset($stmt_select);
+
     // Close connection
     unset($pdo);
 } else {
@@ -51,6 +79,7 @@ if (isset($_POST["club_id"]) && !empty($_POST["club_id"])) {
     }
 }
 ?>
+
 
 
 <!DOCTYPE html>
