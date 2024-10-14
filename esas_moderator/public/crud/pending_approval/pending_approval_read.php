@@ -22,9 +22,6 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
         // Bind variables to the prepared statement as parameters
         $stmt->bindParam(":student_id", $param_student_id);
 
-        // Set parameters
-        $param_student_id = trim($_GET["student_id"]);
-
         // Attempt to execute the prepared statement
         if ($stmt->execute()) {
             if ($stmt->rowCount() == 1) {
@@ -52,7 +49,6 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     // Close statement
     unset($stmt);
 
-
     // Prepare a select statement to fetch questions and dateApplied from tbl_registration
     $sql_questions = "SELECT question1, question2, question3, dateApplied FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id";
 
@@ -60,10 +56,6 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
         // Bind variables to the prepared statement as parameters
         $stmt->bindParam(":student_id", $param_student_id);
         $stmt->bindParam(":club_id", $param_club_id);
-
-        // Set parameters
-        $param_student_id = trim($_GET["student_id"]);
-        $param_club_id = trim($_GET["club_id"]); 
 
         // Attempt to execute the prepared statement
         if ($stmt->execute()) {
@@ -79,7 +71,6 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
             echo "Could not fetch questions. Please try again later.";
         }
     }
-
 
     // Close statement
     unset($stmt);
@@ -126,6 +117,25 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                     $updatePendingStmt->bindParam(':student_id', $param_student_id, PDO::PARAM_INT);
                     $updatePendingStmt->execute();
                 }
+
+                // Fetch the club name for logging
+                $stmt = $pdo->prepare("SELECT clubName FROM tbl_clubs WHERE club_id = :club_id");
+                $stmt->bindParam(':club_id', $param_club_id, PDO::PARAM_INT);
+                $stmt->execute();
+                $club = $stmt->fetch(PDO::FETCH_ASSOC);
+                $clubName = $club['clubName'] ?? 'Unknown Club'; // Handle case where club name is not found
+
+                // Log the approval action
+                logActivity($pdo, $fullName, $student_id, $clubName, true); // Call the function to log activity for approval
+            } else {
+                // Log the disapproval action
+                $stmt = $pdo->prepare("SELECT clubName FROM tbl_clubs WHERE club_id = :club_id");
+                $stmt->bindParam(':club_id', $param_club_id, PDO::PARAM_INT);
+                $stmt->execute();
+                $club = $stmt->fetch(PDO::FETCH_ASSOC);
+                $clubName = $club['clubName'] ?? 'Unknown Club'; // Handle case where club name is not found
+
+                logActivity($pdo, $fullName, $student_id, $clubName, false); // Call the function to log activity for disapproval
             }
 
             header("location: ../../pending_approvals.php");
@@ -138,7 +148,30 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     unset($updateStmt);
 }
 
+// Function to log activity
+function logActivity($pdo, $fullName, $student_id, $clubName, $isApproved) {
+    // Prepare the SQL statement to insert activity log
+    $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id, student_id) 
+                VALUES (:activity, :dateAdded, :moderator_id, :student_id)";
     
+    $stmt = $pdo->prepare($logSql);
+    $activity = $isApproved 
+                ? "You approved $fullName's application in $clubName" 
+                : "You disapproved $fullName's application in $clubName"; // Construct the activity message based on approval/disapproval
+    $dateAdded = date('Y-m-d H:i:s'); // Get the current timestamp
+
+    // Assuming you have a way to get the current moderator ID, replace `current_moderator_id` with the actual variable
+    $moderator_id = $_SESSION['moderator_id']; // Assuming you have this session variable set during login
+
+    // Bind parameters and execute the log insertion
+    $stmt->execute([
+        'activity' => $activity,
+        'dateAdded' => $dateAdded,
+        'moderator_id' => $moderator_id,
+        'student_id' => $student_id
+    ]);
+}
+
 // Fetch the student's registration status for the current club
 $stmt = $pdo->prepare("SELECT status FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id");
 $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
@@ -159,8 +192,8 @@ $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
 $stmt->execute();
 $disapprovedCount = $stmt->fetchColumn();
 
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
