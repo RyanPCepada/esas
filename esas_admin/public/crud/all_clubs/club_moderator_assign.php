@@ -1,5 +1,14 @@
 <?php
 require_once "../../../../config.php";
+session_start();
+
+// Ensure the moderator ID is set in the session
+if (isset($_SESSION['admin_id'])) {
+    $adminId = $_SESSION['admin_id'];
+} else {
+    echo json_encode(['error' => 'Admin not logged in.']);
+    exit;
+}
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');

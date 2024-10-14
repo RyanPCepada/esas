@@ -1,5 +1,14 @@
 <?php
 require_once "../../../../config.php";
+session_start();
+
+// Ensure the moderator ID is set in the session
+if (isset($_SESSION['admin_id'])) {
+    $adminId = $_SESSION['admin_id'];
+} else {
+    echo json_encode(['error' => 'Admin not logged in.']);
+    exit;
+}
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -79,15 +88,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $clubName = $clubStmt->fetchColumn();
 
                 // Log the activity
-                $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) 
-                            VALUES (:activity, NOW(), :moderatorId)";
+                $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id) 
+                        VALUES (:activity, NOW(), :admin_id, :moderator_id)";
                 if ($logStmt = $pdo->prepare($logSql)) {
                     $activity = "You assigned {$moderatorName} as a moderator of {$clubName}";
-                    $logStmt->bindParam(':activity', $activity);
-                    $logStmt->bindParam(':moderatorId', $selectedModeratorId);
+                    $logStmt->bindParam(":activity", $activity);
+                    $logStmt->bindParam(":admin_id", $adminId); // Use the admin_id from the session
+                    $logStmt->bindParam(":moderator_id", $moderator_id);
                     $logStmt->execute(); // Log the activity
                 }
-                
+
                 header("location: ../../moderators.php"); // Redirect to a list of moderators
                 exit();
             } else {
