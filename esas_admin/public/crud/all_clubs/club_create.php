@@ -1,5 +1,14 @@
 <?php
 require_once "../../../../config.php";
+session_start();
+
+// Ensure the moderator ID is set in the session
+if (isset($_SESSION['admin_id'])) {
+    $adminId = $_SESSION['admin_id'];
+} else {
+    echo json_encode(['error' => 'Admin not logged in.']);
+    exit;
+}
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -186,14 +195,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
                 // Log the activity of adding the club
                 $activity = "You added " . $clubName . " to the clubs list";
-                $admin_id = 1; // Replace this with actual admin ID
                 $moderator_id = $newModeratorId; // Assuming this is the moderator's ID
                 $student_id = null; // Replace with actual student ID if applicable
     
                 $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (:activity, NOW(), :admin_id, :moderator_id, :student_id)";
                 if ($logStmt = $pdo->prepare($logSql)) {
                     $logStmt->bindParam(":activity", $activity);
-                    $logStmt->bindParam(":admin_id", $admin_id);
+                    $logStmt->bindParam(":admin_id", $adminId);  // Use the correctly assigned variable
                     $logStmt->bindParam(":moderator_id", $moderator_id);
                     $logStmt->bindParam(":student_id", $student_id); // Use actual student_id if needed
                     $logStmt->execute();
