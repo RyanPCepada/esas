@@ -1,4 +1,14 @@
 <?php 
+session_start();
+
+// Ensure the moderator ID is set in the session
+if (isset($_SESSION['admin_id'])) {
+    $adminId = $_SESSION['admin_id'];
+} else {
+    echo json_encode(['error' => 'Admin not logged in.']);
+    exit;
+}
+
 // Process delete operation after confirmation
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -39,13 +49,11 @@ if (isset($_POST["club_id"]) && !empty($_POST["club_id"])) {
         $activity_msg = "You deleted " . $club_name . " from the clubs list";
         $stmt_log->bindParam(":activity", $activity_msg);
         $stmt_log->bindParam(":dateAdded", $dateAdded);
-        $stmt_log->bindParam(":admin_id", $admin_id); // Assuming you have the admin ID
+        $stmt_log->bindParam(":admin_id", $adminId);  // Use the correctly assigned variable
         $stmt_log->bindParam(":student_id", $student_id); // Assuming you have the student ID or set to NULL
 
         // Get the current date and time
         $dateAdded = date('Y-m-d H:i:s');
-        // Set the admin_id and student_id accordingly
-        $admin_id = 1; // Replace with actual admin ID
         $student_id = NULL; // Set NULL if not applicable
 
         $stmt_log->execute();
