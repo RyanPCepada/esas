@@ -1,5 +1,14 @@
 <?php
-// Process delete operation after confirmation
+session_start();
+
+// Ensure the moderator ID is set in the session
+if (isset($_SESSION['admin_id'])) {
+    $adminId = $_SESSION['admin_id'];
+} else {
+    echo json_encode(['error' => 'Admin not logged in.']);
+    exit;
+}
+
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
@@ -11,40 +20,70 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
     $pdo->beginTransaction();
 
     try {
-        // Prepare a delete statement for the moderators table
-        $sql = "DELETE FROM tbl_moderators WHERE moderator_id = :moderator_id";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(":moderator_id", $param_moderator_id);
-        $param_moderator_id = trim($_POST["moderator_id"]);
-        $stmt->execute();
+        // First, fetch the moderator's details from tbl_moderators
+        $moderator_id = trim($_POST["moderator_id"]);
 
-        // Optionally, delete from any related tables if necessary
-        // For example, removing associations in clubs_and_moderators
-        $sql2 = "DELETE FROM tbl_clubs_and_moderators WHERE moderator_id = :moderator_id";
-        $stmt2 = $pdo->prepare($sql2);
-        $stmt2->bindParam(":moderator_id", $param_moderator_id);
-        $stmt2->execute();
+        // Fetch moderator's full name
+        $fetchModeratorSQL = "
+            SELECT firstName, middleName, lastName 
+            FROM tbl_moderators 
+            WHERE moderator_id = :moderator_id
+        ";
+        $fetchModeratorStmt = $pdo->prepare($fetchModeratorSQL);
+        $fetchModeratorStmt->bindParam(":moderator_id", $moderator_id);
+        $fetchModeratorStmt->execute();
+        $moderatorData = $fetchModeratorStmt->fetch(PDO::FETCH_ASSOC);
 
-        // Commit the transaction
-        $pdo->commit();
+        // Ensure we have the moderator details
+        if ($moderatorData) {
+            // Store the moderator's full name
+            $moderatorFullName = $moderatorData['firstName'] . ' ' . $moderatorData['middleName'] . ' ' . $moderatorData['lastName'];
 
-        // Redirect to landing page
-        header("location: ../../moderators.php");
-        exit();
+            // Prepare a delete statement for the moderators table
+            $sql = "DELETE FROM tbl_moderators WHERE moderator_id = :moderator_id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(":moderator_id", $moderator_id);
+            $stmt->execute();
+
+            // Optionally, delete from any related tables if necessary
+            // For example, removing associations in clubs_and_moderators
+            $sql2 = "DELETE FROM tbl_clubs_and_moderators WHERE moderator_id = :moderator_id";
+            $stmt2 = $pdo->prepare($sql2);
+            $stmt2->bindParam(":moderator_id", $moderator_id);
+            $stmt2->execute();
+
+            // Log the activity in tbl_activity_logs
+            $activity = "You deleted {$moderatorFullName} from the moderator's list.";
+            $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id) VALUES (:activity, NOW(), :admin_id, :moderator_id)";
+            $logStmt = $pdo->prepare($logSQL);
+            $logStmt->bindParam(":activity", $activity);
+            $logStmt->bindParam(":admin_id", $adminId);
+            $logStmt->bindParam(":moderator_id", $moderator_id);
+            $logStmt->execute();
+
+            // Commit the transaction
+            $pdo->commit();
+
+            // Redirect to the moderators page
+            header("location: ../../moderators.php");
+            exit();
+        } else {
+            // No moderator found for the moderator_id
+            echo "Moderator not found.";
+        }
     } catch (Exception $e) {
         // Rollback transaction on error
         $pdo->rollBack();
         echo "Oops! Something went wrong. Please try again later.";
     }
 
-    // Close statement
+    // Close statements and connection
     unset($stmt);
     unset($stmt2);
-    
-    // Close connection
+    unset($logStmt);
     unset($pdo);
 } else {
-    // Check existence of id parameter
+    // Check existence of moderator_id parameter
     if (empty(trim($_GET["moderator_id"]))) {
         // URL doesn't contain moderator_id parameter. Redirect to error page
         header("location: ../public/error.php");
@@ -52,6 +91,7 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
