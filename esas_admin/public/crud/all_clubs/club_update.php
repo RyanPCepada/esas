@@ -171,25 +171,27 @@ if (!empty($_POST['recommendedDepartments'])) {
 
                 if ($stmt->execute()) {
                     // Log the activity
-                    $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (:activity, NOW(), :adminId, :moderatorId, :studentId)";
+                    $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
+                            VALUES (:activity, NOW(), :adminId, :moderatorId, :studentId)";
                     if ($logStmt = $pdo->prepare($logSql)) {
                         // Prepare the activity message
                         $activityMessage = "You updated {$clubName} information";
                         
                         // Bind parameters
                         $logStmt->bindParam(":activity", $activityMessage);
-                        // Replace with actual admin, moderator, and student IDs as applicable
-                        $adminId = null; // Replace with actual admin ID if available
-                        $moderatorId = $currentModeratorId; // Use the current moderator ID
-                        $studentId = null; // Replace with actual student ID if available
-
-                        $logStmt->bindParam(":adminId", $adminId);
-                        $logStmt->bindParam(":moderatorId", $moderatorId);
-                        $logStmt->bindParam(":studentId", $studentId);
-
+                        $logStmt->bindParam(":adminId", $adminId); // Use the adminId from the session
+                        $logStmt->bindParam(":moderatorId", $currentModeratorId); // Use the current moderator ID
+                        $logStmt->bindParam(":studentId", $studentId); // Replace with actual student ID if available
+                        
                         // Execute the log insert
-                        $logStmt->execute();
+                        if ($logStmt->execute()) {
+                            // Log inserted successfully
+                        } else {
+                            // Handle error
+                            echo "Failed to log the activity.";
+                        }
                     }
+
 
                     // Handle moderator association (unchanged)
                     if (!empty($_POST['moderator'])) {

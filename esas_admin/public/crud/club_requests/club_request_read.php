@@ -1,6 +1,15 @@
 <?php
 
 require_once "../../../../config.php"; 
+session_start();
+
+// Ensure the moderator ID is set in the session
+if (isset($_SESSION['admin_id'])) {
+    $adminId = $_SESSION['admin_id'];
+} else {
+    echo json_encode(['error' => 'Admin not logged in.']);
+    exit;
+}
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -85,6 +94,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     $newStatus = $_POST["action"] === 'approve' ? 'approved' : 'disapproved'; // Changed to lowercase
     $dateDecided = ($newStatus === 'approved') ? date('Y-m-d H:i:s') : null; // Get current date and time if approved, null if disapproved
 
+    // Update the club request status
     $updateSql = "UPDATE tbl_club_requests 
                    SET status = :status, 
                        dateDecided = :dateDecided 
@@ -92,7 +102,6 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
     if ($updateStmt = $pdo->prepare($updateSql)) {
         $updateStmt->bindParam(":status", $newStatus);
-        // Use a conditional binding for dateDecided
         if ($newStatus === 'approved') {
             $updateStmt->bindParam(":dateDecided", $dateDecided); // Bind actual date
         } else {
@@ -102,6 +111,23 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
         $updateStmt->bindParam(":request_id", $request_id, PDO::PARAM_INT);
 
         if ($updateStmt->execute()) {
+
+            // Insert into activity logs after updating the request status
+            $activity = "You " . $newStatus . " " . $requestedByName . "'s club request";
+            $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id)
+                       VALUES (:activity, :dateAdded, :admin_id, :moderator_id, :student_id)";
+
+            if ($logStmt = $pdo->prepare($logSql)) {
+                $logStmt->bindParam(":activity", $activity);
+                $logStmt->bindParam(":dateAdded", date('Y-m-d H:i:s')); // Log current date and time
+                $logStmt->bindParam(":admin_id", $admin_id, PDO::PARAM_INT); // Replace with actual admin ID
+                $logStmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT); // Replace with actual moderator ID
+                $logStmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
+
+                // Execute the log statement
+                $logStmt->execute();
+            }
+
             header("location: club_request_read.php?request_id=" . $request_id . "&status=" . strtolower($newStatus));
             exit();
         } else {
@@ -111,7 +137,6 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     }
     unset($updateStmt);
 }
-
 
 ?>
 
