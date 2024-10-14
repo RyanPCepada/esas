@@ -5,24 +5,24 @@ include '../config.php';
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-$email = '';
+$admin_id = '';
 $password = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = trim($_POST['email']);
+    $admin_id = trim($_POST['admin_id']);
     $password = trim($_POST['password']);
     
     // Function to check admin login with plain text password
-    function checkAdmin($pdo, $email, $password) {
-        $query = "SELECT * FROM tbl_admin WHERE email = :email AND password = :password";
+    function checkAdmin($pdo, $admin_id, $password) {
+        $query = "SELECT * FROM tbl_admin WHERE admin_id = :admin_id AND password = :password";
         $stmt = $pdo->prepare($query);
-        $stmt->execute(['email' => $email, 'password' => $password]);
+        $stmt->execute(['admin_id' => $admin_id, 'password' => $password]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
     // Assuming $pdo is correctly initialized in your config.php
     
-    $admin_result = checkAdmin($pdo, $email, $password);
+    $admin_result = checkAdmin($pdo, $admin_id, $password);
     if ($admin_result) {
         $_SESSION['admin_id'] = $admin_result['admin_id'];
 
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     } else {
         // Show an alert if login credentials are incorrect
-        echo "<script>alert('Invalid username/email or password.');</script>";
+        echo "<script>alert('Invalid Admin ID or password.');</script>";
     }
 }
 ?>
@@ -148,8 +148,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <h4 class="text-center" id="label_login">Admin Login</h4>
             <form action="" method="POST">
                 <div class="form-group">
-                    <label for="email">Username/Email</label>
-                    <input type="text" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
+                    <label for="admin_id">Admin ID</label>
+                    <input type="text" class="form-control" id="admin_id" name="admin_id" value="<?php echo htmlspecialchars($admin_id); ?>" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
