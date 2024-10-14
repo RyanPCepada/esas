@@ -63,6 +63,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(":clubId", $selectedClubId);
             $stmt->bindParam(":moderatorId", $selectedModeratorId);
             if ($stmt->execute()) {
+                
+                // Fetch the moderator name
+                $moderatorNameQuery = "SELECT CONCAT(firstName, ' ', lastName) AS moderator_name FROM tbl_moderators WHERE moderator_id = :moderatorId";
+                $moderatorStmt = $pdo->prepare($moderatorNameQuery);
+                $moderatorStmt->bindParam(':moderatorId', $selectedModeratorId);
+                $moderatorStmt->execute();
+                $moderatorName = $moderatorStmt->fetchColumn();
+
+                // Fetch the club name
+                $clubNameQuery = "SELECT clubName FROM tbl_clubs WHERE club_id = :clubId";
+                $clubStmt = $pdo->prepare($clubNameQuery);
+                $clubStmt->bindParam(':clubId', $selectedClubId);
+                $clubStmt->execute();
+                $clubName = $clubStmt->fetchColumn();
+
+                // Log the activity
+                $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) 
+                            VALUES (:activity, NOW(), :moderatorId)";
+                if ($logStmt = $pdo->prepare($logSql)) {
+                    $activity = "You assigned {$moderatorName} as a moderator of {$clubName}";
+                    $logStmt->bindParam(':activity', $activity);
+                    $logStmt->bindParam(':moderatorId', $selectedModeratorId);
+                    $logStmt->execute(); // Log the activity
+                }
+                
                 header("location: ../../moderators.php"); // Redirect to a list of moderators
                 exit();
             } else {
@@ -71,6 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+
 
 ?>
 
