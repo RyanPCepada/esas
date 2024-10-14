@@ -95,6 +95,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(":profilePic", $profilePic);
 
             if ($stmt->execute()) {
+                // Fetch the full name of the newly added moderator
+                $fullName = $firstName . ' ' . $middleName . ' ' . $lastName;
+
+                // Insert activity log
+                $sqlLog = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, NOW(), :moderator_id)";
+                if ($logStmt = $pdo->prepare($sqlLog)) {
+                    $activity = "You added $fullName to the moderators list.";
+                    $logStmt->bindParam(":activity", $activity);
+                    $logStmt->bindParam(":moderator_id", $moderator_id);
+                    $logStmt->execute();
+                }
+
                 $newModeratorId = $pdo->lastInsertId();
 
                 if (!empty($_POST["club"])) {
@@ -119,6 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     unset($pdo);
 }
 ?>
+
 
 
 
