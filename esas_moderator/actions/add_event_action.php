@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $description = $_POST['description'];
     $date = $_POST['date'];
-    $timeStarts = $_POST['timeStarts']; // Updated to timeStarts
-    $timeEnds = $_POST['timeEnds'];     // Added timeEnds
+    $timeStarts = $_POST['timeStarts'];
+    $timeEnds = $_POST['timeEnds'];
     $location = $_POST['location'];
     $registrationLink = $_POST['registrationLink'];
     $club_id = $_POST['club_id'];
@@ -25,6 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             VALUES (:title, :description, :date, :timeStarts, :timeEnds, :location, :registrationLink, :dateAdded, :dateModified, :club_id, :moderator_id)";
     
     try {
+        $pdo->beginTransaction();
+
+        // Insert event into tbl_events
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':title' => $title,
@@ -34,17 +37,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':timeEnds' => $timeEnds,
             ':location' => $location,
             ':registrationLink' => $registrationLink,
-            ':dateAdded' => $currentDateTime,       // Set dateAdded to the current datetime
-            ':dateModified' => $currentDateTime,    // Set dateModified to the current datetime
+            ':dateAdded' => $currentDateTime,
+            ':dateModified' => $currentDateTime,
             ':club_id' => $club_id,
             ':moderator_id' => $moderator_id
         ]);
 
+        // Get the club name
+        $club_sql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
+        $club_stmt = $pdo->prepare($club_sql);
+        $club_stmt->execute([':club_id' => $club_id]);
+        $club = $club_stmt->fetch(PDO::FETCH_ASSOC);
+        $clubName = $club['clubName'];
+
+        // Insert into tbl_activity_logs without club_id
+        $activity = "You added an event for " . $clubName;
+        $log_sql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) 
+                    VALUES (:activity, :dateAdded, :moderator_id)";
+        $log_stmt = $pdo->prepare($log_sql);
+        $log_stmt->execute([
+            ':activity' => $activity,
+            ':dateAdded' => $currentDateTime,
+            ':moderator_id' => $moderator_id
+        ]);
+
+        $pdo->commit();
+
         // Redirect to home.php after successful insertion
         header("Location: /esas/esas_moderator/public/home.php?success=1&club_id=" . urlencode($club_id));
-        exit(); // Make sure to call exit after redirecting
+        exit();
     } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage(); // Handle error appropriately
+        $pdo->rollBack();
+        echo "Error: " . $e->getMessage();
     }
 }
 ?>
