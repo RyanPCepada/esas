@@ -51,6 +51,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm'])) {
         if ($stmt->rowCount() > 0) {
             // Successfully removed the moderator
             $_SESSION['success_message'] = "Moderator removed successfully from the club.";
+            
+            // Log the activity
+            $activity = "You removed $moderator_name as a moderator of $club_name.";
+            $admin_id = $_SESSION['admin_id']; // Assuming admin_id is stored in session
+            
+            $log_stmt = $pdo->prepare("INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (?, NOW(), ?, ?, ?)");
+            $log_stmt->execute([$activity, $admin_id, $moderator_id, null]); // Assuming student_id is not relevant here
+
         } else {
             // No rows affected, meaning the moderator wasn't assigned to this club
             $_SESSION['error_message'] = "Error: Moderator wasn't assigned to this club.";
@@ -64,6 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm'])) {
     exit;
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
