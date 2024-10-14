@@ -92,6 +92,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $profilePic, 
         $moderator_id
     ])) {
+        // Profile updated successfully, now log the activity
+        $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
+        $logStmt = $pdo->prepare($logSql);
+        $logStmt->execute([
+            'activity' => 'You updated your profile',
+            'dateAdded' => date('Y-m-d H:i:s'), // current timestamp
+            'moderator_id' => $moderator_id
+        ]);
+
         echo "Profile updated successfully!";
         header("location: ../../../settings.php");
         exit();
@@ -102,6 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+
 
 <h4 class="text-muted mb-3">Update Profile</h4>
 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data">
