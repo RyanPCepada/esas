@@ -148,7 +148,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(":clubName", $clubName);
             $stmt->bindParam(":information", $information);
             $stmt->bindParam(":coverPhoto", $coverPhoto);
-    
+            
             if ($stmt->execute()) {
                 $clubId = $pdo->lastInsertId();
                 $selectedModerator = $_POST["moderator"];
@@ -184,6 +184,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     }
                 }
     
+                // Log the activity of adding the club
+                $activity = "You added " . $clubName . " to the clubs list";
+                $admin_id = 1; // Replace this with actual admin ID
+                $moderator_id = $newModeratorId; // Assuming this is the moderator's ID
+                $student_id = null; // Replace with actual student ID if applicable
+    
+                $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (:activity, NOW(), :admin_id, :moderator_id, :student_id)";
+                if ($logStmt = $pdo->prepare($logSql)) {
+                    $logStmt->bindParam(":activity", $activity);
+                    $logStmt->bindParam(":admin_id", $admin_id);
+                    $logStmt->bindParam(":moderator_id", $moderator_id);
+                    $logStmt->bindParam(":student_id", $student_id); // Use actual student_id if needed
+                    $logStmt->execute();
+                }
+    
                 header("location: ../../all_clubs.php");
                 exit();
             } else {
@@ -194,6 +209,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     unset($pdo);
+    
 }
 ?>
 
