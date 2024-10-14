@@ -1,8 +1,18 @@
 <?php
-// Process delete operation after confirmation
+session_start();
+
+// Ensure the moderator ID is set in the session
+if (isset($_SESSION['admin_id'])) {
+    $adminId = $_SESSION['admin_id'];
+} else {
+    echo json_encode(['error' => 'Admin not logged in.']);
+    exit;
+}
+
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
+// Check if request_id is set
 if (isset($_POST["request_id"]) && !empty($_POST["request_id"])) {
     // Include config file
     require_once "../../../../config.php";
@@ -11,32 +21,62 @@ if (isset($_POST["request_id"]) && !empty($_POST["request_id"])) {
     $pdo->beginTransaction();
 
     try {
-        // Prepare a delete statement for the club_requests table
-        $sql = "DELETE FROM tbl_club_requests WHERE request_id = :request_id";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(":request_id", $param_request_id);
-        $param_request_id = trim($_POST["request_id"]);
-        $stmt->execute();
+        // First, fetch the student_id and student name from tbl_club_requests and tbl_students
+        $request_id = trim($_POST["request_id"]);
+        
+        // Fetch the student_id and student details from tbl_club_requests
+        $fetchStudentSQL = "
+            SELECT r.student_id, s.firstName, s.middleName, s.lastName 
+            FROM tbl_club_requests AS r
+            JOIN tbl_students AS s ON r.student_id = s.student_id 
+            WHERE r.request_id = :request_id
+        ";
+        $fetchStudentStmt = $pdo->prepare($fetchStudentSQL);
+        $fetchStudentStmt->bindParam(":request_id", $request_id);
+        $fetchStudentStmt->execute();
+        $studentData = $fetchStudentStmt->fetch(PDO::FETCH_ASSOC);
 
-        // Commit the transaction
-        $pdo->commit();
+        // Ensure we have the student details
+        if ($studentData) {
+            $student_id = $studentData['student_id'];
+            $studentName = $studentData['firstName'] . ' ' . $studentData['middleName'] . ' ' . $studentData['lastName'];
 
-        // Redirect to landing page
-        header("location: ../../club_requests.php");
-        exit();
+            // Now, delete the request from tbl_club_requests
+            $sql = "DELETE FROM tbl_club_requests WHERE request_id = :request_id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(":request_id", $request_id);
+            $stmt->execute();
+
+            // Log the activity in tbl_activity_logs
+            $activity = "You deleted {$studentName}'s club request";
+            $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, student_id) VALUES (:activity, NOW(), :admin_id, :student_id)";
+            $logStmt = $pdo->prepare($logSQL);
+            $logStmt->bindParam(":activity", $activity);
+            $logStmt->bindParam(":admin_id", $adminId);
+            $logStmt->bindParam(":student_id", $student_id);
+            $logStmt->execute();
+
+            // Commit the transaction
+            $pdo->commit();
+
+            // Redirect to the club requests page
+            header("location: ../../club_requests.php");
+            exit();
+        } else {
+            // No student found for the request_id
+            echo "Student not found for the club request.";
+        }
     } catch (Exception $e) {
         // Rollback transaction on error
         $pdo->rollBack();
         echo "Oops! Something went wrong. Please try again later.";
     }
 
-    // Close statement
+    // Close statement and connection
     unset($stmt);
-    
-    // Close connection
     unset($pdo);
 } else {
-    // Check existence of id parameter
+    // Check existence of request_id parameter
     if (empty(trim($_GET["request_id"]))) {
         // URL doesn't contain request_id parameter. Redirect to error page
         header("location: ../public/error.php");
