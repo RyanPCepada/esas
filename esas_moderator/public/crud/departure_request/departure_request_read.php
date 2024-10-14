@@ -1,6 +1,13 @@
 <?php
 // Include config file
 require_once "../../../../config.php";
+session_start();
+
+if (!isset($_SESSION['moderator_id'])) {
+    die("You are not logged in.");
+}
+
+$moderator_id = $_SESSION['moderator_id'];
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -52,6 +59,31 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     // Close statement
     unset($stmt);
 
+    // Prepare a select statement to fetch the club name from tbl_clubs
+    $sql_club = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id"; // Adjust this query to get club name
+
+    if ($stmt = $pdo->prepare($sql_club)) {
+        // Bind variables to the prepared statement as parameters
+        $stmt->bindParam(":club_id", $param_club_id);
+
+        // Attempt to execute the prepared statement
+        if ($stmt->execute()) {
+            if ($stmt->rowCount() == 1) {
+                // Fetch result row as an associative array
+                $clubRow = $stmt->fetch(PDO::FETCH_ASSOC);
+                $clubName = $clubRow["clubName"]; // Get the club name
+            } else {
+                echo "No valid club id found.";
+                exit();
+            }
+        } else {
+            echo "Could not fetch club name. Please try again later.";
+            exit();
+        }
+    }
+    
+    // Close statement
+    unset($stmt);
 
     // Prepare a select statement to fetch questions and dateRequested from tbl_departure_requests
     $sql_questions = "SELECT reason, dateRequested FROM tbl_departure_requests WHERE student_id = :student_id AND club_id = :club_id";
@@ -79,7 +111,6 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
             echo "Could not fetch questions. Please try again later.";
         }
     }
-
 
     // Close statement
     unset($stmt);
@@ -131,6 +162,20 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
                     // Execute the update statement for registration
                     if ($updateRegistrationStmt->execute()) {
+                        // Log the activity
+                        $logActivitySql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
+                                           VALUES (:activity, NOW(), :admin_id, :moderator_id, :student_id)"; // Modify as per your log structure
+
+                        if ($logStmt = $pdo->prepare($logActivitySql)) {
+                            $activity = "You approved $fullName's departure request in $clubName";
+                            // Assume admin_id and moderator_id are defined elsewhere or passed via POST
+                            $logStmt->bindParam(":activity", $activity);
+                            $logStmt->bindParam(":admin_id", $admin_id); // Ensure these variables are set appropriately
+                            $logStmt->bindParam(":moderator_id", $moderator_id); // Ensure these variables are set appropriately
+                            $logStmt->bindParam(":student_id", $param_student_id);
+                            $logStmt->execute(); // Execute the log statement
+                        }
+
                         header("location: ../../departure_requests.php");
                         exit();
                     } else {
@@ -140,6 +185,20 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                 }
                 unset($updateRegistrationStmt);
             } else {
+                // Log disapproval activity
+                $logActivitySql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
+                                   VALUES (:activity, NOW(), :admin_id, :moderator_id, :student_id)"; // Modify as per your log structure
+
+                if ($logStmt = $pdo->prepare($logActivitySql)) {
+                    $activity = "You disapproved $fullName's departure request in $clubName";
+                    // Assume admin_id and moderator_id are defined elsewhere or passed via POST
+                    $logStmt->bindParam(":activity", $activity);
+                    $logStmt->bindParam(":admin_id", $admin_id); // Ensure these variables are set appropriately
+                    $logStmt->bindParam(":moderator_id", $moderator_id); // Ensure these variables are set appropriately
+                    $logStmt->bindParam(":student_id", $param_student_id);
+                    $logStmt->execute(); // Execute the log statement
+                }
+
                 // Redirect or show success message for disapproved requests
                 header("location: ../../departure_requests.php");
                 exit();
@@ -151,9 +210,8 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     }
     unset($updateStmt);
 }
-
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
