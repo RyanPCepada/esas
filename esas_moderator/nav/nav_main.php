@@ -56,6 +56,7 @@
                 <hr class="dropdown-divider" />
             </li>
             <li><a class="dropdown-item" href="/esas/esas_moderator/settings.php">Settings</a></li>
+            <li><a class="dropdown-item" href="/esas/esas_moderator/history.php">History</a></li>
             <li><a class="dropdown-item" href="/esas/esas_moderator/logout.php">Logout</a></li>
         </ul>
     </li>
