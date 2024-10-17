@@ -427,6 +427,8 @@ try {
                 <div class="d-flex justify-content-end mb-3">
                     <button class="btn btn-custom" onclick="showContent('posts')">Posts</button>
                     <button class="btn btn-custom" onclick="showContent('events')">Events</button>
+                    <button class="btn btn-custom" onclick="showContent('about')">About</button>
+                    <button class="btn btn-custom" onclick="showContent('officers')">Officers</button>
                     <button class="btn btn-custom" onclick="showContent('chats')">Chats</button>
 
                     <div class="departure-ellipsis text-center" style="cursor: pointer; width: 22px; height: 22px; border-radius: 50%;" onclick="toggleDropdown()">
