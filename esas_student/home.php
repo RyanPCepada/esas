@@ -423,7 +423,7 @@ try {
                     </div>
                 </div>
 
-                <!-- Buttons for Posts, Events, and Chats -->
+                <!-- Buttons for Posts, Events, About, Officers, and Chats -->
                 <div class="d-flex justify-content-end mb-3">
                     <button class="btn btn-custom" onclick="showContent('posts')">Posts</button>
                     <button class="btn btn-custom" onclick="showContent('events')">Events</button>
@@ -473,6 +473,16 @@ try {
                             <?php include './components/events.php' ?>
                     </div>
 
+                    <!-- ABOUT DISPLAY -->
+                    <div id="about" class="p-0" style="display: none;">
+                            <?php include './components/about.php' ?>
+                    </div>
+
+                    <!-- OFFICERS DISPLAY -->
+                    <div id="officers" class="p-0" style="display: none;">
+                            <?php include './components/officers.php' ?>
+                    </div>
+
                     <!-- CHATS DISPLAY -->
                     <div id="chats" class="p-0" style="display: none;">
                         <?php include './components/chats.php' ?>
@@ -511,12 +521,14 @@ try {
     </div>
 </div>
 
-<!-- JavaScript to switch between Posts, Events, and Chats -->
+<!-- JavaScript to switch between Posts, Events, About, Officers, and Chats -->
 <script>
 function showContent(contentId) {
     // Hide all content sections
     document.getElementById('posts').style.display = 'none';
     document.getElementById('events').style.display = 'none';
+    document.getElementById('about').style.display = 'none';
+    document.getElementById('officers').style.display = 'none';
     document.getElementById('chats').style.display = 'none';
 
     // Show the selected content section
