@@ -342,7 +342,7 @@ try {
                                         <div class="d-flex align-items-center justify-content-end pb-3 mt-2 mb-3">
                                             <!-- <h2 class="text-muted mt-0 mb-0">My Club Requests</h2> -->
                                             <a href="../esas_student/crud/club_requests/club_request_create.php" class="btn btn-primary" id="request-club-btn" style="width: 160px; border-radius: 3px; margin-right: 5px;">
-                                                Request for a Club
+                                                Request New Club
                                             </a>
                                         </div>
 
