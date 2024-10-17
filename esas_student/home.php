@@ -55,7 +55,12 @@ try {
             $coverPhoto = $club['coverPhoto']; // Set coverPhoto from clubs table
 
             // Update the is_read field to 1 for notifications for this student and club
-            $sql = "UPDATE tbl_notifications SET is_read = 1 WHERE student_id = :student_id AND club_id = :club_id";
+            $sql = "UPDATE tbl_notifications 
+            SET is_read = 1 
+            WHERE student_id = :student_id 
+            AND club_id = :club_id 
+            AND notification = 'Posted an announcement'"; 
+
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
             $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
