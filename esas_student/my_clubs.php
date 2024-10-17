@@ -149,26 +149,6 @@ try {
         }
 
 
-        @media (max-width: 767px) {
-            .card-body {
-                padding: 0px !important; 
-                max-width: 100%; 
-            }
-            .card-img-only {
-                width: 315px;
-                height: 177px;
-                width: auto;
-                height: 145px;
-                margin-top: 10px;
-            }
-            .date {
-                margin-left: 20px;
-            }
-        }
-
-
-
-        
         .card-container {
             opacity: 0;
             transform: translateY(20px); /* Start from below */
@@ -218,16 +198,16 @@ try {
         .club-notification-badge {
             position: absolute;
             top: 5px;
-            right: 5px;
-            width: 24px;
-            height: 24px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
             background-color: red;
             color: white;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 2000;
         }
 
 
@@ -236,6 +216,28 @@ try {
         }
 
         
+
+
+        @media (max-width: 767px) {
+            .card-body {
+                padding: 0px !important; 
+                max-width: 100%; 
+            }
+            .card-img-only {
+                width: 315px;
+                height: 177px;
+                width: auto;
+                height: 145px;
+                margin-top: 10px;
+            }
+            .date {
+                margin-left: 20px;
+            }
+            .club-notification-badge {
+                top: 5px;
+                right: 5px;
+            }
+        }
     </style>
 </head>
 
@@ -424,8 +426,8 @@ try {
                         clubs = response.map(club => club.club_id); // Populate clubs array
                         clubsContainer.innerHTML = response.map(club => `
                             <div class="col-md-4 card-container"> 
+                                <span class="club-notification-badge" id="club-notification-${club.club_id}" style="display:none;"></span>
                                 <div class="card card-img-only">
-                                    <span class="club-notification-badge" id="club-notification-${club.club_id}" style="display:none;"></span>
                                     <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}` : `/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}`}" 
                                     onclick="markClubNotificationsAsRead(${club.club_id})">
                                         <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
@@ -436,7 +438,7 @@ try {
                                 </div>
                             </div>
                         `).join('');
-                        fetchNotificationCounts();
+                        fetchClubNotificationCounts();
                     } else {
                         clubsContainer.innerHTML = '<p>No clubs found.</p>';
                     }
@@ -449,7 +451,7 @@ try {
         }
 
 
-            function fetchNotificationCounts() {
+            function fetchClubNotificationCounts() {
                 clubs.forEach(club_id => {
                     $.ajax({
                         url: `/esas/esas_student/apis/notifications/club-notifications-api.php?club_id=${club_id}`,
@@ -465,7 +467,11 @@ try {
                         }
                     });
                 });
-            }
+            } 
+
+setInterval(fetchClubNotificationCounts, 10000);
+fetchClubNotificationCounts(); // Initial call to load notifications
+
 
             function markClubNotificationsAsRead(club_id) {
                 $.ajax({
