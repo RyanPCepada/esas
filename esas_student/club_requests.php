@@ -350,7 +350,7 @@ try {
                                         <nav>
                                             <div class="nav nav-tabs n" role="tablist">
                                                 <button title="Requested Clubs" class="ms-2 px-2 nav-link active" id="nav-requestedclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-requestedclubs" type="button" role="tab" aria-controls="nav-requestedclubs" aria-selected="true" onclick="updateLabel('Requested Clubs')">
-                                                    Requests
+                                                    All Requests
                                                 </button>
                                                 <button title="Pending Approval" class="px-2 nav-link" id="nav-pendingclubs-tab" data-bs-toggle="tab" data-bs-target="#nav-pendingclubs" type="button" role="tab" aria-controls="nav-pendingclubs" aria-selected="false" onclick="updateLabel('Pending Approval')">
                                                     Pending
