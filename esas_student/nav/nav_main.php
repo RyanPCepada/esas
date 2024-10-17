@@ -30,7 +30,7 @@
         <div class="dropdown-menu dropdown-menu-end shadow-sm">
             <div class="d-md-flex align-items-start justify-content-start">
                 <div>
-                    <a class="dropdown-item py-1" onclick="clickSubModule('nav/userreg/userreg_main.php')">Dashboard</a>
+                    <a class="dropdown-item py-1" href="index.php">Dashboard</a>
                     <a class="dropdown-item py-1">Profile</a>
                     <a class="dropdown-item py-1">Certificate of Registration</a>
                     <a class="dropdown-item py-1">Grade Slip</a>
