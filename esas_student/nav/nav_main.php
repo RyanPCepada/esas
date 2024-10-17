@@ -104,7 +104,7 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    // Fetch and display notification dot
+    // Fetch and display Panel notification dot
     function fetchPanelNotificationCount() {
         $.ajax({
             url: '/esas/esas_student/apis/notifications/panel-notifications-api.php',
@@ -120,27 +120,27 @@
         });
     }
 
-    // Fetch and display notification count
+    // Fetch and display dropdown notification count
     function fetchDropdownNotificationCount() {
-                                $.ajax({
-                                    url: '/esas/esas_student/apis/notifications/myclubs-notifications-api.php',
-                                    method: 'GET',
-                                    success: function(response) {
-                                        const data = JSON.parse(response);
-                                        if (data.unread_count > 0) {
-                                            $('#dropdown-notification-count').text(data.unread_count).show();
-                                        } else {
-                                            $('#dropdown-notification-count').hide();
-                                        }
-                                    }
-                                });
-                            }
+        $.ajax({
+            url: '/esas/esas_student/apis/notifications/dropdown-notifications-api.php',
+            method: 'GET',
+            success: function(response) {
+                const data = JSON.parse(response);
+                if (data.unread_count > 0) {
+                    $('#dropdown-notification-count').text(data.unread_count).show();
+                } else {
+                    $('#dropdown-notification-count').hide();
+                }
+            }
+        });
+    }
 
-                            // Fetch notifications every 10 seconds
-                            setInterval(fetchDropdownNotificationCount, 10000);
-                            fetchDropdownNotificationCount();
+    // Fetch dropdown notifications every 10 seconds
+    setInterval(fetchDropdownNotificationCount, 10000);
+    fetchDropdownNotificationCount();
 
-    // Fetch notifications every 10 seconds
+    // Fetch Panel notifications every 10 seconds
     setInterval(fetchPanelNotificationCount, 10000);
     fetchPanelNotificationCount();
 </script>
