@@ -469,8 +469,8 @@ try {
                 });
             } 
 
-setInterval(fetchClubNotificationCounts, 10000);
-fetchClubNotificationCounts(); // Initial call to load notifications
+            setInterval(fetchClubNotificationCounts, 10000);
+            fetchClubNotificationCounts(); // Initial call to load notifications
 
 
             function markClubNotificationsAsRead(club_id) {
