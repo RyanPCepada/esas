@@ -1,9 +1,31 @@
+<style>
+    .nav-link {
+        position: relative; /* Ensure the parent is positioned to handle the absolute position of the red dot */
+    }
+    
+    .panel-notification-badge {
+        position: absolute;
+        top: 0px;
+        left: 35px;
+        width: 10px;
+        height: 10px;
+        background-color: red;
+        border-radius: 50%;
+    }
+
+    @media (max-width: 767px) {
+        .panel-notification-badge {
+            left: 27px;
+        }
+    }
+</style>
+
 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 flex-nowrap">
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" active="false" aria-selected="false">
             Panel
-            <i class="bi bi-chevron-down">
-            </i>
+            <span id="panel-notification-count" class="panel-notification-badge" style="display: none;"></span>
+            <i class="bi bi-chevron-down"></i>
         </a>
         <div class="dropdown-menu dropdown-menu-end shadow-sm">
             <div class="d-md-flex align-items-start justify-content-start">
@@ -59,6 +81,32 @@
         </ul>
     </li>
 </ul>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Fetch and display notification dot
+    function fetchNotificationCount() {
+        $.ajax({
+            url: '/esas/esas_student/apis/notifications/panel-notifications-api.php',
+            method: 'GET',
+            success: function(response) {
+                const data = JSON.parse(response);
+                if (data.unread_count > 0) {
+                    $('#panel-notification-count').show(); // Show red dot
+                } else {
+                    $('#panel-notification-count').hide(); // Hide red dot
+                }
+            }
+        });
+    }
+
+    // Fetch notifications every 10 seconds
+    setInterval(fetchNotificationCount, 10000);
+    fetchNotificationCount();
+</script>
+
+
 <script>
     function clickSubModule(filepath) {
         // console.log(filepath)
