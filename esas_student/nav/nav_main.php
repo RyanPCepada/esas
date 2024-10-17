@@ -13,6 +13,23 @@
         border-radius: 50%;
     }
 
+    
+    .dropdown-notification-badge {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+
     @media (max-width: 767px) {
         .panel-notification-badge {
             left: 27px;
@@ -40,7 +57,8 @@
                     <a class="dropdown-item py-1">Admission</a>
                     <a class="dropdown-item py-1">Library Resource</a>
                     <a class="dropdown-item py-1">Election Voting</a>
-                    <a class="dropdown-item py-1" href="dashboard.php">Club Registration</a>
+                    <a class="dropdown-item py-1" href="dashboard.php">Club Registration
+                    </a>
                     <!-- <a class="dropdown-item py-1" href="clubs_old_v2.php">Club Registration Old</a> -->
                 </div>
                 <!-- <div>
@@ -86,7 +104,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     // Fetch and display notification dot
-    function fetchNotificationCount() {
+    function fetchPanelNotificationCount() {
         $.ajax({
             url: '/esas/esas_student/apis/notifications/panel-notifications-api.php',
             method: 'GET',
@@ -101,9 +119,10 @@
         });
     }
 
+
     // Fetch notifications every 10 seconds
-    setInterval(fetchNotificationCount, 10000);
-    fetchNotificationCount();
+    setInterval(fetchPanelNotificationCount, 10000);
+    fetchPanelNotificationCount();
 </script>
 
 

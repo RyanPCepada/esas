@@ -178,7 +178,7 @@ try {
         }
 
 
-        .notification-badge {
+        .myclubs-notification-badge {
             position: absolute;
             min-width: 20px;
             height: auto;
@@ -280,31 +280,31 @@ try {
                         <li class="nav-item">
                             <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="my-clubs">
                                 <i class="fas fa-user"></i> My Clubs
-                                <span id="notification-count" class="notification-badge" style="display:none;">3</span>
+                                <span id="myclubs-notification-count" class="myclubs-notification-badge" style="display:none;">3</span>
                             </a>
                         </li>
 
                         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                         <script>
-                            // Fetch and display notification count
-                            function fetchNotificationCount() {
+                            // Fetch and display my clubs notification count
+                            function fetchMyClubsNotificationCount() {
                                 $.ajax({
-                                    url: '/esas/esas_student/apis/notifications/notifications-api.php',
+                                    url: '/esas/esas_student/apis/notifications/myclubs-notifications-api.php',
                                     method: 'GET',
                                     success: function(response) {
                                         const data = JSON.parse(response);
                                         if (data.unread_count > 0) {
-                                            $('#notification-count').text(data.unread_count).show();
+                                            $('#myclubs-notification-count').text(data.unread_count).show();
                                         } else {
-                                            $('#notification-count').hide();
+                                            $('#myclubs-notification-count').hide();
                                         }
                                     }
                                 });
                             }
 
-                            // Fetch notifications every 10 seconds
-                            setInterval(fetchNotificationCount, 10000);
-                            fetchNotificationCount();
+                            // Fetch my clubs notifications every 10 seconds
+                            setInterval(fetchMyClubsNotificationCount, 10000);
+                            fetchMyClubsNotificationCount();
 
                             // // Mark notifications as read when "My Clubs" is clicked
                             // $('#my-clubs').click(function() {
