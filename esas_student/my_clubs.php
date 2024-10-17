@@ -280,7 +280,7 @@ try {
                         <li class="nav-item">
                             <a href="../esas_student/my_clubs.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="my-clubs">
                                 <i class="fas fa-user"></i> My Clubs
-                                <span id="myclubs-notification-count" class="myclubs-notification-badge" style="display:none;">3</span>
+                                <span id="myclubs-notification-count" class="myclubs-notification-badge" style="display:none;"></span>
                             </a>
                         </li>
 
