@@ -12,22 +12,33 @@
         background-color: red;
         border-radius: 50%;
     }
+    .dropdown-item {
+        position: relative;
+    }
 
-    
     .dropdown-notification-badge {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            width: 20px;
-            height: 20px;
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 10px;
+        /* left: 140px; */
+        width: 20px;
+        height: 20px;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        font-size: 10px;
+        line-height: 1;
+        padding: 0;
+
+        align-self: end;
+    }
+
+
 
 
     @media (max-width: 767px) {
@@ -57,8 +68,8 @@
                     <a class="dropdown-item py-1">Admission</a>
                     <a class="dropdown-item py-1">Library Resource</a>
                     <a class="dropdown-item py-1">Election Voting</a>
-                    <a class="dropdown-item py-1" href="dashboard.php">Club Registration
-                    <span id="dropdown-notification-count" class="dropdown-notification-badge" style="display:none;">3</span>
+                    <a class="dropdown-item py-1 position-relative" href="dashboard.php">Club Registration
+                        <span id="dropdown-notification-count" class="dropdown-notification-badge" style="display:none;"></span>
                     </a>
                     <!-- <a class="dropdown-item py-1" href="clubs_old_v2.php">Club Registration Old</a> -->
                 </div>
