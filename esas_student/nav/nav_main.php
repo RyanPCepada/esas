@@ -1,6 +1,6 @@
 <style>
     .nav-link {
-        position: relative; /* Ensure the parent is positioned to handle the absolute position of the red dot */
+        position: relative;
     }
     
     .panel-notification-badge {
@@ -58,6 +58,7 @@
                     <a class="dropdown-item py-1">Library Resource</a>
                     <a class="dropdown-item py-1">Election Voting</a>
                     <a class="dropdown-item py-1" href="dashboard.php">Club Registration
+                    <span id="dropdown-notification-count" class="dropdown-notification-badge" style="display:none;">3</span>
                     </a>
                     <!-- <a class="dropdown-item py-1" href="clubs_old_v2.php">Club Registration Old</a> -->
                 </div>
@@ -119,6 +120,25 @@
         });
     }
 
+    // Fetch and display notification count
+    function fetchDropdownNotificationCount() {
+                                $.ajax({
+                                    url: '/esas/esas_student/apis/notifications/myclubs-notifications-api.php',
+                                    method: 'GET',
+                                    success: function(response) {
+                                        const data = JSON.parse(response);
+                                        if (data.unread_count > 0) {
+                                            $('#dropdown-notification-count').text(data.unread_count).show();
+                                        } else {
+                                            $('#dropdown-notification-count').hide();
+                                        }
+                                    }
+                                });
+                            }
+
+                            // Fetch notifications every 10 seconds
+                            setInterval(fetchDropdownNotificationCount, 10000);
+                            fetchDropdownNotificationCount();
 
     // Fetch notifications every 10 seconds
     setInterval(fetchPanelNotificationCount, 10000);
