@@ -9,7 +9,7 @@ date_default_timezone_set('Asia/Manila');
 $student_id = $_SESSION['student_id']; 
 
 // Get the count of unread notifications for the student
-$sql = "SELECT COUNT(*) AS unread_count FROM tbl_notifications WHERE student_id = :student_id AND is_read = 0";
+$sql = "SELECT COUNT(*) AS unread_count FROM tbl_notifications WHERE student_id = :student_id AND is_read = 0 AND notification = 'Posted an announcement'";
 $stmt = $pdo->prepare($sql);
 $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
 $stmt->execute();

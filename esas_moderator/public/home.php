@@ -81,7 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if (!empty($students)) {
                     foreach ($students as $student) {
                         // Insert notification for each student
-                        $sql = "INSERT INTO tbl_notifications (student_id, club_id, post_id, is_read, dateAdded) VALUES (:student_id, :club_id, :post_id, 0, NOW())";
+                        $sql = "INSERT INTO tbl_notifications (notification, student_id, club_id, post_id, is_read, dateAdded) VALUES ('Posted an announcement', :student_id, :club_id, :post_id, 0, NOW())";
                         $stmt = $pdo->prepare($sql);
                         $stmt->bindParam(":student_id", $student['student_id'], PDO::PARAM_INT);
                         $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
