@@ -123,6 +123,7 @@ $(document).ready(function() {
                                 <p class="section-title">Club Details</p>
                                 <p class="date-created"><strong>Date of Creation:</strong> ${formattedDate}</p>
                                 <p class="information"><strong>Information:</strong> ${club.information}</p>
+                                <a href="../settings.php">Edit Information in Settings</a>
                             </div>
                             <br>
                             <p class="club_moderators text-primary my-2">Club Moderators <em>(${moderatorsCount})</em></p>
