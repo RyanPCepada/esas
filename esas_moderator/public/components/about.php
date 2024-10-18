@@ -34,7 +34,7 @@
     }
 
     .club-info .information {
-        font-size: 1.2em; /* Slightly larger font for club information */
+        font-size: 1.1em; /* Slightly larger font for club information */
         color: #333; /* Darker color for better readability */
         line-height: 1.5; /* Improved line spacing for readability */
     }
