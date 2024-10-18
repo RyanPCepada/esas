@@ -20,7 +20,7 @@ if (isset($_GET['club_id'])) {
                 WHEN o.vicePresident = s.student_id THEN 'Vice President'
                 WHEN o.secretary = s.student_id THEN 'Secretary'
                 WHEN o.treasurer = s.student_id THEN 'Treasurer'
-                WHEN o.pio = s.student_id THEN 'Public Information Officer'
+                WHEN o.pio = s.student_id THEN 'P.I.O.'
                 WHEN o.srgtAtArms = s.student_id THEN 'Sergeant at Arms'
             END AS position
         FROM 
@@ -36,8 +36,9 @@ if (isset($_GET['club_id'])) {
 
         if ($officers) {
             echo json_encode(['success' => true, 'officers' => $officers]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'No officers found for this club.']);
+        }
+        else {
+            echo json_encode(['success' => false, 'message' => '']);
         }
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);

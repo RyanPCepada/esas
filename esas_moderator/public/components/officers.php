@@ -1,16 +1,21 @@
-OFFICERS
-
-<div class="officers-section auto-scroll">
-    <!-- Officers information will be dynamically inserted here -->
+<div class="officers-section">
+    <div class="row d-flex align-items-center">
+        <div class="col-12 d-flex justify-content-start">
+            <h5 class="text-muted mb-3" style="font-size: 1.2em;">Club Officers</h5>
+        </div>
+    </div>
+    <div class="officers-list auto-scroll" id="officersList">
+        <!-- Officerss will be dynamically inserted here -->
+    </div>
 </div>
 
 <style>
     .officers-info {
-        margin: 20px;
+        /* margin: 20px;
         padding: 20px;
         background-color: #f9f9f9; 
         border-radius: 10px; 
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
     }
 
     .officers-info h3 {
@@ -59,30 +64,67 @@ OFFICERS
 $(document).ready(function() {
     const clubId = getQueryParameter('club_id');
 
+    // Define the officer positions
+    const positions = ['President', 'Vice President', 'Secretary', 'Treasurer', 'P.I.O.', 'Sergeant at Arms'];
+
     if (clubId) {
         $.ajax({
-            url: `/esas/esas_student/apis/club-officers-api.php?club_id=${clubId}`,
+            url: `/esas/esas_moderator/apis/club-officers-api.php?club_id=${clubId}`,
             type: 'GET',
             dataType: 'json',
             success: function(response) {
+                const officersSection = $('.officers-list');
+                
+                // Create officers info section
+                officersSection.append('<div class="officers-info"><div class="officer-row"></div></div>');
+                const officerRow = $('.officer-row');
+
+                // Initialize an empty array to track existing officer positions
+                const existingPositions = [];
+
                 if (response.success) {
-                    const officersSection = $('.officers-section');
                     const officers = response.officers;
 
-                    officersSection.append('<div class="officers-info"><h3>Club Officers</h3><div class="officer-row"></div></div>');
-                    
-                    const officerRow = $('.officer-row');
+                    // Loop through existing officers and display their information
                     officers.forEach(officer => {
                         officerRow.append(`
                             <div class="officer-card">
-                                <img src="${officer.profilePic || '/esas/esas_student/PROF_PIC.png'}" alt="${officer.fullName}">
+                                <img src="${officer.profilePic || '/esas/esas_student/images/PROF_PIC.png'}" alt="${officer.fullName}">
                                 <h6>${officer.fullName}</h6>
                                 <p>${officer.position}</p>
                             </div>
                         `);
+                        // Add the position to the existingPositions array
+                        existingPositions.push(officer.position);
                     });
                 } else {
-                    $('.officers-section').append(`<p>${response.message}</p>`);
+                    officerRow.append(`<p>${response.message}</p>`);
+                }
+
+                // Display placeholder cards for each officer position not filled
+                positions.forEach(position => {
+                    if (!existingPositions.includes(position)) {
+                        officerRow.append(`
+                            <div class="officer-card">
+                                <img src="/esas/esas_student/images/PROF_PIC.png" alt="No ${position} selected">
+                                <h6>No ${position} selected</h6>
+                                <p>${position}</p>
+                            </div>
+                        `);
+                    }
+                });
+
+                // If there are no officers at all, display all positions with placeholders
+                if (officers.length === 0) {
+                    positions.forEach(position => {
+                        officerRow.append(`
+                            <div class="officer-card">
+                                <img src="/esas/esas_student/images/PROF_PIC.png" alt="No ${position} selected">
+                                <h6>No ${position} selected</h6>
+                                <p>${position}</p>
+                            </div>
+                        `);
+                    });
                 }
             },
             error: function() {
@@ -99,3 +141,4 @@ $(document).ready(function() {
     }
 });
 </script>
+
