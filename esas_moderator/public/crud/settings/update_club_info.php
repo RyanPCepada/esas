@@ -116,7 +116,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                         <button type="submit" class="btn btn-primary">Update Club</button>
                     </form>
                 </li>
-                <hr>
             <?php endforeach; ?>
         </ul>
     </div>

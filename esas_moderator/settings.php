@@ -160,7 +160,7 @@ if (!$club) {
     
     <div class="wrapper">
         <h2 class="mt-5">Account Settings</h2>
-        <p class="text-muted">Change your profile and account settings</p>
+        <p class="text-muted">Change your profile, account, and club settings</p>
 
         <div class="container-fluid container">
             <div class="row">
@@ -169,6 +169,7 @@ if (!$club) {
                     <a href="../esas_moderator/public/crud/settings/update_profile.php"><i class="fas fa-user-edit"></i> Profile</a>
                     <a href="../esas_moderator/public/crud/settings/update_password.php"><i class="fas fa-lock"></i> Password</a>
                     <a href="../esas_moderator/public/crud/settings/update_club_info.php"><i class="fas fa-university"></i> Club Information</a>
+                    <a href="../esas_moderator/public/crud/settings/update_club_officers.php"><i class="fas fa-user-tie"></i> Club Officers</a>
                 </div>
                 <!-- Main Content Area -->
                 <div class="col-md-9 main-content">
