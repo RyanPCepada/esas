@@ -14,7 +14,7 @@ if (isset($_GET['club_id'])) {
     try {
         // Prepare the SQL query to fetch all relevant information
         $sql = "
-        SELECT 
+SELECT 
     c.club_id, 
     c.clubName, 
     c.information, 
@@ -25,8 +25,9 @@ if (isset($_GET['club_id'])) {
     f.middleName AS founderMiddleName,
     f.lastName AS founderLastName,
     f.profilePic AS founderProfilePic,
-    GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.middleName, ' ', m.lastName, '|', m.profilePic, '|', m.department) ORDER BY m.firstName SEPARATOR ', ') AS moderators,
-    GROUP_CONCAT(DISTINCT CONCAT(s.firstName, ' ', s.middleName, ' ', s.lastName, '|', s.profilePic, '|', s.department) ORDER BY s.firstName SEPARATOR ', ') AS members,
+    GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.middleName, ' ', m.lastName, '|', m.profilePic, '|', m.department, '|', cm.dateAdded) ORDER BY m.firstName SEPARATOR ', ') AS moderators,
+    GROUP_CONCAT(DISTINCT CONCAT(s.firstName, ' ', s.middleName, ' ', s.lastName, '|', s.profilePic, '|', s.department, '|', s.year, '|', r.dateApproved) 
+                 ORDER BY s.firstName SEPARATOR ', ') AS members,
     r.dateApplied AS registrationDate,
     r.status AS registrationStatus,
     r.question1,
@@ -35,9 +36,9 @@ if (isset($_GET['club_id'])) {
 FROM 
     tbl_clubs c
 LEFT JOIN 
-    tbl_registration r ON r.club_id = c.club_id
+    tbl_registration r ON r.club_id = c.club_id AND r.status = 'active'  -- Only fetch active registrations
 LEFT JOIN 
-    tbl_students s ON s.student_id IN (SELECT student_id FROM tbl_registration WHERE club_id = c.club_id)
+    tbl_students s ON s.student_id = r.student_id -- Fetch only the active students based on the registration table
 LEFT JOIN 
     tbl_clubs_and_moderators cm ON cm.club_id = c.club_id
 LEFT JOIN 

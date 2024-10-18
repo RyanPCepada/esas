@@ -492,6 +492,8 @@ function showContent(contentId) {
     // Hide all content sections
     document.getElementById('posts').style.display = 'none';
     document.getElementById('events').style.display = 'none';
+    document.getElementById('about').style.display = 'none';
+    document.getElementById('officers').style.display = 'none';
     document.getElementById('chats').style.display = 'none';
 
     // Show the selected content section
