@@ -14,37 +14,41 @@ if (isset($_GET['club_id'])) {
     try {
         // Prepare the SQL query to fetch all relevant information
         $sql = "
-            SELECT 
-                c.club_id,
-                c.clubName,
-                c.information,
-                c.coverPhoto,
-                c.dateAdded AS clubDateAdded,
-                c.dateModified AS clubDateModified,
-                f.firstName AS founderFirstName,
-                f.middleName AS founderMiddleName,
-                f.lastName AS founderLastName,
-                f.profilePic AS founderProfilePic,
-                GROUP_CONCAT(m.firstName, ' ', m.middleName, ' ', m.lastName SEPARATOR ', ') AS moderators,
-                GROUP_CONCAT(s.firstName, ' ', s.middleName, ' ', s.lastName SEPARATOR ', ') AS members,
-                GROUP_CONCAT(DISTINCT e.title ORDER BY e.dateAdded DESC SEPARATOR ', ') AS events,
-                GROUP_CONCAT(DISTINCT a.attachmentFileName ORDER BY a.dateUploaded DESC SEPARATOR ', ') AS attachments,
-                GROUP_CONCAT(DISTINCT r.goal ORDER BY r.dateDecided DESC SEPARATOR ', ') AS goals,
-                GROUP_CONCAT(DISTINCT r.misssion ORDER BY r.dateDecided DESC SEPARATOR ', ') AS missions,
-                GROUP_CONCAT(DISTINCT r.vision ORDER BY r.dateDecided DESC SEPARATOR ', ') AS visions,
-                GROUP_CONCAT(DISTINCT r.activities ORDER BY r.dateDecided DESC SEPARATOR ', ') AS activities
-            FROM tbl_clubs c
-            LEFT JOIN tbl_moderators f ON c.founder_id = f.moderator_id
-            LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
-            LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
-            LEFT JOIN tbl_registration rg ON c.club_id = rg.club_id
-            LEFT JOIN tbl_students s ON rg.student_id = s.student_id
-            LEFT JOIN tbl_events e ON c.club_id = e.club_id
-            LEFT JOIN tbl_posts_attachments a ON c.club_id = a.club_id
-            LEFT JOIN tbl_club_requests r ON c.club_id = r.club_id
-            WHERE c.club_id = :club_id
-            GROUP BY c.club_id, f.firstName, f.middleName, f.lastName
-        ";
+        SELECT 
+    c.club_id, 
+    c.clubName, 
+    c.information, 
+    c.coverPhoto, 
+    c.dateAdded AS clubDateAdded, 
+    c.dateModified AS clubDateModified,
+    f.firstName AS founderFirstName,
+    f.middleName AS founderMiddleName,
+    f.lastName AS founderLastName,
+    f.profilePic AS founderProfilePic,
+    GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.middleName, ' ', m.lastName, '|', m.profilePic, '|', m.department) ORDER BY m.firstName SEPARATOR ', ') AS moderators,
+    GROUP_CONCAT(DISTINCT CONCAT(s.firstName, ' ', s.middleName, ' ', s.lastName, '|', s.profilePic, '|', s.department) ORDER BY s.firstName SEPARATOR ', ') AS members,
+    r.dateApplied AS registrationDate,
+    r.status AS registrationStatus,
+    r.question1,
+    r.question2,
+    r.question3
+FROM 
+    tbl_clubs c
+LEFT JOIN 
+    tbl_registration r ON r.club_id = c.club_id
+LEFT JOIN 
+    tbl_students s ON s.student_id IN (SELECT student_id FROM tbl_registration WHERE club_id = c.club_id)
+LEFT JOIN 
+    tbl_clubs_and_moderators cm ON cm.club_id = c.club_id
+LEFT JOIN 
+    tbl_moderators m ON m.moderator_id = cm.moderator_id
+LEFT JOIN 
+    tbl_students f ON f.student_id = c.founder_id
+WHERE 
+    c.club_id = :club_id
+GROUP BY 
+    c.club_id
+";
 
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
