@@ -149,7 +149,7 @@
 <div class="chatbox-section">
     <div class="row d-flex align-items-center">
         <div class="col-12 d-flex justify-content-start">
-            <h5 class="text-muted mb-3" style="font-size: 1.2em;">Chat Box</h5>
+            <h5 class="text-muted mb-3" style="font-size: 1.2em;">Club Conversations</h5>
         </div>
     </div>
     <div class="chat-list auto-scroll" id="chatList">
