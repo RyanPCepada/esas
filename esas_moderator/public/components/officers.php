@@ -76,7 +76,7 @@
 $(document).ready(function() {
     const clubId = getQueryParameter('club_id');
 
-    // Define the officer positions
+    // Define the officer positions in the required order
     const positions = ['President', 'Vice President', 'Secretary', 'Treasurer', 'P.I.O.', 'Sergeant at Arms'];
 
     if (clubId) {
@@ -93,61 +93,64 @@ $(document).ready(function() {
                 const bottomRow = $('.officer-row.bottom-row');
 
                 // Initialize an empty array to track existing officer positions
-                const existingPositions = [];
+                const existingPositions = {};
 
                 if (response.success) {
                     const officers = response.officers;
 
-                    // Loop through existing officers and display their information
+                    // Loop through existing officers and store their information based on position
                     officers.forEach(officer => {
                         const profilePicPath = officer.profilePic ? `/esas/esas_student/images/${officer.profilePic}` : '/esas/esas_student/images/PROF_PIC.png';
-                        existingPositions.push(officer.position);  // Add the officer's position to existing positions
-
-                        if (officer.position === 'President' || officer.position === 'Vice President') {
-                            topRow.append(`
-                                <div class="officer-card">
-                                    <img src="${profilePicPath}" alt="${officer.fullName}">
-                                    <h6>${officer.fullName}</h6>
-                                    <p>${officer.position}</p>
-                                </div>
-                            `);
-                        } else {
-                            bottomRow.append(`
-                                <div class="officer-card">
-                                    <img src="${profilePicPath}" alt="${officer.fullName}">
-                                    <h6>${officer.fullName}</h6>
-                                    <p>${officer.position}</p>
-                                </div>
-                            `);
-                        }
+                        existingPositions[officer.position] = officer;  // Store the officer by position
                     });
 
+                    // Render officers in the specified order
+                    positions.forEach(position => {
+                        if (existingPositions[position]) {
+                            const officer = existingPositions[position];
+                            const profilePicPath = officer.profilePic ? `/esas/esas_student/images/${officer.profilePic}` : '/esas/esas_student/images/PROF_PIC.png';
+                            
+                            if (position === 'President' || position === 'Vice President') {
+                                topRow.append(`
+                                    <div class="officer-card">
+                                        <img src="${profilePicPath}" alt="${officer.fullName}">
+                                        <h6>${officer.fullName}</h6>
+                                        <p>${officer.position}</p>
+                                    </div>
+                                `);
+                            } else {
+                                bottomRow.append(`
+                                    <div class="officer-card">
+                                        <img src="${profilePicPath}" alt="${officer.fullName}">
+                                        <h6>${officer.fullName}</h6>
+                                        <p>${officer.position}</p>
+                                    </div>
+                                `);
+                            }
+                        } else {
+                            // If no officer is found for this position, add a placeholder
+                            if (position === 'President' || position === 'Vice President') {
+                                topRow.append(`
+                                    <div class="officer-card">
+                                        <img src="/esas/esas_student/images/PROF_PIC.png" alt="No ${position} selected">
+                                        <h6>None</h6>
+                                        <p>${position}</p>
+                                    </div>
+                                `);
+                            } else {
+                                bottomRow.append(`
+                                    <div class="officer-card">
+                                        <img src="/esas/esas_student/images/PROF_PIC.png" alt="No ${position} selected">
+                                        <h6>None</h6>
+                                        <p>${position}</p>
+                                    </div>
+                                `);
+                            }
+                        }
+                    });
                 } else {
                     bottomRow.append(`<p>${response.message}</p>`);
                 }
-
-                // Display placeholder cards for each officer position not filled
-                positions.forEach(position => {
-                    if (!existingPositions.includes(position)) {  // Only add placeholders for positions not already filled
-                        if (position === 'President' || position === 'Vice President') {
-                            topRow.append(`
-                                <div class="officer-card">
-                                    <img src="/esas/esas_student/images/PROF_PIC.png" alt="No ${position} selected">
-                                    <p class="text-danger mt-2"><em>No student</em></p>
-                                    <p>${position}</p>
-                                </div>
-                            `);
-                        } else {
-                            bottomRow.append(`
-                                <div class="officer-card">
-                                    <img src="/esas/esas_student/images/PROF_PIC.png" alt="No ${position} selected">
-                                    <p class="text-danger mt-2"><em>No student</em></p>
-                                    <p>${position}</p>
-                                </div>
-                            `);
-                        }
-                    }
-                });
 
                 // If there are no officers at all, display all positions with placeholders
                 if (officers.length === 0) {
@@ -156,7 +159,7 @@ $(document).ready(function() {
                             topRow.append(`
                                 <div class="officer-card">
                                     <img src="/esas/esas_student/images/PROF_PIC.png" alt="No ${position} selected">
-                                    <h6>No ${position} selected</h6>
+                                    <h6>None</h6>
                                     <p>${position}</p>
                                 </div>
                             `);
@@ -164,7 +167,7 @@ $(document).ready(function() {
                             bottomRow.append(`
                                 <div class="officer-card">
                                     <img src="/esas/esas_student/images/PROF_PIC.png" alt="No ${position} selected">
-                                    <h6>No ${position} selected</h6>
+                                    <h6>None</h6>
                                     <p>${position}</p>
                                 </div>
                             `);
@@ -185,4 +188,5 @@ $(document).ready(function() {
         return urlParams.get(param);
     }
 });
+
 </script>
