@@ -394,6 +394,8 @@ unset($pdo);
                 <div class="d-flex justify-content-end mb-3">
                     <button class="btn btn-custom" onclick="showContent('posts')">Posts</button>
                     <button class="btn btn-custom" onclick="showContent('events')">Events</button>
+                    <button class="btn btn-custom" onclick="showContent('about')">About</button>
+                    <button class="btn btn-custom" onclick="showContent('officers')">Officers</button>
                     <button class="btn btn-custom" onclick="showContent('chats')">Chats</button>
                 </div>
 
@@ -458,6 +460,16 @@ unset($pdo);
                     <!-- EVENTS DISPLAY -->
                     <div id="events" class="p-0" style="display: none;"> <!-- style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: none;"-->
                         <?php include '../public/components/events.php' ?>
+                    </div>
+
+                    <!-- ABOUT DISPLAY -->
+                    <div id="about" class="p-0" style="display: none;">
+                            <?php include './components/about.php' ?>
+                    </div>
+
+                    <!-- OFFICERS DISPLAY -->
+                    <div id="officers" class="p-0" style="display: none;">
+                            <?php include './components/officers.php' ?>
                     </div>
 
                     <!-- CHATS DISPLAY -->
