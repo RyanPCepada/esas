@@ -19,7 +19,7 @@
     }
 
     .officer-card {
-        min-width: 150px;
+        min-width: 190px;
         border: 1px solid #ddd; 
         border-radius: 8px; 
         padding: 10px; 

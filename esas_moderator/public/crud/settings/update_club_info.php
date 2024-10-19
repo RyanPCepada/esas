@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                                 </label>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Update Club</button>
+                        <button type="submit" class="btn btn-primary mb-3">Update Club</button>
                     </form>
                 </li>
             <?php endforeach; ?>
