@@ -52,6 +52,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Attempt to execute the prepared statement
         if ($stmt->execute()) {
+            // Retrieve the club name for logging
+            $clubSql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
+            $clubStmt = $pdo->prepare($clubSql);
+            $clubStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+            $clubStmt->execute();
+
+            // Fetch the club name
+            $club = $clubStmt->fetch(PDO::FETCH_ASSOC);
+            $clubName = $club['clubName'] ?? 'Unknown Club'; // Default value if club not found
+
+            // Log the deletion activity
+            $activity = "You deleted your comment in a post in $clubName";
+            $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
+                        VALUES (:activity, NOW(), :admin_id, NULL, :student_id)";
+            $logStmt = $pdo->prepare($logSQL);
+            $logStmt->bindParam(":activity", $activity);
+            $logStmt->bindParam(":admin_id", $adminId); // Ensure $adminId is defined
+            $logStmt->bindParam(":student_id", $student_id);
+            $logStmt->execute();
+
             // Correct the redirect URL to include the full path
             $redirect_url = '/esas/esas_student/home.php?club_id=' . urlencode($club_id);
             echo json_encode(['success' => true, 'message' => 'Comment deleted successfully.', 'redirect_url' => $redirect_url]);
@@ -65,6 +85,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Close statement
     unset($stmt);
+    unset($clubStmt); // Unset club statement
+    unset($logStmt); // Unset log statement
 }
 
 // Close connection (if not using persistent connection)
