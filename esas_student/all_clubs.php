@@ -111,16 +111,46 @@ try {
             background: linear-gradient(to top right, rgba(0,0,0,0.6), rgba(255,255,255,0.2));
         }
 
-        .card small {
+        .card .members-count {
             position: absolute;
-            top: 5px;
-            right: 5px;
+            top: 0px;
+            right: 0px;
             color: white;
             padding: 8px;
             font-size: 14px;
             cursor: pointer;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Shadow effect */
         }
+
+        .card .slots-count {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            color: white;
+            padding: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Shadow effect */
+            border-radius: 4px; /* Rounded corners */
+            z-index: 10;
+        }
+
+        .slots-unlimited {
+            background-color: #1E90FF; /* Dodger Blue */
+            background-color: rgba(30, 144, 255, 0.8); /* Dodger Blue with 80% opacity */
+            background-color: rgba(40, 167, 69, 0.8); /* Green with 80% opacity */
+            background-color: #28a745; /* Green for Unlimited */
+        }
+
+        .slots-remaining {
+            background-color: rgba(0, 0, 0, 0.6); /* Dark semi-transparent for remaining slots */
+            background-color: rgba(65, 105, 225, 0.8); /* Royal Blue with 80% opacity */
+        }
+
+        .slots-full {
+            background-color: red; /* Red for Full */
+        }
+
         .overlay-text {
             position: absolute;
             bottom: 0;
@@ -136,51 +166,13 @@ try {
         .overlay-text h4 {
             margin: 7px;
             font-size: 25px;
+            font-size: 22px;
             line-height: 1.1;
         }
         .overlay-text p {
             margin: 5px 0 0;
             font-size: 14px;
         }
-
-
-        @media (max-width: 767px) {
-            
-            .mainbar {
-                padding: 10px;
-            }
-            .mainbar h2 {
-                margin-bottom: 16px;
-                margin-left: 0px;
-            }
-            .card-body {
-                padding: 0px !important; 
-                max-width: 100%; 
-            }
-            .card-img-only-all {
-                width: 315px;
-                height: 177px;
-                width: auto;
-                height: 145px;
-                margin-top: 10px;
-
-                /* temporary manipulation, can't figure out the reason of card padding behaviour */
-                /* width: 280px !important;
-                height: 157px;
-                margin-left: -6px; */
-            }
-            #departmentSelect {
-                width: 30% !important;
-            }
-            .table-striped {
-                margin-top: 10px;
-            }
-            #allClubsContainer {
-                margin-top: -20px !important;
-            }
-        }
-
-
 
 
 
@@ -222,13 +214,6 @@ try {
             max-width: 16.66%;
         }
 
-        /* Media query for mobile screens (2 cards per row) */
-        @media (max-width: 768px) {
-            .officers-link {
-                margin-left: 0px !important;
-            }
-        }
-
 
 
         .myclubs-notification-badge {
@@ -253,6 +238,51 @@ try {
             position: relative; /* This makes the span position relative to the button */
         }
 
+
+        
+
+        @media (max-width: 767px) {
+            
+            .mainbar {
+                padding: 10px;
+            }
+            .mainbar h2 {
+                margin-bottom: 16px;
+                margin-left: 0px;
+            }
+            .card-body {
+                padding: 0px !important; 
+                max-width: 100%; 
+            }
+            .card-img-only-all {
+                width: 315px;
+                height: 177px;
+                width: auto;
+                height: 145px;
+                margin-top: 10px;
+
+                /* temporary manipulation, can't figure out the reason of card padding behaviour */
+                /* width: 280px !important;
+                height: 157px;
+                margin-left: -6px; */
+            }
+            #departmentSelect {
+                width: 30% !important;
+            }
+            .table-striped {
+                margin-top: 10px;
+            }
+            #allClubsContainer {
+                margin-top: -20px !important;
+            }
+        }
+
+        /* Media query for mobile screens (2 cards per row) */
+        @media (max-width: 768px) {
+            .officers-link {
+                margin-left: 0px !important;
+            }
+        }
         
     </style>
 </head>
@@ -453,12 +483,35 @@ try {
                     if (totalRows > 0) {
                         data.forEach(club => {
                             const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
+
+                            let slotsText = '';
+                            let slotsClass = '';
+                            
+                            // Determine the slotsText and slotsClass based on the club's slotsRemaining
+                            if (club.slotsRemaining === null || club.slotsRemaining === undefined) {
+                                slotsText = 'Unlimited slots';
+                                slotsClass = 'slots-unlimited'; // Green background
+                            } else if (club.slotsRemaining === 0) {
+                                slotsText = 'Full';
+                                slotsClass = 'slots-full'; // Red background
+                            } else if (club.slotsRemaining === 1) {
+                                slotsText = '1 slot remaining';
+                                slotsClass = 'slots-remaining'; // Standard remaining background
+                            } else if (club.slotsRemaining > 1) {
+                                slotsText = `${club.slotsRemaining} slots remaining`;
+                                slotsClass = 'slots-remaining'; // Standard remaining background
+                            }
+
+                            // Generate HTML for each club card
                             const cardHTML = `
                                 <div class="col-md-4 card-container club-card" data-club-name="${club.clubName}">
                                     <div class="card card-img-only-all">
-                                        <small data-toggle="tooltip" title="${memberText}">
+                                        <small class="members-count" data-toggle="tooltip" title="${memberText}">
                                             <i class="fa fa-user mr-1"></i>${club.membersCount}
                                         </small>
+                                        ${slotsText ? `<small class="slots-count ${slotsClass}" data-toggle="tooltip" title="${slotsText}">
+                                            <i class="fa fa-check-circle mr-1"></i>${slotsText}
+                                        </small>` : ''}
                                         <a href="/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
                                             <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
                                             <div class="overlay-text">

@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                             <textarea class="form-control" id="information" name="information" rows="4" required><?php echo htmlspecialchars($club['information']); ?></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="slots">Slots</label>
+                            <label for="slots">Membership Limit</label>
                             <input type="number" class="form-control" id="slots" name="slots" value="<?php echo htmlspecialchars($club['slots']); ?>" style="width: 40%;">
                         </div>
                         <div class="form-group">
