@@ -86,6 +86,7 @@ if ($clubId) {
         }
     }
 }
+
 // Handle recommendations
 if (!empty($_POST['recommendedDepartments'])) {
     // First, delete existing recommendations for the club
@@ -103,6 +104,13 @@ if (!empty($_POST['recommendedDepartments'])) {
             $insertStmt->bindParam(":department", $department);
             $insertStmt->execute();
         }
+    }
+} else {
+    // If no departments are selected, delete all existing recommendations
+    $deleteRecommendationsSql = "DELETE FROM tbl_club_recommendations WHERE club_id = :clubId";
+    if ($deleteStmt = $pdo->prepare($deleteRecommendationsSql)) {
+        $deleteStmt->bindParam(":clubId", $clubId);
+        $deleteStmt->execute();
     }
 }
 
