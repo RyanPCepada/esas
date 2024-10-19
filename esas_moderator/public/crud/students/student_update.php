@@ -61,12 +61,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $activity = "You updated " . htmlspecialchars($student['firstName'] . ' ' . $student['lastName']) . " status into " . htmlspecialchars($status);
 
             // Insert activity log
-            $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, student_id, admin_id, moderator_id) 
-                        VALUES (:activity, NOW(), :student_id, :admin_id, :moderator_id)";
+            $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) 
+                        VALUES (:activity, NOW(), :moderator_id)";
             $logStmt = $pdo->prepare($logSql);
             $logStmt->bindParam(":activity", $activity);
-            $logStmt->bindParam(":student_id", $student_id);
-            $logStmt->bindParam(":admin_id", $admin_id); // Replace with the actual admin ID
+            // $logStmt->bindParam(":student_id", $student_id);
+            // $logStmt->bindParam(":admin_id", $admin_id); // Replace with the actual admin ID
             $logStmt->bindParam(":moderator_id", $moderator_id); // Replace with the actual moderator ID
             $logStmt->execute(); // Execute the logging statement
 
