@@ -61,12 +61,14 @@ function getClubOfficers($pdo, $clubId) {
 // Process form submission for updating club officers
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     $clubId = $_POST['club_id'];
-    $president_id = $_POST['president'] ?? null;
-    $vice_president_id = $_POST['vice_president'] ?? null;
-    $secretary_id = $_POST['secretary'] ?? null;
-    $treasurer_id = $_POST['treasurer'] ?? null;
-    $pio_id = $_POST['pio'] ?? null;
-    $srgtAtArms_id = $_POST['srgt_at_arms'] ?? null;
+    
+    // Assign values from POST and set to NULL if empty
+    $president_id = !empty($_POST['president']) ? $_POST['president'] : null;
+    $vice_president_id = !empty($_POST['vice_president']) ? $_POST['vice_president'] : null;
+    $secretary_id = !empty($_POST['secretary']) ? $_POST['secretary'] : null;
+    $treasurer_id = !empty($_POST['treasurer']) ? $_POST['treasurer'] : null;
+    $pio_id = !empty($_POST['pio']) ? $_POST['pio'] : null;
+    $srgtAtArms_id = !empty($_POST['srgt_at_arms']) ? $_POST['srgt_at_arms'] : null;
 
     // Fetch the club name for logging purposes
     $clubNameSql = "SELECT clubName FROM tbl_clubs WHERE club_id = ?";
@@ -138,88 +140,88 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                         <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($club['club_id']); ?>">
 
                         <!-- President -->
-<div class="form-group">
-    <label for="president">President</label>
-    <select class="form-control" id="president" name="president">
-        <option value="">Select President</option>
-        <?php foreach ($activeMembers as $member): ?>
-            <option value="<?php echo $member['student_id']; ?>" 
-                <?php echo (isset($officers['president']) && $member['student_id'] == $officers['president']) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-</div>
+                        <div class="form-group">
+                            <label for="president">President</label>
+                            <select class="form-control" id="president" name="president">
+                                <option value="">Select President</option>
+                                <?php foreach ($activeMembers as $member): ?>
+                                    <option value="<?php echo $member['student_id']; ?>" 
+                                        <?php echo (isset($officers['president']) && $member['student_id'] == $officers['president']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-<!-- Vice President -->
-<div class="form-group">
-    <label for="vice_president">Vice President</label>
-    <select class="form-control" id="vice_president" name="vice_president">
-        <option value="">Select Vice President</option>
-        <?php foreach ($activeMembers as $member): ?>
-            <option value="<?php echo $member['student_id']; ?>" 
-                <?php echo (isset($officers['vicePresident']) && $member['student_id'] == $officers['vicePresident']) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-</div>
+                        <!-- Vice President -->
+                        <div class="form-group">
+                            <label for="vice_president">Vice President</label>
+                            <select class="form-control" id="vice_president" name="vice_president">
+                                <option value="">Select Vice President</option>
+                                <?php foreach ($activeMembers as $member): ?>
+                                    <option value="<?php echo $member['student_id']; ?>" 
+                                        <?php echo (isset($officers['vicePresident']) && $member['student_id'] == $officers['vicePresident']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-<!-- Secretary -->
-<div class="form-group">
-    <label for="secretary">Secretary</label>
-    <select class="form-control" id="secretary" name="secretary">
-        <option value="">Select Secretary</option>
-        <?php foreach ($activeMembers as $member): ?>
-            <option value="<?php echo $member['student_id']; ?>" 
-                <?php echo (isset($officers['secretary']) && $member['student_id'] == $officers['secretary']) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-</div>
+                        <!-- Secretary -->
+                        <div class="form-group">
+                            <label for="secretary">Secretary</label>
+                            <select class="form-control" id="secretary" name="secretary">
+                                <option value="">Select Secretary</option>
+                                <?php foreach ($activeMembers as $member): ?>
+                                    <option value="<?php echo $member['student_id']; ?>" 
+                                        <?php echo (isset($officers['secretary']) && $member['student_id'] == $officers['secretary']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-<!-- Treasurer -->
-<div class="form-group">
-    <label for="treasurer">Treasurer</label>
-    <select class="form-control" id="treasurer" name="treasurer">
-        <option value="">Select Treasurer</option>
-        <?php foreach ($activeMembers as $member): ?>
-            <option value="<?php echo $member['student_id']; ?>" 
-                <?php echo (isset($officers['treasurer']) && $member['student_id'] == $officers['treasurer']) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-</div>
+                        <!-- Treasurer -->
+                        <div class="form-group">
+                            <label for="treasurer">Treasurer</label>
+                            <select class="form-control" id="treasurer" name="treasurer">
+                                <option value="">Select Treasurer</option>
+                                <?php foreach ($activeMembers as $member): ?>
+                                    <option value="<?php echo $member['student_id']; ?>" 
+                                        <?php echo (isset($officers['treasurer']) && $member['student_id'] == $officers['treasurer']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-<!-- PIO -->
-<div class="form-group">
-    <label for="pio">PIO</label>
-    <select class="form-control" id="pio" name="pio">
-        <option value="">Select PIO</option>
-        <?php foreach ($activeMembers as $member): ?>
-            <option value="<?php echo $member['student_id']; ?>" 
-                <?php echo (isset($officers['pio']) && $member['student_id'] == $officers['pio']) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-</div>
+                        <!-- PIO -->
+                        <div class="form-group">
+                            <label for="pio">PIO</label>
+                            <select class="form-control" id="pio" name="pio">
+                                <option value="">Select PIO</option>
+                                <?php foreach ($activeMembers as $member): ?>
+                                    <option value="<?php echo $member['student_id']; ?>" 
+                                        <?php echo (isset($officers['pio']) && $member['student_id'] == $officers['pio']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-<!-- Sergeant at Arms -->
-<div class="form-group">
-    <label for="srgt_at_arms">Sergeant at Arms</label>
-    <select class="form-control" id="srgt_at_arms" name="srgt_at_arms">
-        <option value="">Select Sergeant at Arms</option>
-        <?php foreach ($activeMembers as $member): ?>
-            <option value="<?php echo $member['student_id']; ?>" 
-                <?php echo (isset($officers['srgtAtArms']) && $member['student_id'] == $officers['srgtAtArms']) ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-</div>
+                        <!-- Sergeant at Arms -->
+                        <div class="form-group">
+                            <label for="srgt_at_arms">Sergeant at Arms</label>
+                            <select class="form-control" id="srgt_at_arms" name="srgt_at_arms">
+                                <option value="">Select Sergeant at Arms</option>
+                                <?php foreach ($activeMembers as $member): ?>
+                                    <option value="<?php echo $member['student_id']; ?>" 
+                                        <?php echo (isset($officers['srgtAtArms']) && $member['student_id'] == $officers['srgtAtArms']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
 
                         <button type="submit" class="btn btn-primary mb-3">Update Officers</button>
