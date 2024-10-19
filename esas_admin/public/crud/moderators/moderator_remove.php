@@ -57,7 +57,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm'])) {
             $admin_id = $_SESSION['admin_id']; // Assuming admin_id is stored in session
             
             $log_stmt = $pdo->prepare("INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (?, NOW(), ?, ?, ?)");
-            $log_stmt->execute([$activity, $admin_id, $moderator_id, null]); // Assuming student_id is not relevant here
+            // $log_stmt->execute([$activity, $admin_id, $moderator_id, null]);
+            $log_stmt->execute([$activity, $admin_id, null, null]); // Assuming student_id is not relevant here
 
         } else {
             // No rows affected, meaning the moderator wasn't assigned to this club
