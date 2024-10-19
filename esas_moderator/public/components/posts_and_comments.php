@@ -159,7 +159,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="editPostModalLabel">Edit Post</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -173,7 +173,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
         </div>
       </form>
@@ -187,7 +187,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="deletePostModalLabel">Delete Post</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -196,7 +196,7 @@
         <input type="hidden" id="deletePostId" name="post_id">
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="confirmDelete()">Delete</button>
       </div>
     </div>
