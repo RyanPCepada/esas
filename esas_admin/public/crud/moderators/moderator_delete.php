@@ -54,11 +54,10 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
 
             // Log the activity in tbl_activity_logs
             $activity = "You deleted {$moderatorFullName} from the moderator's list.";
-            $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id) VALUES (:activity, NOW(), :admin_id, :moderator_id)";
+            $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id) VALUES (:activity, NOW(), :admin_id, null)";
             $logStmt = $pdo->prepare($logSQL);
             $logStmt->bindParam(":activity", $activity);
             $logStmt->bindParam(":admin_id", $adminId);
-            $logStmt->bindParam(":moderator_id", $moderator_id);
             $logStmt->execute();
 
             // Commit the transaction
