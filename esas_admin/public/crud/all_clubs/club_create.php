@@ -196,7 +196,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
                 // Log the activity of adding the club
                 $activity = "You added " . $clubName . " to the clubs list";
-                $moderator_id = $newModeratorId; // Assuming this is the moderator's ID
+                // $moderator_id = $newModeratorId; // Assuming this is the moderator's ID
+                $moderator_id = null;
                 $student_id = null; // Replace with actual student ID if applicable
     
                 $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (:activity, NOW(), :admin_id, :moderator_id, :student_id)";
