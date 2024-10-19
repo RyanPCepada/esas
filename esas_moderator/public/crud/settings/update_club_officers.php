@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                         <div class="form-group">
                             <label for="president">President</label>
                             <select class="form-control" id="president" name="president">
-                                <option value="">Select President</option>
+                                <option value="">-- Select President --</option>
                                 <?php foreach ($activeMembers as $member): ?>
                                     <option value="<?php echo $member['student_id']; ?>" 
                                         <?php echo (isset($officers['president']) && $member['student_id'] == $officers['president']) ? 'selected' : ''; ?>>
@@ -157,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                         <div class="form-group">
                             <label for="vice_president">Vice President</label>
                             <select class="form-control" id="vice_president" name="vice_president">
-                                <option value="">Select Vice President</option>
+                                <option value="">-- Select Vice President --</option>
                                 <?php foreach ($activeMembers as $member): ?>
                                     <option value="<?php echo $member['student_id']; ?>" 
                                         <?php echo (isset($officers['vicePresident']) && $member['student_id'] == $officers['vicePresident']) ? 'selected' : ''; ?>>
@@ -171,7 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                         <div class="form-group">
                             <label for="secretary">Secretary</label>
                             <select class="form-control" id="secretary" name="secretary">
-                                <option value="">Select Secretary</option>
+                                <option value="">-- Select Secretary --</option>
                                 <?php foreach ($activeMembers as $member): ?>
                                     <option value="<?php echo $member['student_id']; ?>" 
                                         <?php echo (isset($officers['secretary']) && $member['student_id'] == $officers['secretary']) ? 'selected' : ''; ?>>
@@ -185,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                         <div class="form-group">
                             <label for="treasurer">Treasurer</label>
                             <select class="form-control" id="treasurer" name="treasurer">
-                                <option value="">Select Treasurer</option>
+                                <option value="">-- Select Treasurer --</option>
                                 <?php foreach ($activeMembers as $member): ?>
                                     <option value="<?php echo $member['student_id']; ?>" 
                                         <?php echo (isset($officers['treasurer']) && $member['student_id'] == $officers['treasurer']) ? 'selected' : ''; ?>>
@@ -199,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                         <div class="form-group">
                             <label for="pio">PIO</label>
                             <select class="form-control" id="pio" name="pio">
-                                <option value="">Select PIO</option>
+                                <option value="">-- Select PIO --</option>
                                 <?php foreach ($activeMembers as $member): ?>
                                     <option value="<?php echo $member['student_id']; ?>" 
                                         <?php echo (isset($officers['pio']) && $member['student_id'] == $officers['pio']) ? 'selected' : ''; ?>>
@@ -213,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                         <div class="form-group">
                             <label for="srgt_at_arms">Sergeant at Arms</label>
                             <select class="form-control" id="srgt_at_arms" name="srgt_at_arms">
-                                <option value="">Select Sergeant at Arms</option>
+                                <option value="">-- Select Sergeant at Arms --</option>
                                 <?php foreach ($activeMembers as $member): ?>
                                     <option value="<?php echo $member['student_id']; ?>" 
                                         <?php echo (isset($officers['srgtAtArms']) && $member['student_id'] == $officers['srgtAtArms']) ? 'selected' : ''; ?>>
