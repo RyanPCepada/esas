@@ -71,7 +71,7 @@ if ($post_id) {
             }
 
             // Log the activity in tbl_activity_logs using the moderator ID from session
-            $activity = "You deleted your post '{$postContent}' in {$clubName}.";
+            $activity = "You deleted your post '{$postContent}' in {$clubName}";
             $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) 
                        VALUES (:activity, NOW(), :moderator_id)";
             $logStmt = $pdo->prepare($logSQL);

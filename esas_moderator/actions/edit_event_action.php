@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $clubName = $club['clubName'];
 
         // Log the activity in tbl_activity_logs
-        $activity = "You updated the event '{$old_event_name}' into '{$title}' in {$clubName}.";
+        $activity = "You updated the event '{$old_event_name}' into '{$title}' in {$clubName}";
         $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) 
                    VALUES (:activity, NOW(), :moderator_id)";
         $logStmt = $pdo->prepare($logSQL);
