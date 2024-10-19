@@ -44,6 +44,23 @@ try {
         exit();
     }
 
+    // Retrieve the clubName for logging
+    $clubNameSql = "
+        SELECT clubName 
+        FROM tbl_clubs 
+        WHERE club_id = :club_id";
+    $clubNameStmt = $pdo->prepare($clubNameSql);
+    $clubNameStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+    $clubNameStmt->execute();
+    $club = $clubNameStmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$club) {
+        header("Location: ../departure_request_read.php?error=club_not_found");
+        exit();
+    }
+
+    $clubName = $club['clubName'];
+
     // Update the reason and dateRequested for the departure request
     $updateSql = "
         UPDATE tbl_departure_requests 
@@ -56,7 +73,16 @@ try {
     $updateStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
 
     if ($updateStmt->execute()) {
-        // Redirect to the home page with the club_id in the URL
+        // Log the activity
+        $activity = "You updated your departure request in {$clubName}"; // Using clubName instead of club_id
+        $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
+                   VALUES (:activity, NOW(), null, null, :student_id)";
+        $logStmt = $pdo->prepare($logSql);
+        $logStmt->bindParam(":activity", $activity);
+        $logStmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
+        $logStmt->execute(); // Execute the log insertion
+
+        // Redirect to the home page with the club_id and reason in the URL
         $redirect_url = '/esas/esas_student/crud/departure_requests/departure_request_read.php?club_id=' . urlencode($club_id) . "&reason=" . urlencode($reason);
         header("Location: $redirect_url");
         exit();
@@ -70,4 +96,4 @@ try {
     // Handle database connection or query error
     header("Location: ../departure_request_read.php?error=db_error");
     exit();
-} 
+}
