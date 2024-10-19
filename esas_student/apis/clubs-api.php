@@ -39,11 +39,15 @@ switch ($method) {
                 // Append member count and calculate remaining slots
                 foreach ($result as &$club) {
                     $club['membersCount'] = $member_count;
-                    $club['slotsRemaining'] = $club['slots'] - $member_count;
 
-                    // Ensure remaining slots can't be negative
-                    if ($club['slotsRemaining'] < 0) {
-                        $club['slotsRemaining'] = 0;
+                    // Calculate remaining slots
+                    if ($club['slots'] === null || $club['slots'] === 0) {
+                        $club['slotsRemaining'] = null; // Treat as unlimited slots
+                    } else {
+                        $club['slotsRemaining'] = $club['slots'] - $member_count;
+                        if ($club['slotsRemaining'] < 0) {
+                            $club['slotsRemaining'] = 0; // Ensure it's not negative
+                        }
                     }
 
                     // Format the moderators
@@ -82,9 +86,13 @@ switch ($method) {
                 $club['membersCount'] = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
 
                 // Calculate remaining slots
-                $club['slotsRemaining'] = $club['slots'] - $club['membersCount'];
-                if ($club['slotsRemaining'] < 0) {
-                    $club['slotsRemaining'] = 0;
+                if ($club['slots'] === null || $club['slots'] === 0) {
+                    $club['slotsRemaining'] = null; // Treat as unlimited slots
+                } else {
+                    $club['slotsRemaining'] = $club['slots'] - $club['membersCount'];
+                    if ($club['slotsRemaining'] < 0) {
+                        $club['slotsRemaining'] = 0; // Ensure it's not negative
+                    }
                 }
 
                 // Format the moderators
@@ -109,30 +117,26 @@ switch ($method) {
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Fetch counts of students for all clubs (only active members)
-foreach ($result as &$club) {
-    $stmt_count = $pdo->prepare('SELECT COUNT(DISTINCT student_id) as member_count FROM tbl_registration WHERE club_id = ? AND status = \'active\'');
-    $stmt_count->execute([$club['club_id']]);
-    $club['membersCount'] = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
+            foreach ($result as &$club) {
+                $stmt_count = $pdo->prepare('SELECT COUNT(DISTINCT student_id) as member_count FROM tbl_registration WHERE club_id = ? AND status = \'active\'');
+                $stmt_count->execute([$club['club_id']]);
+                $club['membersCount'] = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
 
-    // Check if slots are set (not null)
-    if (isset($club['slots']) && $club['slots'] !== null) {
-        // Calculate remaining slots if slots value is available
-        $club['slotsRemaining'] = $club['slots'] - $club['membersCount'];
-        
-        // Ensure remaining slots can't be negative
-        if ($club['slotsRemaining'] < 0) {
-            $club['slotsRemaining'] = 0;
-        }
-    } else {
-        // If slots are not set (null), mark it as unlimited
-        $club['slotsRemaining'] = null;
-    }
+                // Calculate remaining slots
+                if ($club['slots'] === null || $club['slots'] === 0) {
+                    $club['slotsRemaining'] = null; // Treat as unlimited slots
+                } else {
+                    $club['slotsRemaining'] = $club['slots'] - $club['membersCount'];
+                    if ($club['slotsRemaining'] < 0) {
+                        $club['slotsRemaining'] = 0; // Ensure it's not negative
+                    }
+                }
 
-    // Format the moderators
-    $moderatorNames = explode(", ", $club['moderators']);
-    $moderatorPics = explode(", ", $club['profilePics']);
-    $club['formattedModerators'] = formatModerators($moderatorNames, $moderatorPics);
-}
+                // Format the moderators
+                $moderatorNames = explode(", ", $club['moderators']);
+                $moderatorPics = explode(", ", $club['profilePics']);
+                $club['formattedModerators'] = formatModerators($moderatorNames, $moderatorPics);
+            }
 
             echo json_encode($result);
         }
