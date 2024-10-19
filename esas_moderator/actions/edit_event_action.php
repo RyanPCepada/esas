@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $eventStmt = $pdo->prepare($eventSql);
     $eventStmt->execute([':event_id' => $event_id]);
     $event = $eventStmt->fetch(PDO::FETCH_ASSOC);
-    $old_event_name = $event['title']; // Save the old event name
+    //$old_event_name = $event['title']; // Save the old event name
     
     // Update tbl_events using PDO
     $sql = "UPDATE tbl_events 
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $clubName = $club['clubName'];
 
         // Log the activity in tbl_activity_logs
-        $activity = "You updated the event '{$old_event_name}' into '{$title}' in {$clubName}";
+        $activity = "You updated the event '{$title}' information in {$clubName}";
         $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) 
                    VALUES (:activity, NOW(), :moderator_id)";
         $logStmt = $pdo->prepare($logSQL);

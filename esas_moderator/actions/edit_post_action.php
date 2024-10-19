@@ -62,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmt->execute()) {
                 // Format the activity message
                 $activity = "You edited your post '" . (strlen($old_post_content) > 70 ? substr($old_post_content, 0, 67) . "..." : $old_post_content) . 
-                            "' into '" . (strlen($post_content) > 70 ? substr($post_content, 0, 67) . "..." : $post_content) . 
                             "' in NBSC Quick Response Team";
 
                 // Log the activity in tbl_activity_logs using the moderator ID from session
