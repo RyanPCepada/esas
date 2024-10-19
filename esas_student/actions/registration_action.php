@@ -59,32 +59,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check input errors before inserting into the database
     if (empty($question1_err) && empty($question2_err) && empty($question3_err) && empty($club_id_err)) {
-        // Prepare an insert statement
-        $sql = "INSERT INTO tbl_registration (student_id, question1, question2, question3, status, club_id) 
-                VALUES (:student_id, :question1, :question2, :question3, :status, :club_id)";
+        // Fetch the club name based on the club ID
+        $clubSql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
+        $clubStmt = $pdo->prepare($clubSql);
+        $clubStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $clubStmt->execute();
+        $club = $clubStmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($club) {
+            $clubName = $club['clubName'];
 
-        $stmt = $pdo->prepare($sql);
+            // Prepare an insert statement
+            $sql = "INSERT INTO tbl_registration (student_id, question1, question2, question3, status, club_id) 
+                    VALUES (:student_id, :question1, :question2, :question3, :status, :club_id)";
 
-        // Bind variables to the prepared statement as parameters
-        $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
-        $stmt->bindParam(":question1", $question1);
-        $stmt->bindParam(":question2", $question2);
-        $stmt->bindParam(":question3", $question3);
-        $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+            $stmt = $pdo->prepare($sql);
 
-        // Add status with default value "pending"
-        $status = 'pending';
-        $stmt->bindParam(":status", $status);
+            // Bind variables to the prepared statement as parameters
+            $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
+            $stmt->bindParam(":question1", $question1);
+            $stmt->bindParam(":question2", $question2);
+            $stmt->bindParam(":question3", $question3);
+            $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
 
-        // Attempt to execute the prepared statement
-        if ($stmt->execute()) {
-            // Records created successfully. Redirect to landing page
-            echo "<script>alert('Registration successful!');</script>";
-            echo "<script>window.location.href = '/esas/esas_student/all_clubs.php';</script>";
-            exit();
+            // Add status with default value "pending"
+            $status = 'pending';
+            $stmt->bindParam(":status", $status);
+
+            // Attempt to execute the prepared statement
+            if ($stmt->execute()) {
+                // Log the activity in tbl_activity_logs
+                $activity = "You submitted an application to join $clubName";
+                $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, student_id) VALUES (:activity, NOW(), :student_id)";
+                $logStmt = $pdo->prepare($logSql);
+                $logStmt->bindParam(":activity", $activity);
+                $logStmt->bindParam(":student_id", $student_id);
+                $logStmt->execute(); // Execute the log insertion
+
+                // Records created successfully. Redirect to landing page
+                echo "<script>alert('Registration successful!');</script>";
+                echo "<script>window.location.href = '/esas/esas_student/all_clubs.php';</script>";
+                exit();
+            } else {
+                echo "Oops! Something went wrong. Please try again later.";
+                // Debug: echo $stmt->errorInfo(); // Uncomment for debugging
+            }
         } else {
-            echo "Oops! Something went wrong. Please try again later.";
-            // Debug: echo $stmt->errorInfo(); // Uncomment for debugging
+            echo "Club not found."; // Handle the case where the club ID does not exist
         }
     }
 
