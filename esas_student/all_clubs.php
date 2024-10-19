@@ -498,7 +498,7 @@ try {
                                 slotsText = '1 slot remaining';
                                 slotsClass = 'slots-remaining'; // Standard remaining background
                             } else if (club.slotsRemaining > 1) {
-                                slotsText = `${club.slotsRemaining} slots remaining`;
+                                slotsText = `${club.slotsRemaining} slots available`;
                                 slotsClass = 'slots-remaining'; // Standard remaining background
                             }
 
