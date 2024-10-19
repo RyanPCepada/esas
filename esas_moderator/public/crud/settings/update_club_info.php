@@ -10,7 +10,7 @@ $moderator_id = $_SESSION['moderator_id'];
 
 // Fetch clubs handled by the active moderator
 $sql = "
-    SELECT c.club_id, c.clubName, c.information, c.coverPhoto 
+    SELECT c.club_id, c.clubName, c.information, c.coverPhoto, c.slots 
     FROM tbl_clubs AS c
     JOIN tbl_clubs_and_moderators AS cm ON c.club_id = cm.club_id
     WHERE cm.moderator_id = ?
@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     $clubName = $_POST['clubName'];
     $information = $_POST['information'];
     $coverPhoto = $_FILES['coverPhoto']['name'] ? $_FILES['coverPhoto']['name'] : null;
+    $slots = $_POST['slots']; // Retrieve the slots value from the form
 
     // Handle cover photo upload
     if ($coverPhoto) {
@@ -52,11 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     // Update club information
     $updateSql = "
         UPDATE tbl_clubs 
-        SET clubName = ?, information = ?, coverPhoto = COALESCE(?, coverPhoto), dateModified = NOW() 
+        SET clubName = ?, information = ?, coverPhoto = COALESCE(?, coverPhoto), slots = ?, dateModified = NOW() 
         WHERE club_id = ?";
     
     $updateStmt = $pdo->prepare($updateSql);
-    if ($updateStmt->execute([$clubName, $information, $fileName ?? null, $clubId])) {
+    if ($updateStmt->execute([$clubName, $information, $fileName ?? null, $slots, $clubId])) {
         // Log the activity after a successful update
         $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
         $logStmt = $pdo->prepare($logSql);
@@ -74,7 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     }
 }
 ?>
-
 
 <h4 class="text-muted mb-3">Update Club Information</h4>
 
@@ -97,8 +97,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                             <textarea class="form-control" id="information" name="information" rows="4" required><?php echo htmlspecialchars($club['information']); ?></textarea>
                         </div>
                         <div class="form-group">
+                            <label for="slots">Slots</label>
+                            <input type="number" class="form-control" id="slots" name="slots" value="<?php echo htmlspecialchars($club['slots']); ?>" style="width: 40%;">
+                        </div>
+                        <div class="form-group">
                             <label for="coverPhoto">Cover Photo</label>
-                            
                             <div class="cover-photo-container d-flex align-items-start">
                                 <?php if (!empty($club['coverPhoto'])): ?>
                                     <div class="mb-2">
@@ -122,8 +125,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
 <?php else: ?>
     <p>No clubs found for this moderator.</p>
 <?php endif; ?>
-
-
 
 <script>
     function updateImagePreview(input, imgTag) {
