@@ -79,10 +79,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Prepare the activity log entry
             $activity = "You edited your comment in a post in $clubName";
             $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
-                        VALUES (:activity, NOW(), :admin_id, NULL, :student_id)";
+                        VALUES (:activity, NOW(), NULL, NULL, :student_id)";
             $logStmt = $pdo->prepare($logSQL);
             $logStmt->bindParam(":activity", $activity);
-            $logStmt->bindParam(":admin_id", $adminId); // Ensure $adminId is defined
             $logStmt->bindParam(":student_id", $student_id);
             $logStmt->execute();
 
