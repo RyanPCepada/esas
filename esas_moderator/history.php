@@ -30,6 +30,24 @@ $stmt_activities = $pdo->prepare($sql_activities);
 $stmt_activities->execute([$moderator_id]);
 $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activities
 
+// Handle deletion if form is submitted
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
+    // Get activity IDs from the submitted form
+    if (!empty($_POST['activity_ids'])) {
+        $activity_ids = $_POST['activity_ids'];
+        
+        // Prepare a statement for deletion
+        $placeholders = implode(',', array_fill(0, count($activity_ids), '?'));
+        $sql_delete = "DELETE FROM tbl_activity_logs WHERE activity_id IN ($placeholders)";
+        $stmt_delete = $pdo->prepare($sql_delete);
+        $stmt_delete->execute($activity_ids);
+        
+        // Redirect to the same page to refresh the list
+        header("Location: history.php");
+        exit;
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -66,17 +84,39 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
         .activity-card {
             margin-bottom: 10px; /* Spacing between cards */
             padding: 10px 15px; /* Smaller padding for the card */
-            /* border: 1px solid #ddd; Border for the card */
             border-radius: 5px; /* Rounded corners */
             background-color: #ffffff; /* White background */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* Align items at the start */
         }
-        .activity-card .activity-title {
+        .activity-card input[type="checkbox"] {
+            margin-right: 10px;
+            align-self: flex-start; /* Align checkbox at the top */
+        }
+        .activity-content {
+            flex-grow: 1; /* Allow content to grow */
+        }
+        .activity-title {
             font-weight: bold;
         }
-        .activity-card .activity-date {
+        .activity-date {
             font-size: 0.85rem;
             color: #6c757d; /* Muted text color */
+        }
+        .history-delete-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: darkgrey;
+            margin-left: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        .history-delete-btn:hover {
+            background-color: grey;
         }
     </style>
 </head>
@@ -86,21 +126,34 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
         <h2 class="mt-5">History</h2>
         <p class="text-muted">All your interactions within the system</p>
 
-        <div class="container-fluid container auto-scroll">
-            <div class="row">
-                <!-- Activity cards -->
-                <?php if ($activities): ?>
-                    <?php foreach ($activities as $activity): ?>
-                        <div class="activity-card">
-                            <div class="activity-title"><?php echo htmlspecialchars($activity['activity']); ?></div>
-                            <div class="activity-date"><?php echo htmlspecialchars(date('F j, Y | g:i A', strtotime($activity['dateAdded']))); ?></div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="text-center">No activities found.</div>
-                <?php endif; ?>
+        <form method="post" action="">
+            <div class="container-fluid container auto-scroll">
+                <div class="row">
+                    <!-- Activity cards -->
+                    <?php if ($activities): ?>
+                        <?php foreach ($activities as $activity): ?>
+                            <div class="activity-card">
+                                <input class="mt-1" type="checkbox" name="activity_ids[]" value="<?php echo htmlspecialchars($activity['activity_id']); ?>">
+                                <div class="activity-content">
+                                    <div class="activity-title"><?php echo htmlspecialchars($activity['activity']); ?></div>
+                                    <div class="activity-date"><?php echo htmlspecialchars(date('F j, Y | g:i A', strtotime($activity['dateAdded']))); ?></div>
+                                </div>
+                                <div class="history-delete-btn">
+                                    <a href="delete_activity.php?id=<?php echo htmlspecialchars($activity['activity_id']); ?>" onclick="return confirm('Are you sure you want to delete this activity?');"
+                                    style="color: white; text-decoration: none;">x</a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="text-center">No activities found.</div>
+                    <?php endif; ?>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" name="delete" class="btn btn-danger">Delete Selected</button>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 </body>
 </html>
+  
