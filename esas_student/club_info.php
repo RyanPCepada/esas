@@ -1,4 +1,4 @@
-<?php
+<?php 
 // Start the session
 session_start();
 
@@ -15,6 +15,8 @@ $coverPhoto = '';
 $dateAdded = '';
 $moderators = '';
 $membersCount = '';
+$slots = ''; // Initialize slots variable
+$availableSlots = ''; // Initialize available slots variable
 
 // Fetch the current student's ID from the session
 if (isset($_SESSION['student_id'])) {
@@ -50,51 +52,49 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
     try {
         // Prepare SQL query to fetch club information and moderators' profile pictures
         $stmt = $pdo->prepare("
-            SELECT c.clubName, c.information, c.coverPhoto, c.dateAdded,
-                GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', COALESCE(m.middleName, ''), ' ', m.lastName) ORDER BY m.firstName SEPARATOR '|') AS moderatorNames,
-                GROUP_CONCAT(DISTINCT m.profilePic ORDER BY m.firstName SEPARATOR '|') AS moderatorPics,
-                COUNT(DISTINCT CASE WHEN r.status = 'active' THEN r.student_id END) AS membersCount,  -- Count only active members
+            SELECT c.clubName, c.information, c.coverPhoto, c.dateAdded, c.slots, 
+                m.firstName, m.middleName, m.lastName, m.profilePic,
+                COUNT(DISTINCT CASE WHEN r.status = 'active' THEN r.student_id END) AS membersCount,
                 COUNT(DISTINCT m.moderator_id) AS numModerators
             FROM tbl_clubs c
-            LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id  -- Join with tbl_clubs_and_moderators
-            LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id   -- Join moderators through the junction table
+            LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+            LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
             LEFT JOIN tbl_registration r ON c.club_id = r.club_id
             WHERE c.club_id = ?
-            GROUP BY c.club_id
+            GROUP BY m.moderator_id
+            ORDER BY m.firstName
         ");
         $stmt->execute([$club_id]);
-        $club = $stmt->fetch(PDO::FETCH_ASSOC);
+        $moderatorsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Fetch the club information
-        if ($club) {
+        if (!empty($moderatorsData)) {
+            $club = $moderatorsData[0]; // Get the first row for club info
             $clubName = htmlspecialchars($club['clubName']);
             $information = htmlspecialchars_decode($club['information']); // Decode HTML entities
             $coverPhoto = htmlspecialchars($club['coverPhoto']);
             $dateAdded = htmlspecialchars($club['dateAdded']);
             $membersCount = htmlspecialchars($club['membersCount']);
-            
-            // Safely process moderators' names and profile pictures
-            $moderatorNames = !empty($club['moderatorNames']) ? explode('|', $club['moderatorNames']) : [];
-            $moderatorPics = !empty($club['moderatorPics']) ? explode('|', $club['moderatorPics']) : [];
-            $numModerators = isset($club['numModerators']) ? $club['numModerators'] : 0;
+            $slots = htmlspecialchars($club['slots']); // Fetch and sanitize slots
+
+            // Calculate available slots
+            $activeMembersCount = (int)$membersCount; // Convert to integer for calculation
+            $availableSlots = max(0, $slots - $activeMembersCount); // Ensure no negative slots
 
             // Generate moderators HTML
             $moderators = '';
-            if ($numModerators > 0) {
-                foreach ($moderatorNames as $index => $name) {
-                    $pic = isset($moderatorPics[$index]) ? htmlspecialchars($moderatorPics[$index]) : '';
-                    $moderators .= '
-                    <div class="moderator-item">
-                        <img src="/esas/esas_moderator/images/' . $pic . '" alt="Profile Pic" class="moderator-pic">
-                        <p class="moderator-name">' . htmlspecialchars($name) . '</p>
-                    </div>';
-                }
-            } else {
-                // If there are no moderators, show "None"
-                $moderators = '<h4 class="text-muted">None</h4>';
+            foreach ($moderatorsData as $club) {
+                $name = htmlspecialchars($club['firstName'] . ' ' . ($club['middleName'] ? $club['middleName'] . ' ' : '') . htmlspecialchars($club['lastName']));
+                $pic = htmlspecialchars($club['profilePic']);
+                $moderators .= '
+                <div class="moderator-item">
+                    <img src="/esas/esas_moderator/images/' . $pic . '" alt="Profile Pic" class="moderator-pic">
+                    <p class="moderator-name">' . $name . '</p>
+                </div>';
             }
 
             // Set the correct label for moderators
+            $numModerators = count($moderatorsData);
             $moderatorsLabel = ($numModerators <= 1) ? 'Moderator:' : 'Moderators:';
 
             // Format the date into "Month Year"
@@ -110,15 +110,8 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             $information = 'No information available for this club.';
         }
 
-
-
         // Fetch the student's registration status for the current club
-        $stmt = $pdo->prepare("
-        SELECT status, registration_id 
-        FROM tbl_registration 
-        WHERE student_id = :student_id 
-        AND club_id = :club_id 
-        ORDER BY registration_id DESC LIMIT 1"); // Fetch the latest registration
+        $stmt = $pdo->prepare("SELECT status, registration_id FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id ORDER BY registration_id DESC LIMIT 1"); // Fetch the latest registration
         $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
         $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -126,7 +119,6 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 
         $status = $registration['status'] ?? null;  // Use null if no registration found
         $registration_id = $registration['registration_id'] ?? null; // Fetch the corresponding registration_id
-
 
         // Count how many clubs the student is currently "active" in
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
@@ -184,7 +176,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
         } */
         .wrapper {
             width: 100%;
-            max-width: 800px;
+            max-width: 750px;
             margin: 0 auto;
             padding: 0px;
             min-height: 500px;
@@ -237,7 +229,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
         }
 
         .moderator-name {
-            font-size: 18px;
+            font-size: 16px;
             margin: 0;
             line-height: 1.2;
         }
@@ -255,7 +247,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateX(20px); /* Start from below */
+                transform: translateX(-20px); /* Start from below */
             }
             to {
                 opacity: 1;
@@ -275,6 +267,111 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
         }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        .clubname-and-coverphoto {
+    margin-top: 0px;
+}
+
+.club-info-coverphoto {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.club-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.creation-date {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.divider {
+    margin: 10px 0;
+    border-color: #ccc;
+}
+
+.moderators-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #003366; /* Dark blue for the label */
+}
+
+.moderators {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0px; /* Space between moderator elements */
+}
+
+.moderator-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    background-color: #f8f9fa;
+}
+
+.moderator-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+
+
+
+        .members-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .members-info h5 {
+            font-size: 1.2rem;
+            color: #333;
+            margin: 0;
+        }
+
+        .members-count, .slots-count {
+            font-weight: bold;
+            color: #003366;
+            margin-left: 5px;
+        }
+
+
+
+
+
+
+
         .club-register-now .alert {
             padding: 10px 20px;
             max-width: 70%;
@@ -288,6 +385,10 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
             .club-register-now .alert {
                 max-width: 90%;
             }
+            .members-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
         
     </style>
@@ -300,24 +401,25 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
             <!-- <div class="mt-2 mb-2">
                 <a href="javascript:history.go(-1)" class="btn btn-secondary"><i class="fa fa-arrow-left"></i></a>
             </div> -->
-            <div class="clubname-and-coverphoto">
+            <div class="clubname-and-coverphoto"> 
                 <div class="row">
-                    <div class="col-12 col-md-4">
-                        <h2 class="text-muted mt-4" style="max-width: 100%;"><?php echo $clubName; ?></h2>
-                        <p>Created: <?php echo $formattedDate; ?></p>
-                        <hr>
-                        <h5 class="mb-3"><?php echo $moderatorsLabel; ?></h5>
-                        <?php echo $moderators; ?>
-                        <hr>
-                        <h5>Members: <?php echo $membersCount; ?></h5>
-                        <!-- <hr> -->
-                    </div>
                     <div class="col-12 col-md-8">
-                        <img class="club-info-coverphoto mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo" style="max-width: 100%; border-radius: 10px;">
+                        <img class="club-info-coverphoto mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <h2 class="club-name text-muted mt-4"><?php echo $clubName; ?></h2>
+                        <p class="creation-date">Created: <?php echo $formattedDate; ?></p>
+                        <hr class="divider">
+                        <h5 class="moderators-label mb-3"><?php echo $moderatorsLabel; ?></h5>
+                        <div class="moderators"><?php echo $moderators; ?></div>
                     </div>
                 </div>
             </div>
 
+            <div class="members-info d-flex justify-content-between align-items-center">
+                <h5>Members: <span class="members-count"><?php echo $membersCount; ?></span></h5>
+                <h5>Available Slots: <span class="slots-count"><?php echo $availableSlots; ?></span></h5>
+            </div>
             <div class="club-info">
                 <?php echo $information; ?>
             </div>
