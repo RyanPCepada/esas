@@ -12,14 +12,17 @@
 <style>
     .officers-info {
         /* margin: 20px; */
-        /* padding: 20px; */
+        padding: 20px;
         /* background-color: #f9f9f9;  */
         /* border-radius: 10px;  */
         /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+        background-color: #f9f9f9; 
+        border-radius: 10px; 
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     .officer-card {
-        min-width: 190px;
+        min-width: 180px;
         border: 1px solid #ddd; 
         border-radius: 8px; 
         padding: 10px; 
