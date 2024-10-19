@@ -84,7 +84,7 @@ $(document).ready(function() {
 
     if (clubId) {
         $.ajax({
-            url: `/esas/esas_moderator/apis/club-officers-api.php?club_id=${clubId}`,
+            url: `/esas/esas_student/apis/club-officers-api.php?club_id=${clubId}`,
             type: 'GET',
             dataType: 'json',
             success: function(response) {
