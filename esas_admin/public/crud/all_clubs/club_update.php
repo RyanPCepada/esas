@@ -172,7 +172,7 @@ if (!empty($_POST['recommendedDepartments'])) {
                 if ($stmt->execute()) {
                     // Log the activity
                     $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
-                            VALUES (:activity, NOW(), :adminId, :moderatorId, :studentId)";
+                            VALUES (:activity, NOW(), :adminId, NULL, NULL)"; // Set moderator_id and student_id to NULL
                     if ($logStmt = $pdo->prepare($logSql)) {
                         // Prepare the activity message
                         $activityMessage = "You updated {$clubName} information";
@@ -180,8 +180,6 @@ if (!empty($_POST['recommendedDepartments'])) {
                         // Bind parameters
                         $logStmt->bindParam(":activity", $activityMessage);
                         $logStmt->bindParam(":adminId", $adminId); // Use the adminId from the session
-                        $logStmt->bindParam(":moderatorId", $currentModeratorId); // Use the current moderator ID
-                        $logStmt->bindParam(":studentId", $studentId); // Replace with actual student ID if available
                         
                         // Execute the log insert
                         if ($logStmt->execute()) {
@@ -191,7 +189,6 @@ if (!empty($_POST['recommendedDepartments'])) {
                             echo "Failed to log the activity.";
                         }
                     }
-
 
                     // Handle moderator association (unchanged)
                     if (!empty($_POST['moderator'])) {
