@@ -42,10 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Log the activity
         $activity = "You assigned $moderatorName to $clubName";
         $admin_id = $_SESSION['admin_id']; // Assuming admin ID is stored in session
-        $student_id = null; // Replace with actual student ID if necessary
 
         $logStmt = $pdo->prepare("INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (?, NOW(), ?, ?, ?)");
-        $logStmt->execute([$activity, $admin_id, $moderator_id, $student_id]);
+        $logStmt->execute([$activity, $admin_id, null, null]);
 
         // Redirect back to the moderator update page with a success message
         $_SESSION['message'] = 'Moderator assigned successfully!';
