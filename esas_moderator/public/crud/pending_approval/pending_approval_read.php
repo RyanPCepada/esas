@@ -155,11 +155,10 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     unset($updateStmt);
 }
 
-// Function to log activity
 function logActivity($pdo, $fullName, $student_id, $clubName, $isApproved) {
     // Prepare the SQL statement to insert activity log
     $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id, student_id) 
-                VALUES (:activity, :dateAdded, :moderator_id, :student_id)";
+                VALUES (:activity, :dateAdded, :moderator_id, NULL)";
     
     $stmt = $pdo->prepare($logSql);
     $activity = $isApproved 
@@ -170,14 +169,14 @@ function logActivity($pdo, $fullName, $student_id, $clubName, $isApproved) {
     // Assuming you have a way to get the current moderator ID, replace `current_moderator_id` with the actual variable
     $moderator_id = $_SESSION['moderator_id']; // Assuming you have this session variable set during login
 
-    // Bind parameters and execute the log insertion
+    // Bind parameters and execute the log insertion (student_id set as NULL)
     $stmt->execute([
         'activity' => $activity,
         'dateAdded' => $dateAdded,
-        'moderator_id' => $moderator_id,
-        'student_id' => $student_id
+        'moderator_id' => $moderator_id
     ]);
 }
+
 
 // Fetch the student's registration status for the current club
 $stmt = $pdo->prepare("SELECT status FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id");
