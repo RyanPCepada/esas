@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Fetch the current student's ID
     $student_id = $_SESSION['student_id'];
-    
+
     if (!empty($club_id)) {
         if (!empty($post_id) && !empty($comment)) {
             // Insert comment into database
@@ -25,6 +25,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
             
             if ($stmt->execute()) {
+                // Log the activity
+                // Retrieve the club name for logging
+                $clubSql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
+                $clubStmt = $pdo->prepare($clubSql);
+                $clubStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+                $clubStmt->execute();
+
+                // Fetch the club name
+                $club = $clubStmt->fetch(PDO::FETCH_ASSOC);
+                $clubName = $club['clubName'] ?? 'Unknown Club'; // Default value if club not found
+
+                // Prepare the activity log entry
+                $activity = "You commented in a post in $clubName";
+                $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, student_id) VALUES (:activity, NOW(), :student_id)";
+                $logStmt = $pdo->prepare($logSQL);
+                $logStmt->bindParam(":activity", $activity);
+                $logStmt->bindParam(":student_id", $student_id);
+                $logStmt->execute(); // Log the activity
+
                 // Comment inserted successfully
                 echo '<script>
                     // alert("Comment added successfully.");
