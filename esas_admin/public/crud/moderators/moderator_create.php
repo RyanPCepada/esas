@@ -108,12 +108,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // Insert activity log
                 $sqlLog = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id) 
-                VALUES (:activity, NOW(), :admin_id, :moderator_id)";
+                            VALUES (:activity, NOW(), :admin_id, NULL)"; // Set moderator_id to NULL
                 if ($logStmt = $pdo->prepare($sqlLog)) {
                     $activity = "You added $fullName to the moderators list.";
                     $logStmt->bindParam(":activity", $activity);
                     $logStmt->bindParam(":admin_id", $admin_id); // Use the admin_id from the session
-                    $logStmt->bindParam(":moderator_id", $moderator_id);
 
                     if ($logStmt->execute()) {
                         // Insert into clubs and moderators
