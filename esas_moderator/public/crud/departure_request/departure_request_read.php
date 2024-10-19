@@ -163,17 +163,15 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                     // Execute the update statement for registration
                     if ($updateRegistrationStmt->execute()) {
                         // Log the activity
-                        $logActivitySql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
-                                           VALUES (:activity, NOW(), :admin_id, :moderator_id, :student_id)"; // Modify as per your log structure
+                        $logActivitySql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) 
+                        VALUES (:activity, NOW(), :moderator_id)"; // Modified to include only moderator_id
 
                         if ($logStmt = $pdo->prepare($logActivitySql)) {
-                            $activity = "You approved $fullName's departure request in $clubName";
-                            // Assume admin_id and moderator_id are defined elsewhere or passed via POST
-                            $logStmt->bindParam(":activity", $activity);
-                            $logStmt->bindParam(":admin_id", $admin_id); // Ensure these variables are set appropriately
-                            $logStmt->bindParam(":moderator_id", $moderator_id); // Ensure these variables are set appropriately
-                            $logStmt->bindParam(":student_id", $param_student_id);
-                            $logStmt->execute(); // Execute the log statement
+                        $activity = "You approved $fullName's departure request in $clubName";
+                        // Ensure moderator_id is defined appropriately
+                        $logStmt->bindParam(":activity", $activity);
+                        $logStmt->bindParam(":moderator_id", $moderator_id); // Only binding moderator_id
+                        $logStmt->execute(); // Execute the log statement
                         }
 
                         header("location: ../../departure_requests.php");
