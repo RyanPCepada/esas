@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             die("Invalid cover photo type or file too large. Only JPG, JPEG, PNG, GIF under 10MB allowed.");
         }
-    }else {
+    } else {
         die("Please upload a cover photo.");
     }
 
@@ -105,8 +105,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Execute the query
         if ($stmt->execute()) {
-            // Redirect to success page or show success message
-            echo "<script>alert('Club request submitted successfully!'); window.location.href = '../club_requests.php';</script>";
+            // Log the activity in tbl_activity_logs
+            $activity = "You submitted a club request '$clubName'";
+            $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, student_id) 
+                       VALUES (:activity, NOW(), :student_id)";
+            $logStmt = $pdo->prepare($logSQL);
+
+            // If you need to store admin_id as well, uncomment the following lines
+            // $logStmt->bindParam(":admin_id", $admin_id);
+            // Make sure to bind the student_id from the session
+            $logStmt->bindParam(":activity", $activity);
+            $logStmt->bindParam(":student_id", $student_id, PDO::PARAM_INT); // Use student_id from session
+
+            // Execute the log insertion
+            if ($logStmt->execute()) {
+                // Redirect to success page or show success message
+                echo "<script>alert('Club request submitted successfully!'); window.location.href = '../club_requests.php';</script>";
+            } else {
+                echo "Error logging the activity. Please try again.";
+            }
         } else {
             echo "Something went wrong. Please try again.";
         }
