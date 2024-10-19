@@ -60,16 +60,14 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
             LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
             LEFT JOIN tbl_registration r ON c.club_id = r.club_id
-            WHERE c.club_id = ?
-            GROUP BY m.moderator_id
-            ORDER BY m.firstName
+            WHERE c.club_id = ? 
+            GROUP BY c.club_id
         ");
         $stmt->execute([$club_id]);
-        $moderatorsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $club = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Fetch the club information
-        if (!empty($moderatorsData)) {
-            $club = $moderatorsData[0]; // Get the first row for club info
+        if ($club) {
             $clubName = htmlspecialchars($club['clubName']);
             $information = htmlspecialchars_decode($club['information']); // Decode HTML entities
             $coverPhoto = htmlspecialchars($club['coverPhoto']);
@@ -83,18 +81,27 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 
             // Generate moderators HTML
             $moderators = '';
-            foreach ($moderatorsData as $club) {
-                $name = htmlspecialchars($club['firstName'] . ' ' . ($club['middleName'] ? $club['middleName'] . ' ' : '') . htmlspecialchars($club['lastName']));
-                $pic = htmlspecialchars($club['profilePic']);
-                $moderators .= '
-                <div class="moderator-item">
-                    <img src="/esas/esas_moderator/images/' . $pic . '" alt="Profile Pic" class="moderator-pic">
-                    <p class="moderator-name">' . $name . '</p>
-                </div>';
+            if ($club['numModerators'] > 0) {
+                $stmt = $pdo->prepare("SELECT m.firstName, m.middleName, m.lastName, m.profilePic FROM tbl_moderators m INNER JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id WHERE cm.club_id = ?");
+                $stmt->execute([$club_id]);
+                $moderatorsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($moderatorsData as $moderator) {
+                    $name = htmlspecialchars($moderator['firstName'] . ' ' . ($moderator['middleName'] ? $moderator['middleName'] . ' ' : '') . htmlspecialchars($moderator['lastName']));
+                    $pic = htmlspecialchars($moderator['profilePic']);
+                    $moderators .= '
+                    <div class="moderator-item">
+                        <img src="/esas/esas_moderator/images/' . $pic . '" alt="Profile Pic" class="moderator-pic">
+                        <p class="moderator-name">' . $name . '</p>
+                    </div>';
+                }
+            } else {
+                // If there are no moderators, show "None"
+                $moderators = '<h4 class="text-muted">None</h4>';
             }
 
             // Set the correct label for moderators
-            $numModerators = count($moderatorsData);
+            $numModerators = $club['numModerators'];
             $moderatorsLabel = ($numModerators <= 1) ? 'Moderator:' : 'Moderators:';
 
             // Format the date into "Month Year"
@@ -148,7 +155,6 @@ $encodedClubName = addslashes($clubName);
 $information = nl2br(htmlspecialchars($information)); // Convert newlines to <br>
 $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; // Wrap paragraphs
 ?>
-
 
 
 <!DOCTYPE html>
@@ -426,7 +432,17 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
 
 
             <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
-                <?php if ($status === 'active'): ?>
+                <?php if ($availableSlots <= 0 && $status === 'active'): ?>
+                    <div class="alert alert-info custom-alert" role="alert">
+                        <p class="lead mb-0">You are already a member of this club.
+                            <a href="/esas/esas_student/home.php?club_id=<?php echo $club_id; ?>"> Go to Home</a>
+                        </p>
+                    </div>
+                <?php elseif ($availableSlots <= 0): ?>
+                    <div class="alert alert-danger custom-alert" role="alert">
+                        <p class="lead mb-0">This club is full.</p>
+                    </div>
+                <?php elseif ($status === 'active'): ?>
                     <div class="alert alert-info custom-alert" role="alert">
                         <p class="lead mb-0">You are already a member of this club.
                             <a href="/esas/esas_student/home.php?club_id=<?php echo $club_id; ?>"> Go to Home</a>
@@ -434,7 +450,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                     </div>
                 <?php elseif ($status === 'pending' && $clubsCount >= 2): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You are no longer be qualified on this club. You can only register for up to 2 clubs.</p>
+                        <p class="lead mb-0">You are no longer qualified for this club. You can only register for up to 2 clubs.</p>
                     </div>
                 <?php elseif ($clubsCount >= 2 && $disapprovedCount >= 3): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
