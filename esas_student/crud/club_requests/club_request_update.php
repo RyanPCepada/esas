@@ -1,4 +1,6 @@
 <?php
+session_start(); // Start the session
+
 require_once "../../../config.php";
 
 // Set the default timezone to Asia/Manila
@@ -115,11 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Validate request letter
         if (!in_array($letterExtension, $validLetterExtensions)) {
             $requestLetter_err = "Invalid file extension. Only PDF, DOC, and DOCX are allowed.";
-        }
-        // elseif ($coverPhotoSize > 10000000) {
-        //     $coverPhoto_err = "Image size is too large (max 10MB).";  //REMOVED THE LIMIT SIZE OF IMAGE
-        // }
-         else {
+        } else {
             $newRequestLetterName = 'request_letter_' . uniqid() . '.' . $letterExtension;
             $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_student/request_letters/';
             $uploadPath = $uploadDir . $newRequestLetterName;
@@ -156,6 +154,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(":requestId", $requestId);
 
             if ($stmt->execute()) {
+                // Insert activity log
+                $activityLog = "You updated your club request '$clubName'";
+                $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, student_id) 
+                VALUES (:activity, NOW(), :student_id)";
+
+                if ($logStmt = $pdo->prepare($logSQL)) {
+                    $logStmt->bindParam(":activity", $activityLog);
+                    $logStmt->bindParam(":student_id", $_SESSION['student_id']); // Get student_id from session
+                    $logStmt->execute(); // Log the activity
+                }
+
                 header("location: ../../club_requests.php");
                 exit();
             } else {
@@ -163,11 +172,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     }
+
 }
 
 unset($stmt);
 unset($pdo);
 ?>
+
 
 
 <!DOCTYPE html>
