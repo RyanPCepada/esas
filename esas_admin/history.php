@@ -3,7 +3,7 @@ require_once "../config.php"; // Database config file
 session_start();
 
 if (!isset($_SESSION['admin_id'])) {
-    echo "Moderator ID is not set in the session.";
+    echo "Admin ID is not set in the session.";
     exit;
 }
 
@@ -20,7 +20,7 @@ $admin = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch as associative array
 
 // Check if the admin was found
 if (!$admin) {
-    echo "Moderator not found.";
+    echo "Admin not found.";
     exit; // Exit if the admin is not found
 }
 

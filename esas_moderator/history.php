@@ -30,24 +30,6 @@ $stmt_activities = $pdo->prepare($sql_activities);
 $stmt_activities->execute([$moderator_id]);
 $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activities
 
-// Handle deletion if form is submitted
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
-    // Get activity IDs from the submitted form
-    if (!empty($_POST['activity_ids'])) {
-        $activity_ids = $_POST['activity_ids'];
-        
-        // Prepare a statement for deletion
-        $placeholders = implode(',', array_fill(0, count($activity_ids), '?'));
-        $sql_delete = "DELETE FROM tbl_activity_logs WHERE activity_id IN ($placeholders)";
-        $stmt_delete = $pdo->prepare($sql_delete);
-        $stmt_delete->execute($activity_ids);
-        
-        // Redirect to the same page to refresh the list
-        header("Location: history.php");
-        exit;
-    }
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -105,28 +87,71 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
             font-size: 0.85rem;
             color: #6c757d; /* Muted text color */
         }
-        .history-delete-btn {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: darkgrey;
-            margin-left: 10px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
+        .history-delete-button, .history-clearall-button {
+            width: 90px;
+            height: auto;
+            text-decoration: none;
+            /* background-color: white; */
+            color: black;
+            border: solid 1px grey;
+            border-radius: 50px;
+            padding: 6px 16px;
+            line-height: 1.5;
+            display: inline-block;
+            text-align: center;
+            
         }
-        .history-delete-btn:hover {
-            background-color: grey;
+
+        .history-delete-button:hover, .history-clearall-button:hover {
+            text-decoration: none;
+            background-color: white;
+            background-color: #36454F; /*Charcoal black*/
+            /* color: white; */
+            color: black;
+            color: white;
+            /* border: solid 1px white; */
+            border: solid 1px grey;
+        }
+
+        .history-x-btn {
+            margin-left: 10px;
+            font-size: 18px;
+            color: grey;
+        }
+        .history-x-btn:hover {
+            color: darkgrey;
         }
     </style>
 </head>
 <body>
     
     <div class="wrapper">
-        <h2 class="mt-5">History</h2>
-        <p class="text-muted">All your interactions within the system</p>
-
-        <form method="post" action="">
+        <form method="post" action="../esas_admin/actions/history_delete.php">
+            <h2 class="mt-5">History</h2>
+            <div class="d-flex justify-content-between mb-2">
+                <p class="text-muted">All your interactions within the system</p>
+                <div>
+                    <button type="submit" name="delete" class="history-delete-button" 
+                        onclick="
+                            const checkboxes = document.querySelectorAll('input[type=checkbox]:checked'); 
+                            if (checkboxes.length === 0) {
+                                alert('No activities selected.');
+                                return false;
+                            } 
+                            if (<?php echo empty($activities) ? 'true' : 'false'; ?>) { 
+                                alert('No activities to delete.'); 
+                                return false; 
+                            } 
+                            return confirm('Are you sure you want to delete selected activities?');
+                        ">
+                        Delete
+                    </button>
+                    <button type="submit" name="clear_all" class="history-clearall-button" 
+                        onclick="if (<?php echo empty($activities) ? 'true' : 'false'; ?>) { alert('No activities to clear.'); return false; } return confirm('Are you sure you want to clear all activities?');">
+                        Clear All
+                    </button>
+                </div>
+            </div>
             <div class="container-fluid container auto-scroll">
                 <div class="row">
                     <!-- Activity cards -->
@@ -138,22 +163,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
                                     <div class="activity-title"><?php echo htmlspecialchars($activity['activity']); ?></div>
                                     <div class="activity-date"><?php echo htmlspecialchars(date('F j, Y | g:i A', strtotime($activity['dateAdded']))); ?></div>
                                 </div>
-                                <div class="history-delete-btn">
-                                    <a href="delete_activity.php?id=<?php echo htmlspecialchars($activity['activity_id']); ?>" onclick="return confirm('Are you sure you want to delete this activity?');"
-                                    style="color: white; text-decoration: none;">x</a>
-                                </div>
+                                <a href="../esas_admin/actions/history_delete.php?id=<?php echo htmlspecialchars($activity['activity_id']); ?>" onclick="return confirm('Are you sure you want to delete this activity?');"
+                                    style="text-decoration: none;"><i class="fas fa-times-circle history-x-btn"></i>
+                                </a>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <div class="text-center">No activities found.</div>
                     <?php endif; ?>
                 </div>
-                <div class="text-center mt-3">
-                    <button type="submit" name="delete" class="btn btn-danger">Delete Selected</button>
-                </div>
             </div>
         </form>
+
     </div>
 </body>
 </html>
-  
