@@ -12,7 +12,7 @@ try {
     // Use the existing PDO instance from config.php
     global $pdo;
 
-    // Prepare and execute the SQL statement
+    // Prepare and execute the SQL statement to fetch student details
     $sql = "SELECT firstName, middleName, lastName FROM tbl_students WHERE student_id = :student_id";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
@@ -31,11 +31,18 @@ try {
         $firstName = $middleName = $lastName = "UNKNOWN";
     }
 
+    // Check the count of pending club requests
+    $sqlCount = "SELECT COUNT(*) as pending_count FROM tbl_club_requests WHERE student_id = :student_id AND status = 'pending'";
+    $stmtCount = $pdo->prepare($sqlCount);
+    $stmtCount->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+    $stmtCount->execute();
+    $countResult = $stmtCount->fetch(PDO::FETCH_ASSOC);
+    $pendingCount = $countResult['pending_count'];
+
 } catch (PDOException $e) {
     // Handle database connection or query error
     die("Database error: " . $e->getMessage());
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -341,7 +348,7 @@ try {
                                     <div class="row g-0">
                                         <div class="d-flex align-items-center justify-content-end pb-3 mt-2 mb-3">
                                             <!-- <h2 class="text-muted mt-0 mb-0">My Club Requests</h2> -->
-                                            <a href="../esas_student/crud/club_requests/club_request_create.php" class="btn btn-primary" id="request-club-btn" style="width: 160px; border-radius: 3px; margin-right: 5px;">
+                                            <a href="#" class="btn btn-primary" id="request-club-btn" style="width: 160px; border-radius: 3px; margin-right: 5px;" onclick="checkPendingRequests(<?php echo $pendingCount; ?>)">
                                                 Request New Club
                                             </a>
                                         </div>
@@ -410,8 +417,6 @@ try {
     <script src="../assets/js/jquery.dataTables.min.js"></script>
     <script src="../assets/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/global_script.js"></script>
-
-
 
     <script>
         function submitClubRequest() {
@@ -687,6 +692,32 @@ $(document).on('click', '#deleteButton', function(e) {
 
 
 
+<!-- Limitation Modal -->
+<div id="limitationModal" class="modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); background-color: rgba(0,0,0,0.4);">
+    <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
+        <span style="color: red; font-weight: bold;">Request Limit Reached</span>
+        <p>You can only have a maximum of 5 pending club requests. Please wait for your current requests to be processed before submitting new ones.</p>
+        <button type="button" class="btn btn-secondary mb-1" onclick="document.getElementById('limitationModal').style.display='none'">Close</button>
+    </div>
+</div>
 
+<script>
+function checkPendingRequests(pendingCount) {
+    if (pendingCount >= 5) {
+        document.getElementById('limitationModal').style.display = 'block';
+    } else {
+        // Redirect to club request creation page if under limit
+        window.location.href = '../esas_student/crud/club_requests/club_request_create.php';
+    }
+}
+
+// Close the modal when the user clicks outside of it
+window.onclick = function(event) {
+    const modal = document.getElementById('limitationModal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
 </body>
 </html>
