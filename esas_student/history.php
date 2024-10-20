@@ -3,7 +3,7 @@ require_once "../config.php"; // Database config file
 session_start();
 
 if (!isset($_SESSION['student_id'])) {
-    echo "Admin ID is not set in the session.";
+    echo "Student ID is not set in the session.";
     exit;
 }
 
@@ -20,7 +20,7 @@ $student = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch as associative array
 
 // Check if the student was found
 if (!$student) {
-    echo "Admin not found.";
+    echo "Student not found.";
     exit; // Exit if the student is not found
 }
 
