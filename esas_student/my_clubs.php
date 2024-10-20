@@ -428,7 +428,7 @@ try {
                             <div class="col-md-4 card-container"> 
                                 <span class="club-notification-badge" id="club-notification-${club.club_id}" style="display:none;"></span>
                                 <div class="card card-img-only">
-                                    <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}` : `/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}`}" 
+                                    <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}` : `/esas/esas_student/application_details.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}`}" 
                                     onclick="markClubNotificationsAsRead(${club.club_id})">
                                         <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
                                         <div class="overlay-text">
