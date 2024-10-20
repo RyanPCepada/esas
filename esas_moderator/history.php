@@ -126,7 +126,7 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
 <body>
     
     <div class="wrapper">
-        <form method="post" action="../esas_admin/actions/history_delete.php">
+        <form method="post" action="../esas_moderator/actions/history_delete.php">
             <h2 class="mt-5">History</h2>
             <div class="d-flex justify-content-between mb-2">
                 <p class="text-muted">All your interactions within the system</p>
@@ -163,7 +163,7 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
                                     <div class="activity-title"><?php echo htmlspecialchars($activity['activity']); ?></div>
                                     <div class="activity-date"><?php echo htmlspecialchars(date('F j, Y | g:i A', strtotime($activity['dateAdded']))); ?></div>
                                 </div>
-                                <a href="../esas_admin/actions/history_delete.php?id=<?php echo htmlspecialchars($activity['activity_id']); ?>" onclick="return confirm('Are you sure you want to delete this activity?');"
+                                <a href="../esas_moderator/actions/history_delete.php?id=<?php echo htmlspecialchars($activity['activity_id']); ?>" onclick="return confirm('Are you sure you want to delete this activity?');"
                                     style="text-decoration: none;"><i class="fas fa-times-circle history-x-btn"></i>
                                 </a>
                             </div>
