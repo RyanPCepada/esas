@@ -75,9 +75,19 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             $membersCount = htmlspecialchars($club['membersCount']);
             $slots = htmlspecialchars($club['slots']); // Fetch and sanitize slots
 
-            // Calculate available slots
-            $activeMembersCount = (int)$membersCount; // Convert to integer for calculation
-            $availableSlots = max(0, $slots - $activeMembersCount); // Ensure no negative slots
+            // Calculate available slots and handle "Unlimited" and "Full" cases
+            if ($slots === null || (int)$slots === 0) {
+                $availableSlots = 'Unlimited'; // When slots are NULL or 0
+            } else {
+                $activeMembersCount = (int)$membersCount; // Convert to integer for calculation
+                $remainingSlots = (int)$slots - $activeMembersCount; // Calculate remaining slots
+                
+                if ($remainingSlots <= 0) {
+                    $availableSlots = 'Full'; // Club is full
+                } else {
+                    $availableSlots = $remainingSlots; // Display available slots
+                }
+            }
 
             // Generate moderators HTML
             $moderators = '';
@@ -438,7 +448,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                             <a href="/esas/esas_student/home.php?club_id=<?php echo $club_id; ?>"> Go to Home</a>
                         </p>
                     </div>
-                <?php elseif ($availableSlots <= 0): ?>
+                <?php elseif ($membersCount === $slots && ($slots !== 0 || $slots !== NULL)): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
                         <p class="lead mb-0">This club is full.</p>
                     </div>
