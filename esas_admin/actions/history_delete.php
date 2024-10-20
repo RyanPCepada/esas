@@ -15,44 +15,49 @@ $admin_id = $_SESSION['admin_id'];
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-// Handle "X" icon (single activity deletion)
-if (isset($_GET['id'])) {
-    $activity_id = htmlspecialchars($_GET['id']);
-    
-    // Prepare and execute the delete statement for a single activity using PDO
-    $stmt = $pdo->prepare("DELETE FROM tbl_activity_logs WHERE activity_id = :activity_id");
-    $stmt->bindParam(':activity_id', $activity_id, PDO::PARAM_INT);
-    
-    if ($stmt->execute()) {
-        // Redirect after successful deletion
-        header("Location: /esas/esas_admin/history.php");
-        exit;
+// Check if the delete request is for multiple activities or a single activity
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete'])) {
+    // Handle multiple deletions
+    if (isset($_POST['activity_ids']) && is_array($_POST['activity_ids'])) {
+        $activity_ids = $_POST['activity_ids'];
+        
+        // Prepare the SQL statement for deletion
+        $placeholders = rtrim(str_repeat('?,', count($activity_ids)), ','); // Create placeholders
+        $sql = "DELETE FROM tbl_activity_logs WHERE activity_id IN ($placeholders) AND admin_id = ?";
+        $stmt = $pdo->prepare($sql);
+        
+        // Execute the statement with the activity IDs and the admin ID
+        $stmt->execute(array_merge($activity_ids, [$admin_id]));
+        
+        // Provide feedback
+        if ($stmt->rowCount() > 0) {
+            echo "Selected activities have been deleted successfully.";
+        } else {
+            echo "No activities were deleted. Please check your selection.";
+        }
     } else {
-        echo "Error deleting activity.";
+        echo "No activities selected for deletion.";
     }
+} elseif (isset($_GET['id'])) {
+    // Handle individual deletion when clicking the "X" icon
+    $activity_id = $_GET['id'];
+    
+    // Prepare the SQL statement for deletion
+    $sql = "DELETE FROM tbl_activity_logs WHERE activity_id = ? AND admin_id = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$activity_id, $admin_id]);
+    
+    // Provide feedback
+    if ($stmt->rowCount() > 0) {
+        echo "The activity has been deleted successfully.";
+    } else {
+        echo "The activity could not be deleted. Please try again.";
+    }
+} else {
+    echo "Invalid request.";
 }
 
-// Handle bulk deletion (checkbox selection)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete']) && isset($_POST['activity_ids'])) {
-    $activity_ids = $_POST['activity_ids']; // Array of selected activity IDs
-    
-    // Use a prepared statement to delete multiple activities
-    $stmt = $pdo->prepare("DELETE FROM tbl_activity_logs WHERE activity_id = :activity_id");
-    
-    foreach ($activity_ids as $id) {
-        $id = htmlspecialchars($id);
-        $stmt->bindParam(':activity_id', $id, PDO::PARAM_INT);
-        
-        if (!$stmt->execute()) {
-            // Log an error message if the deletion fails
-            echo "Error deleting activity with ID: $id<br>";
-        }
-    }
-    
-    // Redirect after successful bulk deletion
-    header("Location: /esas/esas_admin/history.php");
-    exit;
-} else {
-    echo "No activities selected for deletion.";
-}
+// Redirect back to the history page after the operation
+header("Location: /esas/esas_admin/history.php");
+exit;
 ?>

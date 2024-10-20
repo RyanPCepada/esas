@@ -87,11 +87,11 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
             font-size: 0.85rem;
             color: #6c757d; /* Muted text color */
         }
-        .history-delete-button {
-            width: auto;
+        .history-delete-button, .history-clearall-button {
+            width: 90px;
             height: auto;
             text-decoration: none;
-            background-color: white;
+            /* background-color: white; */
             color: black;
             border: solid 1px grey;
             border-radius: 50px;
@@ -102,11 +102,15 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
             
         }
 
-        .history-delete-button:hover {
+        .history-delete-button:hover, .history-clearall-button:hover {
             text-decoration: none;
-            background-color: grey;
+            background-color: white;
+            background-color: #36454F; /*Charcoal black*/
+            /* color: white; */
+            color: black;
             color: white;
-            border: solid 1px white;
+            /* border: solid 1px white; */
+            border: solid 1px grey;
         }
 
         .history-x-btn {
@@ -122,15 +126,16 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
 <body>
     
     <div class="wrapper">
-        <form method="post" action="../actions/history_delete.php">
+        <form method="post" action="../esas_admin/actions/history_delete.php">
             <h2 class="mt-5">History</h2>
             <div class="d-flex justify-content-between mb-2">
                 <p class="text-muted">All your interactions within the system</p>
-                <a href="../esas_admin/actions/history_delete.php?id=<?php echo htmlspecialchars($activity['activity_id']); ?>" onclick="return confirm('Are you sure you want to delete this activity?');"
-                    class="history-delete-button">Delete
-                </a>
+                <div>
+                    <button type="submit" name="delete" class="history-delete-button" onclick="return confirm('Are you sure you want to delete selected activities?');">
+                        Delete
+                    </button>
+                </div>
             </div>
-
             <div class="container-fluid container auto-scroll">
                 <div class="row">
                     <!-- Activity cards -->
@@ -151,11 +156,9 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
                         <div class="text-center">No activities found.</div>
                     <?php endif; ?>
                 </div>
-                <div class="text-center mt-3">
-                    <button type="submit" name="delete" class="btn btn-danger">Delete Selected</button>
-                </div>
             </div>
         </form>
+
     </div>
 </body>
 </html>
