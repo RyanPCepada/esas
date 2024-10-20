@@ -131,8 +131,24 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
             <div class="d-flex justify-content-between mb-2">
                 <p class="text-muted">All your interactions within the system</p>
                 <div>
-                    <button type="submit" name="delete" class="history-delete-button" onclick="return confirm('Are you sure you want to delete selected activities?');">
+                    <button type="submit" name="delete" class="history-delete-button" 
+                        onclick="
+                            const checkboxes = document.querySelectorAll('input[type=checkbox]:checked'); 
+                            if (checkboxes.length === 0) {
+                                alert('No activities selected.');
+                                return false;
+                            } 
+                            if (<?php echo empty($activities) ? 'true' : 'false'; ?>) { 
+                                alert('No activities to delete.'); 
+                                return false; 
+                            } 
+                            return confirm('Are you sure you want to delete selected activities?');
+                        ">
                         Delete
+                    </button>
+                    <button type="submit" name="clear_all" class="history-clearall-button" 
+                        onclick="if (<?php echo empty($activities) ? 'true' : 'false'; ?>) { alert('No activities to clear.'); return false; } return confirm('Are you sure you want to clear all activities?');">
+                        Clear All
                     </button>
                 </div>
             </div>
