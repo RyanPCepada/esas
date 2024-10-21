@@ -35,7 +35,11 @@ if (!$student) {
 }
 
 // Fetch application details for the specified club and student
-$sql_application = "SELECT * FROM tbl_registration WHERE student_id = ? AND club_id = ? AND (registration_id = ? OR status = 'pending') AND (status = 'pending' OR status = 'approved' OR status = 'disapproved')";
+$sql_application = "SELECT *, remarks FROM tbl_registration 
+                    WHERE student_id = ? 
+                    AND club_id = ? 
+                    AND (registration_id = ? OR (status = 'pending' AND registration_id IS NOT NULL))
+                    AND (status = 'pending' OR status = 'approved' OR status = 'disapproved')";
 $stmt_application = $pdo->prepare($sql_application);
 $stmt_application->execute([$student_id, $club_id, $registration_id]);
 $application = $stmt_application->fetch(PDO::FETCH_ASSOC); // Fetch application details
@@ -141,6 +145,8 @@ switch ($status) {
                         <?php if (!empty($application['dateApproved'])): ?>
                             <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateApproved']); ?></p>
                         <?php endif; ?>
+                        <p><strong>Remarks:</strong> <?php echo !empty($application['remarks']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
+
                     </div>
                 </div>
             </div>
