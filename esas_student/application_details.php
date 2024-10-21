@@ -17,8 +17,11 @@ $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
 $registration_id = isset($_GET['registration_id']) ? $_GET['registration_id'] : null;
 
 // Check if club_id and registration_id are provided
-if (!$club_id || !$registration_id) {
-    echo "Club ID or Registration ID is not provided.";
+if (!$club_id) {
+    echo "Club ID is not provided.";
+    exit;
+} else if (!$registration_id) {
+    echo "Registration ID is not provided.";
     exit;
 }
 
@@ -92,6 +95,8 @@ switch ($status) {
         $icon = '<i class="fas fa-hourglass-start text-warning"></i>'; // Pending icon
         break;
 }
+echo "Club ID: " . htmlspecialchars($club_id) . "<br>";
+echo "Registration ID: " . htmlspecialchars($registration_id) . "<br>";
 ?>
 
 <!DOCTYPE html>
@@ -141,12 +146,18 @@ switch ($status) {
                         <p><strong>What skills or experiences do you have that will contribute to the club's activities?</strong><br><?php echo htmlspecialchars($application['question2']); ?></p>
                         <p><strong>How do you plan to balance your time between club activities and your academic responsibilities?</strong><br><?php echo htmlspecialchars($application['question3']); ?></p>
                         <hr>
-                        <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                        <?php if (!empty($application['dateApproved'])): ?>
+                        
+                        <?php if ($status === 'pending'): ?>
+                            <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
+                        <?php elseif ($status === 'disapproved'): ?>
+                            <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
+                            <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateApproved']); ?></p>
+                        <?php elseif ($status === 'approved'): ?>
+                            <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                             <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateApproved']); ?></p>
                         <?php endif; ?>
-                        <p><strong>Remarks:</strong> <?php echo !empty($application['remarks']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
 
+                        <p><strong>Remarks:</strong> <?php echo !empty($application['remarks']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
                     </div>
                 </div>
             </div>
