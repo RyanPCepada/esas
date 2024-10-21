@@ -42,7 +42,8 @@ $sql_application = "SELECT *, remarks FROM tbl_registration
                     WHERE student_id = ? 
                     AND club_id = ? 
                     AND (registration_id = ? OR (status = 'pending' AND registration_id IS NOT NULL))
-                    AND (status = 'pending' OR status = 'approved' OR status = 'disapproved')";
+                    AND (status IN ('pending', 'active', 'disapproved'))"; // Include 'active'
+                    //AND (status = 'pending' OR status = 'active' OR status = 'disapproved')";
 $stmt_application = $pdo->prepare($sql_application);
 $stmt_application->execute([$student_id, $club_id, $registration_id]);
 $application = $stmt_application->fetch(PDO::FETCH_ASSOC); // Fetch application details
@@ -77,11 +78,8 @@ function formatDate($date) {
     return (new DateTime($date))->format('F j, Y');
 }
 
-// Get status from the URL
-$status = isset($_GET['status']) ? $_GET['status'] : 'pending'; // Default to 'pending' if no status is passed
-
-// Determine the status and icon
-$status = strtolower($status); // Using the passed status from URL
+// Determine the status and icon based on the fetched application
+$status = strtolower($application['status']); // Get the status from the application details
 $icon = '';
 switch ($status) {
     case 'approved':
@@ -90,13 +88,19 @@ switch ($status) {
     case 'disapproved':
         $icon = '<i class="fas fa-times-circle text-danger"></i>'; // Disapproved icon
         break;
+    case 'active':
+        $icon = '<i class="fas fa-check-circle text-primary"></i>'; // Active icon
+        break;
     case 'pending':
     default:
         $icon = '<i class="fas fa-hourglass-start text-warning"></i>'; // Pending icon
         break;
 }
-echo "Club ID: " . htmlspecialchars($club_id) . "<br>";
-echo "Registration ID: " . htmlspecialchars($registration_id) . "<br>";
+
+// Display the status
+// echo "Status: " . $icon . " <strong>" . ucfirst($status) . "</strong><br>";
+// echo "Club ID: " . htmlspecialchars($club_id) . "<br>";
+// echo "Registration ID: " . htmlspecialchars($registration_id) . "<br>";
 ?>
 
 <!DOCTYPE html>
@@ -152,12 +156,13 @@ echo "Registration ID: " . htmlspecialchars($registration_id) . "<br>";
                         <?php elseif ($status === 'disapproved'): ?>
                             <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                             <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateApproved']); ?></p>
-                        <?php elseif ($status === 'approved'): ?>
+                            <p><strong>Remarks:</strong> <?php echo !empty($application['remarks']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
+                        <?php elseif ($status === 'active'): ?>
                             <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                             <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateApproved']); ?></p>
+                            <p><strong>Remarks:</strong> <?php echo !empty($application['remarks']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
                         <?php endif; ?>
 
-                        <p><strong>Remarks:</strong> <?php echo !empty($application['remarks']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
                     </div>
                 </div>
             </div>

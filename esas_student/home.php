@@ -113,8 +113,8 @@ try {
     // Handle database connection or query error
     die("Database error: " . $e->getMessage());
 }
-echo "Club ID: " . htmlspecialchars($club_id) . "<br>";
-echo "Registration ID: " . htmlspecialchars($registration_id) . "<br>";
+// echo "Club ID: " . htmlspecialchars($club_id) . "<br>";
+// echo "Registration ID: " . htmlspecialchars($registration_id) . "<br>";
 ?>
 
 
