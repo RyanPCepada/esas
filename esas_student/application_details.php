@@ -1,4 +1,4 @@
-<?php
+<?php 
 require_once "../config.php"; // Database config file
 session_start();
 
@@ -12,12 +12,13 @@ $student_id = $_SESSION['student_id']; // Get student ID from session
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-// Get club_id from the URL
+// Get club_id and registration_id from the URL
 $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
+$registration_id = isset($_GET['registration_id']) ? $_GET['registration_id'] : null;
 
-// Check if club_id is provided
-if (!$club_id) {
-    echo "Club ID is not provided.";
+// Check if club_id and registration_id are provided
+if (!$club_id || !$registration_id) {
+    echo "Club ID or Registration ID is not provided.";
     exit;
 }
 
@@ -33,11 +34,12 @@ if (!$student) {
     exit; // Exit if the student is not found
 }
 
-// Fetch application details for the specified club
-$sql_application = "SELECT * FROM tbl_registration WHERE student_id = ? AND club_id = ?";
+// Fetch application details for the specified club and student
+$sql_application = "SELECT * FROM tbl_registration WHERE student_id = ? AND club_id = ? AND (registration_id = ? OR status = 'pending') AND (status = 'pending' OR status = 'approved' OR status = 'disapproved')";
 $stmt_application = $pdo->prepare($sql_application);
-$stmt_application->execute([$student_id, $club_id]);
+$stmt_application->execute([$student_id, $club_id, $registration_id]);
 $application = $stmt_application->fetch(PDO::FETCH_ASSOC); // Fetch application details
+
 
 // Check if the application was found
 if (!$application) {
@@ -68,6 +70,24 @@ function formatDate($date) {
     return (new DateTime($date))->format('F j, Y');
 }
 
+// Get status from the URL
+$status = isset($_GET['status']) ? $_GET['status'] : 'pending'; // Default to 'pending' if no status is passed
+
+// Determine the status and icon
+$status = strtolower($status); // Using the passed status from URL
+$icon = '';
+switch ($status) {
+    case 'approved':
+        $icon = '<i class="fas fa-check-circle text-success"></i>'; // Approved icon
+        break;
+    case 'disapproved':
+        $icon = '<i class="fas fa-times-circle text-danger"></i>'; // Disapproved icon
+        break;
+    case 'pending':
+    default:
+        $icon = '<i class="fas fa-hourglass-start text-warning"></i>'; // Pending icon
+        break;
+}
 ?>
 
 <!DOCTYPE html>
@@ -106,13 +126,17 @@ function formatDate($date) {
     
     <div class="wrapper">
             <h2 class="mt-5">Application Details</h2>
-            <p class="text-muted">Review your application details for <?php echo htmlspecialchars($club['clubName']); ?></p>
+            <div class="justify-content-between">
+                <p class="text-muted">Review your application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
+                <p>Status: <?php echo $icon; ?> <strong><?php echo ucfirst($status); ?></strong></p>
+            </div>
             <div class="container-fluid container auto-scroll">
                 <div class="row">
                     <div class="col">
                         <p><strong>Why do you want to join this club?</strong><br><?php echo htmlspecialchars($application['question1']); ?></p>
                         <p><strong>What skills or experiences do you have that will contribute to the club's activities?</strong><br><?php echo htmlspecialchars($application['question2']); ?></p>
                         <p><strong>How do you plan to balance your time between club activities and your academic responsibilities?</strong><br><?php echo htmlspecialchars($application['question3']); ?></p>
+                        <hr>
                         <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                         <?php if (!empty($application['dateApproved'])): ?>
                             <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateApproved']); ?></p>
