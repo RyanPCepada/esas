@@ -1,6 +1,12 @@
 <?php
 require_once "../../../../config.php";
+require __DIR__ . '/../../../vendor/autoload.php';
+
 session_start();
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 
 // Ensure the moderator ID is set in the session
 if (isset($_SESSION['admin_id'])) {
@@ -14,7 +20,7 @@ if (isset($_SESSION['admin_id'])) {
 date_default_timezone_set('Asia/Manila');
 
 // Define the default profile picture constant
-define('PROF_PIC_DEFAULT', 'PROF_PIC.png'); // Change 'PROF_PIC.png' to your actual default image path if necessary
+define('PROF_PIC_DEFAULT', 'PROF_PIC.png'); 
 
 $moderatorQuery = "SELECT moderator_id, CONCAT(firstName, ' ', lastName) AS moderator_name FROM tbl_moderators";
 if ($stmt = $pdo->prepare($moderatorQuery)) {
@@ -59,7 +65,6 @@ if (isset($_POST['fetch_type'])) {
     }
 }
 
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($_POST["moderator"]) && !empty($_POST["club"])) {
         $selectedModeratorId = $_POST["moderator"];
@@ -73,12 +78,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(":moderatorId", $selectedModeratorId);
             if ($stmt->execute()) {
                 
-                // Fetch the moderator name
-                $moderatorNameQuery = "SELECT CONCAT(firstName, ' ', lastName) AS moderator_name FROM tbl_moderators WHERE moderator_id = :moderatorId";
-                $moderatorStmt = $pdo->prepare($moderatorNameQuery);
+                // Fetch the moderator name and email
+                $moderatorInfoQuery = "SELECT CONCAT(firstName, ' ', lastName) AS moderator_name, email FROM tbl_moderators WHERE moderator_id = :moderatorId";
+                $moderatorStmt = $pdo->prepare($moderatorInfoQuery);
                 $moderatorStmt->bindParam(':moderatorId', $selectedModeratorId);
                 $moderatorStmt->execute();
-                $moderatorName = $moderatorStmt->fetchColumn();
+                $moderatorInfo = $moderatorStmt->fetch(PDO::FETCH_ASSOC);
+                $moderatorName = $moderatorInfo['moderator_name'];
+                $moderatorEmail = $moderatorInfo['email'];
 
                 // Fetch the club name
                 $clubNameQuery = "SELECT clubName FROM tbl_clubs WHERE club_id = :clubId";
@@ -93,12 +100,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($logStmt = $pdo->prepare($logSql)) {
                     $activity = "You assigned {$moderatorName} as a moderator of {$clubName}";
                     $logStmt->bindParam(":activity", $activity);
-                    $logStmt->bindParam(":admin_id", $adminId); // Use the admin_id from the session
-                    $logStmt->bindParam(":moderator_id", $moderator_id);
-                    $logStmt->execute(); // Log the activity
+                    $logStmt->bindParam(":admin_id", $adminId); 
+                    $logStmt->bindParam(":moderator_id", $selectedModeratorId);
+                    $logStmt->execute(); 
                 }
 
-                header("location: ../../moderators.php"); // Redirect to a list of moderators
+                // Send email notification
+                $mail = new PHPMailer(true);
+                try {
+                    // SMTP settings
+                    $mail->isSMTP();                                       // Send using SMTP
+                    $mail->Host       = 'smtp.gmail.com';                  // Set the SMTP server to send through
+                    $mail->SMTPAuth   = true;                              // Enable SMTP authentication
+                    $mail->Username   = 'k.blancia.dev@gmail.com';         // SMTP username
+                    $mail->Password   = 'kcnt aoii lrlm ehub';             // SMTP password
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;    // Enable TLS encryption
+                    $mail->Port       = 587;                               // TCP port to connect to
+
+                    // Email content
+                    $mail->setFrom('k.blancia.dev@gmail.com', 'Moderator Club Assignment');         
+                    $mail->addAddress($moderatorEmail, $moderatorName); 
+                    $mail->Subject = 'Club Assignment Notification';
+                    $mail->Body = "Hello {$moderatorName},\n\nYou have been assigned as a moderator for the {$clubName} club.\n\nBest regards,\nYour Admin Team";
+
+                    // Send the email
+                    if (!$mail->send()) {
+                        echo "Email could not be sent. Mailer Error: {$mail->ErrorInfo}";
+                    }
+                } catch (Exception $e) {
+                    echo "Email could not be sent. Mailer Error: {$mail->ErrorInfo}";
+                }
+
+                 header("location: ../../moderators.php"); 
                 exit();
             } else {
                 echo "Oops! Something went wrong. Please try again later.";
@@ -106,8 +139,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
-
-
 ?>
 
 

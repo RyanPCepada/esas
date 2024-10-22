@@ -1,9 +1,12 @@
 <?php
-// Start the session
+
+require_once "../../../../config.php";
+require __DIR__ . '/../../../vendor/autoload.php';
+
 session_start();
 
-// Include the configuration file
-require_once '../../../../config.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -13,15 +16,17 @@ if (isset($_POST['club_id']) && isset($_POST['moderator_id'])) {
     $club_id = $_POST['club_id'];
     $moderator_id = $_POST['moderator_id'];
 
-    // Fetch the moderator's full name
-    $stmt = $pdo->prepare("SELECT firstName, middleName, lastName FROM tbl_moderators WHERE moderator_id = ?");
+    // Fetch the moderator's full name and email
+    $stmt = $pdo->prepare("SELECT firstName, middleName, lastName, email FROM tbl_moderators WHERE moderator_id = ?");
     $stmt->execute([$moderator_id]);
     $moderator = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($moderator) {
         $moderator_name = trim($moderator['firstName'] . ' ' . $moderator['middleName'] . ' ' . $moderator['lastName']);
+        $moderator_email = $moderator['email']; // Get the moderator's email
     } else {
         $moderator_name = "Unknown Moderator";
+        $moderator_email = ''; // Default empty email if not found
     }
 
     // Fetch the club's name
@@ -57,8 +62,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm'])) {
             $admin_id = $_SESSION['admin_id']; // Assuming admin_id is stored in session
             
             $log_stmt = $pdo->prepare("INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (?, NOW(), ?, ?, ?)");
-            // $log_stmt->execute([$activity, $admin_id, $moderator_id, null]);
             $log_stmt->execute([$activity, $admin_id, null, null]); // Assuming student_id is not relevant here
+
+            // Send email notification to the moderator about the removal
+            $mail = new PHPMailer(true);
+            try {
+                // SMTP settings
+                $mail->isSMTP();                                       // Send using SMTP
+                $mail->Host       = 'smtp.gmail.com';                  // Set the SMTP server to send through
+                $mail->SMTPAuth   = true;                              // Enable SMTP authentication
+                $mail->Username   = 'k.blancia.dev@gmail.com';         // SMTP username
+                $mail->Password   = 'kcnt aoii lrlm ehub';             // SMTP password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;    // Enable TLS encryption
+                $mail->Port       = 587;                               // TCP port to connect to
+    
+                // Email content
+                $mail->setFrom('k.blancia.dev@gmail.com', 'Club Assignment Removed');      
+                $mail->addAddress($moderator_email, $moderator_name); 
+
+                // Content
+                $mail->isHTML(true); // Set email format to HTML
+                $mail->Subject = 'Removed as Club Moderator';
+                $mail->Body = "Hello {$moderator_name},
+                               You have been removed as a moderator of the {$club_name} club.
+                               If you have any questions, please contact the admin team.
+                               Best regards, Your Admin Team";
+
+                // Send the email
+                $mail->send();
+                // Optionally log or handle successful email sending
+            } catch (Exception $e) {
+                echo "Email could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            }
 
         } else {
             // No rows affected, meaning the moderator wasn't assigned to this club
@@ -73,6 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm'])) {
     exit;
 }
 ?>
+
 
 
 <!DOCTYPE html>

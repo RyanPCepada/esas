@@ -1,6 +1,13 @@
 <?php
 // Include config file
 require_once "../../../../config.php";
+require __DIR__ . '/../../../vendor/autoload.php';
+
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+
 session_start();
 
 if (!isset($_SESSION['moderator_id'])) {
@@ -9,9 +16,15 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id'];
 
+$final_email ='';
+$student_id =[];
+$club_id=[];
+$registration_id;
+
+echo $final_email;
+
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
-
 // Check existence of student_id, club_id, and registration_id parameter before processing further
 if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"])) 
     && isset($_GET["club_id"]) && !empty(trim($_GET["club_id"])) 
@@ -20,10 +33,21 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     // Set parameters
     $param_student_id = trim($_GET["student_id"]);
     $param_club_id = trim($_GET["club_id"]);
-    $param_registration_id = trim($_GET["registration_id"]); // Get registration_id from URL
+    $param_registration_id = trim($_GET["registration_id"]); 
+
+    // Log student, club, and registration IDs
+    echo "<script>console.log('Student ID: " . $param_student_id . "');</script>";
+    echo "<script>console.log('Club ID: " . $param_club_id . "');</script>";
+    echo "<script>console.log('Registration ID: " . $param_registration_id . "');</script>";
+
+    $registration_id = trim($_GET["registration_id"]);
+    $student_id = trim($_GET["student_id"]);
+    $club_id = trim($_GET["club_id"]);
 
     // Prepare a select statement to fetch the student details
     $sql = "SELECT * FROM tbl_students WHERE student_id = :student_id";
+
+    echo "<script>console.log('Preparing SQL to fetch student details');</script>";
 
     if ($stmt = $pdo->prepare($sql)) {
         // Bind variables to the prepared statement as parameters
@@ -31,25 +55,36 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
 
         // Attempt to execute the prepared statement
         if ($stmt->execute()) {
+            echo "<script>console.log('SQL executed successfully');</script>";
             if ($stmt->rowCount() == 1) {
                 // Fetch result row as an associative array
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                
+
+                // Assigning values from the fetched row
                 $student_id = $row["student_id"];
                 $firstName = !empty($row["firstName"]) ? $row["firstName"] : '';
                 $middleName = !empty($row["middleName"]) ? $row["middleName"] : '';
                 $lastName = !empty($row["lastName"]) ? $row["lastName"] : '';
+                $email = !empty($row["instiEmail"]) ? $row["instiEmail"] : '';
+
+                $final_email = $email;
+                echo "<script>console.log('Final Email: " . $final_email . "');</script>";
                 $fullName = trim("$firstName $middleName $lastName");
 
                 // For profile picture
                 $profilePic = !empty($row['profilePic']) ? '/esas/esas_student/images/' . $row['profilePic'] : 'No Image Available';
+                echo "<script>console.log('Profile Picture: " . $profilePic . "');</script>";
             } else {
                 // Redirect to error page if no valid id is found
+                echo "<script>console.log('No valid student ID found');</script>";
                 header("location: ../public/error.php");
                 exit();
             }
         } else {
-            echo "Oops! Something went wrong. Please try again later.";
+            // Handle the error when executing the statement
+            echo "<script>console.log('Error executing the student details query');</script>";
+            echo "Error executing the query. Please try again.";
+            exit();
         }
     }
 
@@ -59,6 +94,8 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     // Prepare a select statement to fetch questions and dateApplied from tbl_registration
     $sql_questions = "SELECT question1, question2, question3, dateApplied FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id";
 
+    echo "<script>console.log('Preparing SQL to fetch registration questions and dateApplied');</script>";
+
     if ($stmt = $pdo->prepare($sql_questions)) {
         // Bind variables to the prepared statement as parameters
         $stmt->bindParam(":student_id", $param_student_id);
@@ -66,15 +103,19 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
 
         // Attempt to execute the prepared statement
         if ($stmt->execute()) {
+            echo "<script>console.log('SQL executed successfully for questions');</script>";
             // Fetch the questions and dateApplied together in one call
-            $questions = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch all as associative array
+            $questions = $stmt->fetch(PDO::FETCH_ASSOC); 
 
             if ($questions) {
-                $dateApplied = $questions['dateApplied']; // Date applied from the fetched array
+                $dateApplied = $questions['dateApplied']; 
+                echo "<script>console.log('Date Applied: " . $dateApplied . "');</script>";
             } else {
+                echo "<script>console.log('No registration details found');</script>";
                 echo "No registration details found.";
             }
         } else {
+            echo "<script>console.log('Error executing the questions query');</script>";
             echo "Could not fetch questions. Please try again later.";
         }
     }
@@ -84,76 +125,193 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     
 } else {
     // URL doesn't contain student_id or club_id parameter. Redirect to error page
+    echo "<script>console.log('Missing required parameters in URL');</script>";
     header("location: ../public/error.php");
     exit();
 }
+
+// Function to update the registration status
+function updateRegistrationStatus($pdo, $student_id, $club_id, $registration_id, $newStatus) {
+    echo "<script>console.log('Updating registration status to " . $newStatus . "');</script>";
+    $updateSql = "UPDATE tbl_registration 
+                  SET status = :status, dateApproved = NOW() 
+                  WHERE student_id = :student_id 
+                  AND club_id = :club_id 
+                  AND registration_id = :registration_id";
+
+    $stmt = $pdo->prepare($updateSql);
+    $stmt->execute([
+        ':status' => $newStatus,
+        ':student_id' => $student_id,
+        ':club_id' => $club_id,
+        ':registration_id' => $registration_id,
+    ]);
+    $rowCount = $stmt->rowCount();
+    echo "<script>console.log('Rows affected: " . $rowCount . "');</script>";
+    return $rowCount;
+}
+
+// Function to count active memberships
+function countActiveMemberships($pdo, $student_id) {
+    echo "<script>console.log('Counting active memberships for student ID: " . $student_id . "');</script>";
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
+    $stmt->execute([':student_id' => $student_id]);
+    $activeCount = $stmt->fetchColumn();
+    echo "<script>console.log('Active Memberships: " . $activeCount . "');</script>";
+    return $activeCount;
+}
+
+// Function to update pending registrations status
+function updatePendingRegistrations($pdo, $student_id) {
+    echo "<script>console.log('Updating pending registrations for student ID: " . $student_id . "');</script>";
+    $updatePendingSql = "UPDATE tbl_registration SET status = 'maxed' WHERE student_id = :student_id AND status = 'pending'";
+    $stmt = $pdo->prepare($updatePendingSql);
+    $stmt->execute([':student_id' => $student_id]);
+}
+
+// Function to fetch club name
+function fetchClubName($pdo, $club_id) {
+    echo "<script>console.log('Fetching club name for club ID: " . $club_id . "');</script>";
+    $stmt = $pdo->prepare("SELECT clubName FROM tbl_clubs WHERE club_id = :club_id");
+    $stmt->execute([':club_id' => $club_id]);
+    $club = $stmt->fetch(PDO::FETCH_ASSOC);
+    $clubName = $club['clubName'] ?? 'Unknown Club';
+    echo "<script>console.log('Club Name: " . $clubName . "');</script>";
+    return $clubName;
+}
+
 
 // Handle approval or disapproval
 if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprove'])) {
     // Set new status based on action
     $newStatus = $_POST["action"] === 'approve' ? 'active' : 'disapproved';
+   
+    // Log action and new status
+    echo "<script>console.log('Action: " . $_POST["action"] . "');</script>";
+    echo "<script>console.log('New Status: " . $newStatus . "');</script>";
+   
+    // Get values for student_id, club_id, registration_id (assuming they are coming from POST data)
+    echo "<script>console.log('Fetching student_id, club_id, registration_id');</script>";
+    
+    // Debug global variables
+    echo "<script>console.log('Student ID: " . json_encode($student_id) . "');</script>";
+    echo "<script>console.log('Club ID: " . json_encode($club_id) . "');</script>";
+    echo "<script>console.log('Registration ID: " . json_encode($registration_id) . "');</script>";
 
-    // Prepare the SQL statement to update the specific registration record
-    $updateSql = "UPDATE tbl_registration 
-                  SET status = :status, dateApproved = NOW() 
-                  WHERE student_id = :student_id 
-                  AND club_id = :club_id 
-                  AND registration_id = :registration_id"; // Include registration_id
+    // Update registration status
+    echo "<script>console.log('Updating registration status...');</script>";
+    if (updateRegistrationStatus($pdo, $student_id, $club_id, $registration_id, $newStatus) > 0) {
+        echo "<script>console.log('Registration status updated successfully');</script>";
+        
+        // Check the current active memberships after approval
+        if ($newStatus === 'active') {
+            echo "<script>console.log('New status is active. Counting active memberships...');</script>";
+            // Count how many clubs the student is currently "active" in
+            $clubsCount = countActiveMemberships($pdo, $student_id);
 
-    if ($updateStmt = $pdo->prepare($updateSql)) {
-        // Bind parameters
-        $updateStmt->bindParam(":status", $newStatus);
-        $updateStmt->bindParam(":student_id", $param_student_id, PDO::PARAM_INT);
-        $updateStmt->bindParam(":club_id", $param_club_id, PDO::PARAM_INT);
-        $updateStmt->bindParam(":registration_id", $param_registration_id, PDO::PARAM_INT); // Bind registration_id
+            echo "<script>console.log('Active Clubs Count: " . $clubsCount . "');</script>";
 
-        // Execute the update statement
-        if ($updateStmt->execute()) {
-            // Check the current active memberships after approval
-            if ($newStatus === 'active') {
-                // Count how many clubs the student is currently "active" in
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
-                $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-                $stmt->execute();
-                $clubsCount = $stmt->fetchColumn();
-
-                // If the student already has 2 active memberships, update the status of other pending registrations
-                if ($clubsCount >= 2) {
-                    $updatePendingSql = "UPDATE tbl_registration SET status = 'maxed' WHERE student_id = :student_id AND status = 'pending'";
-                    $updatePendingStmt = $pdo->prepare($updatePendingSql);
-                    $updatePendingStmt->bindParam(':student_id', $param_student_id, PDO::PARAM_INT);
-                    $updatePendingStmt->execute();
-                }
-
-                // Fetch the club name for logging
-                $stmt = $pdo->prepare("SELECT clubName FROM tbl_clubs WHERE club_id = :club_id");
-                $stmt->bindParam(':club_id', $param_club_id, PDO::PARAM_INT);
-                $stmt->execute();
-                $club = $stmt->fetch(PDO::FETCH_ASSOC);
-                $clubName = $club['clubName'] ?? 'Unknown Club'; // Handle case where club name is not found
-
-                // Log the approval action
-                logActivity($pdo, $fullName, $student_id, $clubName, true); // Call the function to log activity for approval
-            } else {
-                // Log the disapproval action
-                $stmt = $pdo->prepare("SELECT clubName FROM tbl_clubs WHERE club_id = :club_id");
-                $stmt->bindParam(':club_id', $param_club_id, PDO::PARAM_INT);
-                $stmt->execute();
-                $club = $stmt->fetch(PDO::FETCH_ASSOC);
-                $clubName = $club['clubName'] ?? 'Unknown Club'; // Handle case where club name is not found
-
-                logActivity($pdo, $fullName, $student_id, $clubName, false); // Call the function to log activity for disapproval
+            // If the student already has 2 active memberships, update the status of other pending registrations
+            if ($clubsCount >= 2) {
+                echo "<script>console.log('Student has 2 or more active memberships. Updating pending registrations...');</script>";
+                updatePendingRegistrations($pdo, $student_id);
             }
 
-            header("location: ../../pending_approvals.php");
-            exit();
+         
+            $clubName = fetchClubName($pdo, $club_id);
+            echo "<script>console.log('Club Name: " . $clubName . "');</script>";
+
+          
+            echo "<script>console.log('Logging approval action...');</script>";
+            logActivity($pdo, $fullName, $student_id, $clubName, true); 
+
+            echo "<script>console.log('Sending approval email...');</script>";
+           
+            sendNotificationEmail($final_email, $fullName, $clubName, 'approved');
         } else {
-            echo "Error updating the request. Please try again.";
-            exit();
+            // YOU CAN DELETE NING MGA CONCOLE LOGS NAKO. FOR DEBUGGING PURPOSES RANA
+            echo "<script>console.log('New status is disapproved');</script>";
+
+            $clubName = fetchClubName($pdo, $club_id);
+            echo "<script>console.log('Club Name: " . $clubName . "');</script>";
+
+            echo "<script>console.log('Logging disapproval action...');</script>";
+            logActivity($pdo, $fullName, $student_id, $clubName, false); 
+
+            echo "<script>console.log('Sending disapproval email...');</script>";
+            sendNotificationEmail($final_email, $fullName, $clubName, 'disapproved');
+        }
+
+        echo "<script>console.log('Redirecting to pending approvals...');</script>";
+         header("location: ../../pending_approvals.php");
+        exit();
+    } else {
+        echo "<script>console.log('Error updating the request');</script>";
+        echo "Error updating the request. Please try again.";
+        exit();
+    }
+}
+
+// Function to send email notification using PHPMailer
+function sendNotificationEmail($final_email, $fullName, $clubName, $action) {
+    // Load PHPMailer
+    $mail = new PHPMailer(true);
+    
+    try {
+        echo "<script>console.log('Starting to send email...');</script>";
+    
+        // Server settings
+        echo "<script>console.log('Configuring SMTP settings...');</script>";
+        $mail->isSMTP();                                       // Send using SMTP
+        $mail->Host       = 'smtp.gmail.com';                  // Set the SMTP server to send through
+        $mail->SMTPAuth   = true;                              // Enable SMTP authentication
+        $mail->Username   = 'k.blancia.dev@gmail.com';         // SMTP username
+        $mail->Password   = 'kcnt aoii lrlm ehub';             // SMTP password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;    // Enable TLS encryption
+        $mail->Port       = 587;                               // TCP port to connect to
+        
+        echo "<script>console.log('SMTP configuration completed.');</script>";
+    
+        // Recipients
+        echo "<script>console.log('Adding recipient: {$final_email}');</script>";
+        $mail->setFrom('k.blancia.dev@gmail.com', 'Club Registration');
+        $mail->addAddress($final_email, $fullName);           
+    
+        // Content
+        echo "<script>console.log('Setting up email content...');</script>";
+        $mail->isHTML(true);                                  
+        $subject = $action === 'approved' ? 'Club Registration Approved' : 'Club Registration Disapproved';
+        $mail->Subject = $subject;
+    
+        $message = $action === 'approved' ? 
+            "Dear $fullName,<br><br>Congratulations! Your registration for the club <b>$clubName</b> has been approved." : 
+            "Dear $fullName,<br><br>We regret to inform you that your registration for the club <b>$clubName</b> has been disapproved.";
+        
+        $mail->Body    = $message;
+        echo "<script>console.log('Email subject and body set.');</script>";
+    
+        // Attempt to send the email
+        echo "<script>console.log('Attempting to send the email...');</script>";
+        $mail->send();
+        
+        // Log success
+        echo 'Email has been sent';
+        echo "<script>console.log('Email sent successfully to {$final_email}');</script>";
+    } catch (Exception $e) {
+
+        // Handle specific SMTP authentication errors
+        if (strpos($mail->ErrorInfo, '535') !== false) {
+            echo "<script>console.log('Error: Incorrect username or password.');</script>";
+        } elseif (strpos($mail->ErrorInfo, '534') !== false) {
+            echo "<script>console.log('Error: Gmail is blocking the sign-in attempt. Ensure that Less Secure Apps are enabled or use an App Password.');</script>";
+        } else {
+            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            echo "<script>console.log('Mailer Error: {$mail->ErrorInfo}');</script>";
         }
     }
-    unset($updateStmt);
+    
 }
+
 
 function logActivity($pdo, $fullName, $student_id, $clubName, $isApproved) {
     // Prepare the SQL statement to insert activity log
