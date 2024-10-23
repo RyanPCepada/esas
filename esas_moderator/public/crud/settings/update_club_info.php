@@ -10,7 +10,7 @@ $moderator_id = $_SESSION['moderator_id'];
 
 // Fetch clubs handled by the active moderator
 $sql = "
-    SELECT c.club_id, c.clubName, c.information, c.coverPhoto, c.slots 
+    SELECT c.club_id, c.clubName, c.information, c.mission, c.vision, c.history, c.coverPhoto, c.slots 
     FROM tbl_clubs AS c
     JOIN tbl_clubs_and_moderators AS cm ON c.club_id = cm.club_id
     WHERE cm.moderator_id = ?
@@ -24,6 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     $clubId = $_POST['club_id'];
     $clubName = $_POST['clubName'];
     $information = $_POST['information'];
+    $mission = $_POST['mission'];
+    $vision = $_POST['vision'];
+    $history = $_POST['history'];
     $coverPhoto = $_FILES['coverPhoto']['name'] ? $_FILES['coverPhoto']['name'] : null;
     $slots = $_POST['slots']; // Retrieve the slots value from the form
 
@@ -53,21 +56,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     // Update club information
     $updateSql = "
         UPDATE tbl_clubs 
-        SET clubName = ?, information = ?, coverPhoto = COALESCE(?, coverPhoto), slots = ?, dateModified = NOW() 
+        SET clubName = ?, information = ?, mission = ?, vision = ?, history = ?, coverPhoto = COALESCE(?, coverPhoto), slots = ?, dateModified = NOW() 
         WHERE club_id = ?";
     
     $updateStmt = $pdo->prepare($updateSql);
-    if ($updateStmt->execute([$clubName, $information, $fileName ?? null, $slots, $clubId])) {
+    if ($updateStmt->execute([$clubName, $information, $mission, $vision, $history, $fileName ?? null, $slots, $clubId])) {
         // Log the activity after a successful update
         $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
         $logStmt = $pdo->prepare($logSql);
         $logStmt->execute([
-            'activity' => "You updated $clubName information",
+            'activity' => "You updated $clubName details",
             'dateAdded' => date('Y-m-d H:i:s'),
             'moderator_id' => $moderator_id
         ]);
 
-        echo "Club information updated successfully!";
+        echo "Club details updated successfully!";
         header("location: ../../../settings.php");
         exit();
     } else {
@@ -95,6 +98,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                         <div class="form-group">
                             <label for="information">Information</label>
                             <textarea class="form-control" id="information" name="information" rows="4" required><?php echo htmlspecialchars($club['information']); ?></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="mission">Mission</label>
+                            <textarea class="form-control" id="mission" name="mission" rows="4" required><?php echo htmlspecialchars($club['mission']); ?></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="vision">Vision</label>
+                            <textarea class="form-control" id="vision" name="vision" rows="4" required><?php echo htmlspecialchars($club['vision']); ?></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="history">History</label>
+                            <textarea class="form-control" id="history" name="history" rows="4" required><?php echo htmlspecialchars($club['history']); ?></textarea>
                         </div>
                         <div class="form-group">
                             <label for="slots">Membership Limit</label>
