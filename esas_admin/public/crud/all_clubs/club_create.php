@@ -13,8 +13,8 @@ if (isset($_SESSION['admin_id'])) {
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-$clubName = $information = $mission = $vision = $history = $coverPhoto = "";
-$clubName_err = $information_err = $mission_err = $vision_err = $history_err = $coverPhoto_err = "";
+$clubName = $description = $mission = $vision = $history = $coverPhoto = "";
+$clubName_err = $description_err = $mission_err = $vision_err = $history_err = $coverPhoto_err = "";
 $moderators = [];
 define('COVERPHOTO_DEFAULT', 'COVERPHOTO_DEFAULT.png');
 define('PROF_PIC_DEFAULT', 'PROF_PIC.png');
@@ -113,11 +113,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $clubName = $input_clubName;
     }
 
-    $input_information = trim($_POST["information"]);
-    if (empty($input_information)) {
-        $information_err = "Please enter club information.";
+    $input_description = trim($_POST["description"]);
+    if (empty($input_description)) {
+        $description_err = "Please enter club description.";
     } else {
-        $information = $input_information;
+        $description = $input_description;
     }
 
     // Validate mission
@@ -175,14 +175,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $coverPhoto = COVERPHOTO_DEFAULT;
     }
 
-    if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err)) {
-        $sql = "INSERT INTO tbl_clubs (clubName, information, mission, vision, history, coverPhoto, founder_id, dateAdded) 
-        VALUES (:clubName, :information, :mission, :vision, :history, :coverPhoto, :admin_id, NOW())";
+    if (empty($clubName_err) && empty($description_err) && empty($coverPhoto_err)) {
+        $sql = "INSERT INTO tbl_clubs (clubName, description, mission, vision, history, coverPhoto, founder_id, dateAdded) 
+        VALUES (:clubName, :description, :mission, :vision, :history, :coverPhoto, :admin_id, NOW())";
 
         if ($stmt = $pdo->prepare($sql)) {
             // Bind parameters
             $stmt->bindParam(":clubName", $clubName);
-            $stmt->bindParam(":information", $information);
+            $stmt->bindParam(":description", $description);
             $stmt->bindParam(":mission", $mission);
             $stmt->bindParam(":vision", $vision);
             $stmt->bindParam(":history", $history);
@@ -297,9 +297,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <span class="invalid-feedback"><?php echo $clubName_err; ?></span>
                     </div>
                     <div class="form-group mb-2">
-                        <label>Information</label>
-                        <textarea name="information" class="form-control <?php echo (!empty($information_err)) ? 'is-invalid' : ''; ?>"><?php echo $information; ?></textarea>
-                        <span class="invalid-feedback"><?php echo $information_err; ?></span>
+                        <label>Description</label>
+                        <textarea name="description" class="form-control <?php echo (!empty($description_err)) ? 'is-invalid' : ''; ?>"><?php echo $description; ?></textarea>
+                        <span class="invalid-feedback"><?php echo $description_err; ?></span>
                     </div>
                     <div class="form-group mb-2">
                         <label>Mission</label>

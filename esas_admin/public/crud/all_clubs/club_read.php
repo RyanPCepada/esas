@@ -14,7 +14,7 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
     $sql = "SELECT 
                 c.club_id,
                 c.clubName,
-                c.information,
+                c.description,
                 c.mission,
                 c.vision,
                 c.history,
@@ -41,7 +41,7 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
 
                 // Retrieve the details
                 $clubName = htmlspecialchars($row["clubName"]);
-                $information = !empty($row["information"]) ? htmlspecialchars($row["information"]) : 'No information available.';
+                $description = !empty($row["description"]) ? htmlspecialchars($row["description"]) : 'No description available.';
                 $mission = !empty($row["mission"]) ? htmlspecialchars($row["mission"]) : 'No mission available.';
                 $vision = !empty($row["vision"]) ? htmlspecialchars($row["vision"]) : 'No vision available.';
                 $history = !empty($row["history"]) ? htmlspecialchars($row["history"]) : 'No history available.';
@@ -122,8 +122,8 @@ unset($pdo);
                         <hr>
                         <div class="row p-2 mt-4">
                             <div class="col-md-12">
-                                <h5>Information:</h5>
-                                <p style="text-align: justify; text-indent: 30px;"><?php echo $information; ?></p>
+                                <h5>Description:</h5>
+                                <p style="text-align: justify; text-indent: 30px;"><?php echo $description; ?></p>
                                 <h5>Mission:</h5>
                                 <p style="text-align: justify; text-indent: 30px;"><?php echo $mission; ?></p>
                                 <h5>Vision:</h5>

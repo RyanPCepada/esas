@@ -14,8 +14,8 @@ if (isset($_SESSION['admin_id'])) {
 date_default_timezone_set('Asia/Manila');
 
     $clubId = $_GET['club_id'] ?? null; // Get the club ID from the query string
-    $clubName = $information = $mission = $vision = $history = $coverPhoto = "";
-    $clubName_err = $information_err = $mission_err = $vision_err = $history_err = $coverPhoto_err = "";
+    $clubName = $description = $mission = $vision = $history = $coverPhoto = "";
+    $clubName_err = $description_err = $mission_err = $vision_err = $history_err = $coverPhoto_err = "";
     define('COVERPHOTO_DEFAULT', 'COVERPHOTO_DEFAULT.png');
 
     // Fetch moderators
@@ -55,7 +55,7 @@ date_default_timezone_set('Asia/Manila');
                 $club = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($club) {
                     $clubName = $club['clubName'];
-                    $information = $club['information'];
+                    $description = $club['description'];
                     $mission = $club['mission'];
                     $vision = $club['vision'];
                     $history = $club['history'];
@@ -127,11 +127,11 @@ if (!empty($_POST['recommendedDepartments'])) {
             $clubName = $input_clubName;
         }
 
-        $input_information = trim($_POST["information"]);
-        if (empty($input_information)) {
-            $information_err = "Please enter club information.";
+        $input_description = trim($_POST["description"]);
+        if (empty($input_description)) {
+            $description_err = "Please enter club description.";
         } else {
-            $information = $input_information;
+            $description = $input_description;
         }
 
         // Validate mission
@@ -196,10 +196,10 @@ if (!empty($_POST['recommendedDepartments'])) {
 
 
         // Update the club if no errors
-        if (empty($clubName_err) && empty($information_err) && empty($mission_err) && empty($vision_err) && empty($history_err) && empty($coverPhoto_err)) {
+        if (empty($clubName_err) && empty($description_err) && empty($mission_err) && empty($vision_err) && empty($history_err) && empty($coverPhoto_err)) {
             $sql = "UPDATE tbl_clubs 
                     SET clubName = :clubName, 
-                        information = :information, 
+                        description = :description, 
                         mission = :mission, 
                         vision = :vision, 
                         history = :history, 
@@ -209,7 +209,7 @@ if (!empty($_POST['recommendedDepartments'])) {
             if ($stmt = $pdo->prepare($sql)) {
                 // Bind parameters
                 $stmt->bindParam(":clubName", $clubName);
-                $stmt->bindParam(":information", $information);
+                $stmt->bindParam(":description", $description);
                 $stmt->bindParam(":mission", $mission);
                 $stmt->bindParam(":vision", $vision);
                 $stmt->bindParam(":history", $history);
@@ -222,7 +222,7 @@ if (!empty($_POST['recommendedDepartments'])) {
                             VALUES (:activity, NOW(), :adminId, NULL, NULL)"; // Set moderator_id and student_id to NULL
                     if ($logStmt = $pdo->prepare($logSql)) {
                         // Prepare the activity message
-                        $activityMessage = "You updated {$clubName} details";
+                        $activityMessage = "You updated {$clubName} information";
                         
                         // Bind parameters
                         $logStmt->bindParam(":activity", $activityMessage);
@@ -355,9 +355,9 @@ unset($pdo);
                             <span class="invalid-feedback"><?php echo $clubName_err; ?></span>
                         </div>
                         <div class="form-group mb-2">
-                            <label>Information</label>
-                            <textarea name="information" class="form-control <?php echo (!empty($information_err)) ? 'is-invalid' : ''; ?>" rows="5"><?php echo htmlspecialchars($information); ?></textarea>
-                            <span class="invalid-feedback"><?php echo $information_err; ?></span>
+                            <label>Description</label>
+                            <textarea name="description" class="form-control <?php echo (!empty($description_err)) ? 'is-invalid' : ''; ?>" rows="5"><?php echo htmlspecialchars($description); ?></textarea>
+                            <span class="invalid-feedback"><?php echo $description_err; ?></span>
                         </div>
                         <div class="form-group mb-2">
                             <label>Mission</label>
