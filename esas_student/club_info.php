@@ -8,9 +8,9 @@ require_once '../config.php';
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-// Initialize variables for club information
+// Initialize variables for club description
 $clubName = '';
-$information = '';
+$description = '';
 $mission = '';
 $vision = '';
 $history = '';
@@ -26,7 +26,7 @@ if (isset($_SESSION['student_id'])) {
     $student_id = $_SESSION['student_id'];
 
     try {
-        // Prepare and execute the SQL statement for student information
+        // Prepare and execute the SQL statement for student description
         $sql = "SELECT firstName, middleName, lastName FROM tbl_students WHERE student_id = :student_id";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
@@ -53,9 +53,9 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
     $club_id = $_GET['club_id'];
 
     try {
-        // Prepare SQL query to fetch club information and moderators' profile pictures
+        // Prepare SQL query to fetch club description and moderators' profile pictures
         $stmt = $pdo->prepare("
-            SELECT c.clubName, c.information, c.mission, c.vision, c.history, c.coverPhoto, c.dateAdded, c.slots, 
+            SELECT c.clubName, c.description, c.mission, c.vision, c.history, c.coverPhoto, c.dateAdded, c.slots, 
                 m.firstName, m.middleName, m.lastName, m.profilePic,
                 COUNT(DISTINCT CASE WHEN r.status = 'active' THEN r.student_id END) AS membersCount,
                 COUNT(DISTINCT m.moderator_id) AS numModerators
@@ -69,10 +69,10 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
         $stmt->execute([$club_id]);
         $club = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Fetch the club information
+        // Fetch the club description
         if ($club) {
             $clubName = htmlspecialchars($club['clubName']);
-            $information = htmlspecialchars_decode($club['information']); // Decode HTML entities
+            $description = htmlspecialchars_decode($club['description']); // Decode HTML entities
             $mission = htmlspecialchars_decode($club['mission']); // Decode HTML entities
             $vision = htmlspecialchars_decode($club['vision']); // Decode HTML entities
             $history = htmlspecialchars_decode($club['history']); // Decode HTML entities
@@ -130,7 +130,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 
         } else {
             $clubName = 'Club Not Found';
-            $information = 'No information available for this club.';
+            $description = 'No description available for this club.';
             $mission = 'No mission available for this club.';
             $vision = 'No vision available for this club.';
             $history = 'No history available for this club.';
@@ -165,7 +165,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 
 } else {
     $clubName = 'Invalid Club ID';
-    $information = 'Please provide a valid club ID.';
+    $description = 'Please provide a valid club ID.';
     $mission = 'Please provide a valid club ID.';
     $vision = 'Please provide a valid club ID.';
     $history = 'Please provide a valid club ID.';
@@ -541,7 +541,7 @@ $encodedClubName = addslashes($clubName);
 <div class="club-profile-container">
     <div class="profile-section">
         <h5 class="profile-section-title">Information</h5>
-        <p class="profile-section-content"><?php echo nl2br(htmlspecialchars($information)); ?></p>
+        <p class="profile-section-content"><?php echo nl2br(htmlspecialchars($description)); ?></p>
     </div>
     <div class="profile-section">
         <h5 class="profile-section-title">Mission</h5>

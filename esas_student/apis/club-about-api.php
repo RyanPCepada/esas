@@ -12,12 +12,12 @@ if (isset($_GET['club_id'])) {
     $club_id = intval($_GET['club_id']); // Ensure club_id is an integer
 
     try {
-        // Prepare the SQL query to fetch all relevant information
+        // Prepare the SQL query to fetch all relevant description
         $sql = "
             SELECT 
                 c.club_id, 
                 c.clubName, 
-                c.information, 
+                c.description, 
                 c.mission, 
                 c.vision, 
                 c.history, 
