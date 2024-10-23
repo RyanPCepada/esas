@@ -28,7 +28,7 @@
     }
 
     .club-info .date-created {
-        font-size: 1.1em;
+        /* font-size: 1.1em; */
         color: #666; /* Softer color for the date */
         font-style: italic; /* Italic for date */
     }
@@ -123,6 +123,9 @@ $(document).ready(function() {
                                 <p class="section-title">Club Details</p>
                                 <p class="date-created"><strong>Date of Creation:</strong> ${formattedDate}</p>
                                 <p class="information"><strong>Information:</strong> ${club.information}</p>
+                                <em><p class="mission"><strong>Mission</strong><br> ${club.mission}</p></em>
+                                <em><p class="vision"><strong>Vision</strong><br> ${club.vision}</p></em>
+                                <p class="history"><strong>History</strong><br> ${club.history}</p>
                                 <a href="../settings.php">Edit Information in Settings</a>
                             </div>
                             <br>
