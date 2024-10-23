@@ -28,15 +28,9 @@
     }
 
     .club-info .date-created {
-        font-size: 1.1em;
+        /* font-size: 1.1em; */
         color: #666; /* Softer color for the date */
         font-style: italic; /* Italic for date */
-    }
-
-    .club-info .information {
-        font-size: 1.1em; /* Slightly larger font for club information */
-        color: #333; /* Darker color for better readability */
-        line-height: 1.5; /* Improved line spacing for readability */
     }
 
     .club-info .section-title {
@@ -99,7 +93,7 @@ $(document).ready(function() {
 
     if (clubId) {
         $.ajax({
-            url: `/esas/esas_moderator/apis/club-about-api.php?club_id=${clubId}`,
+            url: `/esas/esas_student/apis/club-about-api.php?club_id=${clubId}`,
             type: 'GET',
             dataType: 'json',
             success: function(response) {
@@ -121,8 +115,11 @@ $(document).ready(function() {
                         <div class="club-info">
                             <div class="club-info-top">
                                 <p class="section-title">Club Details</p>
-                                <p class="date-created"><strong>Date of Creation:</strong> ${formattedDate}</p>
-                                <p class="information"><strong>Information:</strong> ${club.information}</p>
+                                <p class="date-created"><strong>Date of Creation: </strong>${formattedDate}</p>
+                                <p class="information">${club.information}</p>
+                                <em><p class="mission"><strong>Mission</strong><br> ${club.mission}</p></em>
+                                <em><p class="vision"><strong>Vision</strong><br> ${club.vision}</p></em>
+                                <p class="history"><strong>History</strong><br> ${club.history}</p>
                             </div>
                             <br>
                             <p class="club_moderators text-primary my-2">Club Moderators <em>(${moderatorsCount})</em></p>
@@ -140,11 +137,11 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                $('.about-section').append('<p>An error occurred while fetching club information.</p>');
+                $('.about-section').append('<p>An error occurred while fetching club details.</p>');
             }
         });
     } else {
-        $('.about-section').append('<p>Club ID is required to display information.</p>');
+        $('.about-section').append('<p>Club ID is required to display details.</p>');
     }
 
     // Function to build cards for moderators and members
@@ -175,7 +172,7 @@ $(document).ready(function() {
                                     <div class="about-card-body p-0">
                                         <div class="d-flex flex-column">
                                             <h6 class="card-title mb-1">${firstName} ${middleName} ${lastName}</h6>
-                                            <p class="text-primary mb-0">Assigned: ${new Date(dateAssigned).toLocaleDateString('en-US', {
+                                            <p class="text-muted mb-0">Assigned: ${new Date(dateAssigned).toLocaleDateString('en-US', {
                                                 year: 'numeric', month: 'long', day: 'numeric'
                                             })}</p>
                                         </div>
@@ -206,7 +203,7 @@ $(document).ready(function() {
                                         <div class="d-flex flex-column">
                                             <h6 class="card-title mb-1">${firstName} ${middleName} ${lastName}</h6>
                                             <p class="mb-1 text-muted"><strong>${department} ${yearLevel}</strong></p>
-                                            <p class="text-primary mb-0">Member since: ${new Date(dateApproved).toLocaleDateString('en-US', {
+                                            <p class="text-muted mb-0">Member since: ${new Date(dateApproved).toLocaleDateString('en-US', {
                                                 year: 'numeric', month: 'long', day: 'numeric'
                                             })}</p>
                                         </div>
