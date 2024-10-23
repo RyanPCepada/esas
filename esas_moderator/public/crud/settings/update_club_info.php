@@ -10,7 +10,7 @@ $moderator_id = $_SESSION['moderator_id'];
 
 // Fetch clubs handled by the active moderator
 $sql = "
-    SELECT c.club_id, c.clubName, c.information, c.mission, c.vision, c.history, c.coverPhoto, c.slots 
+    SELECT c.club_id, c.clubName, c.description, c.mission, c.vision, c.history, c.coverPhoto, c.slots 
     FROM tbl_clubs AS c
     JOIN tbl_clubs_and_moderators AS cm ON c.club_id = cm.club_id
     WHERE cm.moderator_id = ?
@@ -19,11 +19,11 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute([$moderator_id]);
 $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Process form submission for updating club information
+// Process form submission for updating club description
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     $clubId = $_POST['club_id'];
     $clubName = $_POST['clubName'];
-    $information = $_POST['information'];
+    $description = $_POST['description'];
     $mission = $_POST['mission'];
     $vision = $_POST['vision'];
     $history = $_POST['history'];
@@ -53,28 +53,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
         $coverPhoto = null; // Set this to null to not update the coverPhoto field
     }
 
-    // Update club information
+    // Update club description
     $updateSql = "
         UPDATE tbl_clubs 
-        SET clubName = ?, information = ?, mission = ?, vision = ?, history = ?, coverPhoto = COALESCE(?, coverPhoto), slots = ?, dateModified = NOW() 
+        SET clubName = ?, description = ?, mission = ?, vision = ?, history = ?, coverPhoto = COALESCE(?, coverPhoto), slots = ?, dateModified = NOW() 
         WHERE club_id = ?";
     
     $updateStmt = $pdo->prepare($updateSql);
-    if ($updateStmt->execute([$clubName, $information, $mission, $vision, $history, $fileName ?? null, $slots, $clubId])) {
+    if ($updateStmt->execute([$clubName, $description, $mission, $vision, $history, $fileName ?? null, $slots, $clubId])) {
         // Log the activity after a successful update
         $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
         $logStmt = $pdo->prepare($logSql);
         $logStmt->execute([
-            'activity' => "You updated $clubName information",
+            'activity' => "You updated $clubName description",
             'dateAdded' => date('Y-m-d H:i:s'),
             'moderator_id' => $moderator_id
         ]);
 
-        echo "Club information updated successfully!";
+        echo "Club description updated successfully!";
         header("location: ../../../settings.php");
         exit();
     } else {
-        echo "Error updating club information.";
+        echo "Error updating club description.";
     }
 }
 ?>
@@ -96,8 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                             <input type="text" class="form-control" id="clubName" name="clubName" value="<?php echo htmlspecialchars($club['clubName']); ?>" required>
                         </div>
                         <div class="form-group">
-                            <label for="information">Information</label>
-                            <textarea class="form-control" id="information" name="information" rows="4" required><?php echo htmlspecialchars($club['information']); ?></textarea>
+                            <label for="description">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required><?php echo htmlspecialchars($club['description']); ?></textarea>
                         </div>
                         <div class="form-group">
                             <label for="mission">Mission</label>
