@@ -34,7 +34,7 @@
     }
 
     .club-info .information {
-        font-size: 1.1em; /* Slightly larger font for club information */
+        /* font-size: 1.1em; Slightly larger font for club information */
         color: #333; /* Darker color for better readability */
         line-height: 1.5; /* Improved line spacing for readability */
     }
@@ -49,7 +49,7 @@
     }
 
     .club-info .club_moderators, .club-info .members {
-        font-size: 1.3em;
+        font-size: 1.2em;
         font-weight: bold;
         color: #007bff; /* Primary color for section titles */
     }
@@ -122,18 +122,23 @@ $(document).ready(function() {
                             <div class="club-info-top">
                                 <p class="section-title">Club Details</p>
                                 <p class="date-created"><strong>Date of Creation:</strong> ${formattedDate}</p>
-                                <p class="information"><strong>Information:</strong> ${club.information}</p>
-                                <em><p class="mission"><strong>Mission</strong><br> ${club.mission}</p></em>
-                                <em><p class="vision"><strong>Vision</strong><br> ${club.vision}</p></em>
+                                <p class="information">${club.information}</p>
+                                <div class="mission-container p-3 mb-3 border rounded bg-light">
+                                    <em><p class="mission"><strong>Mission</strong><br> ${club.mission}</p></em>
+                                </div>
+                                <div class="vision-container p-3 mb-3 border rounded bg-light">
+                                    <em><p class="vision"><strong>Vision</strong><br> ${club.vision}</p></em>
+                                </div>
+                                <br>
                                 <p class="history"><strong>History</strong><br> ${club.history}</p>
                                 <a href="../settings.php">Edit Information in Settings</a>
                             </div>
                             <br>
-                            <p class="club_moderators text-primary my-2">Club Moderators <em>(${moderatorsCount})</em></p>
+                            <p class="club_moderators text-muted my-2">Club Moderators <em>(${moderatorsCount})</em></p>
                             <div class="about-row">
                                 ${buildCards(club.moderators, 'moderator')}
                             </div>
-                            <p class="members text-primary my-2">Members <em>(${membersCount})</em></p>
+                            <p class="members text-muted my-2">Members <em>(${membersCount})</em></p>
                             <div class="about-row">
                                 ${buildCards(club.members, 'member')}
                             </div>
@@ -144,11 +149,11 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                $('.about-section').append('<p>An error occurred while fetching club information.</p>');
+                $('.about-section').append('<p>An error occurred while fetching club details.</p>');
             }
         });
     } else {
-        $('.about-section').append('<p>Club ID is required to display information.</p>');
+        $('.about-section').append('<p>Club ID is required to display details.</p>');
     }
 
     // Function to build cards for moderators and members
@@ -179,7 +184,7 @@ $(document).ready(function() {
                                     <div class="about-card-body p-0">
                                         <div class="d-flex flex-column">
                                             <h6 class="card-title mb-1">${firstName} ${middleName} ${lastName}</h6>
-                                            <p class="text-primary mb-0">Assigned: ${new Date(dateAssigned).toLocaleDateString('en-US', {
+                                            <p class="text-muted mb-0">Assigned: ${new Date(dateAssigned).toLocaleDateString('en-US', {
                                                 year: 'numeric', month: 'long', day: 'numeric'
                                             })}</p>
                                         </div>
@@ -210,7 +215,7 @@ $(document).ready(function() {
                                         <div class="d-flex flex-column">
                                             <h6 class="card-title mb-1">${firstName} ${middleName} ${lastName}</h6>
                                             <p class="mb-1 text-muted"><strong>${department} ${yearLevel}</strong></p>
-                                            <p class="text-primary mb-0">Member since: ${new Date(dateApproved).toLocaleDateString('en-US', {
+                                            <p class="text-muted mb-0">Member since: ${new Date(dateApproved).toLocaleDateString('en-US', {
                                                 year: 'numeric', month: 'long', day: 'numeric'
                                             })}</p>
                                         </div>
