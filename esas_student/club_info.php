@@ -477,8 +477,9 @@ $encodedClubName = addslashes($clubName);
                     transform: rotate(-30deg);
                 }
 
-                .profile-section {
+                .mission-section, .vision-section {
                     margin-bottom: 20px; /* Space between sections */
+                    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
                 }
 
                 .profile-section-title {
@@ -520,6 +521,12 @@ $encodedClubName = addslashes($clubName);
                     font-weight: bold;
                     color: white;
                 }
+                
+                .dashed-border {
+                    height: 2px; /* Thickness of the border */
+                    border-top: 2px dashed #ccc; /* Dashed line */
+                    margin: 30px 0; /* Space above and below */
+                }
 
                 /* Responsive Design */
                 @media (max-width: 768px) {
@@ -535,7 +542,7 @@ $encodedClubName = addslashes($clubName);
 
 
             <div class="club-profile-container">
-                <div class="profile-section">
+                <div class="description-section">
                     <h5 class="profile-section-title"><i class="fas fa-lightbulb text-warning" style="font-size: 35px;"></i>
                     Why <?php echo $clubName; ?>?</h5>
                     <?php 
@@ -545,9 +552,9 @@ $encodedClubName = addslashes($clubName);
                         }
                     ?>
                 </div>
-                <div class="row">
+                <div class="row" style="margin-top: 30px; margin-bottom: 30px;">
                     <div class="col-md-6">
-                        <div class="profile-section text-center p-3 mb-3 border rounded bg-light">
+                        <div class="mission-section text-center p-3 mb-3 border rounded bg-light">
                             <em><h5 class="profile-section-title">Mission</h5></em>
                             <?php 
                                 $missionLines = explode("\n", $mission);
@@ -559,7 +566,7 @@ $encodedClubName = addslashes($clubName);
                     </div>
                     
                     <div class="col-md-6">
-                        <div class="profile-section text-center p-3 mb-3 border rounded bg-light">
+                        <div class="vision-section text-center p-3 mb-3 border rounded bg-light">
                             <em><h5 class="profile-section-title">Vision</h5></em>
                             <?php 
                                 $visionLines = explode("\n", $vision);
@@ -572,7 +579,7 @@ $encodedClubName = addslashes($clubName);
                 </div>
 
                 
-                <div class="profile-section">
+                <div class="history-section">
                     <h5 class="profile-section-title"><i class="fas fa-history text-warning" style="font-size: 30px;"></i>
                     History</h5>
                     <?php 
@@ -583,7 +590,8 @@ $encodedClubName = addslashes($clubName);
                     ?>
                 </div>
 
-                <hr class="divider">
+                <!-- <hr class="divider"> -->
+                <div class="dashed-border"></div>
 
                 <div class="mb-3 text-center">
                     <h5 class="moderators-label mt-5 mb-3"><?php echo $moderatorsLabel; ?></h5>
