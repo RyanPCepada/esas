@@ -183,61 +183,75 @@ try {
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
 
                         <!-- THE MAIN PAGE START -->
-                        <div class="card p-2">
+<div class="card p-2">
 
-                            <!-- ALL STUDENT TABLE START -->
-                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <select id="reportType" class="form-control">
-                                            <option value="">-- Select Report Type --</option>
-                                            <option value="all_clubs">All Clubs Records</option>
-                                            <option value="all_moderators">All Moderators Records</option>
-                                            <option value="student_profiles">Student Profiles</option>
-                                            <option value="moderators_and_clubs_overview">Overview of Moderators and Clubs</option>
-                                            <option value="students_and_clubs_overview">Overview of Students and Clubs</option>
-                                            <option value="student_club_requests">Student Club Requests</option>
-                                            <option value="student_registration_status">Student Registration Status</option>
-                                        </select>
-                                    </div>
+<!-- ALL STUDENT TABLE START -->
+<div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+    <div class="row mb-3">
+        <div class="col-md-2">
+            <select id="reportType" class="form-control">
+                <option value="">-- Select Report Type --</option>
+                <option value="all_clubs">All Clubs Records</option>
+                <option value="all_moderators">All Moderators Records</option>
+                <option value="student_profiles">Student Profiles</option>
+                <option value="moderators_and_clubs_overview">Overview of Moderators and Clubs</option>
+                <option value="students_and_clubs_overview">Overview of Students and Clubs</option>
+                <option value="student_club_requests">Student Club Requests</option>
+                <option value="student_registration_status">Student Registration Status</option>
+            </select>
+        </div>
 
-                                    <div class="col-md-2">
-                                        <input type="text" id="startDate" class="form-control" placeholder="Start Date" onfocus="(this.type='date')">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <input type="text" id="endDate" class="form-control" placeholder="End Date" onfocus="(this.type='date')">
-                                    </div>
-                                    
-                                    <div class="text-end col-md-4">
-                                        <button id="generateReport" class="btn btn-primary">Generate Report</button>
-                                        <button id="printReport" class="btn btn-secondary"><i class="fas fa-print"></i> Print Report</button>
-                                    </div>
-                                </div>
+        <!-- Club Dropdown -->
+        <div class="col-md-2">
+            <select id="clubSelect" class="form-control">
+                <option value="">-- Select Club --</option>
+                <?php
+                // Fetch clubs from the database
+                $clubSql = "SELECT club_id, clubName FROM tbl_clubs";
+                $clubs = $pdo->query($clubSql);
+                while ($club = $clubs->fetch()) {
+                    echo '<option value="' . htmlspecialchars($club['club_id']) . '">' . htmlspecialchars($club['clubName']) . '</option>';
+                }
+                ?>
+            </select>
+        </div>
 
-                                <table>
-                                    <tr>
-                                        <td class="label"><strong>Report Title:</strong></td>
-                                        <td id="reportTitle"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="label"><strong>Description:</strong></td>
-                                        <td id="reportDescription"></td>
-                                    </tr>
-                                </table>
+        <div class="col-md-2">
+            <input type="text" id="startDate" class="form-control" placeholder="Start Date" onfocus="(this.type='date')">
+        </div>
+        <div class="col-md-2">
+            <input type="text" id="endDate" class="form-control" placeholder="End Date" onfocus="(this.type='date')">
+        </div>
+        
+        <div class="text-end col-md-4">
+            <button id="generateReport" class="btn btn-primary">Generate Report</button>
+            <button id="printReport" class="btn btn-secondary"><i class="fas fa-print"></i> Print Report</button>
+        </div>
+    </div>
 
-                                <div class="mt-3" id="reportContent">
-                                    <!-- Dynamically generated table will be inserted here -->
-                                </div>
+    <table>
+        <tr>
+            <td class="label"><strong>Report Title:</strong></td>
+            <td id="reportTitle"></td>
+        </tr>
+        <tr>
+            <td class="label"><strong>Description:</strong></td>
+            <td id="reportDescription"></td>
+        </tr>
+    </table>
 
-                            </div>
-                            <!-- ALL STUDENT TABLE END -->
+    <div class="mt-3" id="reportContent">
+        <!-- Dynamically generated table will be inserted here -->
+    </div>
+</div>
+<!-- ALL STUDENT TABLE END -->
 
-                            <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
-                                <em>No results found.</em>
-                            </div>
+<div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
+    <em>No results found.</em>
+</div>
 
-                        </div>
-                        <!-- THE MAIN PAGE END -->
+</div>
+<!-- THE MAIN PAGE END -->
 
 
                     </div>

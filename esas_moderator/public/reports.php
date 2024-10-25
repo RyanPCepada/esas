@@ -201,7 +201,7 @@ try {
                                     <!-- Club Dropdown -->
                                     <div class="col-md-2">
                                         <select id="clubSelect" class="form-control">
-                                            <option value="">Select Club</option>
+                                            <option value="">-- Select Club --</option>
                                             <?php foreach ($clubs as $club): ?>
                                                 <option value="<?= $club['club_id']; ?>"><?= $club['clubName']; ?></option>
                                             <?php endforeach; ?>
