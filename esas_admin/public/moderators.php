@@ -163,199 +163,236 @@ try {
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
 
                         <!-- THE MAIN PAGE START -->
-                        <div class="card p-2">
+<div class="card p-2">
 
-                            <!-- ALL MODERATOR TABLE START -->
-                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+<!-- ALL MODERATOR TABLE START -->
+<div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
 
-                                <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
-                                    <h4 class="text-muted mb-0">Moderators Record</h4>
-                                    <div>
-                                        <a href="../public/crud/moderators/moderator_create.php" class="btn btn-primary">
-                                            <i class="fa fa-plus"></i> Add New Moderator
-                                        </a>
-                                        <a href="../public/crud/moderators/moderator_assign.php" class="btn btn-warning">
-                                            <i class="fa fa-plus"></i> Assign A Moderator
-                                        </a>
-                                    </div>
-                                </div>
+    <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
+        <h4 class="text-muted mb-0">Moderators Record</h4>
+        <div>
+            <a href="../public/crud/moderators/moderator_create.php" class="btn btn-primary">
+                <i class="fa fa-plus"></i> Add New Moderator
+            </a>
+            <a href="../public/crud/moderators/moderator_assign.php" class="btn btn-warning">
+                <i class="fa fa-plus"></i> Assign A Moderator
+            </a>
+        </div>
+    </div>
 
-                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
-                                    <thead>
-                                        <tr>
-                                            <th> <input id="moderatorSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"></th>
-                                            <th class="text-center" colspan="8">
-                                                <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6> <!-- Updated row count display -->
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                </table>
-
-                                <?php
-                                // Include config file
-                                require_once "../../config.php";
-
-                                // SQL query to fetch all moderators with related club information
-                                $sql = "SELECT 
-                                            m.moderator_id,
-                                            m.firstName,
-                                            m.lastName,
-                                            m.email,
-                                            m.phoneNumber,
-                                            m.department,
-                                            m.profilePic,
-                                            GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
-                                        FROM tbl_moderators m
-                                        LEFT JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
-                                        LEFT JOIN tbl_clubs c ON cm.club_id = c.club_id
-                                        GROUP BY m.moderator_id
-                                        ORDER BY m.moderator_id ASC";
-
-                                if ($result = $pdo->query($sql)) {
-                                    $totalRows = $result->rowCount();
-
-                                    if ($totalRows > 0) {
-                                        echo '
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Moderator ID</th>
-                                                        <th>Profile</th>
-                                                        <th>Full Name</th>
-                                                        <th>Club</th>
-                                                        <th>Department</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>';
-
-                                                while ($row = $result->fetch()) {
-                                                    $moderator_id = htmlspecialchars($row['moderator_id']);
-                                                    $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['lastName']);
-                                                    $clubNames = htmlspecialchars($row['clubNames']);
-                                                    $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
-                                                    $email = htmlspecialchars($row['email']);
-                                                    $phoneNumber = htmlspecialchars($row['phoneNumber']);
-                                                    $department = htmlspecialchars($row['department']);
-
-                                                    echo '
-                                                    <tr class="moderator-row">
-                                                        <td class="moderator-id">' . $moderator_id . '</td>
-                                                        <td class="text-center p-1">
-                                                            <img class="moderator-profile-pic" src="/esas/esas_moderator/images/' . $profilePic . '" 
-                                                                alt="' . $fullName . ' profile picture" 
-                                                                style="width: 35px; height: 35px; border-radius: 50%;">
-                                                        </td>
-                                                        <td class="moderator-name">' . $fullName . '</td>
-                                                        <td class="moderator-club">' . $clubNames . '</td>
-                                                        <td class="moderator-department">' . $department . '</td>
-                                                        <td class="text-center">
-                                                            <a href="../public/crud/moderators/moderator_read.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                            <a href="../public/crud/moderators/moderator_update.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                            <a href="../public/crud/moderators/moderator_delete.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
-                                                        </td>
-                                                    </tr>';
-                                                }
-
-                                                echo '
-                                                </tbody>
-                                            </table>
-                                        </div>'; // End of table-responsive
-                                    } else {
-                                        echo '<div class="alert alert-danger"><em>No moderators were found.</em></div>';
+    <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+        <thead>
+            <tr>
+                <th colspan="5">
+                    <div class="row">
+                        <div class="col-12 col-md-8 d-flex align-items-center">
+                            <select id="clubSelect" class="form-select me-2" style="width: 20%;">
+                                <optgroup label="Select Club">
+                                    <option value="" selected>All</option>
+                                    <?php
+                                    // Fetch clubs from tbl_clubs
+                                    $clubSql = "SELECT club_id, clubName FROM tbl_clubs";
+                                    $clubs = $pdo->query($clubSql);
+                                    while ($club = $clubs->fetch()) {
+                                        echo '<option value="' . htmlspecialchars($club['club_id']) . '">' . htmlspecialchars($club['clubName']) . '</option>';
                                     }
-                                } else {
-                                    echo "Oops! Something went wrong. Please try again later.";
-                                }
-                            ?>
-
-                            </div>
-                            <!-- ALL MODERATOR TABLE END -->
-                             
-
-                            <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
-                                <em>No results found.</em>
-                            </div>
-
-
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    const searchInput = document.getElementById('moderatorSearch');
-                                    const moderatorRows = document.querySelectorAll('.moderator-row');
-                                    const rowCountDisplay = document.getElementById('rowCountDisplay');
-                                    const noResultsMessage = document.getElementById('noResultsMessage');
-                                    const totalRows = moderatorRows.length;
-
-                                    rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`;
-
-                                    searchInput.addEventListener('input', function () {
-                                        const searchTerm = searchInput.value.trim().toLowerCase();
-                                        let visibleRowCount = 0;
-
-                                        moderatorRows.forEach(function (row) {
-                                            let rowContainsTerm = false;
-                                            const cells = row.querySelectorAll('td');
-
-                                            cells.forEach(function (cell) {
-                                                // Reset cell content and apply highlight
-                                                cell.innerHTML = removeHighlight(cell.innerHTML);
-                                                if (highlightText(cell, searchTerm)) {
-                                                    rowContainsTerm = true;
-                                                }
-                                            });
-
-                                            if (rowContainsTerm) {
-                                                row.style.display = '';
-                                                visibleRowCount++;
-                                            } else {
-                                                row.style.display = 'none';
-                                            }
-                                        });
-
-                                        rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
-                                        noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
-                                    });
-
-                                    function highlightText(cell, term) {
-                                        const textNodes = getTextNodes(cell);
-                                        let found = false;
-
-                                        textNodes.forEach(node => {
-                                            const text = node.textContent;
-                                            if (text.toLowerCase().includes(term)) {
-                                                const regex = new RegExp(`(${term})`, 'gi');
-                                                const highlightedText = text.replace(regex, '<span style="background-color: lightblue; color: #0033cc;">$1</span>');
-                                                const span = document.createElement('span');
-                                                span.innerHTML = highlightedText;
-                                                node.replaceWith(span);
-                                                found = true;
-                                            }
-                                        });
-
-                                        return found;
-                                    }
-
-                                    function getTextNodes(element) {
-                                        let textNodes = [];
-                                        function recurse(node) {
-                                            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
-                                                textNodes.push(node);
-                                            } else if (node.nodeType === Node.ELEMENT_NODE) {
-                                                node.childNodes.forEach(recurse);
-                                            }
-                                        }
-                                        recurse(element);
-                                        return textNodes;
-                                    }
-
-                                    function removeHighlight(html) {
-                                        return html.replace(/<span[^>]*style="[^"]*background-color:[^"]*"[^>]*>(.*?)<\/span>/gi, '$1');
-                                    }
-                                });
-                            </script>
+                                    ?>
+                                </optgroup>
+                            </select>
+                            <input id="moderatorSearch" class="form-control" type="search" placeholder="Search for moderators here..." aria-label="Search">
                         </div>
-                        <!-- THE MAIN PAGE END -->
+                        <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
+                            <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+    </table>
+
+    <?php
+    // SQL query to fetch all moderators with related club information
+    $sql = "SELECT 
+                m.moderator_id,
+                m.firstName,
+                m.lastName,
+                m.email,
+                m.phoneNumber,
+                m.department,
+                m.profilePic,
+                GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
+            FROM tbl_moderators m
+            LEFT JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
+            LEFT JOIN tbl_clubs c ON cm.club_id = c.club_id
+            GROUP BY m.moderator_id
+            ORDER BY m.moderator_id ASC";
+
+    if ($result = $pdo->query($sql)) {
+        $totalRows = $result->rowCount();
+
+        if ($totalRows > 0) {
+            echo '
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                    <thead>
+                        <tr>
+                            <th>Moderator ID</th>
+                            <th>Profile</th>
+                            <th>Full Name</th>
+                            <th>Club</th>
+                            <th>Department</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+            while ($row = $result->fetch()) {
+                $moderator_id = htmlspecialchars($row['moderator_id']);
+                $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['lastName']);
+                $clubNames = htmlspecialchars($row['clubNames']);
+                $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
+                $department = htmlspecialchars($row['department']);
+
+                echo '
+                <tr class="moderator-row">
+                    <td class="moderator-id">' . $moderator_id . '</td>
+                    <td class="text-center p-1">
+                        <img class="moderator-profile-pic" src="/esas/esas_moderator/images/' . $profilePic . '" 
+                            alt="' . $fullName . ' profile picture" 
+                            style="width: 35px; height: 35px; border-radius: 50%;">
+                    </td>
+                    <td class="moderator-name">' . $fullName . '</td>
+                    <td class="moderator-club">' . $clubNames . '</td>
+                    <td class="moderator-department">' . $department . '</td>
+                    <td class="text-center">
+                        <a href="../public/crud/moderators/moderator_read.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                        <a href="../public/crud/moderators/moderator_update.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
+                        <a href="../public/crud/moderators/moderator_delete.php?moderator_id=' . htmlspecialchars($row['moderator_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                    </td>
+                </tr>';
+            }
+
+            echo '
+            </tbody>
+            </table>
+            </div>'; // End of table-responsive
+        } else {
+            echo '<div class="alert alert-danger"><em>No moderators were found.</em></div>';
+        }
+    } else {
+        echo "Oops! Something went wrong. Please try again later.";
+    }
+    ?>
+
+</div>
+<!-- ALL MODERATOR TABLE END -->
+
+<div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
+    <em>No results found.</em>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('moderatorSearch');
+        const clubSelect = document.getElementById('clubSelect');
+        const moderatorRows = document.querySelectorAll('.moderator-row');
+        const rowCountDisplay = document.getElementById('rowCountDisplay');
+        const noResultsMessage = document.getElementById('noResultsMessage');
+        const totalRows = moderatorRows.length;
+
+        rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`;
+
+        // Filter by club
+        clubSelect.addEventListener('change', function () {
+            const selectedClub = clubSelect.value;
+            let visibleRowCount = 0;
+
+            moderatorRows.forEach(function (row) {
+                const cells = row.querySelectorAll('td');
+                const clubCell = cells[3].textContent.trim(); // Adjust based on club column index
+
+                // Check if the row matches the selected club
+                if (selectedClub === '' || clubCell.includes(selectedClub)) {
+                    row.style.display = '';
+                    visibleRowCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
+            noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
+        });
+
+        // Search functionality
+        searchInput.addEventListener('input', function () {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            let visibleRowCount = 0;
+
+            moderatorRows.forEach(function (row) {
+                let rowContainsTerm = false;
+                const cells = row.querySelectorAll('td');
+
+                cells.forEach(function (cell) {
+                    // Reset cell content and apply highlight
+                    cell.innerHTML = removeHighlight(cell.innerHTML);
+                    if (highlightText(cell, searchTerm)) {
+                        rowContainsTerm = true;
+                    }
+                });
+
+                if (rowContainsTerm) {
+                    row.style.display = '';
+                    visibleRowCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
+            noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
+        });
+
+        function highlightText(cell, term) {
+            const textNodes = getTextNodes(cell);
+            let found = false;
+
+            textNodes.forEach(node => {
+                const text = node.textContent;
+                if (text.toLowerCase().includes(term)) {
+                    const regex = new RegExp(`(${term})`, 'gi');
+                    const highlightedText = text.replace(regex, '<span style="background-color: lightblue; color: #0033cc;">$1</span>');
+                    const span = document.createElement('span');
+                    span.innerHTML = highlightedText;
+                    node.replaceWith(span);
+                    found = true;
+                }
+            });
+
+            return found;
+        }
+
+        function getTextNodes(cell) {
+            const textNodes = [];
+            const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+
+            while (node = walker.nextNode()) {
+                textNodes.push(node);
+            }
+
+            return textNodes;
+        }
+
+        function removeHighlight(html) {
+            return html.replace(/<span style="background-color: lightblue; color: #0033cc;">(.*?)<\/span>/g, '$1');
+        }
+    });
+</script>
+
+</div>
+<!-- THE MAIN PAGE END -->
+
 
                     </div>
                 </div>
