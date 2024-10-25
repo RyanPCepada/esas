@@ -19,7 +19,7 @@ switch ($method) {
 
             // Fetch all disapproved registrations and their associated clubs
             $stmt = $pdo->prepare('
-                SELECT r.registration_id, r.club_id, c.clubName, c.information, c.coverPhoto, r.dateModified
+                SELECT r.registration_id, r.club_id, c.clubName, c.description, c.coverPhoto, r.dateModified
                 FROM tbl_registration r
                 JOIN tbl_clubs c ON r.club_id = c.club_id
                 WHERE r.student_id = ? AND r.status = "disapproved"
@@ -47,7 +47,7 @@ switch ($method) {
                 $stmt_moderators->execute([$clubId]);
                 $moderators = $stmt_moderators->fetchAll(PDO::FETCH_ASSOC);
 
-                // Format the moderators' information
+                // Format the moderators' description
                 $formattedModerators = [];
                 foreach ($moderators as $moderator) {
                     $formattedModerators[] = [

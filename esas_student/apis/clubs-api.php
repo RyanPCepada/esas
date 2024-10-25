@@ -65,7 +65,7 @@ switch ($method) {
             // Read operation (fetch clubs by department)
             $department = $_GET['department'];
             $stmt = $pdo->prepare('
-                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, c.dateAdded, c.dateModified,
+                SELECT c.club_id, c.clubName, c.description, c.coverPhoto, c.dateAdded, c.dateModified,
                        GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderators,
                        GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS profilePics,
                        c.slots  -- Make sure to select the slots field here
@@ -105,7 +105,7 @@ switch ($method) {
         } else {
             // Read operation (fetch all clubs)
             $stmt = $pdo->query('
-                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, c.dateAdded, c.dateModified,
+                SELECT c.club_id, c.clubName, c.description, c.coverPhoto, c.dateAdded, c.dateModified,
                        GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderators,
                        GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS profilePics,
                        c.slots  -- Make sure to select the slots field here
