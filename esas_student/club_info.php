@@ -441,155 +441,156 @@ $encodedClubName = addslashes($clubName);
             
 
             <style>
-    body {
-        font-size: 18px;
-        line-height: 1.6;
-        color: #444;
-        margin: 10px 0;
-        position: relative;
-        z-index: 1;
-        background: #f9f9f9;
-        padding: 15px;
-        border-radius: 10px;
-    }
+                body {
+                    font-size: 18px;
+                    line-height: 1.6;
+                    color: #444;
+                    margin: 10px 0;
+                    position: relative;
+                    z-index: 1;
+                    background: #f9f9f9;
+                    padding: 15px;
+                    border-radius: 10px;
+                }
 
-    .club-profile-container {
-        background-color: #fff;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        padding: 10px 25px;
-        margin-top: 20px;
-        position: relative;
-        overflow: hidden;
-        border: 1px solid #ccc;
-    }
+                .club-profile-container {
+                    background-color: #fff;
+                    border-radius: 15px;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                    padding: 10px 25px;
+                    margin-top: 20px;
+                    position: relative;
+                    overflow: hidden;
+                    border: 1px solid #ccc;
+                }
 
-    .club-profile-container::before {
-        content: "";
-        position: absolute;
-        top: -30%;
-        left: -20%;
-        width: 120%;
-        height: 120%;
-        background: rgba(0, 98, 204, 0.1);
-        border-radius: 50%;
-        z-index: 0;
-        transform: rotate(-30deg);
-    }
+                .club-profile-container::before {
+                    content: "";
+                    position: absolute;
+                    top: -30%;
+                    left: -20%;
+                    width: 120%;
+                    height: 120%;
+                    background: rgba(0, 98, 204, 0.1);
+                    border-radius: 50%;
+                    z-index: 0;
+                    transform: rotate(-30deg);
+                }
 
-    .profile-section {
-        margin-bottom: 20px; /* Space between sections */
-    }
+                .profile-section {
+                    margin-bottom: 20px; /* Space between sections */
+                }
 
-    .profile-section-title {
-        font-weight: bold;
-        color: #0062cc;
-        margin-top: 10px;
-        position: relative;
-        z-index: 1;
-        padding-bottom: 10px;
-    }
+                .profile-section-title {
+                    font-weight: bold;
+                    color: #0062cc;
+                    margin-top: 10px;
+                    position: relative;
+                    z-index: 1;
+                    padding-bottom: 10px;
+                }
 
-    .profile-section-content {
-        text-indent: 2em; /* Indent the first line of each paragraph */
-    }
-
-
-    /* Common styling for both members and slots */
-    .members-info, .slots-info {
-        background-color: rgba(65, 105, 225, 0.8); /* Royal Blue with 80% opacity */
-        border-radius: 10px;
-        padding: 5px 10px;
-        display: inline-block;
-        font-size: 1.2em;
-        color: #00796b; /* Dark teal text color */
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Shadow effect */
-    }
-
-    .members-info {
-        background-color: rgba(34, 139, 34, 0.7); /* Forest Green with 80% opacity */
-    }
-
-    .members-info .fa-users, .slots-info .fa-check-circle {
-        margin-right: 8px;
-    }
-
-    .members-count, .slots-count {
-        font-weight: bold;
-        color: white;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .club-profile-container {
-            padding: 15px;
-        }
-
-        .profile-section-content {
-            /* font-size: 16px; */
-        }
-    }
-</style>
+                .profile-section-content {
+                    text-align: justify; /* Ensures text aligns to both sides */
+                    text-indent: 2em;    /* Indent the first line */
+                    margin-bottom: 1em;  /* Adds space between paragraphs */
+                }
 
 
-<div class="club-profile-container">
-    <div class="profile-section">
-        <h5 class="profile-section-title"><i class="fas fa-lightbulb text-warning" style="font-size: 35px;"></i>
-        Why <?php echo $clubName; ?>?</h5>
-        <?php 
-            $descriptionLines = explode("\n", $description);
-            foreach ($descriptionLines as $line) {
-                echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
-            }
-        ?>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="profile-section p-3 mb-3 border rounded bg-light">
-                <em><h5 class="profile-section-title">Mission</h5></em>
-                <?php 
-                    $missionLines = explode("\n", $mission);
-                    foreach ($missionLines as $line) {
-                        echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
+                /* Common styling for both members and slots */
+                .members-info, .slots-info {
+                    background-color: rgba(65, 105, 225, 0.8); /* Royal Blue with 80% opacity */
+                    border-radius: 10px;
+                    padding: 5px 10px;
+                    display: inline-block;
+                    font-size: 1.2em;
+                    color: #00796b; /* Dark teal text color */
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Shadow effect */
+                }
+
+                .members-info {
+                    background-color: rgba(34, 139, 34, 0.7); /* Forest Green with 80% opacity */
+                }
+
+                .members-info .fa-users, .slots-info .fa-check-circle {
+                    margin-right: 8px;
+                }
+
+                .members-count, .slots-count {
+                    font-weight: bold;
+                    color: white;
+                }
+
+                /* Responsive Design */
+                @media (max-width: 768px) {
+                    .club-profile-container {
+                        padding: 15px;
                     }
-                ?>
-            </div>
-        </div>
-        
-        <div class="col-md-6">
-            <div class="profile-section p-3 mb-3 border rounded bg-light">
-                <em><h5 class="profile-section-title">Vision</h5></em>
-                <?php 
-                    $visionLines = explode("\n", $vision);
-                    foreach ($visionLines as $line) {
-                        echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
+
+                    .profile-section-content {
+                        /* font-size: 16px; */
                     }
-                ?>
+                }
+            </style>
+
+
+            <div class="club-profile-container">
+                <div class="profile-section">
+                    <h5 class="profile-section-title"><i class="fas fa-lightbulb text-warning" style="font-size: 35px;"></i>
+                    Why <?php echo $clubName; ?>?</h5>
+                    <?php 
+                        $descriptionLines = explode("\n", $description);
+                        foreach ($descriptionLines as $line) {
+                            echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
+                        }
+                    ?>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="profile-section text-center p-3 mb-3 border rounded bg-light">
+                            <em><h5 class="profile-section-title">Mission</h5></em>
+                            <?php 
+                                $missionLines = explode("\n", $mission);
+                                foreach ($missionLines as $line) {
+                                    echo '<em><p class="profile-section-content">' . htmlspecialchars($line) . '</p></em>';
+                                }
+                            ?>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="profile-section text-center p-3 mb-3 border rounded bg-light">
+                            <em><h5 class="profile-section-title">Vision</h5></em>
+                            <?php 
+                                $visionLines = explode("\n", $vision);
+                                foreach ($visionLines as $line) {
+                                    echo '<em><p class="profile-section-content">' . htmlspecialchars($line) . '</p></em>';
+                                }
+                            ?>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="profile-section">
+                    <h5 class="profile-section-title"><i class="fas fa-history text-warning" style="font-size: 30px;"></i>
+                    History</h5>
+                    <?php 
+                        $historyLines = explode("\n", $history);
+                        foreach ($historyLines as $line) {
+                            echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
+                        }
+                    ?>
+                </div>
+
+                <hr class="divider">
+
+                <div class="mb-3 text-center">
+                    <h5 class="moderators-label mt-5 mb-3"><?php echo $moderatorsLabel; ?></h5>
+                    <div class="moderators"><?php echo $moderators; ?></div>
+                </div>
+
             </div>
-        </div>
-    </div>
-
-    
-    <div class="profile-section">
-        <h5 class="profile-section-title"><i class="fas fa-history text-warning" style="font-size: 30px;"></i>
-        History</h5>
-        <?php 
-            $historyLines = explode("\n", $history);
-            foreach ($historyLines as $line) {
-                echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
-            }
-        ?>
-    </div>
-
-
-    
-    <hr class="divider">
-
-    <div class="mb-3 text-center">
-        <h5 class="moderators-label mt-5 mb-3"><?php echo $moderatorsLabel; ?></h5>
-        <div class="moderators"><?php echo $moderators; ?></div>
-    </div>
-</div>
 
 
 
