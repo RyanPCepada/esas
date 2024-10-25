@@ -70,7 +70,7 @@ if (!$club) {
             align-items: center; /* Center vertically */
             min-height: 100vh; /* Set a minimum height for vertical centering */
         }
-        .id-card {
+        .id-card-front, .id-card-back {
             border-radius: 10px;
             width: 280px;
             height: 450px;
@@ -183,7 +183,8 @@ if (!$club) {
 
 <div class="id-container" id="id-container">
     <?php if ($club): ?>
-            <div class="id-card" style="background-image: url('/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>');">
+
+            <div class="id-card-front" style="background-image: url('/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>');">
                 
                 <!-- Cover photo at the back -->
                 <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>" alt="Cover Photo" 
@@ -267,6 +268,64 @@ if (!$club) {
 
 
             </div>
+
+
+
+
+            <div class="id-card-back" style="background-image: url('/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>');">
+    <!-- Cover photo at the back -->
+    <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>" alt="Cover Photo" 
+         style="width: 100%; height: 100%; border-radius: 10px; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 0; 
+                opacity: 1; filter: brightness(0.5);">
+
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+                background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, .95), rgba(255, 255, 255, 0.1)); 
+                border-radius: 10px; z-index: 1;"></div>
+
+    <!-- ID Background in front of cover photo -->
+    <img src="/esas/esas_admin/images/ID_BACKGROUND.png" alt="ID Background" 
+         style="width: 100%; height: 100%; border-radius: 10px; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;">
+
+    <div class="school-details" style="position: relative; z-index: 2; display: flex; justify-content: center; margin: 0;">
+        <div style="text-align: center; color: rgba(255, 255, 255, 1);">
+            <p style="font-size: 8px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">VALIDATION ID CARD</p>
+            <p style="font-size: 10px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);"><strong>MEMBERSHIP VALIDATION</strong></p>
+        </div>
+    </div>
+
+    <div class="student-info" style="position: relative; z-index: 2; text-align: center; padding-top: 20px;">
+        <!-- Club Name -->
+        <h3 style="font-size: 21px; color: gold; line-height: 1; text-shadow: 0 3px 3px rgba(0, 0, 0, 1);">
+            <em><strong><?php echo htmlspecialchars($club['clubName']); ?></strong></em>
+        </h3>
+
+        <!-- Validity Table -->
+        <table style="width: 100%; margin-top: 20px; border-collapse: collapse; z-index: 2;">
+            <thead>
+                <tr>
+                    <th style="border: 1px solid #fff; padding: 5px; color: white;">Year</th>
+                    <th style="border: 1px solid #fff; padding: 5px; color: white;">Signature</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                for ($i = 0; $i < 5; $i++) {
+                    $year = date("Y") + $i; // Current year and next four years
+                    echo "<tr style='text-align: center;'>
+                            <td style='border: 1px solid #fff; padding: 5px; color: white;'>$year</td>
+                            <td style='border: 1px solid #fff; padding: 5px; color: white;'>____________________</td>
+                          </tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+
+
     <?php else: ?>
         <p>The student is not an active member of any clubs.</p>
     <?php endif; ?>
