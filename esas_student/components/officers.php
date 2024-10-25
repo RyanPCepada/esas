@@ -5,7 +5,10 @@
         </div>
     </div>
     <div class="officers-list auto-scroll" id="officersList">
-        <!-- Officers will be dynamically inserted here -->
+        <div class="officers-info">
+            <div class="officer-row top-row"></div>
+            <div class="officer-row bottom-row"></div>
+        </div>
     </div>
 </div>
 
@@ -24,6 +27,7 @@
     .officer-card {
         min-width: 180px;
         border: 1px solid #ddd; 
+        border: 1px solid #fff; 
         border-radius: 8px; 
         padding: 10px; 
         display: flex;
@@ -73,6 +77,33 @@
     .officer-row.bottom-row {
         justify-content: center; /* Centering for single officer */
     }
+    
+    .officers-info {
+        position: relative; /* Make it relative for absolute positioning of the pseudo-element */
+        padding: 20px;
+        background-color: #f9f9f9; 
+        border-radius: 10px; 
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden; /* Hide any overflow from shapes */
+    }
+
+    .officers-info::before {
+        content: "";
+        position: absolute;
+        top: 10%;  /* Adjust to position above the container */
+        left: -10%; /* Adjust to position left of the container */
+        width: 120%; /* Make it larger than the container */
+        height: 120%; /* Make it larger than the container */
+        background: rgba(0, 98, 204, 0.1); /* Light background color */
+        border-radius: 50%; /* Rounded shape */
+        z-index: 0; /* Behind the content */
+        transform: rotate(-30deg); /* Rotate for a unique effect */
+    }
+
+    .officers-info > div {
+        position: relative; /* Ensure this is on top of the pseudo-element */
+        z-index: 1; /* Stack above the pseudo-element */
+    }
 </style>
 
 <script>
@@ -91,7 +122,7 @@ $(document).ready(function() {
                 const officersSection = $('.officers-list');
                 
                 // Create officers info section
-                officersSection.append('<div class="officers-info"><div class="officer-row top-row"></div><div class="officer-row bottom-row"></div><div class="text-end mt-3"></div>');
+                // officersSection.append('<div class="officers-info"><div class="officer-row top-row"></div><div class="officer-row bottom-row"></div><div class="text-end mt-3"></div>');
                 const topRow = $('.officer-row.top-row');
                 const bottomRow = $('.officer-row.bottom-row');
 
