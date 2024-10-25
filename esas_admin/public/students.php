@@ -165,194 +165,228 @@ try {
                         <!-- THE MAIN PAGE START -->
                         <div class="card p-2">
 
-                            <!-- ALL STUDENT TABLE START -->
-                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
-                                
-                                <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
-                                    <h4 class="text-muted mb-0">Students Record</h4>
-                                    <a href="../public/crud/students/student_create.php" class="btn btn-danger disabled" style="visibility: hidden;">
-                                        <i class="fa fa-plus"></i> Add New Student
-                                    </a>
-                                </div>
+                        <!-- ALL STUDENT TABLE START -->
+                        <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                             
-                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <input id="studentSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                                            </th>
-                                            <th class="text-center" colspan="8">
-                                                <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6> <!-- Updated row count display -->
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                </table>
+                            <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
+                                <h4 class="text-muted mb-0">Students Record</h4>
+                                <a href="../public/crud/students/student_create.php" class="btn btn-danger disabled" style="visibility: hidden;">
+                                    <i class="fa fa-plus"></i> Add New Student
+                                </a>
+                            </div>
 
-                                <?php
-                                    // Include config file
-                                    require_once "../../config.php";
+                            <!-- Dropdown for clubs and search input -->
+                            <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> 
+                                <thead>
+                                    <tr>
+                                        <th colspan="9">
+                                            <div class="row">
+                                                <div class="col-12 col-md-8 d-flex align-items-center">
+                                                    <select id="clubSelect" class="form-select me-2" style="width: 20%;">
+                                                        <optgroup label="Select Club">
+                                                            <option value="" selected>All</option>
+                                                            <?php
+                                                            // Fetch clubs from tbl_clubs
+                                                            $clubSql = "SELECT club_id, clubName FROM tbl_clubs";
+                                                            $clubs = $pdo->query($clubSql);
+                                                            while ($club = $clubs->fetch()) {
+                                                                echo '<option value="' . htmlspecialchars($club['club_id']) . '">' . htmlspecialchars($club['clubName']) . '</option>';
+                                                            }
+                                                            ?>
+                                                        </optgroup>
+                                                    </select>
+                                                    <input id="studentSearch" class="form-control" type="search" placeholder="Search for students here..." aria-label="Search">
+                                                </div>
+                                                <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
+                                                    <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6> <!-- Updated row count display -->
+                                                </div>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
 
-                                    // SQL query to fetch all students with their registered clubs and active status
-                                    $sql = "SELECT 
-                                                s.student_id,
-                                                s.firstName,
-                                                s.middleName,
-                                                s.lastName,
-                                                s.instiEmail,
-                                                s.phoneNumber,
-                                                s.department,
-                                                s.course,
-                                                s.year,
-                                                s.profilePic,
-                                                GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
-                                            FROM tbl_students s
-                                            LEFT JOIN tbl_registration r ON s.student_id = r.student_id
-                                            LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
-                                            WHERE r.status = 'active' -- Filter for active status
-                                            GROUP BY s.student_id
-                                            ORDER BY s.student_id ASC";
+                            <?php
+                                // Include config file
+                                require_once "../../config.php";
 
-                                    if ($result = $pdo->query($sql)) {
-                                        $totalRows = $result->rowCount();
+                                // SQL query to fetch all students with their registered clubs and active status
+                                $sql = "SELECT 
+                                            s.student_id,
+                                            s.firstName,
+                                            s.middleName,
+                                            s.lastName,
+                                            s.instiEmail,
+                                            s.phoneNumber,
+                                            s.department,
+                                            s.course,
+                                            s.year,
+                                            s.profilePic,
+                                            GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
+                                        FROM tbl_students s
+                                        LEFT JOIN tbl_registration r ON s.student_id = r.student_id
+                                        LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
+                                        WHERE r.status = 'active' -- Filter for active status
+                                        GROUP BY s.student_id
+                                        ORDER BY s.student_id ASC";
 
-                                        if ($totalRows > 0) {
-                                            echo '
-                                            <div class="table-responsive">
-                                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
-                                                    <thead>
-                                                        <tr>
-                                                            <th></th>
-                                                            <th>Full Name</th>
-                                                            <th>Department</th>
-                                                            <th>Course</th>
-                                                            <th>Club</th>
-                                                            <th>Actions</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>';
+                                if ($result = $pdo->query($sql)) {
+                                    $totalRows = $result->rowCount();
 
-                                                    while ($row = $result->fetch()) {
-                                                        $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
-                                                        $clubNames = htmlspecialchars($row['clubNames']);
-                                                        $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
-                                                        $email = htmlspecialchars($row['instiEmail']);
-                                                        $phoneNumber = htmlspecialchars($row['phoneNumber']);
-                                                        $department = htmlspecialchars($row['department']);
-                                                        $course = htmlspecialchars($row['course']);
+                                    if ($totalRows > 0) {
+                                        echo '
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                                                <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>Full Name</th>
+                                                        <th>Department</th>
+                                                        <th>Course</th>
+                                                        <th>Club</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>';
 
-                                                        echo '
-                                                        <tr class="student-row">
-                                                            <td class="text-center p-1">
-                                                                <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
-                                                                    alt="' . $fullName . ' profile picture" 
-                                                                    style="width: 35px; height: 35px; border-radius: 50%;">
-                                                            </td>
-                                                            <td>' . $fullName . '</td>
-                                                            <td>' . $department . '</td>
-                                                            <td>' . $course . '</td>
-                                                            <td>' . $clubNames . '</td>
-                                                            <td class="text-center">
-                                                                <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                                <!-- <a href="../public/crud/students/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                                <a href="../public/crud/students/student_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a> -->
-                                                            </td>
-                                                        </tr>';
-                                                    }
+                                                while ($row = $result->fetch()) {
+                                                    $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
+                                                    $clubNames = htmlspecialchars($row['clubNames']);
+                                                    $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
 
                                                     echo '
-                                                    </tbody>
-                                                </table>
-                                            </div>'; // End of table-responsive
-                                        } else {
-                                            echo '<div class="alert alert-danger"><em>No students were found.</em></div>';
-                                        }
-                                    } else {
-                                        echo "Oops! Something went wrong. Please try again later.";
-                                    }
-                                ?>
-
-                            </div>
-                            <!-- ALL STUDENT TABLE END -->
-
-                            <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
-                                <em>No results found.</em>
-                            </div>
-
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    const searchInput = document.getElementById('studentSearch');
-                                    const studentRows = document.querySelectorAll('.student-row');
-                                    const rowCountDisplay = document.getElementById('rowCountDisplay');
-                                    const noResultsMessage = document.getElementById('noResultsMessage');
-                                    const totalRows = studentRows.length;
-
-                                    rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`;
-
-                                    searchInput.addEventListener('input', function () {
-                                        const searchTerm = searchInput.value.trim().toLowerCase();
-                                        let visibleRowCount = 0;
-
-                                        studentRows.forEach(function (row) {
-                                            const cells = row.querySelectorAll('td');
-                                            let rowContainsTerm = false;
-
-                                            cells.forEach(function (cell) {
-                                                // Reset cell content and apply highlight
-                                                cell.innerHTML = removeHighlight(cell.innerHTML);
-                                                if (highlightText(cell, searchTerm)) {
-                                                    rowContainsTerm = true;
+                                                    <tr class="student-row" data-club="' . htmlspecialchars($clubNames) . '">
+                                                        <td class="text-center p-1">
+                                                            <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
+                                                                alt="' . $fullName . ' profile picture" 
+                                                                style="width: 35px; height: 35px; border-radius: 50%;">
+                                                        </td>
+                                                        <td>' . $fullName . '</td>
+                                                        <td>' . htmlspecialchars($row['department']) . '</td>
+                                                        <td>' . htmlspecialchars($row['course']) . '</td>
+                                                        <td>' . $clubNames . '</td>
+                                                        <td class="text-center">
+                                                            <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                        </td>
+                                                    </tr>';
                                                 }
-                                            });
 
-                                            if (rowContainsTerm) {
-                                                row.style.display = '';
-                                                visibleRowCount++;
-                                            } else {
-                                                row.style.display = 'none';
-                                            }
-                                        });
+                                                echo '
+                                                </tbody>
+                                            </table>
+                                        </div>'; // End of table-responsive
+                                    } else {
+                                        echo '<div class="alert alert-danger"><em>No students were found.</em></div>';
+                                    }
+                                } else {
+                                    echo "Oops! Something went wrong. Please try again later.";
+                                }
+                            ?>
 
-                                        rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
-                                        noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
+                        </div>
+                        <!-- ALL STUDENT TABLE END -->
+
+                        <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
+                            <em>No students found.</em>
+                        </div>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const searchInput = document.getElementById('studentSearch');
+                                const clubSelect = document.getElementById('clubSelect');
+                                const studentRows = document.querySelectorAll('.student-row');
+                                const rowCountDisplay = document.getElementById('rowCountDisplay');
+                                const noResultsMessage = document.getElementById('noResultsMessage');
+                                const totalRows = studentRows.length;
+
+                                rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`;
+
+                                // Filter by club
+                                clubSelect.addEventListener('change', function () {
+                                    const selectedClub = clubSelect.value;
+                                    let visibleRowCount = 0;
+
+                                    studentRows.forEach(function (row) {
+                                        const clubCell = row.getAttribute('data-club'); // Use data attribute for filtering
+
+                                        // Check if the row matches the selected club
+                                        if (selectedClub === '' || clubCell.includes(clubSelect.options[clubSelect.selectedIndex].text)) {
+                                            row.style.display = '';
+                                            visibleRowCount++;
+                                        } else {
+                                            row.style.display = 'none';
+                                        }
                                     });
 
-                                    function highlightText(cell, term) {
-                                        const textNodes = getTextNodes(cell);
-                                        let found = false;
+                                    rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
+                                    noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
+                                });
 
-                                        textNodes.forEach(node => {
-                                            const text = node.textContent;
-                                            if (text.toLowerCase().includes(term)) {
-                                                const regex = new RegExp(`(${term})`, 'gi');
-                                                const highlightedText = text.replace(regex, '<span style="background-color: lightblue; color: #0033cc;">$1</span>');
-                                                const span = document.createElement('span');
-                                                span.innerHTML = highlightedText;
-                                                node.replaceWith(span);
-                                                found = true;
+                                searchInput.addEventListener('input', function () {
+                                    const searchTerm = searchInput.value.trim().toLowerCase();
+                                    let visibleRowCount = 0;
+
+                                    studentRows.forEach(function (row) {
+                                        const cells = row.querySelectorAll('td');
+                                        let rowContainsTerm = false;
+
+                                        cells.forEach(function (cell) {
+                                            // Reset cell content and apply highlight
+                                            cell.innerHTML = removeHighlight(cell.innerHTML);
+                                            if (highlightText(cell, searchTerm)) {
+                                                rowContainsTerm = true;
                                             }
                                         });
 
-                                        return found;
-                                    }
-
-                                    function getTextNodes(element) {
-                                        let textNodes = [];
-                                        function recurse(node) {
-                                            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
-                                                textNodes.push(node);
-                                            } else if (node.nodeType === Node.ELEMENT_NODE) {
-                                                node.childNodes.forEach(recurse);
-                                            }
+                                        if (rowContainsTerm) {
+                                            row.style.display = '';
+                                            visibleRowCount++;
+                                        } else {
+                                            row.style.display = 'none';
                                         }
-                                        recurse(element);
-                                        return textNodes;
-                                    }
+                                    });
 
-                                    function removeHighlight(html) {
-                                        return html.replace(/<span[^>]*style="[^"]*background-color:[^"]*"[^>]*>(.*?)<\/span>/gi, '$1');
-                                    }
+                                    rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
+                                    noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
                                 });
-                            </script>
+
+                                function highlightText(cell, term) {
+                                    const textNodes = getTextNodes(cell);
+                                    let found = false;
+
+                                    textNodes.forEach(node => {
+                                        const text = node.textContent;
+                                        if (text.toLowerCase().includes(term)) {
+                                            const regex = new RegExp(`(${term})`, 'gi');
+                                            const highlightedText = text.replace(regex, '<span style="background-color: lightblue; color: #0033cc;">$1</span>');
+                                            const span = document.createElement('span');
+                                            span.innerHTML = highlightedText;
+                                            node.replaceWith(span);
+                                            found = true;
+                                        }
+                                    });
+
+                                    return found;
+                                }
+
+                                function getTextNodes(element) {
+                                    let textNodes = [];
+                                    function recurse(node) {
+                                        if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
+                                            textNodes.push(node);
+                                        } else if (node.nodeType === Node.ELEMENT_NODE) {
+                                            node.childNodes.forEach(recurse);
+                                        }
+                                    }
+                                    recurse(element);
+                                    return textNodes;
+                                }
+
+                                function removeHighlight(html) {
+                                    return html.replace(/<span[^>]*style="[^"]*background-color:[^"]*"[^>]*>(.*?)<\/span>/gi, '$1');
+                                }
+                            });
+                        </script>
 
                         </div>
                         <!-- THE MAIN PAGE END -->
