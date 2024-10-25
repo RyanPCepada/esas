@@ -322,54 +322,108 @@ try {
                                 // Include config file
                                 require_once "../../config.php";
 
+                                // Original Code 
+                                // I comment this line because it does not work on my mysql version
+                                // // Get club_id and selected month from the URL
+                                // $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
+                                // $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
+
+                                // // SQL query to fetch distinct students with their pending departures, including departure_id
+                                // $sql = "SELECT 
+                                //             s.student_id,
+                                //             s.firstName,
+                                //             s.middleName,
+                                //             s.lastName,
+                                //             s.gender,
+                                //             s.department,
+                                //             s.course,
+                                //             s.profilePic,
+                                //             MIN(r.dateRequested) AS dateRequested,
+                                //             c.club_id,
+                                //             r.departure_id
+                                //         FROM tbl_students s
+                                //         LEFT JOIN tbl_departure_requests r ON s.student_id = r.student_id
+                                //         LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
+                                //         WHERE r.status = 'pending'";
+
+                                // // Add filtering by club_id if provided
+                                // if ($selectedClubId) {
+                                //     $sql .= " AND c.club_id = :club_id";
+                                // }
+
+                                // // This condition accumulates students from the start of the selected month to the current month
+                                // if ($selectedMonth) {
+                                //     $sql .= " AND MONTH(r.dateRequested) <= :selectedMonth";
+                                // }
+
+                                // $sql .= " GROUP BY s.student_id
+                                //         ORDER BY MIN(r.dateRequested) ASC"; // Order by the earliest date applied
+
+                                // $stmt = $pdo->prepare($sql);
+
+                                // // Bind parameters
+                                // $params = [];
+                                // if ($selectedClubId) {
+                                //     $params['club_id'] = $selectedClubId;
+                                // }
+                                // if ($selectedMonth) {
+                                //     $params['selectedMonth'] = $selectedMonth;
+                                // }
+
+                                // // Execute the SQL statement
+                                // $stmt->execute($params);
+
+
                                 // Get club_id and selected month from the URL
-                                $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
-                                $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
+$selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
+$selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
 
-                                // SQL query to fetch distinct students with their pending departures, including departure_id
-                                $sql = "SELECT 
-                                            s.student_id,
-                                            s.firstName,
-                                            s.middleName,
-                                            s.lastName,
-                                            s.gender,
-                                            s.department,
-                                            s.course,
-                                            s.profilePic,
-                                            MIN(r.dateRequested) AS dateRequested,
-                                            c.club_id,
-                                            r.departure_id
-                                        FROM tbl_students s
-                                        LEFT JOIN tbl_departure_requests r ON s.student_id = r.student_id
-                                        LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
-                                        WHERE r.status = 'pending'";
+// SQL query to fetch distinct students with their pending departures, including departure_id
+$sql = "SELECT 
+            s.student_id,
+            s.firstName,
+            s.middleName,
+            s.lastName,
+            s.gender,
+            s.department,
+            s.course,
+            s.profilePic,
+            MIN(r.dateRequested) AS dateRequested,
+            c.club_id,
+            r.departure_id
+        FROM tbl_students s
+        LEFT JOIN tbl_departure_requests r ON s.student_id = r.student_id
+        LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
+        WHERE r.status = 'pending'";
 
-                                // Add filtering by club_id if provided
-                                if ($selectedClubId) {
-                                    $sql .= " AND c.club_id = :club_id";
-                                }
+// Add filtering by club_id if provided
+if ($selectedClubId) {
+    $sql .= " AND c.club_id = :club_id";
+}
 
-                                // This condition accumulates students from the start of the selected month to the current month
-                                if ($selectedMonth) {
-                                    $sql .= " AND MONTH(r.dateRequested) <= :selectedMonth";
-                                }
+// This condition accumulates students from the start of the selected month to the current month
+if ($selectedMonth) {
+    $sql .= " AND MONTH(r.dateRequested) <= :selectedMonth";
+}
 
-                                $sql .= " GROUP BY s.student_id
-                                        ORDER BY MIN(r.dateRequested) ASC"; // Order by the earliest date applied
+$sql .= " GROUP BY s.student_id, s.firstName, s.middleName, s.lastName, s.gender, s.department, s.course, s.profilePic, c.club_id, r.departure_id
+          ORDER BY MIN(r.dateRequested) ASC"; // Order by the earliest date applied
 
-                                $stmt = $pdo->prepare($sql);
+$stmt = $pdo->prepare($sql);
 
-                                // Bind parameters
-                                $params = [];
-                                if ($selectedClubId) {
-                                    $params['club_id'] = $selectedClubId;
-                                }
-                                if ($selectedMonth) {
-                                    $params['selectedMonth'] = $selectedMonth;
-                                }
+// Bind parameters
+$params = [];
+if ($selectedClubId) {
+    $params['club_id'] = $selectedClubId;
+}
+if ($selectedMonth) {
+    $params['selectedMonth'] = $selectedMonth;
+}
 
-                                // Execute the SQL statement
-                                $stmt->execute($params);
+// Execute the SQL statement
+$stmt->execute($params);
+
+
 
                                 $totalRows = $stmt->rowCount(); // Get the total rows from the prepared statement
 

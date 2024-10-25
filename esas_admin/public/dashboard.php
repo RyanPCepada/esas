@@ -448,7 +448,7 @@ try {
                             <div class="row card-row2 col-12" style="border: 1px solid transparent; margin: 0;">
 
                                 <!-- PIE CHART -->
-                                <div class="col-md-5 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <p>Total Students per Club</p>
                                         <div style="height: auto; background-color: transparent;">
@@ -588,7 +588,7 @@ try {
                                 <!-- PIE CHART END -->
 
                                 <!-- OTHER CHARTS -->
-                                <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-6" style="border: 1px solid transparent; padding: 0;">
 
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
                                         <!-- Registry per SY -->
