@@ -11,6 +11,9 @@ date_default_timezone_set('Asia/Manila');
 // Initialize variables for club information
 $clubName = '';
 $information = '';
+$mission = '';
+$vision = '';
+$history = '';
 $coverPhoto = '';
 $dateAdded = '';
 $moderators = '';
@@ -52,7 +55,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
     try {
         // Prepare SQL query to fetch club information and moderators' profile pictures
         $stmt = $pdo->prepare("
-            SELECT c.clubName, c.information, c.coverPhoto, c.dateAdded, c.slots, 
+            SELECT c.clubName, c.information, c.mission, c.vision, c.history, c.coverPhoto, c.dateAdded, c.slots, 
                 m.firstName, m.middleName, m.lastName, m.profilePic,
                 COUNT(DISTINCT CASE WHEN r.status = 'active' THEN r.student_id END) AS membersCount,
                 COUNT(DISTINCT m.moderator_id) AS numModerators
@@ -70,14 +73,27 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
         if ($club) {
             $clubName = htmlspecialchars($club['clubName']);
             $information = htmlspecialchars_decode($club['information']); // Decode HTML entities
+            $mission = htmlspecialchars_decode($club['mission']); // Decode HTML entities
+            $vision = htmlspecialchars_decode($club['vision']); // Decode HTML entities
+            $history = htmlspecialchars_decode($club['history']); // Decode HTML entities
             $coverPhoto = htmlspecialchars($club['coverPhoto']);
             $dateAdded = htmlspecialchars($club['dateAdded']);
             $membersCount = htmlspecialchars($club['membersCount']);
             $slots = htmlspecialchars($club['slots']); // Fetch and sanitize slots
 
-            // Calculate available slots
-            $activeMembersCount = (int)$membersCount; // Convert to integer for calculation
-            $availableSlots = max(0, $slots - $activeMembersCount); // Ensure no negative slots
+            // Calculate available slots and handle "Unlimited" and "Full" cases
+            if ($slots === null || (int)$slots === 0) {
+                $availableSlots = 'Unlimited'; // When slots are NULL or 0
+            } else {
+                $activeMembersCount = (int)$membersCount; // Convert to integer for calculation
+                $remainingSlots = (int)$slots - $activeMembersCount; // Calculate remaining slots
+                
+                if ($remainingSlots <= 0) {
+                    $availableSlots = 'Full'; // Club is full
+                } else {
+                    $availableSlots = $remainingSlots; // Display available slots
+                }
+            }
 
             // Generate moderators HTML
             $moderators = '';
@@ -115,6 +131,9 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
         } else {
             $clubName = 'Club Not Found';
             $information = 'No information available for this club.';
+            $mission = 'No mission available for this club.';
+            $vision = 'No vision available for this club.';
+            $history = 'No history available for this club.';
         }
 
         // Fetch the student's registration status for the current club
@@ -147,13 +166,15 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 } else {
     $clubName = 'Invalid Club ID';
     $information = 'Please provide a valid club ID.';
+    $mission = 'Please provide a valid club ID.';
+    $vision = 'Please provide a valid club ID.';
+    $history = 'Please provide a valid club ID.';
 }
 
 // Encode clubName for JavaScript use
 $encodedClubName = addslashes($clubName);
 
-$information = nl2br(htmlspecialchars($information)); // Convert newlines to <br>
-$information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; // Wrap paragraphs
+
 ?>
 
 
@@ -188,7 +209,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
             min-height: 500px;
         }
         .container-fluid {
-            padding: 20px;
+            padding: 0px;
         }
         .navbar-darkblue {
             background-color: #003366;
@@ -300,23 +321,18 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
 .club-info-coverphoto {
     width: 100%;
     height: auto;
+    margin-top: 10px;
     border-radius: 10px;
     object-fit: cover;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .club-name {
-    font-size: 1.5rem;
     font-weight: bold;
 }
 
-.creation-date {
-    font-size: 0.9rem;
-    color: #666;
-}
-
 .divider {
-    margin: 10px 0;
+    margin-top: 40px;
     border-color: #ccc;
 }
 
@@ -333,13 +349,16 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
 }
 
 .moderator-item {
-    width: 100%;
+    width: auto;
     display: flex;
     align-items: center;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 50px;
+    margin: 5px;
+    padding: 15px;
+    /* border: 1px solid #ccc; */
+    border-radius: 10px;
     background-color: #f8f9fa;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .moderator-pic {
@@ -352,24 +371,16 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
 
 
 
-        .members-info {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        .numbers-section {
+            margin-top: 10px;
+            line-height: 10px
         }
 
-        .members-info h5 {
-            font-size: 1.2rem;
-            color: #333;
-            margin: 0;
-        }
-
-        .members-count, .slots-count {
+        .members-count{
             font-weight: bold;
             color: #003366;
             margin-left: 5px;
+            margin-top: 0px;
         }
 
 
@@ -388,10 +399,13 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
 
         
         @media (max-width: 768px) {
+            .club-info-coverphoto {
+                margin-top: 0px;
+            }
             .club-register-now .alert {
                 max-width: 90%;
             }
-            .members-info {
+            .numbers-section {
                 flex-direction: column;
                 align-items: flex-start;
             }
@@ -410,25 +424,152 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
             <div class="clubname-and-coverphoto"> 
                 <div class="row">
                     <div class="col-12 col-md-8">
-                        <img class="club-info-coverphoto mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo">
+                        <img class="club-info-coverphoto" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo">
                     </div>
                     <div class="col-12 col-md-4">
-                        <h2 class="club-name text-muted mt-4"><?php echo $clubName; ?></h2>
+                        <h3 class="club-name text-muted mt-2"><?php echo $clubName; ?></h3>
                         <p class="creation-date">Created: <?php echo $formattedDate; ?></p>
-                        <hr class="divider">
-                        <h5 class="moderators-label mb-3"><?php echo $moderatorsLabel; ?></h5>
-                        <div class="moderators"><?php echo $moderators; ?></div>
+                        <!-- <hr class="divider"> -->
+
+                            <p>Members: <span class="members-count"><?php echo $membersCount; ?></span></p>
+
+
+                            <p class="slots-info text-light">
+                                <i class="fas fa-check-circle text-light"></i> Available Slots: <span class="slots-count"><?php echo $availableSlots; ?></span>
+                            </p>
+
+                       
+
                     </div>
                 </div>
             </div>
+            
+            
 
-            <div class="members-info d-flex justify-content-between align-items-center">
-                <h5>Members: <span class="members-count"><?php echo $membersCount; ?></span></h5>
-                <h5>Available Slots: <span class="slots-count"><?php echo $availableSlots; ?></span></h5>
-            </div>
-            <div class="club-info">
-                <?php echo $information; ?>
-            </div>
+            <style>
+    body {
+        font-size: 18px;
+        line-height: 1.6;
+        color: #444;
+        margin: 10px 0;
+        position: relative;
+        z-index: 1;
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    .club-profile-container {
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        padding: 10px 25px;
+        margin-top: 20px;
+        position: relative;
+        overflow: hidden;border: 1px solid #ccc;
+    }
+
+    .club-profile-container::before {
+        content: "";
+        position: absolute;
+        top: -30%;
+        left: -20%;
+        width: 120%;
+        height: 120%;
+        background: rgba(0, 98, 204, 0.1);
+        border-radius: 50%;
+        z-index: 0;
+        transform: rotate(-30deg);
+    }
+
+    .profile-section-title {
+        font-weight: bold;
+        color: #0062cc;
+        margin-top: 10px;
+        position: relative;
+        z-index: 1;
+        padding-bottom: 10px;
+    }
+
+    
+
+    /* .profile-section {
+        margin-bottom: 25px;
+    } */
+
+    /* Hover Effect for Paragraphs */
+    .profile-section-content:hover {
+        box-shadow: 0 5px 15px rgba(0, 98, 204, 0.2);
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
+    }
+
+
+
+    .slots-info {
+    background-color: #e0f7fa; /* Light teal background */
+    border-radius: 10px;
+    padding: 5px 10px;
+    display: inline-block;
+    font-size: 1.2em;
+    color: #00796b; /* Dark teal text color */
+    background-color: rgba(65, 105, 225, 0.8); /* Royal Blue with 80% opacity */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Shadow effect */
+}
+
+.slots-info .fa-check-circle {
+    margin-right: 8px;
+}
+
+.slots-count {
+    font-weight: bold;
+    color: white; /* Same dark teal for consistency */
+}
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .club-profile-container {
+            padding: 15px;
+        }
+
+        .profile-section-content {
+            font-size: 16px;
+        }
+    }
+</style>
+
+<div class="club-profile-container">
+    <div class="profile-section">
+        <h5 class="profile-section-title">Information</h5>
+        <p class="profile-section-content"><?php echo nl2br(htmlspecialchars($information)); ?></p>
+    </div>
+    <div class="profile-section">
+        <h5 class="profile-section-title">Mission</h5>
+        <p class="profile-section-content"><?php echo nl2br(htmlspecialchars($mission)); ?></p>
+    </div>
+    <div class="profile-section">
+        <h5 class="profile-section-title">Vision</h5>
+        <p class="profile-section-content"><?php echo nl2br(htmlspecialchars($vision)); ?></p>
+    </div>
+    <div class="profile-section">
+        <h5 class="profile-section-title">History</h5>
+        <p class="profile-section-content"><?php echo nl2br(htmlspecialchars($history)); ?></p>
+    </div>
+
+    <hr class="divider">
+<h5 class="moderators-label mt-5 mb-3"><?php echo $moderatorsLabel; ?></h5>
+                        <div class="moderators"><?php echo $moderators; ?></div>
+</div>
+
+
+                        
+
+
+
+
+
+
+
 
 
             <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
@@ -438,7 +579,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                             <a href="/esas/esas_student/home.php?club_id=<?php echo $club_id; ?>"> Go to Home</a>
                         </p>
                     </div>
-                <?php elseif ($availableSlots <= 0): ?>
+                <?php elseif ($membersCount === $slots && ($slots !== 0 || $slots !== NULL)): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
                         <p class="lead mb-0">This club is full.</p>
                     </div>

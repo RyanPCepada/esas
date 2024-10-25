@@ -416,39 +416,39 @@ try {
         $(document).ready(function() {
             let clubs = [];
 
-        function loadClubs(tab, containerId, dateLabel) {
-            $.ajax({
-                url: `/esas/esas_student/apis/student-clubs-${tab}-api.php`,
-                type: "GET",
-                success: function(response) {
-                    const clubsContainer = document.getElementById(containerId);
-                    if (response && response.length > 0) {
-                        clubs = response.map(club => club.club_id); // Populate clubs array
-                        clubsContainer.innerHTML = response.map(club => `
-                            <div class="col-md-4 card-container"> 
-                                <span class="club-notification-badge" id="club-notification-${club.club_id}" style="display:none;"></span>
-                                <div class="card card-img-only">
-                                    <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}` : `/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}`}" 
-                                    onclick="markClubNotificationsAsRead(${club.club_id})">
-                                        <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
-                                        <div class="overlay-text">
-                                            <h4>${club.clubName}</h4>
-                                        </div>
-                                    </a>
+            function loadClubs(tab, containerId) {
+                $.ajax({
+                    url: `/esas/esas_student/apis/student-clubs-${tab}-api.php`,
+                    type: "GET",
+                    success: function(response) {
+                        const clubsContainer = document.getElementById(containerId);
+                        if (response && response.length > 0) {
+                            clubs = response.map(club => club.club_id); // Populate clubs array
+                            clubsContainer.innerHTML = response.map(club => `
+                                <div class="col-md-4 card-container"> 
+                                    <span class="club-notification-badge" id="club-notification-${club.club_id}" style="display:none;"></span>
+                                    <div class="card card-img-only">
+                                        <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}&registration_id=${club.registration_id}` : `/esas/esas_student/application_details.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}&status=${tab}&registration_id=${club.registration_id}`}" 
+                                        onclick="markClubNotificationsAsRead(${club.club_id})">
+                                            <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
+                                            <div class="overlay-text">
+                                                <h4>${club.clubName}</h4>
+                                            </div>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                        `).join('');
-                        fetchClubNotificationCounts();
-                    } else {
-                        clubsContainer.innerHTML = '<p>No clubs found.</p>';
+                            `).join('');
+                            fetchClubNotificationCounts();
+                        } else {
+                            clubsContainer.innerHTML = '<p>No clubs found.</p>';
+                        }
+                    },
+                    error: function() {
+                        const clubsContainer = document.getElementById(containerId);
+                        clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
                     }
-                },
-                error: function() {
-                    const clubsContainer = document.getElementById(containerId);
-                    clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
-                }
-            });
-        }
+                });
+            }
 
 
             function fetchClubNotificationCounts() {

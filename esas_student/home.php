@@ -12,6 +12,7 @@ $student_id = $_SESSION['student_id'];
 $postContent = "";
 $postContent_err = "";
 $club_id = ""; // Initialize club_id variable
+$registration_id = ""; // Initialize registration_id variable
 $clubName = ""; // Initialize clubName variable
 $coverPhoto = ""; // Initialize coverPhoto variable
 $profilePic = ""; // Initialize profilePic variable
@@ -31,6 +32,11 @@ try {
         $stmt->execute();
         $student = $stmt->fetch(PDO::FETCH_ASSOC);
         $club_id = $student['club_id']; // Default to the first club
+    }
+
+    // Check if registration_id is passed in the URL
+    if (isset($_GET['registration_id']) && is_numeric($_GET['registration_id'])) {
+        $registration_id = $_GET['registration_id']; // Use the passed registration_id
     }
 
     // Fetch the student's profile picture
@@ -107,6 +113,8 @@ try {
     // Handle database connection or query error
     die("Database error: " . $e->getMessage());
 }
+// echo "Club ID: " . htmlspecialchars($club_id) . "<br>";
+// echo "Registration ID: " . htmlspecialchars($registration_id) . "<br>";
 ?>
 
 
@@ -396,7 +404,7 @@ try {
 
         .dropdown a {
             color: black; /* Link color */
-            padding: 12px 16px; /* Link padding */
+            padding: 4px 16px; /* Link padding */
             text-decoration: none; /* No underline */
             display: block; /* Make it a block */
         }
@@ -436,6 +444,9 @@ try {
                     </div>
 
                     <div id="dropdownMenu" class="dropdown mt-4">
+                        <a href="../esas_student/profile.php?student_id=<?php echo $student_id; ?>">See Profile</a>
+                        <a href="../esas_student/application_details.php?club_id=<?php echo urlencode($club_id); ?>&registration_id=<?php echo urlencode($registration_id); ?>">Application Details</a>
+                        <a href="../esas_student/history.php?student_id=<?php echo $student_id; ?>">History</a>
                         <?php if ($hasDepartureRequest): ?>
                             <a href="../esas_student/crud/departure_requests/departure_request_read.php?club_id=<?php echo $_GET['club_id']; ?>">See Departure Request</a>
                         <?php else: ?>

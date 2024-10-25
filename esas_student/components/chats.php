@@ -81,7 +81,7 @@
     margin-bottom: 5px;
 }
 
-.student-name {
+.chats-student-name {
     font-size: 16px;
     font-weight: bold;
     color: #333;
@@ -129,7 +129,7 @@
     .chat-header { /*student name is located */
         margin-left: -20px;
     }
-    .student-name {
+    .chats-student-name {
         line-height: 1.2;
     }
     .message-date {
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
                             <div class="chat-content">
                                 <div class="chat-header">
-                                    <span class="student-name">
+                                    <span class="chats-student-name">
                                         ${fullName}${student.is_moderator ? '<span class="moderator-shield"> <i class="fas fa-shield-alt text-danger"></i></span>' : ''}
                                     </span>
                                     <span class="message-date">${messageDate}</span>
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const studentPic = this.querySelector('.chat-avatar img').src;
 
                         modal.querySelector('.modal-student-avatar img').src = studentPic; 
-                        modal.querySelector('#modal-student-name').innerText = studentFullName; 
+                        modal.querySelector('#modal-chats-student-name').innerText = studentFullName; 
 
                         modal.querySelector('.modal-header').classList.remove('chat-tep', 'chat-bsba', 'chat-ccs', 'chat-default');
 
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <img id="modal-student-pic" src="" alt="Student Avatar" />
         </div>
         <div class="modal-student-info">
-            <span id="modal-student-name">Student Name</span>
+            <span id="modal-chats-student-name">Student Name</span>
         </div>
         <div class="modal-close-btn">
             <span id="close-modal">&times;</span>
@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function () {
     flex-direction: column; /* Stack the name if it wraps */
 }
 
-#modal-student-name {
+#modal-chats-student-name {
     font-size: 1.2em;
     line-height: 1.2;
     white-space: nowrap; /* Prevents the name from wrapping to the next line */

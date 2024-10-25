@@ -15,6 +15,9 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
                 c.club_id,
                 c.clubName,
                 c.information,
+                c.mission,
+                c.vision,
+                c.history,
                 c.dateAdded,
                 c.coverPhoto,
                 GROUP_CONCAT(DISTINCT m.firstName, ' ', m.middleName, ' ', m.lastName ORDER BY m.lastName ASC SEPARATOR ', ') AS moderatorNames
@@ -39,6 +42,9 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
                 // Retrieve the details
                 $clubName = htmlspecialchars($row["clubName"]);
                 $information = !empty($row["information"]) ? htmlspecialchars($row["information"]) : 'No information available.';
+                $mission = !empty($row["mission"]) ? htmlspecialchars($row["mission"]) : 'No mission available.';
+                $vision = !empty($row["vision"]) ? htmlspecialchars($row["vision"]) : 'No vision available.';
+                $history = !empty($row["history"]) ? htmlspecialchars($row["history"]) : 'No history available.';
                 $dateAdded = !empty($row["dateAdded"]) ? htmlspecialchars($row["dateAdded"]) : 'None';
                 $moderatorNames = !empty($row["moderatorNames"]) ? htmlspecialchars($row["moderatorNames"]) : 'None';
                 $coverPhoto = !empty($row["coverPhoto"]) ? htmlspecialchars($row["coverPhoto"]) : "default-cover.jpg";
@@ -118,6 +124,12 @@ unset($pdo);
                             <div class="col-md-12">
                                 <h5>Information:</h5>
                                 <p style="text-align: justify; text-indent: 30px;"><?php echo $information; ?></p>
+                                <h5>Mission:</h5>
+                                <p style="text-align: justify; text-indent: 30px;"><?php echo $mission; ?></p>
+                                <h5>Vision:</h5>
+                                <p style="text-align: justify; text-indent: 30px;"><?php echo $vision; ?></p>
+                                <h5>History:</h5>
+                                <p style="text-align: justify; text-indent: 30px;"><?php echo $history; ?></p>
                             </div>
                         </div>
 

@@ -13,8 +13,8 @@ if (isset($_SESSION['admin_id'])) {
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-$clubName = $information = $coverPhoto = "";
-$clubName_err = $information_err = $coverPhoto_err = "";
+$clubName = $information = $mission = $vision = $history = $coverPhoto = "";
+$clubName_err = $information_err = $mission_err = $vision_err = $history_err = $coverPhoto_err = "";
 $moderators = [];
 define('COVERPHOTO_DEFAULT', 'COVERPHOTO_DEFAULT.png');
 define('PROF_PIC_DEFAULT', 'PROF_PIC.png');
@@ -120,6 +120,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $information = $input_information;
     }
 
+    // Validate mission
+    $input_mission = trim($_POST["mission"]);
+    if (empty($input_mission)) {
+        $mission_err = "Please enter the club's mission.";
+    } else {
+        $mission = $input_mission;
+    }
+
+    // Validate vision
+    $input_vision = trim($_POST["vision"]);
+    if (empty($input_vision)) {
+        $vision_err = "Please enter the club's vision.";
+    } else {
+        $vision = $input_vision;
+    }
+
+    // Validate history
+    $input_history = trim($_POST["history"]);
+    if (empty($input_history)) {
+        $history_err = "Please enter the club's history.";
+    } else {
+        $history = $input_history;
+    }
+
     if (isset($_FILES['coverPhoto']) && $_FILES['coverPhoto']['name']) {
         $coverPhotoName = $_FILES['coverPhoto']['name'];
         $coverPhotoSize = $_FILES['coverPhoto']['size'];
@@ -152,10 +176,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err)) {
-        $sql = "INSERT INTO tbl_clubs (clubName, information, coverPhoto, founder_id, dateAdded) VALUES (:clubName, :information, :coverPhoto, :admin_id, NOW())";
+        $sql = "INSERT INTO tbl_clubs (clubName, information, mission, vision, history, coverPhoto, founder_id, dateAdded) 
+        VALUES (:clubName, :information, :mission, :vision, :history, :coverPhoto, :admin_id, NOW())";
+
         if ($stmt = $pdo->prepare($sql)) {
+            // Bind parameters
             $stmt->bindParam(":clubName", $clubName);
             $stmt->bindParam(":information", $information);
+            $stmt->bindParam(":mission", $mission);
+            $stmt->bindParam(":vision", $vision);
+            $stmt->bindParam(":history", $history);
             $stmt->bindParam(":coverPhoto", $coverPhoto);
             $stmt->bindParam(":admin_id", $adminId);
             
@@ -270,6 +300,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <label>Information</label>
                         <textarea name="information" class="form-control <?php echo (!empty($information_err)) ? 'is-invalid' : ''; ?>"><?php echo $information; ?></textarea>
                         <span class="invalid-feedback"><?php echo $information_err; ?></span>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label>Mission</label>
+                        <textarea name="mission" class="form-control <?php echo (!empty($mission_err)) ? 'is-invalid' : ''; ?>"><?php echo $mission; ?></textarea>
+                        <span class="invalid-feedback"><?php echo $mission_err; ?></span>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label>Vision</label>
+                        <textarea name="vision" class="form-control <?php echo (!empty($vision_err)) ? 'is-invalid' : ''; ?>"><?php echo $vision; ?></textarea>
+                        <span class="invalid-feedback"><?php echo $vision_err; ?></span>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label>History</label>
+                        <textarea name="history" class="form-control <?php echo (!empty($history_err)) ? 'is-invalid' : ''; ?>"><?php echo $history; ?></textarea>
+                        <span class="invalid-feedback"><?php echo $history_err; ?></span>
                     </div>
                     <div class="form-group mb-2">
                         <label>Cover Photo</label>
