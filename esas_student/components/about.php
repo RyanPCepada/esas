@@ -149,7 +149,7 @@ $(document).ready(function() {
 
                     // Build the club description HTML
                     aboutSection.append(`
-                        <div class="club-info">
+                        <div class="club-info mb-5">
                             <div class="club-info-top">
                                 <p class="date-created"><strong>Date of Creation: </strong>${formattedDate}</p>
                                 <p><i class="fas fa-lightbulb text-warning" style="font-size: 35px;"></i><strong>Why ${club.clubName}?</strong></p>
@@ -172,6 +172,7 @@ $(document).ready(function() {
                                 <!-- <div class="dashed-border"></div> -->
                                 <p><i class="fas fa-history text-warning" style="font-size: 30px;"></i><strong> History</strong></p>
                                 <p class="history">${club.history}</p>
+
                                 <div class="dashed-border"></div>
                                 <p class="club_moderators text-muted my-2">${moderatorsCount} Club Moderators <i class="fas fa-shield-alt text-danger" style="font-size: 20px;"></i></p>
                                 <div class="about-row">
