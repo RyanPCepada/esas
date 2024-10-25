@@ -106,7 +106,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
                     $name = htmlspecialchars($moderator['firstName'] . ' ' . ($moderator['middleName'] ? $moderator['middleName'] . ' ' : '') . htmlspecialchars($moderator['lastName']));
                     $pic = htmlspecialchars($moderator['profilePic']);
                     $moderators .= '
-                    <div class="moderator-item">
+                    <div class="moderator-item text-start">
                         <img src="/esas/esas_moderator/images/' . $pic . '" alt="Profile Pic" class="moderator-pic">
                         <p class="moderator-name">' . $name . '</p>
                     </div>';
@@ -242,25 +242,6 @@ $encodedClubName = addslashes($clubName);
             line-height: 1.6;
             text-align: justify;
         }
-        .moderator-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .moderator-pic {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-
-        .moderator-name {
-            font-size: 16px;
-            margin: 0;
-            line-height: 1.2;
-        }
-
 
 
 
@@ -344,6 +325,8 @@ $encodedClubName = addslashes($clubName);
 
 .moderators {
     display: flex;
+    align-items: center;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 0px; /* Space between moderator elements */
 }
@@ -367,6 +350,14 @@ $encodedClubName = addslashes($clubName);
     border-radius: 50%;
     margin-right: 5px;
 }
+
+.moderator-name {
+    font-size: 16px;
+    margin: 0;
+    line-height: 1.2;
+}
+
+
 
 
 
@@ -412,7 +403,7 @@ $encodedClubName = addslashes($clubName);
             .moderator-item {
                 width: 100%;
             }
-        
+        }
     </style>
 </head>
 
@@ -593,8 +584,11 @@ $encodedClubName = addslashes($clubName);
 
     
     <hr class="divider">
-    <h5 class="moderators-label mt-5 mb-3"><?php echo $moderatorsLabel; ?></h5>
-    <div class="moderators"><?php echo $moderators; ?></div>
+
+    <div class="mb-3 text-center">
+        <h5 class="moderators-label mt-5 mb-3"><?php echo $moderatorsLabel; ?></h5>
+        <div class="moderators"><?php echo $moderators; ?></div>
+    </div>
 </div>
 
 
