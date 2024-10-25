@@ -1,13 +1,20 @@
 <?php
 // Include config file
 require_once "../../../../config.php";
+require __DIR__ . '/../../../vendor/autoload.php';
+
 session_start();
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 
 if (!isset($_SESSION['moderator_id'])) {
     die("You are not logged in.");
 }
 
 $moderator_id = $_SESSION['moderator_id'];
+$final_email;
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -20,7 +27,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     // Set parameters
     $param_student_id = trim($_GET["student_id"]);
     $param_club_id = trim($_GET["club_id"]);
-    $param_departure_id = trim($_GET["departure_id"]); // Get departure_id from URL
+    $param_departure_id = trim($_GET["departure_id"]); 
 
     // Prepare a select statement to fetch the student details
     $sql = "SELECT * FROM tbl_students WHERE student_id = :student_id";
@@ -28,9 +35,6 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     if ($stmt = $pdo->prepare($sql)) {
         // Bind variables to the prepared statement as parameters
         $stmt->bindParam(":student_id", $param_student_id);
-
-        // Set parameters
-        $param_student_id = trim($_GET["student_id"]);
 
         // Attempt to execute the prepared statement
         if ($stmt->execute()) {
@@ -43,7 +47,8 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
                 $middleName = !empty($row["middleName"]) ? $row["middleName"] : '';
                 $lastName = !empty($row["lastName"]) ? $row["lastName"] : '';
                 $fullName = trim("$firstName $middleName $lastName");
-
+                $final_email = trim($row["instiEmail"]);
+                
                 // For profile picture
                 $profilePic = !empty($row['profilePic']) ? '/esas/esas_student/images/' . $row['profilePic'] : 'No Image Available';
             } else {
@@ -60,7 +65,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     unset($stmt);
 
     // Prepare a select statement to fetch the club name from tbl_clubs
-    $sql_club = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id"; // Adjust this query to get club name
+    $sql_club = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id"; 
 
     if ($stmt = $pdo->prepare($sql_club)) {
         // Bind variables to the prepared statement as parameters
@@ -71,7 +76,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
             if ($stmt->rowCount() == 1) {
                 // Fetch result row as an associative array
                 $clubRow = $stmt->fetch(PDO::FETCH_ASSOC);
-                $clubName = $clubRow["clubName"]; // Get the club name
+                $clubName = $clubRow["clubName"]; 
             } else {
                 echo "No valid club id found.";
                 exit();
@@ -85,7 +90,6 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     // Close statement
     unset($stmt);
 
-    // Prepare a select statement to fetch questions and dateRequested from tbl_departure_requests
     $sql_questions = "SELECT reason, dateRequested FROM tbl_departure_requests WHERE student_id = :student_id AND club_id = :club_id";
 
     if ($stmt = $pdo->prepare($sql_questions)) {
@@ -93,17 +97,12 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
         $stmt->bindParam(":student_id", $param_student_id);
         $stmt->bindParam(":club_id", $param_club_id);
 
-        // Set parameters
-        $param_student_id = trim($_GET["student_id"]);
-        $param_club_id = trim($_GET["club_id"]); 
-
         // Attempt to execute the prepared statement
         if ($stmt->execute()) {
-            // Fetch the questions and dateRequested together in one call
-            $questions = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch all as associative array
+            $questions = $stmt->fetch(PDO::FETCH_ASSOC); 
 
             if ($questions) {
-                $dateRequested = $questions['dateRequested']; // Date applied from the fetched array
+                $dateRequested = $questions['dateRequested']; 
             } else {
                 echo "No departure details found.";
             }
@@ -116,7 +115,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     unset($stmt);
     
 } else {
-    // URL doesn't contain student_id or club_id parameter. Redirect to error page
+  
     header("location: ../public/error.php");
     exit();
 }
@@ -131,17 +130,46 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                   SET status = :status, dateApproved = NOW() 
                   WHERE student_id = :student_id 
                   AND club_id = :club_id 
-                  AND departure_id = :departure_id"; // Include departure_id
+                  AND departure_id = :departure_id"; 
 
     if ($updateStmt = $pdo->prepare($updateSql)) {
         // Bind parameters
         $updateStmt->bindParam(":status", $newStatus);
         $updateStmt->bindParam(":student_id", $param_student_id, PDO::PARAM_INT);
         $updateStmt->bindParam(":club_id", $param_club_id, PDO::PARAM_INT);
-        $updateStmt->bindParam(":departure_id", $param_departure_id, PDO::PARAM_INT); // Bind departure_id
+        $updateStmt->bindParam(":departure_id", $param_departure_id, PDO::PARAM_INT); 
 
         // Execute the update statement
         if ($updateStmt->execute()) {
+            // Prepare to send an email notification
+            $mail = new PHPMailer(true);
+            
+            try {
+                // Server settings
+                $mail->isSMTP();                                       // Send using SMTP
+                $mail->Host       = 'smtp.gmail.com';                  // Set the SMTP server to send through
+                $mail->SMTPAuth   = true;                              // Enable SMTP authentication
+                $mail->Username   = 'sportsnbscesas@gmail.com';         // SMTP username
+                $mail->Password   = 'wubj bmsj ckmj nope';             // SMTP password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;    // Enable TLS encryption
+                $mail->Port       = 587;                               // TCP port to connect to
+
+                // Recipients
+                echo "<script>console.log('Adding recipient: {$final_email}');</script>";
+                $mail->setFrom('sportsnbscesas@gmail.com', 'NBSC Club Organizations');
+                $mail->addAddress($final_email, $fullName);            
+
+                // Content
+                $mail->isHTML(true);                                     
+                $mail->Subject = "Departure Request " . ucfirst($newStatus);
+                $mail->Body    = "Dear $fullName,<br><br>Your departure request for the club <b>'$clubName'<b> has been <b>$newStatus<b>.<br><br>Thank you for being part of the <b>$clubName</b> family!";
+
+                // Send the email
+                $mail->send();
+            } catch (Exception $e) {
+                echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            }
+
             // Check if the request was approved
             if ($_POST["action"] === 'approve') {
                 // Prepare to update the registration table
@@ -149,11 +177,10 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                            SET status = :new_status, dateApproved = NOW() 
                            WHERE student_id = :student_id 
                            AND status = 'active' 
-                           AND club_id = :club_id"; // Use relevant identifiers
+                           AND club_id = :club_id"; 
 
                 if ($updateRegistrationStmt = $pdo->prepare($updateRegistrationSql)) {
-                    // Set new status value
-                    $newStatusValue = 'departed'; // Example status value for departure
+                    $newStatusValue = 'departed'; 
 
                     // Bind parameters
                     $updateRegistrationStmt->bindParam(":new_status", $newStatusValue);
@@ -162,53 +189,30 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
                     // Execute the update statement for registration
                     if ($updateRegistrationStmt->execute()) {
-                        // Log the activity
                         $logActivitySql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) 
-                        VALUES (:activity, NOW(), :moderator_id)"; // Modified to include only moderator_id
+                        VALUES (:activity, NOW(), :moderator_id)"; 
 
                         if ($logStmt = $pdo->prepare($logActivitySql)) {
-                        $activity = "You approved $fullName's departure request in $clubName";
-                        // Ensure moderator_id is defined appropriately
-                        $logStmt->bindParam(":activity", $activity);
-                        $logStmt->bindParam(":moderator_id", $moderator_id); // Only binding moderator_id
-                        $logStmt->execute(); // Execute the log statement
-                        }
+                        $activityDescription = "Departure request for student '$fullName' was approved.";
+                        $logStmt->bindParam(":activity", $activityDescription);
+                        $logStmt->bindParam(":moderator_id", $moderator_id);
 
-                        header("location: ../../departure_requests.php");
-                        exit();
-                    } else {
-                        echo "Error updating the registration record. Please try again.";
-                        exit();
+                        $logStmt->execute();
+                        }
                     }
                 }
-                unset($updateRegistrationStmt);
-            } else {
-                // Log disapproval activity
-                $logActivitySql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
-                                   VALUES (:activity, NOW(), :admin_id, :moderator_id, :student_id)"; // Modify as per your log structure
-
-                if ($logStmt = $pdo->prepare($logActivitySql)) {
-                    $activity = "You disapproved $fullName's departure request in $clubName";
-                    // Assume admin_id and moderator_id are defined elsewhere or passed via POST
-                    $logStmt->bindParam(":activity", $activity);
-                    $logStmt->bindParam(":admin_id", $admin_id); // Ensure these variables are set appropriately
-                    $logStmt->bindParam(":moderator_id", $moderator_id); // Ensure these variables are set appropriately
-                    $logStmt->bindParam(":student_id", $param_student_id);
-                    $logStmt->execute(); // Execute the log statement
-                }
-
-                // Redirect or show success message for disapproved requests
-                header("location: ../../departure_requests.php");
-                exit();
             }
-        } else {
-            echo "Error updating the request. Please try again.";
+
+          
+            header("location: ../../departure_requests.php");
             exit();
+        } else {
+            echo "Oops! Something went wrong. Please try again later.";
         }
     }
-    unset($updateStmt);
 }
 ?>
+
 
 
 <!DOCTYPE html>
