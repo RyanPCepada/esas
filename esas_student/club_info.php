@@ -118,7 +118,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 
             // Set the correct label for moderators
             $numModerators = $club['numModerators'];
-            $moderatorsLabel = ($numModerators <= 1) ? 'Moderator <i class="fas fa-shield-alt text-primary"></i>' : 'Moderators <i class="fas fa-shield-alt text-primary"></i>';
+            $moderatorsLabel = ($numModerators <= 1) ? 'Moderator <i class="fas fa-shield-alt text-danger"></i>' : 'Moderators <i class="fas fa-shield-alt text-danger"></i>';
 
             // Format the date into "Month Year"
             try {
@@ -349,15 +349,15 @@ $encodedClubName = addslashes($clubName);
 }
 
 .moderator-item {
-    width: auto;
+    width: 30%;
     display: flex;
     align-items: center;
     margin: 5px;
-    padding: 15px;
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 10px;
     background-color: #f8f9fa;
-    background-color: white;
+    /* background-color: white; */
     /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); */
 }
 
@@ -409,7 +409,9 @@ $encodedClubName = addslashes($clubName);
                 flex-direction: column;
                 align-items: flex-start;
             }
-        }
+            .moderator-item {
+                width: 100%;
+            }
         
     </style>
 </head>
@@ -427,20 +429,20 @@ $encodedClubName = addslashes($clubName);
                         <img class="club-info-coverphoto" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo">
                     </div>
                     <div class="col-12 col-md-4">
-                        <div>
-                            <h3 class="club-name text-muted mt-2"><?php echo $clubName; ?></h3>
-                            <p class="creation-date">Created: <?php echo $formattedDate; ?></p>
-                        </div>
+                        <h3 class="club-name text-muted mt-2"><?php echo $clubName; ?></h3>
+                        <p class="creation-date">Created: <?php echo $formattedDate; ?></p>
+                        <!-- <hr class="divider"> -->
 
+                        <p class="members-info text-light mb-1">
+                            <i class="fas fa-users text-light"></i>Members: <span class="members-count"><?php echo $membersCount; ?></span>
+                        </p>
 
-                        <div>
-                            <p class="members-info text-light mb-2">
-                                <i class="fas fa-users text-light"></i> Members: <span class="members-count"><?php echo $membersCount; ?></span>
-                            </p>
-                            <p class="slots-info text-light">
-                                <i class="fas fa-check-circle text-light"></i> Available Slots: <span class="slots-count"><?php echo $availableSlots; ?></span>
-                            </p>
-                        </div>
+                        <p class="slots-info text-light">
+                            <i class="fas fa-check-circle text-light"></i> Slots: <span class="slots-count"><?php echo $availableSlots; ?></span>
+                        </p>
+
+                       
+
                     </div>
                 </div>
             </div>
@@ -501,6 +503,7 @@ $encodedClubName = addslashes($clubName);
         text-indent: 2em; /* Indent the first line of each paragraph */
     }
 
+
     /* Common styling for both members and slots */
     .members-info, .slots-info {
         background-color: rgba(65, 105, 225, 0.8); /* Royal Blue with 80% opacity */
@@ -513,7 +516,7 @@ $encodedClubName = addslashes($clubName);
     }
 
     .members-info {
-        background-color: rgba(34, 139, 34, 0.8); /* Forest Green with 80% opacity */
+        background-color: rgba(34, 139, 34, 0.7); /* Forest Green with 80% opacity */
     }
 
     .members-info .fa-users, .slots-info .fa-check-circle {
@@ -540,7 +543,8 @@ $encodedClubName = addslashes($clubName);
 
 <div class="club-profile-container">
     <div class="profile-section">
-        <h5 class="profile-section-title">Description</h5>
+        <h5 class="profile-section-title"><i class="fas fa-lightbulb text-warning" style="font-size: 35px;"></i>
+        Why <?php echo $clubName; ?>?</h5>
         <?php 
             $descriptionLines = explode("\n", $description);
             foreach ($descriptionLines as $line) {
@@ -548,29 +552,36 @@ $encodedClubName = addslashes($clubName);
             }
         ?>
     </div>
-    
-    <div class="profile-section p-3 mb-3 border rounded bg-light">
-        <em><h5 class="profile-section-title">Mission</h5></em>
-        <?php 
-            $missionLines = explode("\n", $mission);
-            foreach ($missionLines as $line) {
-                echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
-            }
-        ?>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="profile-section p-3 mb-3 border rounded bg-light">
+                <em><h5 class="profile-section-title">Mission</h5></em>
+                <?php 
+                    $missionLines = explode("\n", $mission);
+                    foreach ($missionLines as $line) {
+                        echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
+                    }
+                ?>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="profile-section p-3 mb-3 border rounded bg-light">
+                <em><h5 class="profile-section-title">Vision</h5></em>
+                <?php 
+                    $visionLines = explode("\n", $vision);
+                    foreach ($visionLines as $line) {
+                        echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
+                    }
+                ?>
+            </div>
+        </div>
     </div>
-    
-    <div class="profile-section p-3 mb-3 border rounded bg-light">
-        <em><h5 class="profile-section-title">Vision</h5></em>
-        <?php 
-            $visionLines = explode("\n", $vision);
-            foreach ($visionLines as $line) {
-                echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
-            }
-        ?>
-    </div>
+
     
     <div class="profile-section">
-        <h5 class="profile-section-title">History</h5>
+        <h5 class="profile-section-title"><i class="fas fa-history text-warning" style="font-size: 30px;"></i>
+        History</h5>
         <?php 
             $historyLines = explode("\n", $history);
             foreach ($historyLines as $line) {
@@ -578,6 +589,12 @@ $encodedClubName = addslashes($clubName);
             }
         ?>
     </div>
+
+
+    
+    <hr class="divider">
+    <h5 class="moderators-label mt-5 mb-3"><?php echo $moderatorsLabel; ?></h5>
+    <div class="moderators"><?php echo $moderators; ?></div>
 </div>
 
 
@@ -587,10 +604,6 @@ $encodedClubName = addslashes($clubName);
 
 
 
-
-<hr class="divider">
-    <h5 class="moderators-label mt-5 mb-3"><?php echo $moderatorsLabel; ?></h5>
-    <div class="moderators"><?php echo $moderators; ?></div>
 
 
 
@@ -639,7 +652,7 @@ $encodedClubName = addslashes($clubName);
                     <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>)">Register Now</button>
                 <?php endif; ?>
                 <div class="mt-3">
-                    <a href="javascript:history.go(-1)" class="btn btn-secondary mb-4">Go Back</a>
+                    <a href="javascript:history.go(-1)" class="btn btn-secondary mb-5">Go Back</a>
                 </div>
             </div>
 
