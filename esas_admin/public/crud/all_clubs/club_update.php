@@ -14,8 +14,8 @@ if (isset($_SESSION['admin_id'])) {
 date_default_timezone_set('Asia/Manila');
 
     $clubId = $_GET['club_id'] ?? null; // Get the club ID from the query string
-    $clubName = $information = $coverPhoto = "";
-    $clubName_err = $information_err = $coverPhoto_err = "";
+    $clubName = $description = $mission = $vision = $history = $coverPhoto = "";
+    $clubName_err = $description_err = $mission_err = $vision_err = $history_err = $coverPhoto_err = "";
     define('COVERPHOTO_DEFAULT', 'COVERPHOTO_DEFAULT.png');
 
     // Fetch moderators
@@ -55,7 +55,10 @@ date_default_timezone_set('Asia/Manila');
                 $club = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($club) {
                     $clubName = $club['clubName'];
-                    $information = $club['information'];
+                    $description = $club['description'];
+                    $mission = $club['mission'];
+                    $vision = $club['vision'];
+                    $history = $club['history'];
                     $coverPhoto = $club['coverPhoto'] ?: COVERPHOTO_DEFAULT; // Set default if no cover photo exists
                     $currentModeratorId = $club['moderator_id']; // Fetch current moderator ID
                 } else {
@@ -124,11 +127,35 @@ if (!empty($_POST['recommendedDepartments'])) {
             $clubName = $input_clubName;
         }
 
-        $input_information = trim($_POST["information"]);
-        if (empty($input_information)) {
-            $information_err = "Please enter club information.";
+        $input_description = trim($_POST["description"]);
+        if (empty($input_description)) {
+            $description_err = "Please enter club description.";
         } else {
-            $information = $input_information;
+            $description = $input_description;
+        }
+
+        // Validate mission
+        $input_mission = trim($_POST["mission"]);
+        if (empty($input_mission)) {
+            $mission_err = "Please enter the club's mission.";
+        } else {
+            $mission = $input_mission;
+        }
+    
+        // Validate vision
+        $input_vision = trim($_POST["vision"]);
+        if (empty($input_vision)) {
+            $vision_err = "Please enter the club's vision.";
+        } else {
+            $vision = $input_vision;
+        }
+    
+        // Validate history
+        $input_history = trim($_POST["history"]);
+        if (empty($input_history)) {
+            $history_err = "Please enter the club's history.";
+        } else {
+            $history = $input_history;
         }
 
         // Handle cover photo upload
@@ -169,11 +196,23 @@ if (!empty($_POST['recommendedDepartments'])) {
 
 
         // Update the club if no errors
-        if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err)) {
-            $sql = "UPDATE tbl_clubs SET clubName = :clubName, information = :information, coverPhoto = :coverPhoto WHERE club_id = :clubId";
+        if (empty($clubName_err) && empty($description_err) && empty($mission_err) && empty($vision_err) && empty($history_err) && empty($coverPhoto_err)) {
+            $sql = "UPDATE tbl_clubs 
+                    SET clubName = :clubName, 
+                        description = :description, 
+                        mission = :mission, 
+                        vision = :vision, 
+                        history = :history, 
+                        coverPhoto = :coverPhoto 
+                    WHERE club_id = :clubId";
+            
             if ($stmt = $pdo->prepare($sql)) {
+                // Bind parameters
                 $stmt->bindParam(":clubName", $clubName);
-                $stmt->bindParam(":information", $information);
+                $stmt->bindParam(":description", $description);
+                $stmt->bindParam(":mission", $mission);
+                $stmt->bindParam(":vision", $vision);
+                $stmt->bindParam(":history", $history);
                 $stmt->bindParam(":coverPhoto", $coverPhoto);
                 $stmt->bindParam(":clubId", $clubId);
 
@@ -316,9 +355,24 @@ unset($pdo);
                             <span class="invalid-feedback"><?php echo $clubName_err; ?></span>
                         </div>
                         <div class="form-group mb-2">
-                            <label>Information</label>
-                            <textarea name="information" class="form-control <?php echo (!empty($information_err)) ? 'is-invalid' : ''; ?>" rows="5"><?php echo htmlspecialchars($information); ?></textarea>
-                            <span class="invalid-feedback"><?php echo $information_err; ?></span>
+                            <label>Description</label>
+                            <textarea name="description" class="form-control <?php echo (!empty($description_err)) ? 'is-invalid' : ''; ?>" rows="5"><?php echo htmlspecialchars($description); ?></textarea>
+                            <span class="invalid-feedback"><?php echo $description_err; ?></span>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label>Mission</label>
+                            <textarea name="mission" class="form-control <?php echo (!empty($mission_err)) ? 'is-invalid' : ''; ?>" rows="5"><?php echo htmlspecialchars($mission); ?></textarea>
+                            <span class="invalid-feedback"><?php echo $mission_err; ?></span>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label>Vision</label>
+                            <textarea name="vision" class="form-control <?php echo (!empty($vision_err)) ? 'is-invalid' : ''; ?>" rows="5"><?php echo htmlspecialchars($vision); ?></textarea>
+                            <span class="invalid-feedback"><?php echo $vision_err; ?></span>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label>History</label>
+                            <textarea name="history" class="form-control <?php echo (!empty($history_err)) ? 'is-invalid' : ''; ?>" rows="5"><?php echo htmlspecialchars($history); ?></textarea>
+                            <span class="invalid-feedback"><?php echo $history_err; ?></span>
                         </div>
                         <div class="form-group mb-2">
                             <label>Cover Photo</label>

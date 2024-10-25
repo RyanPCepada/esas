@@ -17,9 +17,9 @@ switch ($method) {
         if (isset($_SESSION['student_id'])) {
             $student_id = $_SESSION['student_id'];
 
-            // Query to fetch the clubs associated with the student
+            // Query to fetch the clubs associated with the student, including registration_id
             $stmt = $pdo->prepare('
-                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, r.dateApplied AS dateAdded, r.dateModified,
+                SELECT c.club_id, c.clubName, c.description, c.coverPhoto, r.registration_id, r.dateApplied AS dateAdded, r.dateModified,
                        GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderators,
                        GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS profilePics
                 FROM tbl_registration r

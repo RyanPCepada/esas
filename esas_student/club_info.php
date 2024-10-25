@@ -8,9 +8,12 @@ require_once '../config.php';
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-// Initialize variables for club information
+// Initialize variables for club description
 $clubName = '';
-$information = '';
+$description = '';
+$mission = '';
+$vision = '';
+$history = '';
 $coverPhoto = '';
 $dateAdded = '';
 $moderators = '';
@@ -23,7 +26,7 @@ if (isset($_SESSION['student_id'])) {
     $student_id = $_SESSION['student_id'];
 
     try {
-        // Prepare and execute the SQL statement for student information
+        // Prepare and execute the SQL statement for student description
         $sql = "SELECT firstName, middleName, lastName FROM tbl_students WHERE student_id = :student_id";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
@@ -50,9 +53,9 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
     $club_id = $_GET['club_id'];
 
     try {
-        // Prepare SQL query to fetch club information and moderators' profile pictures
+        // Prepare SQL query to fetch club description and moderators' profile pictures
         $stmt = $pdo->prepare("
-            SELECT c.clubName, c.information, c.coverPhoto, c.dateAdded, c.slots, 
+            SELECT c.clubName, c.description, c.mission, c.vision, c.history, c.coverPhoto, c.dateAdded, c.slots, 
                 m.firstName, m.middleName, m.lastName, m.profilePic,
                 COUNT(DISTINCT CASE WHEN r.status = 'active' THEN r.student_id END) AS membersCount,
                 COUNT(DISTINCT m.moderator_id) AS numModerators
@@ -66,18 +69,31 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
         $stmt->execute([$club_id]);
         $club = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Fetch the club information
+        // Fetch the club description
         if ($club) {
             $clubName = htmlspecialchars($club['clubName']);
-            $information = htmlspecialchars_decode($club['information']); // Decode HTML entities
+            $description = htmlspecialchars_decode($club['description']); // Decode HTML entities
+            $mission = htmlspecialchars_decode($club['mission']); // Decode HTML entities
+            $vision = htmlspecialchars_decode($club['vision']); // Decode HTML entities
+            $history = htmlspecialchars_decode($club['history']); // Decode HTML entities
             $coverPhoto = htmlspecialchars($club['coverPhoto']);
             $dateAdded = htmlspecialchars($club['dateAdded']);
             $membersCount = htmlspecialchars($club['membersCount']);
             $slots = htmlspecialchars($club['slots']); // Fetch and sanitize slots
 
-            // Calculate available slots
-            $activeMembersCount = (int)$membersCount; // Convert to integer for calculation
-            $availableSlots = max(0, $slots - $activeMembersCount); // Ensure no negative slots
+            // Calculate available slots and handle "Unlimited" and "Full" cases
+            if ($slots === null || (int)$slots === 0) {
+                $availableSlots = 'Unlimited'; // When slots are NULL or 0
+            } else {
+                $activeMembersCount = (int)$membersCount; // Convert to integer for calculation
+                $remainingSlots = (int)$slots - $activeMembersCount; // Calculate remaining slots
+                
+                if ($remainingSlots <= 0) {
+                    $availableSlots = 'Full'; // Club is full
+                } else {
+                    $availableSlots = $remainingSlots; // Display available slots
+                }
+            }
 
             // Generate moderators HTML
             $moderators = '';
@@ -102,7 +118,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 
             // Set the correct label for moderators
             $numModerators = $club['numModerators'];
-            $moderatorsLabel = ($numModerators <= 1) ? 'Moderator:' : 'Moderators:';
+            $moderatorsLabel = ($numModerators <= 1) ? 'Moderator <i class="fas fa-shield-alt text-danger"></i>' : 'Moderators <i class="fas fa-shield-alt text-danger"></i>';
 
             // Format the date into "Month Year"
             try {
@@ -114,7 +130,10 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 
         } else {
             $clubName = 'Club Not Found';
-            $information = 'No information available for this club.';
+            $description = 'No description available for this club.';
+            $mission = 'No mission available for this club.';
+            $vision = 'No vision available for this club.';
+            $history = 'No history available for this club.';
         }
 
         // Fetch the student's registration status for the current club
@@ -146,14 +165,16 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
 
 } else {
     $clubName = 'Invalid Club ID';
-    $information = 'Please provide a valid club ID.';
+    $description = 'Please provide a valid club ID.';
+    $mission = 'Please provide a valid club ID.';
+    $vision = 'Please provide a valid club ID.';
+    $history = 'Please provide a valid club ID.';
 }
 
 // Encode clubName for JavaScript use
 $encodedClubName = addslashes($clubName);
 
-$information = nl2br(htmlspecialchars($information)); // Convert newlines to <br>
-$information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; // Wrap paragraphs
+
 ?>
 
 
@@ -188,7 +209,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
             min-height: 500px;
         }
         .container-fluid {
-            padding: 20px;
+            padding: 0px;
         }
         .navbar-darkblue {
             background-color: #003366;
@@ -300,23 +321,18 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
 .club-info-coverphoto {
     width: 100%;
     height: auto;
+    margin-top: 10px;
     border-radius: 10px;
     object-fit: cover;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .club-name {
-    font-size: 1.5rem;
     font-weight: bold;
 }
 
-.creation-date {
-    font-size: 0.9rem;
-    color: #666;
-}
-
 .divider {
-    margin: 10px 0;
+    margin-top: 40px;
     border-color: #ccc;
 }
 
@@ -333,13 +349,16 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
 }
 
 .moderator-item {
-    width: 100%;
+    width: 30%;
     display: flex;
     align-items: center;
-    padding: 5px;
+    margin: 5px;
+    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 50px;
+    border-radius: 10px;
     background-color: #f8f9fa;
+    /* background-color: white; */
+    /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); */
 }
 
 .moderator-pic {
@@ -352,24 +371,16 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
 
 
 
-        .members-info {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        .numbers-section {
+            margin-top: 10px;
+            line-height: 10px
         }
 
-        .members-info h5 {
-            font-size: 1.2rem;
-            color: #333;
-            margin: 0;
-        }
-
-        .members-count, .slots-count {
+        .members-count{
             font-weight: bold;
             color: #003366;
             margin-left: 5px;
+            margin-top: 0px;
         }
 
 
@@ -388,14 +399,19 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
 
         
         @media (max-width: 768px) {
+            .club-info-coverphoto {
+                margin-top: 0px;
+            }
             .club-register-now .alert {
                 max-width: 90%;
             }
-            .members-info {
+            .numbers-section {
                 flex-direction: column;
                 align-items: flex-start;
             }
-        }
+            .moderator-item {
+                width: 100%;
+            }
         
     </style>
 </head>
@@ -410,35 +426,197 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
             <div class="clubname-and-coverphoto"> 
                 <div class="row">
                     <div class="col-12 col-md-8">
-                        <img class="club-info-coverphoto mt-4" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo">
+                        <img class="club-info-coverphoto" src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" alt="Cover Photo">
                     </div>
                     <div class="col-12 col-md-4">
-                        <h2 class="club-name text-muted mt-4"><?php echo $clubName; ?></h2>
+                        <h3 class="club-name text-muted mt-2"><?php echo $clubName; ?></h3>
                         <p class="creation-date">Created: <?php echo $formattedDate; ?></p>
-                        <hr class="divider">
-                        <h5 class="moderators-label mb-3"><?php echo $moderatorsLabel; ?></h5>
-                        <div class="moderators"><?php echo $moderators; ?></div>
+                        <!-- <hr class="divider"> -->
+
+                        <p class="members-info text-light mb-1">
+                            <i class="fas fa-users text-light"></i>Members: <span class="members-count"><?php echo $membersCount; ?></span>
+                        </p>
+
+                        <p class="slots-info text-light">
+                            <i class="fas fa-check-circle text-light"></i> Slots: <span class="slots-count"><?php echo $availableSlots; ?></span>
+                        </p>
+
+                       
+
                     </div>
                 </div>
             </div>
+            
+            
 
-            <div class="members-info d-flex justify-content-between align-items-center">
-                <h5>Members: <span class="members-count"><?php echo $membersCount; ?></span></h5>
-                <h5>Available Slots: <span class="slots-count"><?php echo $availableSlots; ?></span></h5>
+            <style>
+    body {
+        font-size: 18px;
+        line-height: 1.6;
+        color: #444;
+        margin: 10px 0;
+        position: relative;
+        z-index: 1;
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    .club-profile-container {
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        padding: 10px 25px;
+        margin-top: 20px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #ccc;
+    }
+
+    .club-profile-container::before {
+        content: "";
+        position: absolute;
+        top: -30%;
+        left: -20%;
+        width: 120%;
+        height: 120%;
+        background: rgba(0, 98, 204, 0.1);
+        border-radius: 50%;
+        z-index: 0;
+        transform: rotate(-30deg);
+    }
+
+    .profile-section {
+        margin-bottom: 20px; /* Space between sections */
+    }
+
+    .profile-section-title {
+        font-weight: bold;
+        color: #0062cc;
+        margin-top: 10px;
+        position: relative;
+        z-index: 1;
+        padding-bottom: 10px;
+    }
+
+    .profile-section-content {
+        text-indent: 2em; /* Indent the first line of each paragraph */
+    }
+
+
+    /* Common styling for both members and slots */
+    .members-info, .slots-info {
+        background-color: rgba(65, 105, 225, 0.8); /* Royal Blue with 80% opacity */
+        border-radius: 10px;
+        padding: 5px 10px;
+        display: inline-block;
+        font-size: 1.2em;
+        color: #00796b; /* Dark teal text color */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Shadow effect */
+    }
+
+    .members-info {
+        background-color: rgba(34, 139, 34, 0.7); /* Forest Green with 80% opacity */
+    }
+
+    .members-info .fa-users, .slots-info .fa-check-circle {
+        margin-right: 8px;
+    }
+
+    .members-count, .slots-count {
+        font-weight: bold;
+        color: white;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .club-profile-container {
+            padding: 15px;
+        }
+
+        .profile-section-content {
+            /* font-size: 16px; */
+        }
+    }
+</style>
+
+
+<div class="club-profile-container">
+    <div class="profile-section">
+        <h5 class="profile-section-title"><i class="fas fa-lightbulb text-warning" style="font-size: 35px;"></i>
+        Why <?php echo $clubName; ?>?</h5>
+        <?php 
+            $descriptionLines = explode("\n", $description);
+            foreach ($descriptionLines as $line) {
+                echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
+            }
+        ?>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="profile-section p-3 mb-3 border rounded bg-light">
+                <em><h5 class="profile-section-title">Mission</h5></em>
+                <?php 
+                    $missionLines = explode("\n", $mission);
+                    foreach ($missionLines as $line) {
+                        echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
+                    }
+                ?>
             </div>
-            <div class="club-info">
-                <?php echo $information; ?>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="profile-section p-3 mb-3 border rounded bg-light">
+                <em><h5 class="profile-section-title">Vision</h5></em>
+                <?php 
+                    $visionLines = explode("\n", $vision);
+                    foreach ($visionLines as $line) {
+                        echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
+                    }
+                ?>
             </div>
+        </div>
+    </div>
+
+    
+    <div class="profile-section">
+        <h5 class="profile-section-title"><i class="fas fa-history text-warning" style="font-size: 30px;"></i>
+        History</h5>
+        <?php 
+            $historyLines = explode("\n", $history);
+            foreach ($historyLines as $line) {
+                echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
+            }
+        ?>
+    </div>
 
 
-            <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
+    
+    <hr class="divider">
+    <h5 class="moderators-label mt-5 mb-3"><?php echo $moderatorsLabel; ?></h5>
+    <div class="moderators"><?php echo $moderators; ?></div>
+</div>
+
+
+
+                        
+
+
+
+
+
+
+
+
+
+            <div class="club-register-now mt-5 text-center align-items-center justify-content-center">
                 <?php if ($availableSlots <= 0 && $status === 'active'): ?>
                     <div class="alert alert-info custom-alert" role="alert">
                         <p class="lead mb-0">You are already a member of this club.
                             <a href="/esas/esas_student/home.php?club_id=<?php echo $club_id; ?>"> Go to Home</a>
                         </p>
                     </div>
-                <?php elseif ($availableSlots <= 0): ?>
+                <?php elseif ($membersCount === $slots && ($slots !== 0 || $slots !== NULL)): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
                         <p class="lead mb-0">This club is full.</p>
                     </div>
@@ -474,7 +652,7 @@ $information = '<p>' . str_replace('<br />', '</p><p>', $information) . '</p>'; 
                     <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>)">Register Now</button>
                 <?php endif; ?>
                 <div class="mt-3">
-                    <a href="javascript:history.go(-1)" class="btn btn-secondary">Go Back</a>
+                    <a href="javascript:history.go(-1)" class="btn btn-secondary mb-5">Go Back</a>
                 </div>
             </div>
 

@@ -94,7 +94,9 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     // Prepare a select statement to fetch questions and dateApplied from tbl_registration
     $sql_questions = "SELECT question1, question2, question3, dateApplied FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id";
 
-    echo "<script>console.log('Preparing SQL to fetch registration questions and dateApplied');</script>";
+
+    echo "<script>console.log('Preparing SQL to fetch application questions and dateApplied');</script>";
+
 
     if ($stmt = $pdo->prepare($sql_questions)) {
         // Bind variables to the prepared statement as parameters
@@ -111,8 +113,10 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
                 $dateApplied = $questions['dateApplied']; 
                 echo "<script>console.log('Date Applied: " . $dateApplied . "');</script>";
             } else {
-                echo "<script>console.log('No registration details found');</script>";
-                echo "No registration details found.";
+
+                echo "<script>console.log('No application details found');</script>";
+                echo "No application details found.";
+
             }
         } else {
             echo "<script>console.log('Error executing the questions query');</script>";
@@ -130,9 +134,11 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     exit();
 }
 
-// Function to update the registration status
+
+// Function to update the application status
 function updateRegistrationStatus($pdo, $student_id, $club_id, $registration_id, $newStatus) {
-    echo "<script>console.log('Updating registration status to " . $newStatus . "');</script>";
+    echo "<script>console.log('Updating application status to " . $newStatus . "');</script>";
+
     $updateSql = "UPDATE tbl_registration 
                   SET status = :status, dateApproved = NOW() 
                   WHERE student_id = :student_id 
@@ -161,9 +167,11 @@ function countActiveMemberships($pdo, $student_id) {
     return $activeCount;
 }
 
-// Function to update pending registrations status
+
+// Function to update pending applications status
 function updatePendingRegistrations($pdo, $student_id) {
-    echo "<script>console.log('Updating pending registrations for student ID: " . $student_id . "');</script>";
+    echo "<script>console.log('Updating pending applications for student ID: " . $student_id . "');</script>";
+
     $updatePendingSql = "UPDATE tbl_registration SET status = 'maxed' WHERE student_id = :student_id AND status = 'pending'";
     $stmt = $pdo->prepare($updatePendingSql);
     $stmt->execute([':student_id' => $student_id]);
@@ -198,10 +206,12 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     echo "<script>console.log('Club ID: " . json_encode($club_id) . "');</script>";
     echo "<script>console.log('Registration ID: " . json_encode($registration_id) . "');</script>";
 
-    // Update registration status
-    echo "<script>console.log('Updating registration status...');</script>";
+
+    // Update applications status
+    echo "<script>console.log('Updating applications status...');</script>";
     if (updateRegistrationStatus($pdo, $student_id, $club_id, $registration_id, $newStatus) > 0) {
-        echo "<script>console.log('Registration status updated successfully');</script>";
+        echo "<script>console.log('Applications status updated successfully');</script>";
+
         
         // Check the current active memberships after approval
         if ($newStatus === 'active') {
@@ -210,10 +220,10 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
             $clubsCount = countActiveMemberships($pdo, $student_id);
 
             echo "<script>console.log('Active Clubs Count: " . $clubsCount . "');</script>";
-
-            // If the student already has 2 active memberships, update the status of other pending registrations
+ // If the student already has 2 active memberships, update the status of other pending applications
             if ($clubsCount >= 2) {
-                echo "<script>console.log('Student has 2 or more active memberships. Updating pending registrations...');</script>";
+                echo "<script>console.log('Student has 2 or more active memberships. Updating pending applications...');</script>";
+
                 updatePendingRegistrations($pdo, $student_id);
             }
 
@@ -274,18 +284,22 @@ function sendNotificationEmail($final_email, $fullName, $clubName, $action) {
     
         // Recipients
         echo "<script>console.log('Adding recipient: {$final_email}');</script>";
-        $mail->setFrom('sportsnbscesas@gmail.com', 'Club Registration');
+
+        $mail->setFrom('sportsnbscesas@gmail.com', 'NBSC Club Organizations');
+
         $mail->addAddress($final_email, $fullName);           
     
         // Content
         echo "<script>console.log('Setting up email content...');</script>";
         $mail->isHTML(true);                                  
-        $subject = $action === 'approved' ? 'Club Registration Approved' : 'Club Registration Disapproved';
+
+        $subject = $action === 'approved' ? 'Club Application Approved' : 'Club Application Disapproved';
         $mail->Subject = $subject;
     
         $message = $action === 'approved' ? 
-            "Dear $fullName,<br><br>Congratulations! Your registration for the club <b>$clubName</b> has been approved." : 
-            "Dear $fullName,<br><br>We regret to inform you that your registration for the club <b>$clubName</b> has been disapproved.";
+            "Dear $fullName,<br><br>Congratulations! Your application for the club <b>$clubName</b> has been approved." : 
+            "Dear $fullName,<br><br>We regret to inform you that your application for the club <b>$clubName</b> has been disapproved.";
+
         
         $mail->Body    = $message;
         echo "<script>console.log('Email subject and body set.');</script>";
@@ -387,7 +401,7 @@ $disapprovedCount = $stmt->fetchColumn();
                             <p><strong>Student ID: </strong><?php echo $student_id; ?></p>
                             <hr>
 
-                            <h5>Registration Details:</h5>
+                            <h5>Application Details:</h5>
                             <!-- Display the questions -->
                             <div class="container mt-3 p-0">
                                 <div class="card mb-3 bg-light">

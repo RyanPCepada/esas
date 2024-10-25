@@ -259,11 +259,11 @@ try {
                                     // Include config file
                                     require_once "../../config.php";
 
-                                    // SQL query to fetch all clubs with related information, moderators, member count, and actions
+                                    // SQL query to fetch all clubs with related description, moderators, member count, and actions
                                     $sql = "SELECT 
                                                 c.club_id,
                                                 c.clubName, 
-                                                c.information, 
+                                                c.description, 
                                                 c.coverPhoto, 
                                                 GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.lastName, ':::', m.profilePic) SEPARATOR '|||') AS moderators,
                                                 (SELECT COUNT(DISTINCT r.student_id) FROM tbl_registration r WHERE r.club_id = c.club_id AND r.status = 'active') AS member_count,
