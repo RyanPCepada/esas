@@ -19,7 +19,7 @@ switch ($method) {
 
             // Query to fetch the clubs associated with the moderator
             $stmt = $pdo->prepare('
-                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, c.dateAdded, c.dateModified,
+                SELECT c.club_id, c.clubName, c.description, c.mission, c.vision, c.history, c.coverPhoto, c.dateAdded, c.dateModified,
                        GROUP_CONCAT(s.firstName ORDER BY s.firstName SEPARATOR ", ") AS students,
                        GROUP_CONCAT(s.profilePic ORDER BY s.firstName SEPARATOR ", ") AS studentPics
                 FROM tbl_clubs c

@@ -1,5 +1,5 @@
 <div class="about-section auto-scroll">
-    <!-- Club description will be dynamically inserted here -->
+    <!-- Club details will be dynamically inserted here -->
 </div>
 
 <style>
@@ -33,12 +33,6 @@
         font-style: italic; /* Italic for date */
     }
 
-    .club-info .description {
-        /* font-size: 1.1em; Slightly larger font for club description */
-        color: #333; /* Darker color for better readability */
-        line-height: 1.5; /* Improved line spacing for readability */
-    }
-
     .club-info .section-title {
         font-size: 1.3em;
         font-weight: bold;
@@ -49,7 +43,7 @@
     }
 
     .club-info .club_moderators, .club-info .members {
-        font-size: 1.2em;
+        font-size: 1.3em;
         font-weight: bold;
         color: #007bff; /* Primary color for section titles */
     }
@@ -108,7 +102,7 @@ $(document).ready(function() {
                     const aboutSection = $('.about-section');
 
                     // Format the registration date
-                    const formattedDate = new Date(club.registrationDate).toLocaleDateString('en-US', {
+                    const formattedDate = new Date(club.clubDateAdded).toLocaleDateString('en-US', {
                         year: 'numeric', month: 'long', day: 'numeric'
                     });
 
@@ -121,24 +115,19 @@ $(document).ready(function() {
                         <div class="club-info">
                             <div class="club-info-top">
                                 <p class="section-title">Club Details</p>
-                                <p class="date-created"><strong>Date of Creation:</strong> ${formattedDate}</p>
+                                <p class="date-created"><strong>Date of Creation: </strong>${formattedDate}</p>
                                 <p class="description">${club.description}</p>
-                                <div class="mission-container p-3 mb-3 border rounded bg-light">
-                                    <em><p class="mission"><strong>Mission</strong><br> ${club.mission}</p></em>
-                                </div>
-                                <div class="vision-container p-3 mb-3 border rounded bg-light">
-                                    <em><p class="vision"><strong>Vision</strong><br> ${club.vision}</p></em>
-                                </div>
-                                <br>
+                                <em><p class="mission"><strong>Mission</strong><br> ${club.mission}</p></em>
+                                <em><p class="vision"><strong>Vision</strong><br> ${club.vision}</p></em>
                                 <p class="history"><strong>History</strong><br> ${club.history}</p>
                                 <a href="../settings.php">Edit Information in Settings</a>
                             </div>
                             <br>
-                            <p class="club_moderators text-muted my-2">Club Moderators <em>(${moderatorsCount})</em></p>
+                            <p class="club_moderators text-primary my-2">Club Moderators <em>(${moderatorsCount})</em></p>
                             <div class="about-row">
                                 ${buildCards(club.moderators, 'moderator')}
                             </div>
-                            <p class="members text-muted my-2">Members <em>(${membersCount})</em></p>
+                            <p class="members text-primary my-2">Members <em>(${membersCount})</em></p>
                             <div class="about-row">
                                 ${buildCards(club.members, 'member')}
                             </div>
