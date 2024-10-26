@@ -84,14 +84,17 @@ function formatDate($date) {
 $status = strtolower($application['status']); // Get the status from the application details
 $icon = '';
 switch ($status) {
-    case 'approved':
+    case 'active':
         $icon = '<i class="fas fa-check-circle text-success"></i>'; // Approved icon
         break;
     case 'disapproved':
         $icon = '<i class="fas fa-times-circle text-danger"></i>'; // Disapproved icon
         break;
-    case 'active':
-        $icon = '<i class="fas fa-check-circle text-primary"></i>'; // Active icon
+    case 'inactive':
+        $icon = '<i class="fas fa-user-times text-warning"></i>'; // Active icon
+        break;
+    case 'departed':
+        $icon = '<i class="fas fa-user-slash text-secondary"></i>'; // Active icon
         break;
     case 'pending':
     default:
