@@ -16,6 +16,7 @@ date_default_timezone_set('Asia/Manila');
 $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
 $student_id = isset($_GET['student_id']) ? $_GET['student_id'] : null;
 $application_id = isset($_GET['application_id']) ? $_GET['application_id'] : null;
+$fullName = isset($_GET['fullName']) ? $_GET['fullName'] : null;
 
 // Check if club_id and application_id are provided
 if (!$club_id) {
@@ -141,7 +142,7 @@ switch ($status) {
     <div class="wrapper">
             <h2 class="mt-5">Application Details</h2>
             <div class="justify-content-between">
-                <p class="text-muted">Review your application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
+                <p class="text-muted">Review <strong><?php echo htmlspecialchars($fullName); ?></strong>'s application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
                 <p>Status: <?php echo $icon; ?> <strong><?php echo ucfirst($status); ?></strong></p>
             </div>
             <div class="container-fluid container mb-5 auto-scroll">
