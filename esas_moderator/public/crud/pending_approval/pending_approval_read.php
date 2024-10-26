@@ -134,7 +134,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
 function updateRegistrationStatus($pdo, $student_id, $club_id, $application_id, $newStatus) {
     echo "<script>console.log('Updating application status to " . $newStatus . "');</script>";
     $updateSql = "UPDATE tbl_application 
-                  SET status = :status, dateApproved = NOW() 
+                  SET status = :status, dateDecided = NOW() 
                   WHERE student_id = :student_id 
                   AND club_id = :club_id 
                   AND application_id = :application_id";

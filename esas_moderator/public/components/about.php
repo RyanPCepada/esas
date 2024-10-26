@@ -237,7 +237,7 @@ $(document).ready(function() {
                     </div>
                 `;
             } else {
-                const [fullName, profilePic, department, yearLevel, dateApproved] = details;
+                const [fullName, profilePic, department, yearLevel, dateDecided] = details;
                 const nameParts = fullName.split(' ');
                 const firstName = nameParts[0];
                 const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
@@ -257,7 +257,7 @@ $(document).ready(function() {
                                         <div class="d-flex flex-column" style="line-height: 1em;">
                                             <h7 class="card-title mb-1"><strong>${firstName} ${middleName} ${lastName}</strong></h7>
                                             <p class="mb-1 text-muted"><strong>${department} ${yearLevel}</strong></p>
-                                            <p class="text-muted mb-0">Member since: ${new Date(dateApproved).toLocaleDateString('en-US', {
+                                            <p class="text-muted mb-0">Member since: ${new Date(dateDecided).toLocaleDateString('en-US', {
                                                 year: 'numeric', month: 'long', day: 'numeric'
                                             })}</p>
                                         </div>

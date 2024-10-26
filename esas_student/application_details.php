@@ -155,11 +155,11 @@ switch ($status) {
                             <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                         <?php elseif ($status === 'disapproved'): ?>
                             <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                            <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateApproved']); ?></p>
+                            <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
                             <p><strong>Remarks:</strong> <?php echo !empty($application['remark']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
                         <?php elseif ($status === 'active'): ?>
                             <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                            <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateApproved']); ?></p>
+                            <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
                             <p><strong>Remarks:</strong> <?php echo !empty($application['remark']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
                         <?php endif; ?>
 

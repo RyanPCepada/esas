@@ -29,7 +29,7 @@ if (isset($_GET['club_id'])) {
                 f.lastName AS founderLastName,
                 f.profilePic AS founderProfilePic,
                 GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.middleName, ' ', m.lastName, '|', m.profilePic, '|', m.department, '|', cm.dateAdded) ORDER BY m.firstName SEPARATOR ', ') AS moderators,
-                GROUP_CONCAT(DISTINCT CONCAT(s.firstName, ' ', s.middleName, ' ', s.lastName, '|', s.profilePic, '|', s.department, '|', s.year, '|', r.dateApproved) 
+                GROUP_CONCAT(DISTINCT CONCAT(s.firstName, ' ', s.middleName, ' ', s.lastName, '|', s.profilePic, '|', s.department, '|', s.year, '|', r.dateDecided) 
                             ORDER BY s.firstName SEPARATOR ', ') AS members,
                 r.dateApplied AS applicationDate,
                 r.status AS applicationStatus,

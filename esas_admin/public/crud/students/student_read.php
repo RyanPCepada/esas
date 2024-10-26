@@ -41,7 +41,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
 
                 // For clubs
                 $clubDetails = 'None'; // Default value for now
-                $clubSql = "SELECT DISTINCT c.clubName, c.coverPhoto, r.dateApplied, r.dateApproved 
+                $clubSql = "SELECT DISTINCT c.clubName, c.coverPhoto, r.dateApplied, r.dateDecided 
                             FROM tbl_application r 
                             JOIN tbl_clubs c ON r.club_id = c.club_id 
                             WHERE r.student_id = :student_id AND r.status = 'active'"; // Add status condition
@@ -55,12 +55,12 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                             foreach ($clubs as $club) {
                                 $clubName = htmlspecialchars($club['clubName']);
                                 $dateApplied = !empty($club['dateApplied']) ? date("F j, Y", strtotime($club['dateApplied'])) : 'None';
-                                $dateApproved = !empty($club['dateApproved']) ? date("F j, Y", strtotime($club['dateApproved'])) : 'None';
+                                $dateDecided = !empty($club['dateDecided']) ? date("F j, Y", strtotime($club['dateDecided'])) : 'None';
                                 
                                 // Append each club with its details
                                 $clubDetails .= "<p><strong class='text-muted'>{$clubName}</strong><br>";
                                 $clubDetails .= "<small>Date Applied: {$dateApplied}</small><br>";
-                                $clubDetails .= "<small>Date Approved: {$dateApproved}</small></p>";
+                                $clubDetails .= "<small>Date Approved: {$dateDecided}</small></p>";
                             }
                         }
                     }

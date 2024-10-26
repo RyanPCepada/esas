@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'student_application_status':
-            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS 'Student Name', c.clubName AS 'Club Name', r.status AS 'Status', r.dateApproved AS 'Date Approved' FROM tbl_application r JOIN tbl_students s ON r.student_id = s.student_id JOIN tbl_clubs c ON r.club_id = c.club_id";
+            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS 'Student Name', c.clubName AS 'Club Name', r.status AS 'Status', r.dateDecided AS 'Date Approved' FROM tbl_application r JOIN tbl_students s ON r.student_id = s.student_id JOIN tbl_clubs c ON r.club_id = c.club_id";
             break;
 
         default:
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'clubs_and_students_overview':
             case 'student_application_status':
                 // Assuming application date is relevant for students
-                $query .= " WHERE r.dateApproved BETWEEN '$startDate' AND '$endDate'";
+                $query .= " WHERE r.dateDecided BETWEEN '$startDate' AND '$endDate'";
                 break;
 
             case 'club_activity_summary':

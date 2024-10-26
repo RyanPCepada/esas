@@ -369,7 +369,7 @@ try {
                                                 $endDate = "$endYear-07-31";
 
                                                 // Add the WHERE condition for students active up to the end of the selected school year
-                                                $sql .= " AND dateApproved <= :endDate";
+                                                $sql .= " AND dateDecided <= :endDate";
                                             }
 
                                             // Prepare and execute the query
@@ -467,11 +467,11 @@ try {
 
                                                 if ($selectedYear) {
                                                     $endDate = ($selectedYear + 1) . "-05-31";
-                                                    $sql .= " AND tr.dateApproved <= :endDate";
+                                                    $sql .= " AND tr.dateDecided <= :endDate";
                                                 }
 
                                                 if ($selectedMonth) {
-                                                    $sql .= " AND MONTH(tr.dateApproved) <= :month";
+                                                    $sql .= " AND MONTH(tr.dateDecided) <= :month";
                                                 }
 
                                                 $sql .= " GROUP BY tc.club_id ORDER BY member_count DESC";
@@ -607,15 +607,15 @@ try {
         SELECT 
             CONCAT(
                 CASE 
-                    WHEN MONTH(r.dateApproved) >= 8 
-                    THEN YEAR(r.dateApproved) 
-                    ELSE YEAR(r.dateApproved) - 1 
+                    WHEN MONTH(r.dateDecided) >= 8 
+                    THEN YEAR(r.dateDecided) 
+                    ELSE YEAR(r.dateDecided) - 1 
                 END, 
                 '-', 
                 CASE 
-                    WHEN MONTH(r.dateApproved) >= 8 
-                    THEN YEAR(r.dateApproved) + 1 
-                    ELSE YEAR(r.dateApproved) 
+                    WHEN MONTH(r.dateDecided) >= 8 
+                    THEN YEAR(r.dateDecided) + 1 
+                    ELSE YEAR(r.dateDecided) 
                 END
             ) AS academicYear,
             COUNT(s.student_id) AS memberCount -- Count the number of students for each academic year
@@ -750,7 +750,7 @@ try {
                                                             FROM tbl_students s
                                                             JOIN tbl_application r ON s.student_id = r.student_id
                                                             WHERE r.status = 'active'
-                                                            AND r.dateApproved <= :endDate
+                                                            AND r.dateDecided <= :endDate
                                                             GROUP BY s.year
                                                         ";
 
@@ -878,7 +878,7 @@ try {
                                                             FROM tbl_students s
                                                             JOIN tbl_application r ON s.student_id = r.student_id
                                                             WHERE r.status = 'active' 
-                                                            AND r.dateApproved <= :endDate
+                                                            AND r.dateDecided <= :endDate
                                                             GROUP BY s.gender
                                                         ";
 

@@ -398,7 +398,7 @@ try {
                                                 JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id 
                                                 WHERE cm.moderator_id = :moderator_id 
                                                 AND tr.status = 'active'
-                                                AND tr.dateApproved <= :end_date
+                                                AND tr.dateDecided <= :end_date
                                             ";
 
                                             // Parameters for the query
@@ -591,7 +591,7 @@ try {
                                                     JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id
                                                     WHERE cm.moderator_id = :moderator_id 
                                                     AND tr.status = 'active'
-                                                    AND tr.dateApproved <= :end_date
+                                                    AND tr.dateDecided <= :end_date
                                                 ";
 
                                                 // Add condition for club_id if it's set
@@ -755,8 +755,8 @@ try {
                                                     $sql = "
                                                         SELECT 
                                                             CASE 
-                                                                WHEN MONTH(r.dateApproved) >= 6 THEN CONCAT(YEAR(r.dateApproved), '-', YEAR(r.dateApproved) + 1)
-                                                                ELSE CONCAT(YEAR(r.dateApproved) - 1, '-', YEAR(r.dateApproved))
+                                                                WHEN MONTH(r.dateDecided) >= 6 THEN CONCAT(YEAR(r.dateDecided), '-', YEAR(r.dateDecided) + 1)
+                                                                ELSE CONCAT(YEAR(r.dateDecided) - 1, '-', YEAR(r.dateDecided))
                                                             END AS academicYear, 
                                                             COUNT(DISTINCT s.student_id) AS memberCount
                                                         FROM tbl_students s
@@ -935,7 +935,7 @@ try {
                                                         WHERE r.status = 'active'
                                                         AND cm.moderator_id = :moderator_id
                                                         AND r.club_id = :club_id
-                                                        AND r.dateApproved <= :endDate
+                                                        AND r.dateDecided <= :endDate
                                                         GROUP BY s.year";
 
                                                         // Prepare and execute the query
@@ -1069,7 +1069,7 @@ try {
                                                             JOIN tbl_clubs c ON r.club_id = c.club_id
                                                             JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                                                             WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
-                                                            AND r.dateApproved <= :endDate
+                                                            AND r.dateDecided <= :endDate
                                                         ";
 
                                                         // Add condition for club_id if it's set

@@ -127,7 +127,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
     // Prepare the SQL statement to update the specific departure record
     $updateSql = "UPDATE tbl_departure_requests 
-                  SET status = :status, dateApproved = NOW() 
+                  SET status = :status, dateDecided = NOW() 
                   WHERE student_id = :student_id 
                   AND club_id = :club_id 
                   AND departure_id = :departure_id"; 
@@ -174,7 +174,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
             if ($_POST["action"] === 'approve') {
                 // Prepare to update the application table
                 $updateRegistrationSql = "UPDATE tbl_application 
-                           SET status = :new_status, dateApproved = NOW() 
+                           SET status = :new_status, dateDecided = NOW() 
                            WHERE student_id = :student_id 
                            AND status = 'active' 
                            AND club_id = :club_id"; 
