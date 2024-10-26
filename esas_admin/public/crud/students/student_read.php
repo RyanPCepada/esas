@@ -3,6 +3,12 @@
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
+if (isset($_GET["application_id"]) && !empty(trim($_GET["application_id"]))) {
+    $application_id = trim($_GET["application_id"]);
+} else {
+    $application_id = 'None'; // Default if not provided
+}
+
 if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
     // Include config file
     require_once "../../../../config.php";
@@ -141,11 +147,14 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
 <div class="container">
     <div class="row mt-5">
         <div class="col-md-12">
-            <div class="card">
+            <div class="card mb-5">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3>Student Profile</h3>
                     <!-- <button class="btn btn-info" id="generateIDBtn" data-toggle="modal" data-target="#generateIDModal">Generate ID</button> -->
-                    <a href="../../crud/students/student_generate_id.php?student_id=<?php echo $student_id; ?>" class="btn btn-primary">Generate ID</a>
+                     <div>
+                        <a href="../../../application_details.php?application_id=<?php echo $application_id; ?>&student_id=<?php echo $student_id; ?>&club_id=<?php echo $_GET['club_id']; ?>" class="btn btn-outline-info">Application Details</a>
+                        <a href="../../crud/students/student_generate_id.php?student_id=<?php echo $student_id; ?>" class="btn btn-primary">Generate ID</a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -159,6 +168,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                             <hr>
                             <div class="row col-md-12">
                                 <div class="col-md-6">
+                                <!-- <p><strong>Application ID: </strong><?php echo $application_id; ?></p> -->
                                     <p><strong>Student ID: </strong><?php echo $student_id; ?></p>
                                     <p><strong>Email: </strong><?php echo $email; ?></p>
                                     <p><strong>Phone Number: </strong><?php echo $phoneNumber; ?></p>

@@ -2,12 +2,12 @@
 require_once "../config.php"; // Database config file
 session_start();
 
-if (!isset($_SESSION['moderator_id'])) {
-    echo "Moderator ID is not set in the session.";
+if (!isset($_SESSION['admin_id'])) {
+    echo "Admin ID is not set in the session.";
     exit;
 }
 //Registration
-$moderator_id = $_SESSION['moderator_id']; // Get student ID from session
+$admin_id = $_SESSION['admin_id']; // Get student ID from session
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');

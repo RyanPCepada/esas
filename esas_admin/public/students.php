@@ -210,6 +210,8 @@ try {
                                 // Include config file
                                 require_once "../../config.php";
 
+                                $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
+
                                 // SQL query to fetch all students with their registered clubs and active status
                                 $sql = "SELECT 
                                             s.student_id,
@@ -222,6 +224,8 @@ try {
                                             s.course,
                                             s.year,
                                             s.profilePic,
+                                            r.application_id,
+                                            c.club_id,
                                             GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
                                         FROM tbl_students s
                                         LEFT JOIN tbl_application r ON s.student_id = r.student_id
@@ -239,6 +243,8 @@ try {
                                             <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
                                                 <thead>
                                                     <tr>
+                                                    <!-- <th>Application ID</th> -->
+                                                    <!-- <th>Club ID</th> -->
                                                         <th></th>
                                                         <th>Full Name</th>
                                                         <th>Department</th>
@@ -250,12 +256,16 @@ try {
                                                 <tbody>';
 
                                                 while ($row = $result->fetch()) {
+                                                    $application_id = htmlspecialchars($row['application_id']);
+                                                    $club_id = htmlspecialchars($row['club_id']);
                                                     $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
                                                     $clubNames = htmlspecialchars($row['clubNames']);
                                                     $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
 
                                                     echo '
                                                     <tr class="student-row" data-club="' . htmlspecialchars($clubNames) . '">
+                                                        <!-- <td>' . $application_id . '</td> -->
+                                                        <!-- <td>' . $club_id . '</td> -->
                                                         <td class="text-center p-1">
                                                             <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
                                                                 alt="' . $fullName . ' profile picture" 
@@ -266,7 +276,7 @@ try {
                                                         <td>' . htmlspecialchars($row['course']) . '</td>
                                                         <td>' . $clubNames . '</td>
                                                         <td class="text-center">
-                                                            <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                            <a href="../public/crud/students/student_read.php?application_id=' . htmlspecialchars($row['application_id']) . '&student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($club_id) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                                         </td>
                                                     </tr>';
                                                 }

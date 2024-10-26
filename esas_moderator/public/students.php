@@ -403,7 +403,7 @@ try {
                                         <table class="table table-bordered table-striped" style="background-color: #f9f9f9;" id="studentTable">
                                             <thead>
                                                 <tr>
-                                                    <th>Application ID</th>
+                                                    <!-- <th>Application ID</th> -->
                                                     <th>Student ID</th>
                                                     <th>Profile</th>
                                                     <th>Full Name</th>
@@ -435,7 +435,7 @@ try {
 
                                             echo '
                                             <tr class="student-row" data-status="' . htmlspecialchars($row['status']) . '"> 
-                                                <td>' . $application_id . '</td>
+                                                <!-- <td>' . $application_id . '</td> -->
                                                 <td>' . $student_id . '</td>
                                                 <td class="text-center p-1">
                                                     <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
