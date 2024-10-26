@@ -39,7 +39,7 @@ try {
         FROM 
             tbl_students s 
         JOIN 
-            tbl_registration r ON s.student_id = r.student_id 
+            tbl_application r ON s.student_id = r.student_id 
         LEFT JOIN 
             tbl_chats c ON (s.student_id = c.sender_id OR s.student_id = c.recipient_id) 
             AND c.club_id = :club_id

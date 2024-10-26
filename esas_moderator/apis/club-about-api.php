@@ -31,17 +31,17 @@ if (isset($_GET['club_id'])) {
                 GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.middleName, ' ', m.lastName, '|', m.profilePic, '|', m.department, '|', cm.dateAdded) ORDER BY m.firstName SEPARATOR ', ') AS moderators,
                 GROUP_CONCAT(DISTINCT CONCAT(s.firstName, ' ', s.middleName, ' ', s.lastName, '|', s.profilePic, '|', s.department, '|', s.year, '|', r.dateApproved) 
                             ORDER BY s.firstName SEPARATOR ', ') AS members,
-                r.dateApplied AS registrationDate,
-                r.status AS registrationStatus,
+                r.dateApplied AS applicationDate,
+                r.status AS applicationStatus,
                 r.question1,
                 r.question2,
                 r.question3
             FROM 
                 tbl_clubs c
             LEFT JOIN 
-                tbl_registration r ON r.club_id = c.club_id AND r.status = 'active'  -- Only fetch active registrations
+                tbl_application r ON r.club_id = c.club_id AND r.status = 'active'  -- Only fetch active applications
             LEFT JOIN 
-                tbl_students s ON s.student_id = r.student_id -- Fetch only the active students based on the registration table
+                tbl_students s ON s.student_id = r.student_id -- Fetch only the active students based on the application table
             LEFT JOIN 
                 tbl_clubs_and_moderators cm ON cm.club_id = c.club_id
             LEFT JOIN 

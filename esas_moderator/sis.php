@@ -130,7 +130,7 @@
     };
     const to_cor = () => {
         $('#content').html('');
-        $.post('panel/cor/certificate_of_registration.php', {}, (data) => {
+        $.post('panel/cor/certificate_of_application.php', {}, (data) => {
             $('#content').html(data);
         })
     };

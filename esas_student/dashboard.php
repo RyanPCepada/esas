@@ -465,8 +465,8 @@ try {
                                         try {
                                             // Base SQL query to count total active clubs for the student
                                             $sql = "
-                                                SELECT COUNT(r.club_id) AS total_registrations 
-                                                FROM tbl_registration r
+                                                SELECT COUNT(r.club_id) AS total_applications 
+                                                FROM tbl_application r
                                                 WHERE r.student_id = :student_id
                                             ";
 
@@ -474,12 +474,12 @@ try {
                                             $params = ['student_id' => $student_id];
 
                                             // Prepare and execute the query
-                                            $stmt_registrations = $pdo->prepare($sql);
-                                            $stmt_registrations->execute($params);
+                                            $stmt_applications = $pdo->prepare($sql);
+                                            $stmt_applications->execute($params);
 
-                                            // Fetch the total number of registrations
-                                            $total_registrations = $stmt_registrations->fetchColumn();
-                                            echo "<h3>$total_registrations</h3>";
+                                            // Fetch the total number of applications
+                                            $total_applications = $stmt_applications->fetchColumn();
+                                            echo "<h3>$total_applications</h3>";
                                         } catch (PDOException $e) {
                                             echo "Error: " . $e->getMessage();
                                         }
@@ -497,7 +497,7 @@ try {
                                             // Base SQL query to count total active clubs for the student
                                             $sql = "
                                                 SELECT COUNT(DISTINCT r.club_id) AS total_active_clubs 
-                                                FROM tbl_registration r
+                                                FROM tbl_application r
                                                 WHERE r.student_id = :student_id
                                                 AND r.status = 'active'
                                             ";
@@ -530,7 +530,7 @@ try {
                                             // Base SQL query to count total pending approval students for the logged-in student
                                             $sql = "
                                                 SELECT COUNT(*) AS total_pending_students 
-                                                FROM tbl_registration tr 
+                                                FROM tbl_application tr 
                                                 WHERE tr.status = 'pending' 
                                                 AND tr.student_id = :student_id
                                             ";
@@ -560,7 +560,7 @@ try {
                                             // Base SQL query to count total pending approval students for the logged-in student
                                             $sql = "
                                                 SELECT COUNT(*) AS total_disapproved_students 
-                                                FROM tbl_registration tr 
+                                                FROM tbl_application tr 
                                                 WHERE tr.status = 'disapproved' 
                                                 AND tr.student_id = :student_id
                                             ";

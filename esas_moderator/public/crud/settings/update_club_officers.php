@@ -24,7 +24,7 @@ function getActiveMembers($pdo, $clubId) {
     $sql = "
         SELECT s.student_id, s.firstName, s.lastName, s.profilePic 
         FROM tbl_students AS s
-        JOIN tbl_registration AS r ON s.student_id = r.student_id
+        JOIN tbl_application AS r ON s.student_id = r.student_id
         WHERE r.club_id = ? AND r.status = 'active'
     ";
     $stmt = $pdo->prepare($sql);

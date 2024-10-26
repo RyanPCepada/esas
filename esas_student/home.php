@@ -12,7 +12,7 @@ $student_id = $_SESSION['student_id'];
 $postContent = "";
 $postContent_err = "";
 $club_id = ""; // Initialize club_id variable
-$registration_id = ""; // Initialize registration_id variable
+$application_id = ""; // Initialize application_id variable
 $clubName = ""; // Initialize clubName variable
 $coverPhoto = ""; // Initialize coverPhoto variable
 $profilePic = ""; // Initialize profilePic variable
@@ -26,7 +26,7 @@ try {
         $club_id = $_GET['club_id']; // Use the passed club_id
     } else {
         // Default behavior if no club_id is passed (fallback)
-        $sql = "SELECT club_id FROM tbl_registration WHERE student_id = :student_id LIMIT 1";
+        $sql = "SELECT club_id FROM tbl_application WHERE student_id = :student_id LIMIT 1";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -34,9 +34,9 @@ try {
         $club_id = $student['club_id']; // Default to the first club
     }
 
-    // Check if registration_id is passed in the URL
-    if (isset($_GET['registration_id']) && is_numeric($_GET['registration_id'])) {
-        $registration_id = $_GET['registration_id']; // Use the passed registration_id
+    // Check if application_id is passed in the URL
+    if (isset($_GET['application_id']) && is_numeric($_GET['application_id'])) {
+        $application_id = $_GET['application_id']; // Use the passed application_id
     }
 
     // Fetch the student's profile picture
@@ -114,7 +114,7 @@ try {
     die("Database error: " . $e->getMessage());
 }
 // echo "Club ID: " . htmlspecialchars($club_id) . "<br>";
-// echo "Registration ID: " . htmlspecialchars($registration_id) . "<br>";
+// echo "Registration ID: " . htmlspecialchars($application_id) . "<br>";
 ?>
 
 
@@ -445,7 +445,7 @@ try {
 
                     <div id="dropdownMenu" class="dropdown mt-4">
                         <a href="../esas_student/profile.php?student_id=<?php echo $student_id; ?>">See Profile</a>
-                        <a href="../esas_student/application_details.php?club_id=<?php echo urlencode($club_id); ?>&registration_id=<?php echo urlencode($registration_id); ?>">Application Details</a>
+                        <a href="../esas_student/application_details.php?club_id=<?php echo urlencode($club_id); ?>&application_id=<?php echo urlencode($application_id); ?>">Application Details</a>
                         <a href="../esas_student/history.php?student_id=<?php echo $student_id; ?>">History</a>
                         <?php if ($hasDepartureRequest): ?>
                             <a href="../esas_student/crud/departure_requests/departure_request_read.php?club_id=<?php echo $_GET['club_id']; ?>">See Departure Request</a>

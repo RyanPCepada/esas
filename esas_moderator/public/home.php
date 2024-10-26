@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $post_id = $pdo->lastInsertId();
 
                 // Notify all students registered in the club
-                $sql = "SELECT student_id FROM tbl_registration WHERE club_id = :club_id AND status = 'active'";
+                $sql = "SELECT student_id FROM tbl_application WHERE club_id = :club_id AND status = 'active'";
                 $stmt = $pdo->prepare($sql);
                 $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
                 $stmt->execute();

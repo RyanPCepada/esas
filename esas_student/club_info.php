@@ -62,7 +62,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             FROM tbl_clubs c
             LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
             LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
-            LEFT JOIN tbl_registration r ON c.club_id = r.club_id
+            LEFT JOIN tbl_application r ON c.club_id = r.club_id
             WHERE c.club_id = ? 
             GROUP BY c.club_id
         ");
@@ -136,24 +136,24 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             $history = 'No history available for this club.';
         }
 
-        // Fetch the student's registration status for the current club
-        $stmt = $pdo->prepare("SELECT status, registration_id FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id ORDER BY registration_id DESC LIMIT 1"); // Fetch the latest registration
+        // Fetch the student's application status for the current club
+        $stmt = $pdo->prepare("SELECT status, application_id FROM tbl_application WHERE student_id = :student_id AND club_id = :club_id ORDER BY application_id DESC LIMIT 1"); // Fetch the latest application
         $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
         $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
         $stmt->execute();
-        $registration = $stmt->fetch(PDO::FETCH_ASSOC);
+        $application = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $status = $registration['status'] ?? null;  // Use null if no registration found
-        $registration_id = $registration['registration_id'] ?? null; // Fetch the corresponding registration_id
+        $status = $application['status'] ?? null;  // Use null if no application found
+        $application_id = $application['application_id'] ?? null; // Fetch the corresponding application_id
 
         // Count how many clubs the student is currently "active" in
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_application WHERE student_id = :student_id AND status = 'active'");
         $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
         $stmt->execute();
         $clubsCount = $stmt->fetchColumn();
 
         // Count how many times the student has been "disapproved" for this club
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id AND status = 'disapproved'");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_application WHERE student_id = :student_id AND club_id = :club_id AND status = 'disapproved'");
         $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
         $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -635,7 +635,7 @@ $encodedClubName = addslashes($clubName);
                     </div>
                 <?php elseif ($clubsCount >= 2 && $disapprovedCount >= 3): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You are already registered in 2 clubs and reached the maximum number of registrations allowed for this club.</p>
+                        <p class="lead mb-0">You are already registered in 2 clubs and reached the maximum number of applications allowed for this club.</p>
                     </div>
                 <?php elseif ($clubsCount >= 2): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
@@ -647,7 +647,7 @@ $encodedClubName = addslashes($clubName);
                     </div>
                 <?php elseif ($disapprovedCount >= 3): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You have reached the maximum number of registrations allowed for this club.</p>
+                        <p class="lead mb-0">You have reached the maximum number of applications allowed for this club.</p>
                     </div>
                 <?php else: ?>
                     <h4 class="mb-3">Join Us Now!</h4>
@@ -666,7 +666,7 @@ $encodedClubName = addslashes($clubName);
                 <?php if ($status === 'active'): ?>
                     <div class="alert alert-info custom-alert" role="alert">
                         <p class="lead mb-0">You are already a member of this club.
-                            <a href="/esas/esas_student/home.php?club_id=<?php echo $club_id; ?>&registration_id=<?php echo $registration_id; ?>"> Go to Home</a>
+                            <a href="/esas/esas_student/home.php?club_id=<?php echo $club_id; ?>&application_id=<?php echo $application_id; ?>"> Go to Home</a>
                         </p>
                     </div>
                 <?php elseif ($status === 'pending' && $clubsCount >= 2): ?>
@@ -675,7 +675,7 @@ $encodedClubName = addslashes($clubName);
                     </div>
                 <?php elseif ($clubsCount >= 2 && $disapprovedCount >= 3): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You are already registered in 2 clubs and reached the maximum number of registrations allowed for this club.</p>
+                        <p class="lead mb-0">You are already registered in 2 clubs and reached the maximum number of applications allowed for this club.</p>
                     </div>
                 <?php elseif ($clubsCount >= 2): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
@@ -687,12 +687,12 @@ $encodedClubName = addslashes($clubName);
                     </div>
                 <?php elseif ($disapprovedCount >= 3): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You have reached the maximum number of registrations allowed for this club.</p>
+                        <p class="lead mb-0">You have reached the maximum number of applications allowed for this club.</p>
                     </div>
                 <?php else: ?>
                     <h4 class="mb-3">Join Us Now!</h4>
                     <p class="lead">If you want to be a part of us, register now and become a member of <?php echo $clubName; ?>.</p>
-                    <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>, <?php echo $registration_id; ?>)">Register Now</button>
+                    <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>, <?php echo $application_id; ?>)">Register Now</button>
                 <?php endif; ?>
                 <div class="mt-3">
                     <a href="javascript:history.go(-1)" class="btn btn-secondary">Go Back</a>
@@ -719,7 +719,7 @@ $encodedClubName = addslashes($clubName);
                 alert("Sorry. You have reached the maximum limit of requests for this club.");
             } else {
                 const encodedClubName = encodeURIComponent(clubName);
-                const url = `/esas/esas_student/registration.php?club_id=${clubId}&club_name=${encodedClubName}`;
+                const url = `/esas/esas_student/application.php?club_id=${clubId}&club_name=${encodedClubName}`;
                 window.location.href = url;
             }
         }

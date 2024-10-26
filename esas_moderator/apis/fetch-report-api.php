@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             s.middleName AS 'Middle Name', s.lastName AS 'Last Name', 
                             s.instiEmail AS 'Institutional Email' 
                     FROM tbl_students s 
-                    JOIN tbl_registration r ON s.student_id = r.student_id 
+                    JOIN tbl_application r ON s.student_id = r.student_id 
                     WHERE r.status = 'active' AND r.club_id = :club_id";
             // Apply date filters if provided
             if ($startDate && $endDate) {
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             s.middleName AS 'Middle Name', s.lastName AS 'Last Name', 
                             s.instiEmail AS 'Institutional Email' 
                     FROM tbl_students s 
-                    JOIN tbl_registration r ON s.student_id = r.student_id 
+                    JOIN tbl_application r ON s.student_id = r.student_id 
                     WHERE r.status = 'pending' AND r.club_id = :club_id";
             // Apply date filters if provided
             if ($startDate && $endDate) {
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             s.middleName AS 'Middle Name', s.lastName AS 'Last Name', 
                             s.instiEmail AS 'Institutional Email' 
                     FROM tbl_students s 
-                    JOIN tbl_registration r ON s.student_id = r.student_id 
+                    JOIN tbl_application r ON s.student_id = r.student_id 
                     WHERE r.status = 'disapproved' AND r.club_id = :club_id";
             // Apply date filters if provided
             if ($startDate && $endDate) {

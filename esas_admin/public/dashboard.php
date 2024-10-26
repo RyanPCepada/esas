@@ -358,7 +358,7 @@ try {
 
                                             // Base SQL query to count total active students
                                             $sql = "SELECT COUNT(DISTINCT student_id) AS total_students 
-                                                    FROM tbl_registration 
+                                                    FROM tbl_application 
                                                     WHERE status = 'active'";
 
                                             // If a school year is selected, count students up to the end of that school year (July 31 of the end year)
@@ -460,7 +460,7 @@ try {
 
                                                 $sql = "
                                                     SELECT tc.clubName, COUNT(tr.student_id) AS member_count
-                                                    FROM tbl_registration tr
+                                                    FROM tbl_application tr
                                                     JOIN tbl_clubs tc ON tr.club_id = tc.club_id
                                                     WHERE tr.status = 'active'
                                                 ";
@@ -620,7 +620,7 @@ try {
             ) AS academicYear,
             COUNT(s.student_id) AS memberCount -- Count the number of students for each academic year
         FROM tbl_students s
-        JOIN tbl_registration r ON s.student_id = r.student_id
+        JOIN tbl_application r ON s.student_id = r.student_id
         WHERE r.status = 'active'
         GROUP BY academicYear -- Group by academic year
         ORDER BY academicYear ASC;
@@ -748,7 +748,7 @@ try {
                                                         $sql = "
                                                             SELECT s.year, COUNT(DISTINCT s.student_id) AS count
                                                             FROM tbl_students s
-                                                            JOIN tbl_registration r ON s.student_id = r.student_id
+                                                            JOIN tbl_application r ON s.student_id = r.student_id
                                                             WHERE r.status = 'active'
                                                             AND r.dateApproved <= :endDate
                                                             GROUP BY s.year
@@ -876,7 +876,7 @@ try {
                                                         $sqlCounts = "
                                                             SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
                                                             FROM tbl_students s
-                                                            JOIN tbl_registration r ON s.student_id = r.student_id
+                                                            JOIN tbl_application r ON s.student_id = r.student_id
                                                             WHERE r.status = 'active' 
                                                             AND r.dateApproved <= :endDate
                                                             GROUP BY s.gender

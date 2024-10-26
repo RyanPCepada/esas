@@ -393,7 +393,7 @@ try {
                                             // Base SQL query to count cumulative active students for clubs handled by the moderator
                                             $sql = "
                                                 SELECT COUNT(DISTINCT tr.student_id) AS total_students 
-                                                FROM tbl_registration tr 
+                                                FROM tbl_application tr 
                                                 JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
                                                 JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id 
                                                 WHERE cm.moderator_id = :moderator_id 
@@ -452,10 +452,10 @@ try {
                                                 $endDate = ($latestYear + 1) . "-07-31"; // End date for the latest school year
                                             }
 
-                                            // Base SQL query to count total pending registrations for clubs handled by the moderator
+                                            // Base SQL query to count total pending applications for clubs handled by the moderator
                                             $sql = "
-                                                SELECT COUNT(tr.registration_id) AS total_pending 
-                                                FROM tbl_registration tr
+                                                SELECT COUNT(tr.application_id) AS total_pending 
+                                                FROM tbl_application tr
                                                 JOIN tbl_clubs tc ON tr.club_id = tc.club_id
                                                 JOIN tbl_clubs_and_moderators tcm ON tc.club_id = tcm.club_id
                                                 WHERE tr.status = 'pending' 
@@ -479,7 +479,7 @@ try {
                                             $stmt_pending = $pdo->prepare($sql);
                                             $stmt_pending->execute($params);
 
-                                            // Fetch the total number of pending registrations
+                                            // Fetch the total number of pending applications
                                             $total_pending = $stmt_pending->fetchColumn();
                                             echo "<h3>$total_pending</h3>";
                                         } catch (PDOException $e) {
@@ -586,7 +586,7 @@ try {
                                                 $sql = "
                                                     SELECT ts.department, COUNT(DISTINCT tr.student_id) AS member_count
                                                     FROM tbl_students ts
-                                                    JOIN tbl_registration tr ON ts.student_id = tr.student_id
+                                                    JOIN tbl_application tr ON ts.student_id = tr.student_id
                                                     JOIN tbl_clubs tc ON tr.club_id = tc.club_id
                                                     JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id
                                                     WHERE cm.moderator_id = :moderator_id 
@@ -760,7 +760,7 @@ try {
                                                             END AS academicYear, 
                                                             COUNT(DISTINCT s.student_id) AS memberCount
                                                         FROM tbl_students s
-                                                        JOIN tbl_registration r ON s.student_id = r.student_id
+                                                        JOIN tbl_application r ON s.student_id = r.student_id
                                                         JOIN tbl_clubs c ON r.club_id = c.club_id
                                                         JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                                                         WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
@@ -930,7 +930,7 @@ try {
                                                         $sql = "
                                                         SELECT s.year, COUNT(DISTINCT s.student_id) AS count
                                                         FROM tbl_students s
-                                                        JOIN tbl_registration r ON s.student_id = r.student_id
+                                                        JOIN tbl_application r ON s.student_id = r.student_id
                                                         JOIN tbl_clubs_and_moderators cm ON r.club_id = cm.club_id
                                                         WHERE r.status = 'active'
                                                         AND cm.moderator_id = :moderator_id
@@ -1065,7 +1065,7 @@ try {
                                                         $sqlCounts = "
                                                             SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
                                                             FROM tbl_students s
-                                                            JOIN tbl_registration r ON s.student_id = r.student_id
+                                                            JOIN tbl_application r ON s.student_id = r.student_id
                                                             JOIN tbl_clubs c ON r.club_id = c.club_id
                                                             JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                                                             WHERE r.status = 'active' AND cm.moderator_id = :moderator_id

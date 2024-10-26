@@ -6,21 +6,21 @@ if (!isset($_SESSION['student_id'])) {
     echo "Student ID is not set in the session.";
     exit;
 }
-
+//Registration
 $student_id = $_SESSION['student_id']; // Get student ID from session
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-// Get club_id and registration_id from the URL
+// Get club_id and application_id from the URL
 $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
-$registration_id = isset($_GET['registration_id']) ? $_GET['registration_id'] : null;
+$application_id = isset($_GET['application_id']) ? $_GET['application_id'] : null;
 
-// Check if club_id and registration_id are provided
+// Check if club_id and application_id are provided
 if (!$club_id) {
     echo "Club ID is not provided.";
     exit;
-} else if (!$registration_id) {
+} else if (!$application_id) {
     echo "Registration ID is not provided.";
     exit;
 }
@@ -38,14 +38,14 @@ if (!$student) {
 }
 
 // Fetch application details for the specified club and student
-$sql_application = "SELECT *, remarks FROM tbl_registration 
+$sql_application = "SELECT *, remarks FROM tbl_application 
                     WHERE student_id = ? 
                     AND club_id = ? 
-                    AND (registration_id = ? OR (status = 'pending' AND registration_id IS NOT NULL))
+                    AND (application_id = ? OR (status = 'pending' AND application_id IS NOT NULL))
                     AND (status IN ('pending', 'active', 'disapproved'))"; // Include 'active'
                     //AND (status = 'pending' OR status = 'active' OR status = 'disapproved')";
 $stmt_application = $pdo->prepare($sql_application);
-$stmt_application->execute([$student_id, $club_id, $registration_id]);
+$stmt_application->execute([$student_id, $club_id, $application_id]);
 $application = $stmt_application->fetch(PDO::FETCH_ASSOC); // Fetch application details
 
 
@@ -100,7 +100,7 @@ switch ($status) {
 // Display the status
 // echo "Status: " . $icon . " <strong>" . ucfirst($status) . "</strong><br>";
 // echo "Club ID: " . htmlspecialchars($club_id) . "<br>";
-// echo "Registration ID: " . htmlspecialchars($registration_id) . "<br>";
+// echo "Registration ID: " . htmlspecialchars($application_id) . "<br>";
 ?>
 
 <!DOCTYPE html>

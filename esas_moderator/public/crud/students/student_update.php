@@ -29,7 +29,7 @@ $stmt->execute();
 $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Fetch the current status of the student for the specific club
-$statusSql = "SELECT status FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id";
+$statusSql = "SELECT status FROM tbl_application WHERE student_id = :student_id AND club_id = :club_id";
 $statusStmt = $pdo->prepare($statusSql);
 $statusStmt->bindParam(":student_id", $student_id);
 $statusStmt->bindParam(":club_id", $club_id);
@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $status = $_POST["status"];
     
     // Prepare an update statement to set the student's status for the specific club
-    $sql = "UPDATE tbl_registration 
+    $sql = "UPDATE tbl_application 
             SET status = :status, dateModified = NOW() 
             WHERE student_id = :student_id AND club_id = :club_id";
     

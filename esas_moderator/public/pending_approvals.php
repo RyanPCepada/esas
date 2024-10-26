@@ -36,7 +36,7 @@ try {
     $sqlStudents = "
         SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.age, s.birthday, s.gender, s.instiEmail, s.phoneNumber, s.department, s.course, s.year, s.street, s.barangay, s.municipality, s.province, s.zipcode, s.profilePic
         FROM tbl_students s
-        JOIN tbl_registration r ON s.student_id = r.student_id
+        JOIN tbl_application r ON s.student_id = r.student_id
         WHERE r.status = 'active'
     ";
 
@@ -326,7 +326,7 @@ try {
                                 $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
                                 $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
 
-                                // SQL query to fetch distinct students with their pending registrations, including registration_id
+                                // SQL query to fetch distinct students with their pending applications, including application_id
                                 $sql = "SELECT 
                                             s.student_id,
                                             s.firstName,
@@ -338,9 +338,9 @@ try {
                                             s.profilePic,
                                             MIN(r.dateApplied) AS dateApplied,
                                             c.club_id,
-                                            r.registration_id
+                                            r.application_id
                                         FROM tbl_students s
-                                        LEFT JOIN tbl_registration r ON s.student_id = r.student_id
+                                        LEFT JOIN tbl_application r ON s.student_id = r.student_id
                                         LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
                                         WHERE r.status = 'pending'";
 
@@ -398,11 +398,11 @@ try {
                                         $department = htmlspecialchars($row['department']);
                                         $course = htmlspecialchars($row['course']);
                                         $dateApplied = htmlspecialchars(date('F j, Y', strtotime($row['dateApplied']))); // Format date
-                                        $registrationId = htmlspecialchars($row['registration_id']); // Get registration_id
+                                        $applicationId = htmlspecialchars($row['application_id']); // Get application_id
 
                                         echo '
                                         <tr class="student-row">
-                                            <!-- <td>' . $registrationId . '</td> Display Registration ID -->
+                                            <!-- <td>' . $applicationId . '</td> Display Registration ID -->
                                             <td class="text-center p-1">
                                                 <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
                                                     alt="' . $fullName . ' profile picture" 
@@ -415,7 +415,7 @@ try {
                                             <td>' . $course . '</td>
                                             <td>' . $dateApplied . '</td>
                                             <td class="text-center">
-                                                <a href="../public/crud/pending_approval/pending_approval_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '&registration_id=' . $registrationId . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                <a href="../public/crud/pending_approval/pending_approval_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '&application_id=' . $applicationId . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                                 <!-- <a href="../public/crud/pending_approval/pending_approval_read.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $club_id; ?>" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a> -->
                                                 <!-- <a href="../public/crud/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a> -->
                                                 <!-- <a href="../public/crud/pending_approval/pending_approval_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a> -->

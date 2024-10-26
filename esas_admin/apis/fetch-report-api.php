@@ -32,15 +32,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'students_and_clubs_overview':
-            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS 'Student Full Name', c.clubName AS 'Club Name', s.instiEmail AS 'Institutional Email', s.year AS 'Year' FROM tbl_clubs c JOIN tbl_registration r ON c.club_id = r.club_id JOIN tbl_students s ON r.student_id = s.student_id WHERE status = 'active'";
+            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS 'Student Full Name', c.clubName AS 'Club Name', s.instiEmail AS 'Institutional Email', s.year AS 'Year' FROM tbl_clubs c JOIN tbl_application r ON c.club_id = r.club_id JOIN tbl_students s ON r.student_id = s.student_id WHERE status = 'active'";
             break;
 
         case 'student_club_requests':
             $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS 'Student Name', cr.clubName AS 'Club Name', cr.status AS 'Status', cr.dateRequested AS 'Date Requested', cr.dateDecided AS 'Date Decided', cr.status AS 'Status' FROM tbl_club_requests cr JOIN tbl_students s ON cr.student_id = s.student_id";
             break;
 
-        case 'student_registration_status':
-            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS 'Student Name', c.clubName AS 'Club Name', r.status AS 'Status', r.dateApproved AS 'Date Approved' FROM tbl_registration r JOIN tbl_students s ON r.student_id = s.student_id JOIN tbl_clubs c ON r.club_id = c.club_id";
+        case 'student_application_status':
+            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS 'Student Name', c.clubName AS 'Club Name', r.status AS 'Status', r.dateApproved AS 'Date Approved' FROM tbl_application r JOIN tbl_students s ON r.student_id = s.student_id JOIN tbl_clubs c ON r.club_id = c.club_id";
             break;
 
         default:
@@ -67,8 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
 
             case 'clubs_and_students_overview':
-            case 'student_registration_status':
-                // Assuming registration date is relevant for students
+            case 'student_application_status':
+                // Assuming application date is relevant for students
                 $query .= " WHERE r.dateApproved BETWEEN '$startDate' AND '$endDate'";
                 break;
 

@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $clubName = $club['clubName'];
 
             // Prepare an insert statement
-            $sql = "INSERT INTO tbl_registration (student_id, question1, question2, question3, status, club_id) 
+            $sql = "INSERT INTO tbl_application (student_id, question1, question2, question3, status, club_id) 
                     VALUES (:student_id, :question1, :question2, :question3, :status, :club_id)";
 
             $stmt = $pdo->prepare($sql);

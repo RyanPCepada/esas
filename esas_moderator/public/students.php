@@ -36,7 +36,7 @@ try {
     $sqlStudents = "
         SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.age, s.birthday, s.gender, s.instiEmail, s.phoneNumber, s.department, s.course, s.year, s.street, s.barangay, s.municipality, s.province, s.zipcode, s.profilePic
         FROM tbl_students s
-        JOIN tbl_registration r ON s.student_id = r.student_id
+        JOIN tbl_application r ON s.student_id = r.student_id
         WHERE r.status = 'active'
     ";
 
@@ -359,7 +359,7 @@ try {
                                         r.status AS status,  -- Include the status here
                                         GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
                                     FROM tbl_students s
-                                    LEFT JOIN tbl_registration r ON s.student_id = r.student_id
+                                    LEFT JOIN tbl_application r ON s.student_id = r.student_id
                                     LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
                                     WHERE r.status IN ('active', 'inactive', 'departed', 'disapproved')";
 

@@ -340,8 +340,8 @@ function showEventDetails(event_id) {
                 document.getElementById('eventTime').innerText = `${timeStarts} - ${timeEnds}`; // Display both start and end times
 
                 document.getElementById('eventLocation').innerText = event.location;
-                document.getElementById('eventLink').href = event.registrationLink;
-                document.getElementById('eventLinkText').innerText = event.registrationLink; // Display the link text
+                document.getElementById('eventLink').href = event.applicationLink;
+                document.getElementById('eventLinkText').innerText = event.applicationLink; // Display the link text
 
                 // Show the modal
                 $('#eventDetailsModal').modal('show');
@@ -432,8 +432,8 @@ window.onload = fetchEvents;
                         <input type="text" class="form-control" id="eventLocation" name="location" required>
                     </div>
                     <div class="form-group mb-2">
-                        <label for="registrationLink">Registration Link</label>
-                        <input type="url" class="form-control" id="registrationLink" name="registrationLink">
+                        <label for="applicationLink">Registration Link</label>
+                        <input type="url" class="form-control" id="applicationLink" name="applicationLink">
                     </div>
                     <button type="submit" class="btn btn-primary">Add Event</button>
                 </form>
@@ -486,7 +486,7 @@ window.onload = fetchEvents;
                     </div>
                     <div class="form-group mb-2">
                         <label for="editRegistrationLink">Registration Link</label>
-                        <input type="url" class="form-control" id="editRegistrationLink" name="registrationLink">
+                        <input type="url" class="form-control" id="editRegistrationLink" name="applicationLink">
                     </div>
                     <button type="submit" class="btn btn-primary">Update Event</button>
                 </form>
@@ -543,7 +543,7 @@ function editEvent(event_id) {
             document.getElementById('editEventTimeEnds').value = event.timeEnds; // Assuming this field exists in the event object
 
             document.getElementById('editEventLocation').value = event.location;
-            document.getElementById('editRegistrationLink').value = event.registrationLink;
+            document.getElementById('editRegistrationLink').value = event.applicationLink;
 
             // Show the edit modal
             $('#editEventModal').modal('show');

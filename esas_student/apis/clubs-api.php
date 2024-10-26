@@ -32,7 +32,7 @@ switch ($method) {
 
             if ($result) {
                 // Fetch count of students in this club (only active members)
-                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_registration WHERE club_id = ? AND status = \'active\'');
+                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_application WHERE club_id = ? AND status = \'active\'');
                 $stmt_count->execute([$club_id]);
                 $member_count = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
 
@@ -81,7 +81,7 @@ switch ($method) {
 
             // Fetch counts of students for the filtered clubs (only active members)
             foreach ($result as &$club) {
-                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_registration WHERE club_id = ? AND status = \'active\'');
+                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_application WHERE club_id = ? AND status = \'active\'');
                 $stmt_count->execute([$club['club_id']]);
                 $club['membersCount'] = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
 
@@ -118,7 +118,7 @@ switch ($method) {
 
             // Fetch counts of students for all clubs (only active members)
             foreach ($result as &$club) {
-                $stmt_count = $pdo->prepare('SELECT COUNT(DISTINCT student_id) as member_count FROM tbl_registration WHERE club_id = ? AND status = \'active\'');
+                $stmt_count = $pdo->prepare('SELECT COUNT(DISTINCT student_id) as member_count FROM tbl_application WHERE club_id = ? AND status = \'active\'');
                 $stmt_count->execute([$club['club_id']]);
                 $club['membersCount'] = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
 

@@ -17,25 +17,25 @@ switch ($method) {
         if (isset($_SESSION['student_id'])) {
             $student_id = $_SESSION['student_id'];
 
-            // Fetch all disapproved registrations and their associated clubs
+            // Fetch all disapproved applications and their associated clubs
             $stmt = $pdo->prepare('
-                SELECT r.registration_id, r.club_id, c.clubName, c.description, c.coverPhoto, r.dateModified
-                FROM tbl_registration r
+                SELECT r.application_id, r.club_id, c.clubName, c.description, c.coverPhoto, r.dateModified
+                FROM tbl_application r
                 JOIN tbl_clubs c ON r.club_id = c.club_id
                 WHERE r.student_id = ? AND r.status = "disapproved"
             ');
             $stmt->execute([$student_id]);
-            $registrations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Initialize an array to hold the full details including moderators
             $results = [];
 
-            // Fetch and add moderators for each disapproved registration
-            foreach ($registrations as $registration) {
-                $clubId = $registration['club_id'];
+            // Fetch and add moderators for each disapproved application
+            foreach ($applications as $application) {
+                $clubId = $application['club_id'];
 
                 // Format the dateModified field
-                $registration['dateModified'] = (new DateTime($registration['dateModified']))->format('F j, Y'); // Format the date
+                $application['dateModified'] = (new DateTime($application['dateModified']))->format('F j, Y'); // Format the date
 
                 // Fetch moderators for the current club using the new tbl_clubs_and_moderators table
                 $stmt_moderators = $pdo->prepare('
@@ -56,9 +56,9 @@ switch ($method) {
                     ];
                 }
 
-                // Add the current registration's details and moderators to the results
-                $registration['moderators'] = $formattedModerators;
-                $results[] = $registration;
+                // Add the current application's details and moderators to the results
+                $application['moderators'] = $formattedModerators;
+                $results[] = $application;
             }
 
             echo json_encode($results);

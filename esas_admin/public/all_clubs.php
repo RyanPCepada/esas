@@ -266,7 +266,7 @@ try {
                                                 c.description, 
                                                 c.coverPhoto, 
                                                 GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.lastName, ':::', m.profilePic) SEPARATOR '|||') AS moderators,
-                                                (SELECT COUNT(DISTINCT r.student_id) FROM tbl_registration r WHERE r.club_id = c.club_id AND r.status = 'active') AS member_count,
+                                                (SELECT COUNT(DISTINCT r.student_id) FROM tbl_application r WHERE r.club_id = c.club_id AND r.status = 'active') AS member_count,
                                                 c.dateAdded
                                             FROM tbl_clubs c
                                             LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id

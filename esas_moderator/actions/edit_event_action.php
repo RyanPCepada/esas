@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $timeStarts = $_POST['timeStarts']; // Separate start time
     $timeEnds = $_POST['timeEnds']; // Separate end time
     $location = $_POST['location'];
-    $registrationLink = $_POST['registrationLink'];
+    $applicationLink = $_POST['applicationLink'];
     
     // Fetch the current event title before updating
     $eventSql = "SELECT title FROM tbl_events WHERE event_id = :event_id";
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sql = "UPDATE tbl_events 
             SET title = :title, description = :description, date = :date, 
                 timeStarts = :timeStarts, timeEnds = :timeEnds, location = :location, 
-                registrationLink = :registrationLink, dateModified = NOW()
+                applicationLink = :applicationLink, dateModified = NOW()
             WHERE event_id = :event_id";
     
     try {
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':timeStarts' => $timeStarts,
             ':timeEnds' => $timeEnds,
             ':location' => $location,
-            ':registrationLink' => $registrationLink
+            ':applicationLink' => $applicationLink
         ]);
 
         // Fetch the club name for logging activity

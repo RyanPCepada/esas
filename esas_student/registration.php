@@ -28,7 +28,7 @@ if (empty($status)) {
     $status = 'pending';
 }
 
-// Include the registration form
+// Include the application form
 ?>
 
 
@@ -103,7 +103,7 @@ if (empty($status)) {
                         <h4>Student Registration</h4>
                     <?php endif; ?>
                     <p class="mb-5">Please fill this form and submit to register.</p>
-                    <form action="../esas_student/actions/registration_action.php" method="post">
+                    <form action="../esas_student/actions/application_action.php" method="post">
                         <div class="form-group">
                             <label>Why do you want to join this club?</label>
                             <textarea name="question1" rows="3" class="form-control <?php echo (!empty($question1_err)) ? 'is-invalid' : ''; ?>" required><?php echo htmlspecialchars($question1); ?></textarea>
@@ -142,7 +142,7 @@ if (empty($status)) {
                         <h4>Student Registration</h4>
                     ?php endif; ?>
                     <p class="mb-5">Please fill this form and submit to register.</p>
-                    <form action="../esas_student/actions/registration_action.php" method="post">
+                    <form action="../esas_student/actions/application_action.php" method="post">
                         <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($club_id); ?>">
 
                         <!-- Question 1 --

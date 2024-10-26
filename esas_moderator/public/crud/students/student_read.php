@@ -42,7 +42,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                 // For clubs
                 $clubDetails = 'None'; // Default value for now
                 $clubSql = "SELECT DISTINCT c.clubName, c.coverPhoto, r.dateApplied, r.dateApproved 
-                            FROM tbl_registration r 
+                            FROM tbl_application r 
                             JOIN tbl_clubs c ON r.club_id = c.club_id 
                             WHERE r.student_id = :student_id AND r.status = 'active'"; // Add status condition
 
@@ -71,7 +71,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                 $moderatorSql = "SELECT DISTINCT m.firstName, m.middleName, m.lastName 
                                  FROM tbl_clubs_and_moderators cm 
                                  JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id 
-                                 JOIN tbl_registration r ON cm.club_id = r.club_id 
+                                 JOIN tbl_application r ON cm.club_id = r.club_id 
                                  WHERE r.student_id = :student_id AND r.status = 'active'";
                 
                 if ($moderatorStmt = $pdo->prepare($moderatorSql)) {
@@ -99,7 +99,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
     // Check if the student is active or inactive in any club
     $isActiveOrInactive = false; // Default to not showing the button
 
-    $statusSql = "SELECT status FROM tbl_registration WHERE student_id = :student_id AND (status = 'active' OR status = 'inactive') LIMIT 1";
+    $statusSql = "SELECT status FROM tbl_application WHERE student_id = :student_id AND (status = 'active' OR status = 'inactive') LIMIT 1";
     if ($statusStmt = $pdo->prepare($statusSql)) {
         $statusStmt->bindParam(":student_id", $student_id);
         if ($statusStmt->execute()) {

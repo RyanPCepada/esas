@@ -29,7 +29,7 @@ $clubQuery = $pdo->prepare("
     SELECT cr.status, cl.clubName, cl.club_id, cl.coverPhoto, 
            GROUP_CONCAT(CONCAT(m.firstName, ' ', m.middleName, ' ', m.lastName) SEPARATOR ', ') AS moderatorNames,
            COUNT(m.moderator_id) AS moderatorCount
-    FROM tbl_registration cr
+    FROM tbl_application cr
     INNER JOIN tbl_clubs cl ON cr.club_id = cl.club_id
     LEFT JOIN tbl_clubs_and_moderators cm ON cm.club_id = cl.club_id
     LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id

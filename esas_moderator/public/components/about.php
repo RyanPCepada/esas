@@ -138,8 +138,8 @@ $(document).ready(function() {
                     const club = response.club;
                     const aboutSection = $('.about-list');
 
-                    // Format the registration date
-                    const formattedDate = new Date(club.registrationDate).toLocaleDateString('en-US', {
+                    // Format the application date
+                    const formattedDate = new Date(club.applicationDate).toLocaleDateString('en-US', {
                         year: 'numeric', month: 'long', day: 'numeric'
                     });
 

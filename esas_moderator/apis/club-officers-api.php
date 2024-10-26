@@ -9,7 +9,7 @@ if (isset($_GET['club_id'])) {
     $club_id = intval($_GET['club_id']); // Ensure club_id is an integer
 
     try {
-        // Prepare the SQL query to fetch officers whose registration status is active
+        // Prepare the SQL query to fetch officers whose application status is active
         $sql = "
         SELECT 
             o.officer_id,
@@ -28,7 +28,7 @@ if (isset($_GET['club_id'])) {
         JOIN 
             tbl_students s ON s.student_id IN (o.president, o.vicePresident, o.secretary, o.treasurer, o.pio, o.srgtAtArms)
         JOIN 
-            tbl_registration r ON r.student_id = s.student_id AND r.club_id = o.club_id
+            tbl_application r ON r.student_id = s.student_id AND r.club_id = o.club_id
         WHERE 
             o.club_id = :club_id
             AND r.status = 'active'"; // Only fetch officers with active status

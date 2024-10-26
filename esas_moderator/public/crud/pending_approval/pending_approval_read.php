@@ -19,28 +19,28 @@ $moderator_id = $_SESSION['moderator_id'];
 $final_email ='';
 $student_id =[];
 $club_id=[];
-$registration_id;
+$application_id;
 
 echo $final_email;
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
-// Check existence of student_id, club_id, and registration_id parameter before processing further
+// Check existence of student_id, club_id, and application_id parameter before processing further
 if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"])) 
     && isset($_GET["club_id"]) && !empty(trim($_GET["club_id"])) 
-    && isset($_GET["registration_id"]) && !empty(trim($_GET["registration_id"]))) {
+    && isset($_GET["application_id"]) && !empty(trim($_GET["application_id"]))) {
 
     // Set parameters
     $param_student_id = trim($_GET["student_id"]);
     $param_club_id = trim($_GET["club_id"]);
-    $param_registration_id = trim($_GET["registration_id"]); 
+    $param_application_id = trim($_GET["application_id"]); 
 
-    // Log student, club, and registration IDs
+    // Log student, club, and application IDs
     echo "<script>console.log('Student ID: " . $param_student_id . "');</script>";
     echo "<script>console.log('Club ID: " . $param_club_id . "');</script>";
-    echo "<script>console.log('Registration ID: " . $param_registration_id . "');</script>";
+    echo "<script>console.log('Registration ID: " . $param_application_id . "');</script>";
 
-    $registration_id = trim($_GET["registration_id"]);
+    $application_id = trim($_GET["application_id"]);
     $student_id = trim($_GET["student_id"]);
     $club_id = trim($_GET["club_id"]);
 
@@ -91,8 +91,8 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     // Close statement
     unset($stmt);
 
-    // Prepare a select statement to fetch questions and dateApplied from tbl_registration
-    $sql_questions = "SELECT question1, question2, question3, dateApplied FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id";
+    // Prepare a select statement to fetch questions and dateApplied from tbl_application
+    $sql_questions = "SELECT question1, question2, question3, dateApplied FROM tbl_application WHERE student_id = :student_id AND club_id = :club_id";
 
     echo "<script>console.log('Preparing SQL to fetch application questions and dateApplied');</script>";
 
@@ -131,20 +131,20 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
 }
 
 // Function to update the application status
-function updateRegistrationStatus($pdo, $student_id, $club_id, $registration_id, $newStatus) {
+function updateRegistrationStatus($pdo, $student_id, $club_id, $application_id, $newStatus) {
     echo "<script>console.log('Updating application status to " . $newStatus . "');</script>";
-    $updateSql = "UPDATE tbl_registration 
+    $updateSql = "UPDATE tbl_application 
                   SET status = :status, dateApproved = NOW() 
                   WHERE student_id = :student_id 
                   AND club_id = :club_id 
-                  AND registration_id = :registration_id";
+                  AND application_id = :application_id";
 
     $stmt = $pdo->prepare($updateSql);
     $stmt->execute([
         ':status' => $newStatus,
         ':student_id' => $student_id,
         ':club_id' => $club_id,
-        ':registration_id' => $registration_id,
+        ':application_id' => $application_id,
     ]);
     $rowCount = $stmt->rowCount();
     echo "<script>console.log('Rows affected: " . $rowCount . "');</script>";
@@ -154,7 +154,7 @@ function updateRegistrationStatus($pdo, $student_id, $club_id, $registration_id,
 // Function to count active memberships
 function countActiveMemberships($pdo, $student_id) {
     echo "<script>console.log('Counting active memberships for student ID: " . $student_id . "');</script>";
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_application WHERE student_id = :student_id AND status = 'active'");
     $stmt->execute([':student_id' => $student_id]);
     $activeCount = $stmt->fetchColumn();
     echo "<script>console.log('Active Memberships: " . $activeCount . "');</script>";
@@ -164,7 +164,7 @@ function countActiveMemberships($pdo, $student_id) {
 // Function to update pending applications status
 function updatePendingRegistrations($pdo, $student_id) {
     echo "<script>console.log('Updating pending applications for student ID: " . $student_id . "');</script>";
-    $updatePendingSql = "UPDATE tbl_registration SET status = 'maxed' WHERE student_id = :student_id AND status = 'pending'";
+    $updatePendingSql = "UPDATE tbl_application SET status = 'maxed' WHERE student_id = :student_id AND status = 'pending'";
     $stmt = $pdo->prepare($updatePendingSql);
     $stmt->execute([':student_id' => $student_id]);
 }
@@ -190,17 +190,17 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     echo "<script>console.log('Action: " . $_POST["action"] . "');</script>";
     echo "<script>console.log('New Status: " . $newStatus . "');</script>";
    
-    // Get values for student_id, club_id, registration_id (assuming they are coming from POST data)
-    echo "<script>console.log('Fetching student_id, club_id, registration_id');</script>";
+    // Get values for student_id, club_id, application_id (assuming they are coming from POST data)
+    echo "<script>console.log('Fetching student_id, club_id, application_id');</script>";
     
     // Debug global variables
     echo "<script>console.log('Student ID: " . json_encode($student_id) . "');</script>";
     echo "<script>console.log('Club ID: " . json_encode($club_id) . "');</script>";
-    echo "<script>console.log('Registration ID: " . json_encode($registration_id) . "');</script>";
+    echo "<script>console.log('Registration ID: " . json_encode($application_id) . "');</script>";
 
     // Update applications status
     echo "<script>console.log('Updating applications status...');</script>";
-    if (updateRegistrationStatus($pdo, $student_id, $club_id, $registration_id, $newStatus) > 0) {
+    if (updateRegistrationStatus($pdo, $student_id, $club_id, $application_id, $newStatus) > 0) {
         echo "<script>console.log('Applications status updated successfully');</script>";
         
         // Check the current active memberships after approval
@@ -243,7 +243,8 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
         }
 
         echo "<script>console.log('Redirecting to pending approvals...');</script>";
-         header("location: ../../pending_approvals.php");
+        //  header("location: ../../pending_approvals.php");
+         header("location: pending_approval_read.php?student_id=$student_id");
         exit();
     } else {
         echo "<script>console.log('Error updating the request');</script>";
@@ -336,21 +337,21 @@ function logActivity($pdo, $fullName, $student_id, $clubName, $isApproved) {
 }
 
 
-// Fetch the student's registration status for the current club
-$stmt = $pdo->prepare("SELECT status FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id");
+// Fetch the student's application status for the current club
+$stmt = $pdo->prepare("SELECT status FROM tbl_application WHERE student_id = :student_id AND club_id = :club_id");
 $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
 $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
 $stmt->execute();
-$status = $stmt->fetchColumn(); // Fetch the registration status (e.g., 'active', 'pending', etc.)
+$status = $stmt->fetchColumn(); // Fetch the application status (e.g., 'active', 'pending', etc.)
 
 // Count how many clubs the student is currently "active" in
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND status = 'active'");
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_application WHERE student_id = :student_id AND status = 'active'");
 $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
 $stmt->execute();
 $clubsCount = $stmt->fetchColumn();
 
 // Count how many times the student has been "disapproved" for this club
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_registration WHERE student_id = :student_id AND club_id = :club_id AND status = 'disapproved'");
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM tbl_application WHERE student_id = :student_id AND club_id = :club_id AND status = 'disapproved'");
 $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
 $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
 $stmt->execute();
@@ -435,7 +436,7 @@ $disapprovedCount = $stmt->fetchColumn();
                 <div class="card-footer text-center">
                     <form id="approvalForm" method="post">
                         <input type="hidden" name="action" id="action" value="">
-                        <input type="hidden" name="registration_id" value="<?php echo htmlspecialchars($param_registration_id); ?>">
+                        <input type="hidden" name="application_id" value="<?php echo htmlspecialchars($param_application_id); ?>">
                         <?php if ($clubsCount >= 2): ?>
                             <!-- <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button> -->
                             <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
@@ -449,22 +450,51 @@ $disapprovedCount = $stmt->fetchColumn();
 
 
                 <script>
-                    function confirmAction(action) {
-                        const confirmation = confirm(`Are you sure you want to ${action} this student?`);
-                        if (confirmation) {
-                            document.getElementById('action').value = action;
-                            document.getElementById('approvalForm').submit();
-                            
-                            // Show the remarks modal after the form submission
-                            showRemarksModal(action);
-                        }
-                    }
+    function confirmAction(action) {
+        const confirmation = confirm(`Are you sure you want to ${action} this student?`);
+        if (confirmation) {
+            document.getElementById('action').value = action;
+            document.getElementById('approvalForm').submit();
+            
+            // Show the remarks modal after the form submission
+            showRemarksModal(action);
+        }
+    }
 
-                    function showRemarksModal(action) {
-                        document.getElementById('modalAction').value = action; // Set the action in the remarks modal
-                        document.getElementById('remarksModal').style.display = 'block'; // Show the remarks modal
-                    }
-                </script>
+    function showRemarksModal(action) {
+        document.getElementById('modalAction').value = action; // Set the action in the remarks modal
+        document.getElementById('remarksModal').style.display = 'block'; // Show the remarks modal
+    }
+
+    function submitRemarks(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const remarkForm = document.getElementById('remarksForm');
+        const formData = new FormData(remarkForm); // Collect form data
+
+        // Submit the remark via AJAX
+        fetch(remarkForm.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text(); // Process the response if needed
+            }
+            throw new Error('Network response was not ok.');
+        })
+        .then(data => {
+            // Handle success (e.g., show a success message)
+            alert("Remark submitted successfully!");
+            document.getElementById('remarksModal').style.display = 'none'; // Hide the modal after submission
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+            alert("There was an error submitting your remark.");
+        });
+    }
+</script>
+
 
 
             </div>
@@ -482,12 +512,13 @@ $disapprovedCount = $stmt->fetchColumn();
                 <textarea name="remark" class="form-control" rows="3" placeholder="Enter your remarks here..." required></textarea>
             </div>
             <input type="hidden" name="action" id="modalAction" value="">
-            <input type="hidden" name="registration_id" value="<?php echo htmlspecialchars($param_registration_id); ?>">
+            <input type="hidden" name="application_id" value="<?php echo htmlspecialchars($param_application_id); ?>">
             <button type="submit" class="btn btn-primary mb-1">Submit Remark</button>
             <button type="button" class="btn btn-secondary mb-1" onclick="document.getElementById('remarksModal').style.display='none'">Cancel</button>
         </form>
     </div>
 </div>
+
 
 
 

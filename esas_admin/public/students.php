@@ -224,7 +224,7 @@ try {
                                             s.profilePic,
                                             GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
                                         FROM tbl_students s
-                                        LEFT JOIN tbl_registration r ON s.student_id = r.student_id
+                                        LEFT JOIN tbl_application r ON s.student_id = r.student_id
                                         LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
                                         WHERE r.status = 'active' -- Filter for active status
                                         GROUP BY s.student_id

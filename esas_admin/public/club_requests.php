@@ -224,7 +224,7 @@ try {
                                             GROUP_CONCAT(DISTINCT r.clubName ORDER BY r.clubName ASC SEPARATOR ', ') AS clubNames
                                         FROM tbl_club_requests r
                                         JOIN tbl_students s ON r.student_id = s.student_id
-                                        LEFT JOIN tbl_registration reg ON s.student_id = reg.student_id
+                                        LEFT JOIN tbl_application reg ON s.student_id = reg.student_id
                                         WHERE reg.status = 'active' -- Filter for active students
                                         GROUP BY r.request_id
                                         ORDER BY r.dateRequested DESC";
