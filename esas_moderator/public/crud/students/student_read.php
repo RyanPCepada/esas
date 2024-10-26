@@ -15,6 +15,30 @@ if (isset($_GET["fullName"]) && !empty(trim($_GET["fullName"]))) {
 } else {
     $fullName = 'Unknown'; // Default if not provided
 }
+// Retrieve firstName
+if (isset($_GET["firstName"]) && !empty(trim($_GET["firstName"]))) {
+    $firstName = trim($_GET["firstName"]);
+} else {
+    $firstName = 'Unknown'; // Default if not provided
+}
+
+// Retrieve middleName
+if (isset($_GET["middleName"]) && !empty(trim($_GET["middleName"]))) {
+    $middleName = trim($_GET["middleName"]);
+} else {
+    $middleName = 'Unknown'; // Default if not provided
+}
+
+// Retrieve lastName
+if (isset($_GET["lastName"]) && !empty(trim($_GET["lastName"]))) {
+    $lastName = trim($_GET["lastName"]);
+} else {
+    $lastName = 'Unknown'; // Default if not provided
+}
+
+// Retrieve fullName using firstName, middleName, and lastName
+$fullName = trim("$firstName $middleName $lastName");
+
 
 if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
     // Include config file
@@ -183,11 +207,21 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                         <div class="col-md-4 text-center">
                             <img src="<?php echo $profilePic; ?>" 
                                  alt="<?php echo htmlspecialchars($fullName); ?> Profile Picture" 
-                                 class="img-fluid rounded-circle" style="width: 150px; height: 150px;">
+                                 class="img-fluid rounded-circle mb-4" style="width: 150px; height: 150px;">
+                                 
+                            <!-- <h4><strong class="text-dark"><?php echo $firstName; ?></strong><br><h6 class="text-small">First Name</h6></h4>
+                            <h4><strong class="text-dark"><?php echo $middleName; ?></strong><br><h6 class="text-small">Middle Name</h6></h4>
+                            <h4><strong class="text-dark"><?php echo $lastName; ?></strong><br><h6 class="text-small">Last Name</h6></h4> -->
+                            
+                            <!-- <p>First Name: <strong class="text-dark"><?php echo $firstName; ?></strong></p>
+                            <p>Middle Name: <strong class="text-dark"><?php echo $middleName; ?></strong></p>
+                            <p>Last Name: <strong class="text-dark"><?php echo $lastName; ?></strong></p> -->
+                            
+                            <p><strong>First Name: </strong><?php echo $firstName; ?></p>
+                            <p><strong>Middle Name: </strong><?php echo $middleName; ?></p>
+                            <p><strong>Last Name: </strong><?php echo $lastName; ?></p>
                         </div>
                         <div class="col-md-8">
-                            <h3 class="text-muted mb-3"><?php echo htmlspecialchars($fullName); ?></h3>
-                            <hr>
                             <div class="row col-md-12">
                                 <div class="col-md-6">
                                     <!-- <p><strong>Application ID: </strong><?php echo $application_id; ?></p> -->
