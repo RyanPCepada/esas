@@ -356,6 +356,7 @@ try {
                                         s.year,
                                         s.profilePic,
                                         s.dateAdded AS student_dateAdded,
+                                        r.application_id,
                                         r.status AS status,  -- Include the status here
                                         GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
                                     FROM tbl_students s
@@ -402,6 +403,7 @@ try {
                                         <table class="table table-bordered table-striped" style="background-color: #f9f9f9;" id="studentTable">
                                             <thead>
                                                 <tr>
+                                                    <th>Application ID</th>
                                                     <th>Student ID</th>
                                                     <th>Profile</th>
                                                     <th>Full Name</th>
@@ -418,6 +420,7 @@ try {
 
                                         foreach ($result as $row) {
                                             $formattedDate = date('F j, Y', strtotime($row['student_dateAdded']));
+                                            $application_id = htmlspecialchars($row['application_id']);
                                             $student_id = htmlspecialchars($row['student_id']);
                                             $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
                                             $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
@@ -432,6 +435,7 @@ try {
 
                                             echo '
                                             <tr class="student-row" data-status="' . htmlspecialchars($row['status']) . '"> 
+                                                <td>' . $application_id . '</td>
                                                 <td>' . $student_id . '</td>
                                                 <td class="text-center p-1">
                                                     <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
@@ -446,7 +450,7 @@ try {
                                                 <td>' . $course . '</td>
                                                 <td>' . $status . '</td>
                                                 <td class="text-center">
-                                                    <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($selectedClubId) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                    <a href="../public/crud/students/student_read.php?application_id=' . htmlspecialchars($row['application_id']) . '&student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($selectedClubId) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                                 </td>
                                             </tr>';
                                         }
