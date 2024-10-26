@@ -317,8 +317,8 @@ try {
                                                                 <option value="" selected>All</option>
                                                                 <option value="active">Active</option>
                                                                 <option value="inactive">Inactive</option>
-                                                                <option value="departed">Departed</option>
                                                                 <option value="disapproved">Disapproved</option>
+                                                                <option value="departed">Departed</option>
                                                             </optgroup>
                                                         </select>
                                                         <!-- Search input -->

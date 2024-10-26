@@ -15,6 +15,7 @@ date_default_timezone_set('Asia/Manila');
 // Get student_id and club_id from URL parameters
 $student_id = isset($_GET['student_id']) ? intval($_GET['student_id']) : null;
 $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+$application_id = isset($_GET['application_id']) ? $_GET['application_id'] : null;
 
 // Ensure both student_id and club_id are present
 if (!$student_id || !$club_id) {
@@ -29,8 +30,9 @@ $stmt->execute();
 $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Fetch the current status of the student for the specific club
-$statusSql = "SELECT status FROM tbl_application WHERE student_id = :student_id AND club_id = :club_id";
+$statusSql = "SELECT status FROM tbl_application WHERE application_id = :application_id AND student_id = :student_id AND club_id = :club_id";
 $statusStmt = $pdo->prepare($statusSql);
+$statusStmt->bindParam(":application_id", $application_id);
 $statusStmt->bindParam(":student_id", $student_id);
 $statusStmt->bindParam(":club_id", $club_id);
 $statusStmt->execute();
@@ -47,10 +49,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Prepare an update statement to set the student's status for the specific club
     $sql = "UPDATE tbl_application 
             SET status = :status, dateModified = NOW() 
-            WHERE student_id = :student_id AND club_id = :club_id";
+            WHERE application_id = :application_id AND student_id = :student_id AND club_id = :club_id";
     
     if ($stmt = $pdo->prepare($sql)) {
         // Bind parameters
+        $stmt->bindParam(":application_id", $application_id);
         $stmt->bindParam(":student_id", $student_id);
         $stmt->bindParam(":club_id", $club_id);  // Include the club_id in the WHERE clause
         $stmt->bindParam(":status", $status);
@@ -71,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $logStmt->execute(); // Execute the logging statement
 
             // Status updated successfully
-            header("Location: student_read.php?student_id=$student_id&club_id=$club_id"); // Redirect to the correct page
+            header("Location: student_read.php?application_id=$application_id&student_id=$student_id&club_id=$club_id"); // Redirect to the correct page
             exit(); // Always use exit() after header redirection
         } else {
             $update_status = "Error: Unable to update student status. Please try again.";
@@ -139,7 +142,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <!-- Update form -->
-                <form id="statusForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?student_id=$student_id&club_id=$club_id"; ?>" method="post">
+                <form id="statusForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?application_id=$application_id&student_id=$student_id&club_id=$club_id"; ?>" method="post">
                     <div class="form-group px-3">
                         <label for="status">Change Status:</label>
                         <select name="status" id="status" class="form-control">
@@ -186,7 +189,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Redirect to the previous page on cancel
         function goBack() {
-            window.location.href = "student_read.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $_GET['club_id']; ?>"; // Update with the correct page
+            window.location.href = "student_read.php?application_id=<?php echo $application_id; ?>&student_id=<?php echo $student_id; ?>&club_id=<?php echo $_GET['club_id']; ?>"; // Update with the correct page
         }
 
         // Show a PHP status update alert if needed
