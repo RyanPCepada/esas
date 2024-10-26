@@ -243,8 +243,8 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
         }
 
         echo "<script>console.log('Redirecting to pending approvals...');</script>";
-        //  header("location: ../../pending_approvals.php");
-         header("location: pending_approval_read.php?student_id=$student_id");
+         header("location: ../../pending_approvals.php");
+        //  header("location: pending_approval_read.php?student_id=$student_id");
         exit();
     } else {
         echo "<script>console.log('Error updating the request');</script>";

@@ -143,24 +143,27 @@ switch ($status) {
                 <p class="text-muted">Review your application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
                 <p>Status: <?php echo $icon; ?> <strong><?php echo ucfirst($status); ?></strong></p>
             </div>
-            <div class="container-fluid container auto-scroll">
+            <div class="container-fluid container mb-5 auto-scroll">
                 <div class="row">
                     <div class="col">
                         <p><strong>Why do you want to join this club?</strong><br><?php echo htmlspecialchars($application['question1']); ?></p>
                         <p><strong>What skills or experiences do you have that will contribute to the club's activities?</strong><br><?php echo htmlspecialchars($application['question2']); ?></p>
                         <p><strong>How do you plan to balance your time between club activities and your academic responsibilities?</strong><br><?php echo htmlspecialchars($application['question3']); ?></p>
-                        <hr>
+                        
                         
                         <?php if ($status === 'pending'): ?>
+                            <hr>
                             <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                         <?php elseif ($status === 'disapproved'): ?>
+                            <p><strong>Disapproval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
+                            <hr>
                             <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                             <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
-                            <p><strong>Remarks:</strong> <?php echo !empty($application['remark']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
                         <?php elseif ($status === 'active'): ?>
+                            <p><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
+                            <hr>
                             <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                             <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
-                            <p><strong>Remarks:</strong> <?php echo !empty($application['remark']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
                         <?php endif; ?>
 
                     </div>
