@@ -38,7 +38,7 @@ if (!$student) {
 }
 
 // Fetch application details for the specified club and student
-$sql_application = "SELECT *, remarks FROM tbl_application 
+$sql_application = "SELECT *, remark FROM tbl_application 
                     WHERE student_id = ? 
                     AND club_id = ? 
                     AND (application_id = ? OR (status = 'pending' AND application_id IS NOT NULL))
@@ -156,11 +156,11 @@ switch ($status) {
                         <?php elseif ($status === 'disapproved'): ?>
                             <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                             <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateApproved']); ?></p>
-                            <p><strong>Remarks:</strong> <?php echo !empty($application['remarks']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
+                            <p><strong>Remarks:</strong> <?php echo !empty($application['remark']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
                         <?php elseif ($status === 'active'): ?>
                             <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                             <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateApproved']); ?></p>
-                            <p><strong>Remarks:</strong> <?php echo !empty($application['remarks']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
+                            <p><strong>Remarks:</strong> <?php echo !empty($application['remark']) ? htmlspecialchars($application['remarks']) : 'No remarks available.'; ?></p>
                         <?php endif; ?>
 
                     </div>

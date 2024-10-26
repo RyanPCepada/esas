@@ -139,7 +139,7 @@ $(document).ready(function() {
                     const aboutSection = $('.about-list');
 
                     // Format the application date
-                    const formattedDate = new Date(club.applicationDate).toLocaleDateString('en-US', {
+                    const formattedDate = new Date(club.clubDateAdded).toLocaleDateString('en-US', {
                         year: 'numeric', month: 'long', day: 'numeric'
                     });
 
