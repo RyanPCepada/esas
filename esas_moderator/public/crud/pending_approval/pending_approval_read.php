@@ -392,19 +392,19 @@ $disapprovedCount = $stmt->fetchColumn();
                             <div class="container mt-3 p-0">
                                 <div class="card mb-3 bg-light">
                                     <div class="card-body">
-                                        <p><strong>Why do you want to join this club?:</strong><br><?php echo htmlspecialchars($questions['question1']); ?></p>
+                                        <p><strong>Why do you want to join this club?</strong><br><?php echo htmlspecialchars($questions['question1']); ?></p>
                                     </div>
                                 </div>
                                 
                                 <div class="card mb-3 bg-light">
                                     <div class="card-body">
-                                        <p><strong>What skills or experiences do you have that will contribute to the club's activities?:</strong><br><?php echo htmlspecialchars($questions['question2']); ?></p>
+                                        <p><strong>What skills or experiences do you have that will contribute to the club's activities?</strong><br><?php echo htmlspecialchars($questions['question2']); ?></p>
                                     </div>
                                 </div>
                                 
                                 <div class="card mb-3 bg-light">
                                     <div class="card-body">
-                                        <p><strong>How do you plan to balance your time between club activities and your academic responsibilities?:</strong><br><?php echo htmlspecialchars($questions['question3']); ?></p>
+                                        <p><strong>How do you plan to balance your time between club activities and your academic responsibilities?</strong><br><?php echo htmlspecialchars($questions['question3']); ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -432,17 +432,6 @@ $disapprovedCount = $stmt->fetchColumn();
                 </div>
 
 
-                <script>
-                    function confirmAction(action) {
-                        const confirmation = confirm(`Are you sure you want to ${action} this student?`);
-                        if (confirmation) {
-                            document.getElementById('action').value = action;
-                            document.getElementById('approvalForm').submit();
-                        }
-                    }
-                </script>
-
-
                 <div class="card-footer text-center">
                     <form id="approvalForm" method="post">
                         <input type="hidden" name="action" id="action" value="">
@@ -459,14 +448,54 @@ $disapprovedCount = $stmt->fetchColumn();
                 </div>
 
 
+                <script>
+                    function confirmAction(action) {
+                        const confirmation = confirm(`Are you sure you want to ${action} this student?`);
+                        if (confirmation) {
+                            document.getElementById('action').value = action;
+                            document.getElementById('approvalForm').submit();
+                            
+                            // Show the remarks modal after the form submission
+                            showRemarksModal(action);
+                        }
+                    }
+
+                    function showRemarksModal(action) {
+                        document.getElementById('modalAction').value = action; // Set the action in the remarks modal
+                        document.getElementById('remarksModal').style.display = 'block'; // Show the remarks modal
+                    }
+                </script>
+
+
             </div>
         </div>
     </div>
 </div>
 
+<!-- Remarks Modal -->
+<div id="remarksModal" class="modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+    <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
+        <span style="color: #333; font-weight: bold;">Leave a Remark</span>
+        <p>Your feedback helps the student understand the outcome of their application.</p>
+        <form id="remarksForm" action="actions/add_remark_action.php" method="post" onsubmit="submitRemarks(event)">
+            <div class="form-group">
+                <textarea name="remark" class="form-control" rows="3" placeholder="Enter your remarks here..." required></textarea>
+            </div>
+            <input type="hidden" name="action" id="modalAction" value="">
+            <input type="hidden" name="registration_id" value="<?php echo htmlspecialchars($param_registration_id); ?>">
+            <button type="submit" class="btn btn-primary mb-1">Submit Remark</button>
+            <button type="button" class="btn btn-secondary mb-1" onclick="document.getElementById('remarksModal').style.display='none'">Cancel</button>
+        </form>
+    </div>
+</div>
+
+
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+<script>
+</script>
 </body>
 </html>
