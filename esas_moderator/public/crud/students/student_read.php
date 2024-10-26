@@ -15,6 +15,7 @@ if (isset($_GET["fullName"]) && !empty(trim($_GET["fullName"]))) {
 } else {
     $fullName = 'Unknown'; // Default if not provided
 }
+
 // Retrieve firstName
 if (isset($_GET["firstName"]) && !empty(trim($_GET["firstName"]))) {
     $firstName = trim($_GET["firstName"]);

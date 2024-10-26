@@ -258,6 +258,9 @@ try {
                                                     while ($row = $result->fetch()) {
                                                         $application_id = htmlspecialchars($row['application_id']);
                                                         $club_id = htmlspecialchars($row['club_id']);
+                                                        $firstName = htmlspecialchars($row['firstName']);
+                                                        $middleName = htmlspecialchars($row['middleName']);
+                                                        $lastName = htmlspecialchars($row['lastName']);
                                                         $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
                                                         $clubNames = htmlspecialchars($row['clubNames']);
                                                         $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
@@ -276,7 +279,8 @@ try {
                                                             <td>' . htmlspecialchars($row['course']) . '</td>
                                                             <td>' . $clubNames . '</td>
                                                             <td class="text-center">
-                                                                <a href="../public/crud/students/student_read.php?application_id=' . htmlspecialchars($row['application_id']) . '&student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($club_id) . '&fullName=' . htmlspecialchars($fullName) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                                <a href="../public/crud/students/student_read.php?application_id=' . htmlspecialchars($row['application_id']) . '&student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($club_id) 
+                                                                . '&fullName=' . htmlspecialchars($fullName) . '&firstName=' . htmlspecialchars($firstName) . '&middleName=' . htmlspecialchars($middleName) . '&lastName=' . htmlspecialchars($lastName) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                                             </td>
                                                         </tr>';
                                                     }
