@@ -495,7 +495,8 @@ $disapprovedCount = $stmt->fetchColumn();
     }
 </script>
 
-
+<!-- HERE -->
+<!-- HERE -->
 
             </div>
         </div>
@@ -507,12 +508,14 @@ $disapprovedCount = $stmt->fetchColumn();
     <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
         <span style="color: #333; font-weight: bold;">Leave a Remark</span>
         <p>Your feedback helps the student understand the outcome of their application.</p>
-        <form id="remarksForm" action="actions/add_remark_action.php" method="post" onsubmit="submitRemarks(event)">
+        <form id="remarksForm" action="../../../actions/add_remark_action.php" method="post">
             <div class="form-group">
                 <textarea name="remark" class="form-control" rows="3" placeholder="Enter your remarks here..." required></textarea>
             </div>
             <input type="hidden" name="action" id="modalAction" value="">
             <input type="hidden" name="application_id" value="<?php echo htmlspecialchars($param_application_id); ?>">
+            <input type="hidden" name="student_id" value="">
+            <input type="hidden" name="club_id" value="">
             <button type="submit" class="btn btn-primary mb-1">Submit Remark</button>
             <button type="button" class="btn btn-secondary mb-1" onclick="document.getElementById('remarksModal').style.display='none'">Cancel</button>
         </form>

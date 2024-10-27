@@ -1,50 +1,33 @@
 <?php
-// Include config file
 require_once "../../config.php";
-
-// Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-// Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get input values and sanitize them
     $application_id = isset($_POST['application_id']) ? htmlspecialchars($_POST['application_id']) : '';
     $remark = isset($_POST['remark']) ? htmlspecialchars($_POST['remark']) : '';
-    $action = isset($_POST['action']) ? htmlspecialchars($_POST['action']) : '';
 
-    // Validate the inputs
     if (!empty($application_id) && !empty($remark)) {
-        // Prepare the SQL statement
-        $sql = "UPDATE tbl_application SET remark = ?, status = ?, dateModified = NOW() WHERE application_id = ?";
+        $sql = "UPDATE tbl_application SET remark = ?, dateModified = NOW() WHERE application_id = ?";
         
-        if ($stmt = $conn->prepare($sql)) {
-            // Bind parameters
-            $stmt->bind_param("ssi", $remark, $action, $application_id);
-            
-            // Execute the statement
-            if ($stmt->execute()) {
-                // Success message
-                echo "<script>alert('Remark added successfully!'); window.location.href='your_redirect_page.php';</script>";
+        if ($stmt = $pdo->prepare($sql)) {
+            // Bind values to the parameters and execute
+            if ($stmt->execute([$remark, $application_id])) {
+                echo "success"; // Response text for AJAX
             } else {
-                // Error message
-                echo "<script>alert('Error adding remark. Please try again later.'); window.history.back();</script>";
+                echo "Error: Could not execute the query. " . implode(", ", $stmt->errorInfo());
             }
-            // Close statement
-            $stmt->close();
         } else {
-            // Error preparing the statement
-            echo "<script>alert('Database error. Please try again later.'); window.history.back();</script>";
+            echo "Error: Could not prepare the statement. " . implode(", ", $pdo->errorInfo());
         }
     } else {
-        // Error message for empty fields
-        echo "<script>alert('Please fill in all fields.'); window.history.back();</script>";
+        echo "Error: Missing application_id or remark.";
     }
 } else {
-    // Redirect if the form is not submitted correctly
-    header("Location: your_redirect_page.php");
-    exit();
+    echo "Error: Invalid request method.";
 }
 
-// Close database connection
-$conn->close();
+//HERE
+// Fix the header location and ensure it is executed after processing
+header("Location: /esas/esas_moderator/public/pending_approvals.php");
+exit();
 ?>
