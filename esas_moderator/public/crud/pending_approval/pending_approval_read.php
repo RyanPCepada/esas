@@ -130,7 +130,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     exit();
 }
 
-// Function to update the application status
+// Function to update the application status and remark
 function updateRegistrationStatus($pdo, $student_id, $club_id, $application_id, $newStatus) {
     echo "<script>console.log('Updating application status to " . $newStatus . "');</script>";
     $updateSql = "UPDATE tbl_application 
@@ -434,64 +434,43 @@ $disapprovedCount = $stmt->fetchColumn();
 
 
                 <div class="card-footer text-center">
-                    <form id="approvalForm" method="post">
-                        <input type="hidden" name="action" id="action" value="">
-                        <input type="hidden" name="application_id" value="<?php echo htmlspecialchars($param_application_id); ?>">
-                        <?php if ($clubsCount >= 2): ?>
-                            <!-- <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button> -->
-                            <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
-                        <?php else: ?>
-                            <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve Student</button>
-                            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
-                            <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
-                        <?php endif; ?>
-                    </form>
-                </div>
+    <form id="approvalForm" method="post">
+        <input type="hidden" name="action" id="action" value="">
+        <input type="hidden" name="application_id" value="<?php echo htmlspecialchars($param_application_id); ?>">
+        <input type="hidden" name="remark" id="remark" value=""> <!-- Hidden field for remark -->
+        <?php if ($clubsCount >= 2): ?>
+            <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
+        <?php else: ?>
+            <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve Student</button>
+            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
+            <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
+        <?php endif; ?>
+    </form>
+</div>
 
 
-                <script>
+<script>
     function confirmAction(action) {
         const confirmation = confirm(`Are you sure you want to ${action} this student?`);
         if (confirmation) {
             document.getElementById('action').value = action;
-            document.getElementById('approvalForm').submit();
-            
-            // Show the remarks modal after the form submission
-            showRemarksModal(action);
+            // Show the remarks modal before submitting
+            showRemarksModal();
         }
     }
 
-    function showRemarksModal(action) {
-        document.getElementById('modalAction').value = action; // Set the action in the remarks modal
+    function showRemarksModal() {
         document.getElementById('remarksModal').style.display = 'block'; // Show the remarks modal
     }
 
     function submitRemarks(event) {
         event.preventDefault(); // Prevent the default form submission
 
-        const remarkForm = document.getElementById('remarksForm');
-        const formData = new FormData(remarkForm); // Collect form data
+        const remark = document.querySelector('textarea[name="remark"]').value; // Get the remark
+        document.getElementById('remark').value = remark; // Set the remark in the hidden input
 
-        // Submit the remark via AJAX
-        fetch(remarkForm.action, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (response.ok) {
-                return response.text(); // Process the response if needed
-            }
-            throw new Error('Network response was not ok.');
-        })
-        .then(data => {
-            // Handle success (e.g., show a success message)
-            alert("Remark submitted successfully!");
-            document.getElementById('remarksModal').style.display = 'none'; // Hide the modal after submission
-        })
-        .catch(error => {
-            console.error('There was a problem with the fetch operation:', error);
-            alert("There was an error submitting your remark.");
-        });
+        // Now submit the approval form
+        document.getElementById('approvalForm').submit();
     }
 </script>
 
@@ -508,20 +487,15 @@ $disapprovedCount = $stmt->fetchColumn();
     <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
         <span style="color: #333; font-weight: bold;">Leave a Remark</span>
         <p>Your feedback helps the student understand the outcome of their application.</p>
-        <form id="remarksForm" action="../../../actions/add_remark_action.php" method="post">
+        <form id="remarksForm" onsubmit="submitRemarks(event)">
             <div class="form-group">
                 <textarea name="remark" class="form-control" rows="3" placeholder="Enter your remarks here..." required></textarea>
             </div>
-            <input type="hidden" name="action" id="modalAction" value="">
-            <input type="hidden" name="application_id" value="<?php echo htmlspecialchars($param_application_id); ?>">
-            <input type="hidden" name="student_id" value="">
-            <input type="hidden" name="club_id" value="">
             <button type="submit" class="btn btn-primary mb-1">Submit Remark</button>
             <button type="button" class="btn btn-secondary mb-1" onclick="document.getElementById('remarksModal').style.display='none'">Cancel</button>
         </form>
     </div>
 </div>
-
 
 
 
