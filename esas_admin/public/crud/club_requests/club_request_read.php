@@ -1,7 +1,12 @@
 <?php
 
 require_once "../../../../config.php"; 
+require __DIR__ . '/../../../vendor/autoload.php';
+
 session_start();
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 // Ensure the moderator ID is set in the session
 if (isset($_SESSION['admin_id'])) {
@@ -88,11 +93,10 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
 } 
 
 
-
 // Handle approval or disapproval
 if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprove'])) {
-    $newStatus = $_POST["action"] === 'approve' ? 'approved' : 'disapproved'; // Changed to lowercase
-    $dateDecided = ($newStatus === 'approved') ? date('Y-m-d H:i:s') : null; // Get current date and time if approved, null if disapproved
+    $newStatus = $_POST["action"] === 'approve' ? 'approved' : 'disapproved'; 
+    $dateDecided = ($newStatus === 'approved') ? date('Y-m-d H:i:s') : null; 
 
     // Update the club request status
     $updateSql = "UPDATE tbl_club_requests 
@@ -103,9 +107,9 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     if ($updateStmt = $pdo->prepare($updateSql)) {
         $updateStmt->bindParam(":status", $newStatus);
         if ($newStatus === 'approved') {
-            $updateStmt->bindParam(":dateDecided", $dateDecided); // Bind actual date
+            $updateStmt->bindParam(":dateDecided", $dateDecided); 
         } else {
-            $nullValue = null; // Bind NULL explicitly for disapproved
+            $nullValue = null; 
             $updateStmt->bindParam(":dateDecided", $nullValue, PDO::PARAM_NULL);
         }
         $updateStmt->bindParam(":request_id", $request_id, PDO::PARAM_INT);
@@ -119,13 +123,50 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
             if ($logStmt = $pdo->prepare($logSql)) {
                 $logStmt->bindParam(":activity", $activity);
-                $logStmt->bindParam(":dateAdded", date('Y-m-d H:i:s')); // Log current date and time
-                $logStmt->bindParam(":admin_id", $adminId, PDO::PARAM_INT); // Replace with actual admin ID
-                $logStmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT); // Replace with actual moderator ID
+                $logStmt->bindParam(":dateAdded", date('Y-m-d H:i:s')); 
+                $logStmt->bindParam(":admin_id", $adminId, PDO::PARAM_INT); 
+                $logStmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT); 
                 $logStmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
 
                 // Execute the log statement
                 $logStmt->execute();
+            }
+
+            // Fetch requester email to notify them about the decision
+            $studentEmailSql = "SELECT email FROM tbl_students WHERE student_id = :student_id";
+            $studentEmailStmt = $pdo->prepare($studentEmailSql);
+            $studentEmailStmt->execute([':student_id' => $student_id]);
+            $student = $studentEmailStmt->fetch(PDO::FETCH_ASSOC);
+            $studentEmail = $student['email'];
+
+          
+
+            $mail = new PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username   = 'sportsnbscesas@gmail.com';
+            $mail->Password   = 'wubj bmsj ckmj nope'; 
+     
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+            $mail->setFrom('sportsnbscesas@gmail.com', 'Club Request Notification');
+                       
+
+            // Send email to the requester
+            try {
+                $mail->addAddress($studentEmail); 
+                $mail->isHTML(true);
+                $mail->Subject = "Your Club Request Has Been " . ucfirst($newStatus);
+                $mail->Body = "
+                    <p>Dear Student,</p>
+                    <p>Your request to form a club has been <strong>" . $newStatus . "</strong>.</p>
+                    <p>If you have any questions, feel free to contact us.</p>
+                    <p>Thank you!</p>";
+
+                $mail->send();
+            } catch (Exception $e) {
+                error_log("Mailer Error: " . $mail->ErrorInfo);
             }
 
             header("location: club_request_read.php?request_id=" . $request_id . "&status=" . strtolower($newStatus));
@@ -137,6 +178,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     }
     unset($updateStmt);
 }
+
 
 ?>
 
