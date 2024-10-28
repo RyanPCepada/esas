@@ -132,12 +132,12 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                 $logStmt->execute();
             }
 
-            // Fetch requester email to notify them about the decision
-            $studentEmailSql = "SELECT InstiEmail FROM tbl_students WHERE student_id = :student_id";
+            // Fetch requester instiEmail to notify them about the decision
+            $studentEmailSql = "SELECT instiEmail FROM tbl_students WHERE student_id = :student_id";
             $studentEmailStmt = $pdo->prepare($studentEmailSql);
             $studentEmailStmt->execute([':student_id' => $student_id]);
             $student = $studentEmailStmt->fetch(PDO::FETCH_ASSOC);
-            $studentEmail = $student['InstiEmail'];
+            $studentEmail = $student['instiEmail'];
 
           
 
@@ -153,7 +153,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
             $mail->setFrom('sportsnbscesas@gmail.com', 'Club Request Notification');
                        
 
-            // Send email to the requester
+            // Send instiEmail to the requester
             try {
                 $mail->addAddress($studentEmail); 
                 $mail->isHTML(true);
