@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!empty($application_id) && !empty($remark)) {
         $sql = "UPDATE tbl_application SET remark = ?, dateModified = NOW() WHERE application_id = ?";
-        
+
         if ($stmt = $pdo->prepare($sql)) {
             // Bind values to the parameters and execute
             if ($stmt->execute([$remark, $application_id])) {
@@ -26,8 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo "Error: Invalid request method.";
 }
 
-//HERE
-// Fix the header location and ensure it is executed after processing
+// Ensure this is called after processing
 header("Location: /esas/esas_moderator/public/pending_approvals.php");
 exit();
 ?>

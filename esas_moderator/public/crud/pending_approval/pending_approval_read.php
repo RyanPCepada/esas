@@ -131,7 +131,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
 }
 
 // Function to update the application status and remark
-function updateRegistrationStatus($pdo, $student_id, $club_id, $application_id, $newStatus) {
+function updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $newStatus) {
     echo "<script>console.log('Updating application status to " . $newStatus . "');</script>";
     $updateSql = "UPDATE tbl_application 
                   SET status = :status, dateDecided = NOW() 
@@ -200,7 +200,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
     // Update applications status
     echo "<script>console.log('Updating applications status...');</script>";
-    if (updateRegistrationStatus($pdo, $student_id, $club_id, $application_id, $newStatus) > 0) {
+    if (updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $newStatus) > 0) {
         echo "<script>console.log('Applications status updated successfully');</script>";
         
         // Check the current active memberships after approval
@@ -386,6 +386,8 @@ $disapprovedCount = $stmt->fetchColumn();
                         <div class="col-md-9">
                             <h3 class="text-muted mb-3"><?php echo htmlspecialchars($fullName); ?></h3>
                             <p><strong>Student ID: </strong><?php echo $student_id; ?></p>
+                            
+                            <!-- <p><strong>Application ID: </strong><?php echo $application_id; ?></p> -->
                             <hr>
 
                             <h5>Application Details:</h5>
@@ -434,33 +436,40 @@ $disapprovedCount = $stmt->fetchColumn();
 
 
                 <div class="card-footer text-center">
-    <form id="approvalForm" method="post">
-        <input type="hidden" name="action" id="action" value="">
-        <input type="hidden" name="application_id" value="<?php echo htmlspecialchars($param_application_id); ?>">
-        <input type="hidden" name="remark" id="remark" value=""> <!-- Hidden field for remark -->
-        <?php if ($clubsCount >= 2): ?>
-            <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
-        <?php else: ?>
-            <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve Student</button>
-            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
-            <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
-        <?php endif; ?>
-    </form>
+                    <form id="approvalForm" method="post">
+                        <input type="hidden" name="action" id="action" value="">
+                        <input type="hidden" name="application_id" value="<?php echo htmlspecialchars($param_application_id); ?>">
+                        <input type="hidden" name="remark" id="remark" value=""> <!-- Hidden field for remark -->
+                        <?php if ($clubsCount >= 2): ?>
+                            <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
+                        <?php else: ?>
+                            <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve Student</button>
+                            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
+                            <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
+                        <?php endif; ?>
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
 </div>
 
+<!-- HERE -->
 
 <script>
-    function confirmAction(action) {
+    function confirmAction(action, applicationId) {
         const confirmation = confirm(`Are you sure you want to ${action} this student?`);
         if (confirmation) {
             document.getElementById('action').value = action;
-            // Show the remarks modal before submitting
+            document.getElementById('application_id').value = applicationId; // Set the application ID
             showRemarksModal();
         }
     }
 
     function showRemarksModal() {
-        document.getElementById('remarksModal').style.display = 'block'; // Show the remarks modal
+        document.getElementById('remarksModal').style.display = 'block';
     }
 
     function submitRemarks(event) {
@@ -474,20 +483,13 @@ $disapprovedCount = $stmt->fetchColumn();
     }
 </script>
 
-<!-- HERE -->
-<!-- HERE -->
-
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Remarks Modal -->
 <div id="remarksModal" class="modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
     <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
         <span style="color: #333; font-weight: bold;">Leave a Remark</span>
         <p>Your feedback helps the student understand the outcome of their application.</p>
-        <form id="remarksForm" onsubmit="submitRemarks(event)">
+        <form id="remarksForm" action="../../../actions/add_remark_action.php" method="POST" onsubmit="submitRemarks(event)">
+            <input type="hidden" id="application_id" name="application_id" value=""> <!-- Hidden field for application ID -->
             <div class="form-group">
                 <textarea name="remark" class="form-control" rows="3" placeholder="Enter your remarks here..." required></textarea>
             </div>
@@ -498,6 +500,9 @@ $disapprovedCount = $stmt->fetchColumn();
 </div>
 
 
+
+        <!-- <php echo applicationId; ?> -->
+<!-- <input type="hidden" id="application_id" name="application_id" value="<php echo applicationId; ?>"> -->
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
