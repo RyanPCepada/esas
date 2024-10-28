@@ -133,11 +133,11 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
             }
 
             // Fetch requester email to notify them about the decision
-            $studentEmailSql = "SELECT email FROM tbl_students WHERE student_id = :student_id";
+            $studentEmailSql = "SELECT InstiEmail FROM tbl_students WHERE student_id = :student_id";
             $studentEmailStmt = $pdo->prepare($studentEmailSql);
             $studentEmailStmt->execute([':student_id' => $student_id]);
             $student = $studentEmailStmt->fetch(PDO::FETCH_ASSOC);
-            $studentEmail = $student['email'];
+            $studentEmail = $student['InstiEmail'];
 
           
 

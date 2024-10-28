@@ -3,8 +3,7 @@
 $host = 'localhost';
 $dbname = 'esas';
 $username = 'root';
-$password = 'root';
-$port = 3307;
+$password =''; 
 /* Database credentials. Assuming you are running MySQL
 server with default setting (user 'root' with no password) */
 
@@ -14,7 +13,7 @@ define('DB_PASSWORD', '');
 define('DB_NAME', 'esas');
 
 try {
-    $pdo = new PDO("mysql:host=$host; port=$port; dbname=$dbname", $username, $password);
+    $pdo = new PDO("mysql:host=$host;  dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
