@@ -264,12 +264,12 @@ if ($previousClubCount === 1) {
                     <h3>Student Profile</h3>
                     <!-- <button class="btn btn-info" id="generateIDBtn" data-toggle="modal" data-target="#generateIDModal">Generate ID</button> -->
                     <div>
-                            <a href="../../../application_details.php?application_id=<?php echo $application_id; ?>&student_id=<?php echo $student_id; ?>&fullName=<?php echo $fullName; ?>&club_id=<?php echo $_GET['club_id']; ?>" class="btn btn-outline-info">Application Details</a>
-                            
-                            <?php if ($status === 'active') : // Check if the student status is active ?>
-                                <a href="../../crud/students/student_generate_id.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $_GET['club_id']; ?>" class="btn btn-primary">Generate ID</a>
-                            <?php endif; ?>
-                        </div>
+                        <a href="../../../application_details.php?application_id=<?php echo $application_id; ?>&student_id=<?php echo $student_id; ?>&fullName=<?php echo $fullName; ?>&club_id=<?php echo $_GET['club_id']; ?>" class="btn btn-outline-info">Application Details</a>
+                        
+                        <?php if ($status === 'active') : // Check if the student status is active ?>
+                            <a href="../../crud/students/student_generate_id.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $_GET['club_id']; ?>" class="btn btn-primary">Generate ID</a>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
