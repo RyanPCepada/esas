@@ -160,7 +160,7 @@ switch ($status) {
                             <p class="text-danger"><strong>Disapproval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
                             <hr>
                             <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                            <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateModified']); ?></p>
+                            <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
 
                         <?php elseif ($status === 'active'): ?>
                             <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
