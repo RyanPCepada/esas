@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $confirmPassword = $_POST['confirmPassword'];
     $response = [];
 
-    // Step 1: Verify current password
-    if ($currentPassword !== $moderator['password']) {
+    // Step 1: Verify current password using password_verify
+    if (!password_verify($currentPassword, $moderator['password'])) {
         $response['error'] = "Current password is incorrect.";
     }
     // Step 2: Check if new password matches confirmation password
@@ -35,11 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     elseif (strlen($newPassword) < 8 || !preg_match('/[A-Za-z]/', $newPassword) || !preg_match('/\d/', $newPassword)) {
         $response['error'] = "New password must be at least 8 characters long and contain both letters and numbers.";
     } else {
+        // Hash the new password
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
         // Update password in database
         $updateSql = "UPDATE tbl_moderators SET password = ? WHERE moderator_id = ?";
         $updateStmt = $pdo->prepare($updateSql);
 
-        if ($updateStmt->execute([$newPassword, $moderator_id])) {
+        if ($updateStmt->execute([$hashedPassword, $moderator_id])) {
             // Log the activity
             $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
             $logStmt = $pdo->prepare($logSql);
@@ -88,6 +91,11 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                     alert(response.success);
+                    // Clear input fields after successful update
+                    $('#currentPassword').val('');
+                    $('#newPassword').val('');
+                    $('#confirmPassword').val('');
+                    $('.btn').blur();
                 } else if (response.error) {
                     alert(response.error);
                 }
