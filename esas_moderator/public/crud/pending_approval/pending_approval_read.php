@@ -131,10 +131,10 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
 }
 
 // Function to update the application status and remark
-function updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $newStatus) {
+function updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $newStatus, $remark) {
     echo "<script>console.log('Updating application status to " . $newStatus . "');</script>";
     $updateSql = "UPDATE tbl_application 
-                  SET status = :status, dateDecided = NOW() 
+                  SET status = :status, dateDecided = NOW(), remark = :remark 
                   WHERE student_id = :student_id 
                   AND club_id = :club_id 
                   AND application_id = :application_id";
@@ -142,6 +142,7 @@ function updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $
     $stmt = $pdo->prepare($updateSql);
     $stmt->execute([
         ':status' => $newStatus,
+        ':remark' => $remark, // Add the remark parameter here
         ':student_id' => $student_id,
         ':club_id' => $club_id,
         ':application_id' => $application_id,
@@ -150,6 +151,7 @@ function updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $
     echo "<script>console.log('Rows affected: " . $rowCount . "');</script>";
     return $rowCount;
 }
+
 
 // Function to count active memberships
 function countActiveMemberships($pdo, $student_id) {
@@ -200,7 +202,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
     // Update applications status
     echo "<script>console.log('Updating applications status...');</script>";
-    if (updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $newStatus) > 0) {
+    if (updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $newStatus, $_POST['remark']) > 0) {
         echo "<script>console.log('Applications status updated successfully');</script>";
         
         // Check the current active memberships after approval
@@ -435,6 +437,7 @@ $disapprovedCount = $stmt->fetchColumn();
                 </div>
 
 
+                <!-- Approval Form and Buttons -->
                 <div class="card-footer text-center">
                     <form id="approvalForm" method="post">
                         <input type="hidden" name="action" id="action" value="">
@@ -443,8 +446,8 @@ $disapprovedCount = $stmt->fetchColumn();
                         <?php if ($clubsCount >= 2): ?>
                             <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
                         <?php else: ?>
-                            <button type="button" onclick="confirmAction('approve')" class="btn btn-success">Approve Student</button>
-                            <button type="button" onclick="confirmAction('disapprove')" class="btn btn-danger">Disapprove Student</button>
+                            <button type="button" onclick="confirmAction('approve', <?php echo $param_application_id; ?>)" class="btn btn-success">Approve Student</button>
+                            <button type="button" onclick="confirmAction('disapprove', <?php echo $param_application_id; ?>)" class="btn btn-danger">Disapprove Student</button>
                             <a href="javascript:window.history.back();" class="btn btn-secondary">Go Back</a>
                         <?php endif; ?>
                     </form>
@@ -481,14 +484,16 @@ $disapprovedCount = $stmt->fetchColumn();
         // Now submit the approval form
         document.getElementById('approvalForm').submit();
     }
+
 </script>
+
 
 <!-- Remarks Modal -->
 <div id="remarksModal" class="modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
     <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px;">
         <span style="color: #333; font-weight: bold;">Leave a Remark</span>
         <p>Your feedback helps the student understand the outcome of their application.</p>
-        <form id="remarksForm" action="../../../actions/add_remark_action.php" method="POST" onsubmit="submitRemarks(event)">
+        <form id="remarksForm" action="" method="POST" onsubmit="submitRemarks(event)">
             <input type="hidden" id="application_id" name="application_id" value=""> <!-- Hidden field for application ID -->
             <div class="form-group">
                 <textarea name="remark" class="form-control" rows="3" placeholder="Enter your remarks here..." required></textarea>
@@ -498,7 +503,6 @@ $disapprovedCount = $stmt->fetchColumn();
         </form>
     </div>
 </div>
-
 
 
         <!-- <php echo applicationId; ?> -->
