@@ -1,11 +1,6 @@
 <?php
 session_start();
 require_once "../../config.php";
-require __DIR__ . '../../vendor/autoload.php';
-
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -45,7 +40,6 @@ if (isset($_GET['club_id'])) {
     exit(); // Make sure to call exit after redirecting
 }
 
-
 // Handle post submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate post content
@@ -68,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Bind variables to the prepared statement as parameters
             $stmt->bindParam(":post", $postContent);
-            $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+            $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT); 
             $stmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT);
 
             // Execute the statement
@@ -77,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $post_id = $pdo->lastInsertId();
 
                 // Notify all students registered in the club
-                $sql = "SELECT student_id, email FROM tbl_application WHERE club_id = :club_id AND status = 'active'";
+                $sql = "SELECT student_id FROM tbl_application WHERE club_id = :club_id AND status = 'active'";
                 $stmt = $pdo->prepare($sql);
                 $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
                 $stmt->execute();
@@ -94,41 +88,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
                         $stmt->bindParam(":post_id", $post_id, PDO::PARAM_INT);
                         $stmt->execute();
-
-                        // Email each student
-                        try {
-                            // SMTP settings
-                            $mail->isSMTP();
-                            $mail->Host       = 'smtp.gmail.com';
-                            $mail->SMTPAuth   = true;
-                            $mail->Username   = 'sportsnbscesas@gmail.com';
-                            $mail->Password   = 'wubj bmsj ckmj nope'; 
-                            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                            $mail->Port       = 587;
-
-                            // Recipient email
-                            $mail->setFrom('sportsnbscesas@gmail.com', 'Club Notifications');
-                            $mail->addAddress($student['email']);
-
-                            // Email content
-                            $mail->isHTML(true);
-                            $mail->Subject = 'New Post in ' . $clubName;
-                            $mail->Body    = "Hello,<br><br>A new announcement has been posted in the {$clubName} club:<br><br>
-                                              <strong>{$postContent}</strong><br><br>
-                                              Best regards,<br>Club Moderator Team";
-
-                            // Send the email
-                            $mail->send();
-
-                        } catch (Exception $e) {
-                            echo "Email could not be sent to {$student['email']}. Mailer Error: {$mail->ErrorInfo}";
-                        }
                     }
                 }
 
                 // Log the post creation activity in tbl_activity_logs
                 $activity = "You created a post in {$clubName}";
-                $sql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id)
+                $sql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
                         VALUES (:activity, NOW(), NULL, :moderator_id, NULL)";
                 $stmt = $pdo->prepare($sql);
                 $stmt->bindParam(":activity", $activity);
@@ -141,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Return a JSON response
                 echo json_encode([
                     "success" => true,
-                    "message" => "Post created successfully and emails sent!",
+                    "message" => "Post created successfully!",
                     "redirect_url" => "home.php?club_id={$club_id}"
                 ]);
             } else {
@@ -161,7 +126,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     unset($pdo);
     exit();
 }
-
 
 // Close connection
 unset($pdo);
