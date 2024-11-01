@@ -118,15 +118,13 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
             // Insert into activity logs after updating the request status
             $activity = "You " . $newStatus . " " . $requestedByName . "'s club request";
-            $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id)
-                       VALUES (:activity, :dateAdded, :admin_id, :moderator_id, :student_id)";
+            $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id)
+                       VALUES (:activity, :dateAdded, :admin_id)";
 
             if ($logStmt = $pdo->prepare($logSql)) {
                 $logStmt->bindParam(":activity", $activity);
                 $logStmt->bindParam(":dateAdded", date('Y-m-d H:i:s')); 
                 $logStmt->bindParam(":admin_id", $adminId, PDO::PARAM_INT); 
-                $logStmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT); 
-                $logStmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
 
                 // Execute the log statement
                 $logStmt->execute();
