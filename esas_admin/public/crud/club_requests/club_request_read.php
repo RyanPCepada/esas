@@ -232,19 +232,13 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                                 </p>
                                 <hr>
                                 <div class="container mt-3 p-0">
-                                        <p><strong>Goal: </strong><br><?php echo htmlspecialchars($goal); ?></p>
-                                
-                                
-                                        <p><strong>Mission: </strong><br><?php echo htmlspecialchars($mission); ?></p> <!-- Display mission -->
-                                    
-                                        <p><strong>Vision: </strong><br><?php echo htmlspecialchars($vision); ?></p>   <!-- Display vision -->
-                                    
-                                        <p><strong>Activities: </strong><br><?php echo htmlspecialchars($activities); ?></p>
-                                    
-                                        <hr>
-                                
-                                        <p>Status: </strong><?php echo htmlspecialchars($status); ?></p>
-                                        <p>Date Requested: </strong><?php echo htmlspecialchars($dateRequested); ?></p> 
+                                    <p><strong>Goal: </strong><br><?php echo htmlspecialchars_decode($goal); ?></p>
+                                    <p><strong>Mission: </strong><br><?php echo htmlspecialchars_decode($mission); ?></p>
+                                    <p><strong>Vision: </strong><br><?php echo htmlspecialchars_decode($vision); ?></p>
+                                    <p><strong>Activities: </strong><br><?php echo htmlspecialchars_decode($activities); ?></p>
+                                    <hr>
+                                    <p><strong>Status: </strong><?php echo htmlspecialchars_decode($status); ?></p>
+                                    <p><strong>Date Requested: </strong><?php echo htmlspecialchars_decode($dateRequested); ?></p> 
                                 </div>
                             </div>
                         </div>
