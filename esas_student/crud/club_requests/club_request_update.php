@@ -111,12 +111,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $requestLetterName = $_FILES['requestLetter']['name'];
         $requestLetterTmpName = $_FILES['requestLetter']['tmp_name'];
 
-        $validLetterExtensions = ['pdf', 'doc', 'docx'];
+        $validLetterExtensions = ['pdf'];
         $letterExtension = strtolower(pathinfo($requestLetterName, PATHINFO_EXTENSION));
 
         // Validate request letter
         if (!in_array($letterExtension, $validLetterExtensions)) {
-            $requestLetter_err = "Invalid file extension. Only PDF, DOC, and DOCX are allowed.";
+            $requestLetter_err = "Invalid file extension. Only PDF are allowed.";
         } else {
             $newRequestLetterName = 'request_letter_' . uniqid() . '.' . $letterExtension;
             $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/esas/esas_student/request_letters/';
@@ -265,10 +265,10 @@ unset($pdo);
                         
                         <div class="form-group mb-3">
                             <label for="requestLetter">Update Request Letter</label>
-                            <input type="file" name="requestLetter" class="form-control <?php echo (!empty($requestLetter_err)) ? 'is-invalid' : ''; ?>" id="requestLetter" onchange="previewRequestLetter(event)">
-                            <small class="form-text text-muted">Accepted formats: PDF, DOC, DOCX.</small>
+                            <input type="file" name="requestLetter" class="form-control <?php echo (!empty($requestLetter_err)) ? 'is-invalid' : ''; ?>" id="requestLetter" accept=".pdf" onchange="previewRequestLetter(event)">
+                            <small class="form-text text-muted">Accepted format: PDF only.</small>
                             <span class="invalid-feedback"><?php echo $requestLetter_err; ?></span>
-                            
+
                             <!-- Existing Request Letter Preview -->
                             <?php if (!empty($requestLetter)): ?>
                                 <?php
@@ -279,15 +279,12 @@ unset($pdo);
                                 // Determine which icon to display based on the file extension
                                 if ($fileExtension === 'pdf') {
                                     $icon = '/esas/esas_student/icons/ICON_PDF.png'; // Path to PDF icon
-                                } elseif (in_array($fileExtension, ['doc', 'docx'])) {
-                                    $icon = '/esas/esas_student/icons/ICON_WORD.png'; // Path to Word icon
                                 }
                                 ?>
                                 
                                 <a href="<?php echo htmlspecialchars('/esas/esas_student/request_letters/' . $requestLetter); ?>" target="_blank">
                                     <img src="<?php echo htmlspecialchars($icon); ?>" alt="Request Letter Preview" id="fileIconPreview" style="display:block; margin-top:10px; width: 100px;">
                                 </a>
-                                <!-- <span><?php echo htmlspecialchars($requestLetter); ?></span> -->
                             <?php else: ?>
                                 <img id="fileIconPreview" alt="Request Letter Preview" style="display:none; margin-top:10px; width: 100px;">
                             <?php endif; ?>
@@ -297,21 +294,19 @@ unset($pdo);
                             function previewRequestLetter(event) {
                                 const file = event.target.files[0]; // Get the selected file
                                 const preview = document.getElementById('fileIconPreview'); // Get the preview element
-                                const allowedExtensions = ['pdf', 'doc', 'docx']; // Define allowed file types
+                                const allowedExtension = 'pdf'; // Define allowed file type
                                 
                                 if (file) {
                                     const fileExtension = file.name.split('.').pop().toLowerCase(); // Get file extension
                                     let iconPath = '';
 
                                     // Set icon based on file type
-                                    if (fileExtension === 'pdf') {
+                                    if (fileExtension === allowedExtension) {
                                         iconPath = '/esas/esas_student/icons/ICON_PDF.png';
-                                    } else if (['doc', 'docx'].includes(fileExtension)) {
-                                        iconPath = '/esas/esas_student/icons/ICON_WORD.png';
                                     }
 
                                     // If the file is allowed, update the preview
-                                    if (allowedExtensions.includes(fileExtension)) {
+                                    if (fileExtension === allowedExtension) {
                                         preview.src = iconPath; // Set the icon image based on file type
                                         preview.style.display = 'block'; // Show the preview
                                     } else {

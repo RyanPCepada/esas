@@ -207,9 +207,8 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                                     <div class="card p-3 bg-light" style="width: auto; margin-top: 70px; border-radius: 15px;">
                                         <?php if (!empty($requestLetter)): 
                                             $fileType = pathinfo($requestLetter, PATHINFO_EXTENSION);
-                                            $fileIcon = ($fileType === 'pdf') ? '/esas/esas_student/icons/ICON_PDF.png' :
-                                                        (($fileType === 'doc' || $fileType === 'docx') ? '/esas/esas_student/icons/ICON_WORD.png' : ''); 
-                                            $linkText = ($fileType === 'docx') ? 'Download Attached Request Letter' : 'View Attached Request Letter'; ?>
+                                            $fileIcon = ($fileType === 'pdf') ? '/esas/esas_student/icons/ICON_PDF.png' : ''; 
+                                            $linkText = 'View Attached Request Letter'; ?>
                                             <div class="d-flex align-items-center justify-content-start" style="cursor: pointer;" onclick="window.open('/esas/esas_student/request_letters/<?php echo $requestLetter; ?>', '_blank')">
                                                 <img src="<?php echo $fileIcon; ?>" alt="<?php echo strtoupper($fileType); ?> File" style="width: 70px; margin-right: 10px;">
                                                 <a href="/esas/esas_student/request_letters/<?php echo $requestLetter; ?>" target="_blank" style="color: blue; text-decoration: underline;"><?php echo $linkText; ?></a>
