@@ -1,6 +1,14 @@
 <?php
 // Include config file
 require_once "../../config.php";
+session_start();
+
+if (!isset($_SESSION['student_id'])) {
+    echo "Student ID is not set in the session.";
+    exit;
+}
+//Application
+$student_id = $_SESSION['student_id']; // Get student ID from session
 
 // Check existence of student_id parameter before processing further
 // Set the default timezone to Asia/Manila
@@ -10,6 +18,12 @@ if (isset($_GET["application_id"]) && !empty(trim($_GET["application_id"]))) {
     $application_id = trim($_GET["application_id"]);
 } else {
     $application_id = 'None'; // Default if not provided
+}
+
+if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
+    $club_id = trim($_GET["club_id"]);
+} else {
+    $club_id = 'None'; // Default if not provided
 }
 
 // Retrieve fullName
@@ -262,7 +276,7 @@ if ($clubCount > 1) {
                     </div>
                 </div>
                 <div class="card-footer text-center">
-                    <a href="../home.php?application_id=<?php echo $application_id; ?>&student_id=<?php echo $student_id; ?>" class="btn btn-secondary">Go Back</a>
+                    <a href="../home.php?application_id=<?php echo $application_id; ?>&student_id=<?php echo $student_id; ?>&club_id=<?php echo $club_id; ?>" class="btn btn-secondary">Go Back</a>
                 </div>
             </div>
         </div>
