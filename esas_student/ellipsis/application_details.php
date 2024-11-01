@@ -6,7 +6,7 @@ if (!isset($_SESSION['student_id'])) {
     echo "Student ID is not set in the session.";
     exit;
 }
-//Registration
+//Application
 $student_id = $_SESSION['student_id']; // Get student ID from session
 
 // Set the default timezone to Asia/Manila
@@ -21,7 +21,7 @@ if (!$club_id) {
     echo "Club ID is not provided.";
     exit;
 } else if (!$application_id) {
-    echo "Registration ID is not provided.";
+    echo "Application ID is not provided.";
     exit;
 }
 
@@ -100,7 +100,7 @@ switch ($status) {
 // Display the status
 // echo "Status: " . $icon . " <strong>" . ucfirst($status) . "</strong><br>";
 // echo "Club ID: " . htmlspecialchars($club_id) . "<br>";
-// echo "Registration ID: " . htmlspecialchars($application_id) . "<br>";
+// echo "Application ID: " . htmlspecialchars($application_id) . "<br>";
 ?>
 
 <!DOCTYPE html>
