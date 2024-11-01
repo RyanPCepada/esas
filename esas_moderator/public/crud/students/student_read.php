@@ -124,7 +124,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
                                 
                                 // Append each club with its details
                                 $previousClubDetails .= "<p><strong class='text-muted'>{$clubName}</strong><br>";
-                                $previousClubDetails .= "<small>Membership Approved: {$dateDecided}</small><br>";
+                                $previousClubDetails .= "<small>Date Approved: {$dateDecided}</small><br>";
                                 $previousClubDetails .= "<small>Date Departed: {$dateModified}</small></p>";
                             }
                         }
