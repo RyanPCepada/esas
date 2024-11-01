@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // File upload logic for request letter
     $requestLetter = '';
     $letterTargetDir = "/esas/esas_student/request_letters/"; // Directory for uploaded letters
-    $allowedLetterTypes = ['pdf', 'doc', 'docx']; // Allowed types for letters
+    $allowedLetterTypes = ['pdf']; // Allowed types for letters
 
     if (isset($_FILES['requestLetter']) && $_FILES['requestLetter']['error'] == 0) {
         $letterName = basename($_FILES['requestLetter']['name']);
@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 die("Error uploading the request letter.");
             }
         } else {
-            die("Invalid request letter type or file too large. Only PDF, DOC, DOCX under 10MB allowed.");
+            die("Invalid request letter type or file too large. Only PDF under 10MB allowed.");
         }
     } else {
         die("Please upload a request letter.");
