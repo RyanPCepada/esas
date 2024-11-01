@@ -12,12 +12,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $moderator_id = trim($_POST['moderator_id']);
     $password = trim($_POST['password']);
     
-    // Function to check moderator login with plain text password
+    // Function to check moderator login with hashed password
     function checkModerator($pdo, $moderator_id, $password) {
-        $query = "SELECT * FROM tbl_moderators WHERE moderator_id = :moderator_id AND password = :password";
+        $query = "SELECT * FROM tbl_moderators WHERE moderator_id = :moderator_id";
         $stmt = $pdo->prepare($query);
-        $stmt->execute(['moderator_id' => $moderator_id, 'password' => $password]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->execute(['moderator_id' => $moderator_id]);
+        $moderator = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // If the moderator exists, verify the password
+        if ($moderator) {
+            return password_verify($password, $moderator['password']) ? $moderator : false;
+        }
+        return false; // Moderator not found
     }
 
     // Function to insert activity log
@@ -50,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+
 
 
 
