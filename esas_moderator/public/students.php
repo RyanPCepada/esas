@@ -343,28 +343,26 @@ try {
 
                                     // SQL query to fetch cumulative students with "active" status in the selected club
                                     $sql = "SELECT 
-                                        s.student_id,
-                                        s.firstName,
-                                        s.middleName,
-                                        s.lastName,
-                                        s.age,
-                                        s.gender,
-                                        s.instiEmail,
-                                        s.phoneNumber,
-                                        s.department,
-                                        s.course,
-                                        s.year,
-                                        s.profilePic,
-                                        s.dateAdded AS student_dateAdded,
-                                        r.application_id,
-                                        r.status AS status,  -- Include the status here
-                                        GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
-                                    FROM tbl_students s
-                                    LEFT JOIN tbl_application r ON s.student_id = r.student_id
-                                    LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
-                                    WHERE r.status IN ('active', 'inactive', 'departed', 'disapproved')";
-
-
+                                                s.student_id,
+                                                s.firstName,
+                                                s.middleName,
+                                                s.lastName,
+                                                s.age,
+                                                s.gender,
+                                                s.instiEmail,
+                                                s.phoneNumber,
+                                                s.department,
+                                                s.course,
+                                                s.year,
+                                                s.profilePic,
+                                                s.dateAdded AS student_dateAdded,
+                                                r.application_id,
+                                                r.status,  -- Include each status as it is
+                                                c.clubName
+                                            FROM tbl_students s
+                                            LEFT JOIN tbl_application r ON s.student_id = r.student_id
+                                            LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
+                                            WHERE r.status IN ('active', 'inactive', 'disapproved', 'departed')";
 
                                     // Check if club ID is set and add to the query
                                     if ($selectedClubId) {
@@ -376,7 +374,8 @@ try {
                                         $sql .= " AND MONTH(s.dateAdded) <= :selectedMonth";
                                     }
 
-                                    $sql .= " GROUP BY s.student_id ORDER BY s.student_id ASC";
+                                    $sql .= " ORDER BY s.student_id ASC, r.application_id ASC";
+
 
                                     // Prepare the SQL statement
                                     $stmt = $pdo->prepare($sql);
