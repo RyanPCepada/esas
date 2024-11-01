@@ -106,26 +106,26 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
 
                 // For previous clubs
                 $previousClubDetails = 'No previous club memberships'; // Default value for now
-                $clubSql = "SELECT DISTINCT c.clubName, c.coverPhoto, r.dateApplied, r.dateModified 
+                $clubSql = "SELECT DISTINCT c.clubName, c.coverPhoto, r.dateDecided, r.dateModified 
                             FROM tbl_application r 
                             JOIN tbl_clubs c ON r.club_id = c.club_id 
-                            WHERE r.student_id = :student_id AND r.status = 'active'"; // Add status condition
+                            WHERE r.student_id = :student_id AND r.status = 'departed'"; // Add status condition
 
                 if ($clubStmt = $pdo->prepare($clubSql)) {
                     $clubStmt->bindParam(":student_id", $student_id);
                     if ($clubStmt->execute()) {
                         $clubs = $clubStmt->fetchAll(PDO::FETCH_ASSOC);
                         if (!empty($clubs)) {
-                            $currentClubDetails = '';
+                            $previousClubDetails = '';  // Initialize previous club details here
                             foreach ($clubs as $club) {
                                 $clubName = htmlspecialchars($club['clubName']);
-                                $dateApplied = !empty($club['dateApplied']) ? date("F j, Y", strtotime($club['dateApplied'])) : 'None';
-                                $dateModified  = !empty($club['dateModified ']) ? date("F j, Y", strtotime($club['dateModified '])) : 'None';
+                                $dateDecided = !empty($club['dateDecided']) ? date("F j, Y", strtotime($club['dateDecided'])) : 'None';
+                                $dateModified = !empty($club['dateModified']) ? date("F j, Y", strtotime($club['dateModified'])) : 'None';
                                 
                                 // Append each club with its details
-                                $currentClubDetails .= "<p><strong class='text-muted'>{$clubName}</strong><br>";
-                                $currentClubDetails .= "<small>Date Applied: {$dateApplied}</small><br>";
-                                $currentClubDetails .= "<small>Date Departed: {$dateModified }</small></p>";
+                                $previousClubDetails .= "<p><strong class='text-muted'>{$clubName}</strong><br>";
+                                $previousClubDetails .= "<small>Membership Approved: {$dateDecided}</small><br>";
+                                $previousClubDetails .= "<small>Date Departed: {$dateModified}</small></p>";
                             }
                         }
                     }
@@ -187,7 +187,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))) {
     exit();
 }
 
-//COUNT THE CURRENT CLUB OF THE STUDENT
+// COUNT THE CURRENT CLUB OF THE STUDENT
 $currentClubCountQuery = "SELECT COUNT(application_id) AS current_club_count FROM tbl_application 
                    WHERE student_id = :student_id AND status = 'active'";
 
@@ -198,13 +198,9 @@ $stmt->execute();
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 $currentClubCount = $row['current_club_count'];
 
-if ($currentClubCount > 1) {
-    $currentClubLabel = "Current Clubs:";
-} else {
-    $currentClubLabel = "Current Club:";
-}
+$currentClubLabel = $currentClubCount > 1 ? "Current Clubs:" : "Current Club:";
 
-//COUNT THE PREVIOUS CLUB OF THE STUDENT
+// COUNT THE PREVIOUS CLUB OF THE STUDENT
 $previousClubCountQuery = "SELECT COUNT(application_id) AS previous_club_count FROM tbl_application 
                    WHERE student_id = :student_id AND status = 'departed'";
 
@@ -217,10 +213,10 @@ $previousClubCount = $row['previous_club_count'];
 
 if ($previousClubCount === 1) {
     $previousClubLabel = "Previous Club:";
-} else if ($previousClubCount > 1) {
+} elseif ($previousClubCount > 1) {
     $previousClubLabel = "Previous Clubs:";
 } else {
-    $previousClubLabel = $firstName . " " . $lastName . "has no previous clubs";
+    $previousClubLabel = "Previous Club:";
 }
 ?>
 
