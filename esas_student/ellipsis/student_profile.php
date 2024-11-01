@@ -187,9 +187,9 @@ $row = $stmt->fetch(PDO::FETCH_ASSOC);
 $clubCount = $row['club_count'];
 
 if ($clubCount > 1) {
-    $label = "Your Clubs:";
+    $currentClubLabel = "Your Clubs:";
 } else {
-    $label = "Your Club:";
+    $currentClubLabel = "Your Club:";
 }
 ?>
 
@@ -269,7 +269,7 @@ if ($clubCount > 1) {
                                     <p><strong>Birthday: </strong><?php echo $birthday; ?></p>
                                 </div>
                                 <div class="col-md-6"> 
-                                    <p><strong><?php echo $label; ?></strong><br><?php echo $clubDetails; ?></p>
+                                    <p><strong><?php echo $currentClubLabel; ?></strong><br><?php echo $clubDetails; ?></p>
                                 </div>
                             </div>
                         </div>
