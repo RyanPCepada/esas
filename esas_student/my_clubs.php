@@ -225,7 +225,7 @@ try {
             }
             .card-img-only {
                 width: 315px;
-                height: 153px !important;
+                height: 163px !important;
                 width: auto;
                 height: 145px;
                 margin-top: 10px;
