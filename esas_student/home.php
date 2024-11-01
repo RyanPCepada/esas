@@ -445,7 +445,7 @@ try {
 
                     <div id="dropdownMenu" class="dropdown mt-4">
                         <a href="../esas_student/profile.php?student_id=<?php echo $student_id; ?>">See Profile</a>
-                        <a href="../esas_student/application_details.php?club_id=<?php echo urlencode($club_id); ?>&application_id=<?php echo urlencode($application_id); ?>">Application Details</a>
+                        <a href="../esas_student/ellipsis/application_details.php?club_id=<?php echo urlencode($club_id); ?>&application_id=<?php echo urlencode($application_id); ?>">Application Details</a>
                         <a href="../esas_student/history.php?student_id=<?php echo $student_id; ?>">History</a>
                         <?php if ($hasDepartureRequest): ?>
                             <a href="../esas_student/crud/departure_requests/departure_request_read.php?club_id=<?php echo $_GET['club_id']; ?>">See Departure Request</a>
