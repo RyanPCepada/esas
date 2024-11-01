@@ -1,5 +1,5 @@
 <?php 
-require_once "../config.php"; // Database config file
+require_once "../../config.php"; // Database config file
 session_start();
 
 if (!isset($_SESSION['student_id'])) {
@@ -112,10 +112,10 @@ switch ($status) {
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
-    <script src="../assets/js/all.js" crossorigin="anonymous"></script>
-    <script src="../assets/js/jquery-3.6.0.js"></script>
-    <link href="../assets/css/styles.css" rel="stylesheet" />
-    <link href="../assets/img/nbsclogo.png" rel="icon">
+    <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
+    <script src="../../assets/js/jquery-3.6.0.js"></script>
+    <link href="../../assets/css/styles.css" rel="stylesheet" />
+    <link href="../../assets/img/nbsclogo.png" rel="icon">
     <style>
         body {
             background-color: #f4f4f9;
