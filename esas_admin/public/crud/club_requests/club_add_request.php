@@ -1,6 +1,16 @@
 <?php
 require_once "../../../../config.php";
 
+session_start();
+
+// Ensure the moderator ID is set in the session
+if (isset($_SESSION['admin_id'])) {
+    $adminId = $_SESSION['admin_id'];
+} else {
+    echo json_encode(['error' => 'Admin not logged in.']);
+    exit;
+}
+
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
@@ -208,6 +218,20 @@ $mission = isset($_GET['mission']) ? htmlspecialchars($_GET['mission']) : '';
 $vision = isset($_GET['vision']) ? htmlspecialchars($_GET['vision']) : '';
 
 
+$requestedByName = isset($_GET['requestedByName']) ? htmlspecialchars($_GET['requestedByName']) : '';
+
+// Insert into activity logs after updating the request status
+$activity = "You added " . $requestedByName . "'s club request to the clubs list";
+$logSql = "INSERT INTO tbl_activity_logs (activity, admin_id)
+VALUES (:activity, :admin_id)";
+
+if ($logStmt = $pdo->prepare($logSql)) {
+$logStmt->bindParam(":activity", $activity);
+$logStmt->bindParam(":admin_id", $adminId, PDO::PARAM_INT); 
+
+// Execute the log statement
+$logStmt->execute();
+}
 ?>
 
 
