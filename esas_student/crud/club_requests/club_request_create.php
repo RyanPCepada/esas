@@ -67,11 +67,8 @@
                         
                         <div class="form-group mb-3">
                             <label for="coverPhoto">Add a Cover Photo</label>
-                            <input type="file" name="coverPhoto" class="form-control" id="coverPhoto" accept="image/*" required onchange="previewImage(event)" style="border: none;">
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <img id="coverPhotoPreview" src="#" alt="Cover Photo Preview" style="display:none; width: 50%; object-fit: cover;" />
+                            <input type="file" name="coverPhoto" class="form-control" id="coverPhoto" accept="image/*" onchange="previewCoverPhoto(event)">
+                            <img id="coverPhotoPreview" src="#" alt="Cover Photo Preview" style="display:none; width: 100%; object-fit: cover;" />
                         </div>
 
                         <div class="form-group mb-3">
@@ -99,32 +96,43 @@
 
     <!-- Preview Image Function -->
     <script>
-        // Function to preview PDF icon
-        function previewFile(event) {
-            var file = event.target.files[0];
-            var fileIconPreview = document.getElementById('fileIconPreview');
-            var fileNamePreview = document.getElementById('fileNamePreview');
+    // Function to preview cover photo
+    function previewCoverPhoto(event) {
+        var reader = new FileReader();
+        reader.onload = function(){
+            var output = document.getElementById('coverPhotoPreview');
+            output.src = reader.result;
+            output.style.display = 'block'; // Show the image
+        }
+        reader.readAsDataURL(event.target.files[0]); // Read the file as a data URL
+    }
 
-            // Clear previous previews
-            fileIconPreview.style.display = 'none';
-            fileNamePreview.style.display = 'none';
+    // Function to preview PDF icon
+    function previewFile(event) {
+        var file = event.target.files[0];
+        var fileIconPreview = document.getElementById('fileIconPreview');
+        var fileNamePreview = document.getElementById('fileNamePreview');
 
-            // Check if a file is selected
-            if (file) {
-                // Detect file type
-                if (file.type === "application/pdf") {
-                    // Show PDF icon
-                    fileIconPreview.src = "/esas/esas_student/icons/ICON_PDF.png"; // Path to your PDF icon
-                    fileIconPreview.style.display = 'block';
-                } else {
-                    // For invalid file types, show the filename and notify the user
-                    fileNamePreview.textContent = "Invalid file type. Please select a PDF file.";
-                    fileNamePreview.style.display = 'block';
-                }
+        // Clear previous previews
+        fileIconPreview.style.display = 'none';
+        fileNamePreview.style.display = 'none';
+
+        // Check if a file is selected
+        if (file) {
+            // Detect file type
+            if (file.type === "application/pdf") {
+                // Show PDF icon
+                fileIconPreview.src = "/esas/esas_student/icons/ICON_PDF.png"; // Path to your PDF icon
+                fileIconPreview.style.display = 'block';
+            } else {
+                // For invalid file types, show the filename and notify the user
+                fileNamePreview.textContent = "Invalid file type. Please select a PDF file.";
+                fileNamePreview.style.display = 'block';
             }
         }
-    </script>
-    
+    }
+</script>
+
     <!-- Bootstrap JS and Dependencies -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
