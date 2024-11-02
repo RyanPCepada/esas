@@ -643,7 +643,9 @@ $encodedClubName = addslashes($clubName);
                     </div>
                 <?php elseif ($status === 'pending'): ?>
                     <div class="alert alert-warning custom-alert" role="alert">
-                        <p class="lead mb-0">You have already applied to this club. Please wait for the Moderator's approval.</p>
+                        <p class="lead mb-0">You have already applied to this club. Please wait for the Moderator's approval.
+                            <a href="/esas/esas_student/home.php?club_id=<?php echo $application_id; ?>"> See Application Details</a>
+                        </p>
                     </div>
                 <?php elseif ($disapprovedCount >= 3): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
