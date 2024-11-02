@@ -7,6 +7,7 @@ date_default_timezone_set('Asia/Manila');
 
 // Fetch the current student's ID from the session
 $student_id = $_SESSION['student_id'];
+$fromPendingPage = 'yes';
 
 try {
     // Use the existing PDO instance from config.php
@@ -428,7 +429,7 @@ try {
                                 <div class="col-md-4 card-container"> 
                                     <span class="club-notification-badge" id="club-notification-${club.club_id}" style="display:none;"></span>
                                     <div class="card card-img-only">
-                                        <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}&application_id=${club.application_id}` : `/esas/esas_student/ellipsis/application_details.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}&status=${tab}&application_id=${club.application_id}`}" 
+                                        <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}&application_id=${club.application_id}` : `/esas/esas_student/ellipsis/application_details.php?application_id=${club.application_id}&club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}&from_pending_page=${encodeURIComponent(club.fromPendingPage)}&status=${tab}`}" 
                                         onclick="markClubNotificationsAsRead(${club.club_id})">
                                             <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
                                             <div class="overlay-text">
