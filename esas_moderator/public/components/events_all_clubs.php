@@ -23,31 +23,27 @@
             margin: 0 auto;
             padding: 15px;
         }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
         h3 {
             color: #343a40; /* Darker color for headings */
             font-size: 24px; /* Larger font size */
-            text-align: center; /* Centered heading */
+            text-align: start; /* Centered heading */
         }
         .event-item {
             border: 1px solid #e0e0e0; /* Light border */
-            border-radius: 4px; /* Slightly rounded corners */
+            border-radius: 10px; /* Slightly rounded corners */
             padding: 15px;
             margin-bottom: 15px; /* Spacing between events */
             background-color: #fafafa; /* Light background for each event */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        h2 {
-            font-size: 24px; /* Size for event title */
+        .event-name {
+            font-size: 24px; Size for event title
             color: #007bff; /* Bootstrap primary color for titles */
         }
         p {
             font-size: 16px; /* Font size for paragraph text */
             color: #333; /* Darker color for better readability */
+            margin: 0px;
         }
         strong {
             color: #007bff; /* Bootstrap primary color for strong text */
@@ -58,7 +54,7 @@
 
 <div class="wrapper">
     
-<h3 class="text-muted mt-5 mb-3">Events from All Clubs</h3>
+<h2 class="text-muted mt-5 ml-2 mb-4">Upcoming Events From Other Clubs</h2>
 <div class="container-fluid container" id="events-container"></div>
 
 <script>
@@ -86,9 +82,9 @@
                     const eventElement = document.createElement('div');
                     eventElement.className = 'event-item';
                     eventElement.innerHTML = `
-                        <h2 class="text-dark">${formatDate(event.date)}</h2>
+                        <h2 class="event-name text-dark">${formatDate(event.date)}</h2>
+                        <h3><strong class="text-dark">${event.clubName}</strong></h3>
                         <p><strong>Event:</strong> ${event.title}</p>
-                        <p><strong>Club:</strong> ${event.clubName}</p>
                         <p><strong>Time:</strong> ${formatTime(event.timeStarts)} - ${formatTime(event.timeEnds)}</p>
                         <p><strong>Location:</strong> ${event.location}</p>
                     `;
