@@ -380,11 +380,11 @@ $encodedClubName = addslashes($clubName);
 
 
 
-        .club-register-now .alert {
+        .club-apply-now .alert {
             padding: 10px 20px;
             max-width: 70%;
         }
-        .club-register-now p {
+        .club-apply-now p {
             font-size: 16px;
         }
 
@@ -393,7 +393,7 @@ $encodedClubName = addslashes($clubName);
             .club-info-coverphoto {
                 margin-top: 0px;
             }
-            .club-register-now .alert {
+            .club-apply-now .alert {
                 max-width: 90%;
             }
             .numbers-section {
@@ -612,7 +612,7 @@ $encodedClubName = addslashes($clubName);
 
 
 
-            <div class="club-register-now mt-5 text-center align-items-center justify-content-center">
+            <div class="club-apply-now mt-5 text-center align-items-center justify-content-center">
                 <?php if ($availableSlots <= 0 && $status === 'active'): ?>
                     <div class="alert alert-info custom-alert" role="alert">
                         <p class="lead mb-0">You are already a member of this club.
@@ -631,15 +631,15 @@ $encodedClubName = addslashes($clubName);
                     </div>
                 <?php elseif ($status === 'pending' && $clubsCount >= 2): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You are no longer qualified for this club. You can only register for up to 2 clubs.</p>
+                        <p class="lead mb-0">You are no longer qualified for this club. You can only apply for up to 2 clubs.</p>
                     </div>
                 <?php elseif ($clubsCount >= 2 && $disapprovedCount >= 3): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You are already registered in 2 clubs and reached the maximum number of applications allowed for this club.</p>
+                        <p class="lead mb-0">You are already applyed in 2 clubs and reached the maximum number of applications allowed for this club.</p>
                     </div>
                 <?php elseif ($clubsCount >= 2): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You can only register for up to 2 clubs.</p>
+                        <p class="lead mb-0">You can only apply for up to 2 clubs.</p>
                     </div>
                 <?php elseif ($status === 'pending'): ?>
                     <div class="alert alert-warning custom-alert" role="alert">
@@ -653,8 +653,8 @@ $encodedClubName = addslashes($clubName);
                     </div>
                 <?php else: ?>
                     <h4 class="mb-3">Join Us Now!</h4>
-                    <p class="lead">If you want to be a part of us, register now and become a member of <?php echo $clubName; ?>.</p>
-                    <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>)">Register Now</button>
+                    <p class="lead">If you want to be a part of us, apply now and become a member of <?php echo $clubName; ?>.</p>
+                    <button class="btn btn-primary btn-lg mt-3" onclick="applyNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>)">Apply Now</button>
                 <?php endif; ?>
                 <div class="mt-3">
                     <a href="javascript:history.go(-1)" class="btn btn-secondary mb-5">Go Back</a>
@@ -664,7 +664,7 @@ $encodedClubName = addslashes($clubName);
 
 
             <!-- REGISTRATION ID IS THE PARAMETER
-            <div class="club-register-now mt-4 text-center align-items-center justify-content-center">
+            <div class="club-apply-now mt-4 text-center align-items-center justify-content-center">
                 <?php if ($status === 'active'): ?>
                     <div class="alert alert-info custom-alert" role="alert">
                         <p class="lead mb-0">You are already a member of this club.
@@ -673,15 +673,15 @@ $encodedClubName = addslashes($clubName);
                     </div>
                 <?php elseif ($status === 'pending' && $clubsCount >= 2): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You are no longer qualified for this club. You can only register for up to 2 clubs.</p>
+                        <p class="lead mb-0">You are no longer qualified for this club. You can only apply for up to 2 clubs.</p>
                     </div>
                 <?php elseif ($clubsCount >= 2 && $disapprovedCount >= 3): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You are already registered in 2 clubs and reached the maximum number of applications allowed for this club.</p>
+                        <p class="lead mb-0">You are already applyed in 2 clubs and reached the maximum number of applications allowed for this club.</p>
                     </div>
                 <?php elseif ($clubsCount >= 2): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You can only register for up to 2 clubs.</p>
+                        <p class="lead mb-0">You can only apply for up to 2 clubs.</p>
                     </div>
                 <?php elseif ($status === 'pending'): ?>
                     <div class="alert alert-warning custom-alert" role="alert">
@@ -693,8 +693,8 @@ $encodedClubName = addslashes($clubName);
                     </div>
                 <?php else: ?>
                     <h4 class="mb-3">Join Us Now!</h4>
-                    <p class="lead">If you want to be a part of us, register now and become a member of <?php echo $clubName; ?>.</p>
-                    <button class="btn btn-primary btn-lg mt-3" onclick="registerNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>, <?php echo $application_id; ?>)">Register Now</button>
+                    <p class="lead">If you want to be a part of us, apply now and become a member of <?php echo $clubName; ?>.</p>
+                    <button class="btn btn-primary btn-lg mt-3" onclick="applyNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>, <?php echo $application_id; ?>)">Apply Now</button>
                 <?php endif; ?>
                 <div class="mt-3">
                     <a href="javascript:history.go(-1)" class="btn btn-secondary">Go Back</a>
@@ -710,13 +710,13 @@ $encodedClubName = addslashes($clubName);
     <script src="../assets/js/global_script.js"></script>
 
     <script>
-        function registerNow(clubId, clubName, status, clubsCount, disapprovedCount) {
+        function applyNow(clubId, clubName, status, clubsCount, disapprovedCount) {
             if (status === 'active') {
                 alert("You are already a member of this club.");
             } else if (status === 'pending') {
                 alert("You already applied to this club. Please wait for the Moderator's approval.");
             } else if (clubsCount >= 2) {
-                alert("You can only register for up to 2 clubs.");
+                alert("You can only apply for up to 2 clubs.");
             } else if (disapprovedCount >= 3) {
                 alert("Sorry. You have reached the maximum limit of requests for this club.");
             } else {
