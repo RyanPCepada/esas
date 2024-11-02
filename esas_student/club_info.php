@@ -626,7 +626,7 @@ $encodedClubName = addslashes($clubName);
                 <?php elseif ($status === 'active'): ?>
                     <div class="alert alert-info custom-alert" role="alert">
                         <p class="lead mb-0">You are already a member of this club.
-                            <a href="/esas/esas_student/home.php?club_id=<?php echo $club_id; ?>"> Go to Home</a>
+                            <br><a href="/esas/esas_student/home.php?club_id=<?php echo $club_id; ?>"> Go to Home</a>
                         </p>
                     </div>
                 <?php elseif ($status === 'pending' && $clubsCount >= 2): ?>
