@@ -17,6 +17,7 @@ switch ($method) {
         if (isset($_SESSION['student_id'])) {
             $student_id = $_SESSION['student_id'];
 
+            $fromPendingPage = 'yes';
             // Query to fetch the clubs associated with the student, including application_id
             $stmt = $pdo->prepare('
                 SELECT c.club_id, c.clubName, c.description, c.coverPhoto, r.application_id, r.dateApplied AS dateAdded, r.dateModified,
@@ -34,6 +35,7 @@ switch ($method) {
 
             // Fetch member counts and format moderators for each club
             foreach ($result as &$club) {
+                $club['fromPendingPage'] = $fromPendingPage; // Add this line
                 $club['dateModified'] = (new DateTime($club['dateModified']))->format('F j, Y'); // Format the date
                 $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_application WHERE club_id = ?');
                 $stmt_count->execute([$club['club_id']]);
