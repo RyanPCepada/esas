@@ -49,58 +49,58 @@
             color: #007bff; /* Bootstrap primary color for strong text */
         }
     </style>
-</head>
-<body>
-
+</head><body>
 <div class="wrapper">
-    
-<h2 class="text-muted mt-5 ml-2 mb-4">Upcoming Events From Other Clubs</h2>
-<div class="container-fluid container" id="events-container"></div>
+    <h2 class="text-muted mt-5 ml-2 mb-4">Upcoming Events From Other Clubs</h2>
+    <div class="container-fluid container" id="events-container"></div>
 
-<script>
-    // Function to format the date to "Month Day, Year"
-    function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('en-US', options);
-    }
+    <script>
+        // Function to format the date to "Month Day, Year"
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('en-US', options);
+        }
 
-    // Function to format time to "h:mm AM/PM"
-    function formatTime(timeString) {
-        const date = new Date(`1970-01-01T${timeString}`);
-        return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-    }
+        // Function to format time to "h:mm AM/PM"
+        function formatTime(timeString) {
+            const date = new Date(`1970-01-01T${timeString}`);
+            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+        }
 
-    // Fetch events from the API
-    fetch('/esas/esas_moderator/apis/events-all-clubs-api.php') // Ensure the path is correct
-        .then(response => response.json())
-        .then(data => {
-            const eventsContainer = document.getElementById('events-container');
-            eventsContainer.innerHTML = '';
+        // Get the club_id from the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentClubId = urlParams.get('club_id');
 
-            if (data.length > 0) {
-                data.forEach(event => {
-                    const eventElement = document.createElement('div');
-                    eventElement.className = 'event-item';
-                    eventElement.innerHTML = `
-                        <h2 class="event-name text-dark">${formatDate(event.date)}</h2>
-                        <h3><strong class="text-dark">${event.clubName}</strong></h3>
-                        <p><strong>Event:</strong> ${event.title}</p>
-                        <p><strong>Time:</strong> ${formatTime(event.timeStarts)} - ${formatTime(event.timeEnds)}</p>
-                        <p><strong>Location:</strong> ${event.location}</p>
-                    `;
-                    eventsContainer.appendChild(eventElement);
-                });
-            } else {
-                eventsContainer.innerHTML = '<p>No events available.</p>';
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching events:', error);
-            document.getElementById('events-container').innerHTML = '<p>Error fetching events.</p>';
-        });
-</script>
+        // Fetch events from the API, including the club_id as a query parameter
+        fetch(`/esas/esas_moderator/apis/events-all-clubs-api.php?club_id=${currentClubId}`)
+            .then(response => response.json())
+            .then(data => {
+                const eventsContainer = document.getElementById('events-container');
+                eventsContainer.innerHTML = '';
 
+                if (data.length > 0) {
+                    data.forEach(event => {
+                        const eventElement = document.createElement('div');
+                        eventElement.className = 'event-item';
+                        eventElement.innerHTML = `
+                            <h2 class="event-name text-dark">${formatDate(event.date)}</h2>
+                            <h3><strong class="text-dark">${event.clubName}</strong></h3>
+                            <p><strong>Event:</strong> ${event.title}</p>
+                            <p><strong>Time:</strong> ${formatTime(event.timeStarts)} - ${formatTime(event.timeEnds)}</p>
+                            <p><strong>Location:</strong> ${event.location}</p>
+                        `;
+                        eventsContainer.appendChild(eventElement);
+                    });
+                } else {
+                    eventsContainer.innerHTML = '<p>No events available.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching events:', error);
+                document.getElementById('events-container').innerHTML = '<p>Error fetching events.</p>';
+            });
+    </script>
 </div>
-
 </body>
+
 </html>
