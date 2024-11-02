@@ -98,11 +98,11 @@ if (empty($status)) {
             <div class="row">
                 <div class="col-md-12">
                     <?php if (!empty($clubName)): ?>
-                        <h2><?php echo htmlspecialchars($clubName); ?></h2>
+                        <h2><strong><?php echo htmlspecialchars($clubName); ?></strong></h2>
                         <!-- <h2><?php echo htmlspecialchars($club_id); ?></h2> -->
-                        <h4>Student Registration</h4>
+                        <h4 class="text-muted">Student Application</h4>
                     <?php endif; ?>
-                    <p class="mb-5">Please fill this form and submit to register.</p>
+                    <p class="mb-5">Please fill this form and submit to apply.</p>
                     <form action="../esas_student/actions/application_action.php" method="post">
                         <div class="form-group">
                             <label>Why do you want to join this club?</label>
