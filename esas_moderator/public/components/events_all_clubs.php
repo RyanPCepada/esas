@@ -51,7 +51,7 @@
     </style>
 </head><body>
 <div class="wrapper">
-    <h2 class="text-muted mt-5 ml-2 mb-4">Upcoming Events From Other Clubs</h2>
+    <h2 class="text-muted mt-5 ml-2 mb-4">Upcoming events from other clubs</h2>
     <div class="container-fluid container" id="events-container"></div>
 
     <script>
