@@ -97,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $logStmt->execute(); // Execute the log insertion
 
                 // Records created successfully. Redirect to landing page
-                echo "<script>alert('Registration successful!');</script>";
+                echo "<script>alert('Application submitted successfully!');</script>";
                 echo "<script>window.location.href = '/esas/esas_student/all_clubs.php';</script>";
                 exit();
             } else {
