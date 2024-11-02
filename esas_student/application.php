@@ -38,7 +38,7 @@ if (empty($status)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Student Registration</title>
+    <title>eSAS - Student Application</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
@@ -139,7 +139,7 @@ if (empty($status)) {
                     ?php if (!empty($clubName)): ?>
                         <h2>?php echo htmlspecialchars($clubName); ?></h2>
                         <!-- <h2>?php echo htmlspecialchars($club_id); ?></h2> --
-                        <h4>Student Registration</h4>
+                        <h4>Student Application</h4>
                     ?php endif; ?>
                     <p class="mb-5">Please fill this form and submit to register.</p>
                     <form action="../esas_student/actions/application_action.php" method="post">

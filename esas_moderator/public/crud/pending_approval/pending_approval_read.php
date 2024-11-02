@@ -38,7 +38,7 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
     // Log student, club, and application IDs
     echo "<script>console.log('Student ID: " . $param_student_id . "');</script>";
     echo "<script>console.log('Club ID: " . $param_club_id . "');</script>";
-    echo "<script>console.log('Registration ID: " . $param_application_id . "');</script>";
+    echo "<script>console.log('Application ID: " . $param_application_id . "');</script>";
 
     $application_id = trim($_GET["application_id"]);
     $student_id = trim($_GET["student_id"]);
@@ -164,7 +164,7 @@ function countActiveMemberships($pdo, $student_id) {
 }
 
 // Function to update pending applications status
-function updatePendingRegistrations($pdo, $student_id) {
+function updatePendingApplications($pdo, $student_id) {
     echo "<script>console.log('Updating pending applications for student ID: " . $student_id . "');</script>";
     $updatePendingSql = "UPDATE tbl_application SET status = 'maxed' WHERE student_id = :student_id AND status = 'pending'";
     $stmt = $pdo->prepare($updatePendingSql);
@@ -198,7 +198,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     // Debug global variables
     echo "<script>console.log('Student ID: " . json_encode($student_id) . "');</script>";
     echo "<script>console.log('Club ID: " . json_encode($club_id) . "');</script>";
-    echo "<script>console.log('Registration ID: " . json_encode($application_id) . "');</script>";
+    echo "<script>console.log('Application ID: " . json_encode($application_id) . "');</script>";
 
     // Update applications status
     echo "<script>console.log('Updating applications status...');</script>";
@@ -216,7 +216,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
             // If the student already has 2 active memberships, update the status of other pending applications
             if ($clubsCount >= 2) {
                 echo "<script>console.log('Student has 2 or more active memberships. Updating pending applications...');</script>";
-                updatePendingRegistrations($pdo, $student_id);
+                updatePendingApplications($pdo, $student_id);
             }
 
          

@@ -173,22 +173,22 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
             // Check if the request was approved
             if ($_POST["action"] === 'approve') {
                 // Prepare to update the application table
-                $updateRegistrationSql = "UPDATE tbl_application 
+                $updateApplicationSql = "UPDATE tbl_application 
                            SET status = :new_status, dateDecided = NOW() 
                            WHERE student_id = :student_id 
                            AND status = 'active' 
                            AND club_id = :club_id"; 
 
-                if ($updateRegistrationStmt = $pdo->prepare($updateRegistrationSql)) {
+                if ($updateApplicationStmt = $pdo->prepare($updateApplicationSql)) {
                     $newStatusValue = 'departed'; 
 
                     // Bind parameters
-                    $updateRegistrationStmt->bindParam(":new_status", $newStatusValue);
-                    $updateRegistrationStmt->bindParam(":student_id", $param_student_id, PDO::PARAM_INT);
-                    $updateRegistrationStmt->bindParam(":club_id", $param_club_id, PDO::PARAM_INT);
+                    $updateApplicationStmt->bindParam(":new_status", $newStatusValue);
+                    $updateApplicationStmt->bindParam(":student_id", $param_student_id, PDO::PARAM_INT);
+                    $updateApplicationStmt->bindParam(":club_id", $param_club_id, PDO::PARAM_INT);
 
                     // Execute the update statement for application
-                    if ($updateRegistrationStmt->execute()) {
+                    if ($updateApplicationStmt->execute()) {
                         $logActivitySql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) 
                         VALUES (:activity, NOW(), :moderator_id)"; 
 

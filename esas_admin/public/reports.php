@@ -197,7 +197,7 @@ try {
                 <option value="moderators_and_clubs_overview">Overview of Moderators and Clubs</option>
                 <option value="students_and_clubs_overview">Overview of Students and Clubs</option>
                 <option value="student_club_requests">Student Club Requests</option>
-                <option value="student_application_status">Student Registration Status</option>
+                <option value="student_application_status">Student Application Status</option>
             </select>
         </div>
 
@@ -319,7 +319,7 @@ function generateTitleAndDescription(reportType) {
             reportDescription = "This report lists the clubs proposed by students, including their goals, objectives, and activities they plan to undertake.";
             break;
         case 'student_application_status':
-            reportTitle = "Student Registration Status";
+            reportTitle = "Student Application Status";
             reportDescription = "This report shows the current application status of students for different clubs, including whether they have been approved, disapproved, or are still pending.";
             break;
         default:

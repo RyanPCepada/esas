@@ -454,8 +454,8 @@ try {
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 
                                 <div class="mt-3 mb-3 d-flex justify-content-between align-items-center">
-                                    <!-- <h4 class="text-muted mb-0">Registrations Overview</h4> -->
-                                    <h4 class="text-muted mb-0">Registration Status Summary</h4>
+                                    <!-- <h4 class="text-muted mb-0">Applications Overview</h4> -->
+                                    <h4 class="text-muted mb-0">Application Status Summary</h4>
                                 </div>
 
                                 <!-- Card for STUDENT TOTAL REGISTRATIONS -->
@@ -485,7 +485,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-file-signature mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Registration</p>
+                                        <p>Total Application</p>
                                     </div>
                                 </div>
                                 
@@ -589,7 +589,7 @@ try {
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 
                                 <div class="mt-3 mb-3 d-flex justify-content-between align-items-center">
-                                    <!-- <h4 class="text-muted mb-0">Registrations Overview</h4> -->
+                                    <!-- <h4 class="text-muted mb-0">Applications Overview</h4> -->
                                     <h4 class="text-muted mb-0">Club Requests Overview</h4>
                                 </div>
 

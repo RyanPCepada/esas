@@ -378,7 +378,7 @@ try {
                                     <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
                                         <thead>
                                             <tr>
-                                                <!-- <th>Registration ID</th> New column for Registration ID -->
+                                                <!-- <th>Application ID</th> New column for Application ID -->
                                                 <th>Profile</th>
                                                 <th>Student ID</th>
                                                 <th>Full Name</th>
@@ -402,7 +402,7 @@ try {
 
                                         echo '
                                         <tr class="student-row">
-                                            <!-- <td>' . $applicationId . '</td> Display Registration ID -->
+                                            <!-- <td>' . $applicationId . '</td> Display Application ID -->
                                             <td class="text-center p-1">
                                                 <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
                                                     alt="' . $fullName . ' profile picture" 

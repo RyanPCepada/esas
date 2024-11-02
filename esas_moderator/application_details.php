@@ -6,7 +6,7 @@ if (!isset($_SESSION['moderator_id'])) {
     echo "Moderator ID is not set in the session.";
     exit;
 }
-//Registration
+//Application
 $moderator_id = $_SESSION['moderator_id']; // Get student ID from session
 
 // Set the default timezone to Asia/Manila

@@ -114,7 +114,7 @@ try {
     die("Database error: " . $e->getMessage());
 }
 // echo "Club ID: " . htmlspecialchars($club_id) . "<br>";
-// echo "Registration ID: " . htmlspecialchars($application_id) . "<br>";
+// echo "Application ID: " . htmlspecialchars($application_id) . "<br>";
 ?>
 
 
