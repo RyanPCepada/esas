@@ -136,12 +136,13 @@ switch ($status) {
     </style>
 </head>
 <body>
-    
-    <div class="wrapper">
+<div class="wrapper">
             <h2 class="mt-5">Application Details</h2>
             <div class="justify-content-between">
                 <p class="text-muted">Review your application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
                 <p>Status: <?php echo $icon; ?> <strong><?php echo ucfirst($status); ?></strong></p>
+                <!-- <p>Club ID: <?php echo $club_id; ?></p>
+                <p>Application ID: <?php echo $application_id; ?></p> -->
             </div>
             <div class="container-fluid container mb-5 auto-scroll">
                 <div class="row">
@@ -166,9 +167,30 @@ switch ($status) {
                             <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
                         <?php endif; ?>
 
+                        <div class="text-end">
+                        <!-- Cancel Application button (only if status is 'pending') -->
+                        <?php if ($status === 'pending'): ?>
+                            <button class="btn btn-danger mt-3" onclick="showConfirm(<?php echo $application_id; ?>, <?php echo $club_id; ?>)">
+                                Cancel Application
+                            </button>
+                        <?php endif; ?>
+                        </div>
+
                     </div>
                 </div>
             </div>
     </div>
+
+    <script>
+        function showConfirm(applicationId, clubId) {
+            const userConfirmed = confirm("Are you sure you want to cancel your application?");
+            if (userConfirmed) {
+                // Redirect to the cancellation action with application_id and club_id
+                window.location.href = "/esas/esas_student/actions/cancel_application_action.php?application_id=" + applicationId + "&club_id=" + clubId;
+            }
+        }
+    </script>
+
+
 </body>
 </html>
