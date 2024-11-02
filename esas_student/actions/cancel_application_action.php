@@ -21,9 +21,11 @@ $student_id = $_SESSION['student_id'];
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['application_id']) && isset($_POST['club_id'])) {
     $application_id = $_POST['application_id'];
     $club_id = $_POST['club_id'];
+    $fromPendingPage = $_POST['fromPendingPage'] ?? '';
 } elseif ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['application_id']) && isset($_GET['club_id'])) {
     $application_id = $_GET['application_id'];
     $club_id = $_GET['club_id'];
+    $fromPendingPage = $_GET['fromPendingPage'] ?? '';
 } else {
     echo "<script>alert('Invalid request.'); window.history.back();</script>";
     exit();
@@ -42,7 +44,18 @@ try {
 
     // Execute the statement
     if ($stmt->execute()) {
-        echo "<script>alert('Application has been cancelled successfully.'); window.location.href = '/esas/esas_student/club_info.php?club_id=" . urlencode($club_id) . "';</script>";
+        // Determine the redirect URL based on fromPendingPage
+        if (!empty($fromPendingPage) && $fromPendingPage === 'yes') {
+            echo "<script>
+                alert('Application has been cancelled successfully.');
+                window.location.href = '/esas/esas_student/my_clubs.php?club_id=" . urlencode($club_id) . "&application_id=" . urlencode($application_id) . "';
+            </script>";
+        } else {
+            echo "<script>
+                alert('Application has been cancelled successfully.');
+                window.location.href = '/esas/esas_student/club_info.php?club_id=" . urlencode($club_id) . "&application_id=" . urlencode($application_id) . "';
+            </script>";
+        }
     } else {
         echo "<script>alert('Failed to cancel application. Please try again.'); window.history.back();</script>";
     }
@@ -52,4 +65,5 @@ try {
 
 // Close the database connection
 $pdo = null; // Optional: closing the connection is handled automatically at the end of the script
+
 ?>
