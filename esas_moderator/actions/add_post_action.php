@@ -100,7 +100,7 @@ if (isset($_POST['club_id'])) {
                             // Content
                             $mail->isHTML(true);                                  
                             $mail->Subject = "New Announcement in {$clubName}";
-                            $mail->Body    = "Dear $fullName,<br><br>A new post has been created in <b>'$clubName'</b>.<br><br>For more details, please check your club's home page.";
+                            $mail->Body    = "Dear $fullName,<br><br>A new post has been created in <b>$clubName</b>.<br><br>For more details, please check your club's home page.";
 
                             // Send the email
                             $mail->send();

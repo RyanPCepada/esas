@@ -162,7 +162,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                 // Content
                 $mail->isHTML(true);                                     
                 $mail->Subject = "Departure Request " . ucfirst($newStatus);
-                $mail->Body    = "Dear $fullName,<br><br>Your departure request for the club <b>'$clubName'<b> has been <b>$newStatus<b>.<br><br>Thank you for being part of the <b>$clubName</b> family!";
+                $mail->Body    = "Dear $fullName,<br><br>Your departure request for the club <b>$clubName</b> has been <b>$newStatus</b>.<br><br>Thank you for being part of the <b>$clubName</b> family!";
 
                 // Send the email
                 $mail->send();
