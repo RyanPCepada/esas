@@ -148,17 +148,17 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
      
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
-            $mail->setFrom('sportsnbscesas@gmail.com', 'Club Request Notification');
+            $mail->setFrom('sportsnbscesas@gmail.com', 'NBSC Club Organizations');
                        
 
             // Send instiEmail to the requester
             try {
                 $mail->addAddress($studentEmail); 
                 $mail->isHTML(true);
-                $mail->Subject = "Your Club Request Has Been " . ucfirst($newStatus);
+                $mail->Subject = "Club Request " . ucfirst($newStatus);
                 $mail->Body = "
                     <p>Dear Student,</p>
-                    <p>Your request to form a club has been <strong>" . $newStatus . "</strong>.</p>
+                    <p>Your request for a new club has been <strong>" . $newStatus . "</strong>.</p>
                     <p>If you have any questions, feel free to contact us.</p>
                     <p>Thank you!</p>";
 
