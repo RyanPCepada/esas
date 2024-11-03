@@ -1,6 +1,10 @@
 <?php
 session_start();
 require_once "../../config.php";
+require __DIR__ . '/../vendor/autoload.php'; 
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -55,6 +59,38 @@ if (isset($_POST['club_id'])) {
                 // Check if any students were found
                 if (!empty($students)) {
                     foreach ($students as $student) {
+                        // Get the student's email and full name
+                        $final_email = $student['instiEmail'];
+                        $fullName = "{$student['firstName']} {$student['middleName']} {$student['lastName']}";
+
+                        // SMTP Email sending logic
+                        $mail = new PHPMailer(true); // Create a new PHPMailer instance
+                        try {
+                            // Server settings
+                            $mail->isSMTP();                                        // Send using SMTP
+                            $mail->Host       = 'smtp.gmail.com';                  // Set the SMTP server to send through
+                            $mail->SMTPAuth   = true;                              // Enable SMTP authentication
+                            $mail->Username   = 'sportsnbscesas@gmail.com';         // SMTP username
+                            $mail->Password   = 'wubj bmsj ckmj nope';             // SMTP password
+                            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;    // Enable TLS encryption
+                            $mail->Port       = 587;                               // TCP port to connect to
+
+                            // Recipients
+                            $mail->setFrom('sportsnbscesas@gmail.com', 'NBSC Club Organizations');
+                            $mail->addAddress($final_email, $fullName);           // Add a recipient
+
+                            // Content
+                            $mail->isHTML(true);                                  
+                            $mail->Subject = "New Announcement in {$clubName}";
+                            $mail->Body    = "Dear $fullName,<br><br>A new post has been made in the club <b>'$clubName'</b>.<br><br>Thank you for being part of the <b>$clubName</b> family!";
+
+                            // Send the email
+                            $mail->send();
+                        } catch (Exception $e) {
+                            // Log or handle the error
+                            error_log("Message could not be sent to {$fullName}. Mailer Error: {$mail->ErrorInfo}");
+                        }
+
                         // Insert notification for each student
                         $sql = "INSERT INTO tbl_notifications (notification, student_id, club_id, post_id, is_read, dateAdded)
                                 VALUES ('Posted an announcement', :student_id, :club_id, :post_id, 0, NOW())";
@@ -65,7 +101,7 @@ if (isset($_POST['club_id'])) {
                         $stmt->execute();
                     }
                 }
-
+                
                 // Log the post creation activity in tbl_activity_logs
                 $activity = "You created a post in the club with ID {$club_id}";
                 $sql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
