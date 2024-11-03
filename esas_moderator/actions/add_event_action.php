@@ -1,7 +1,7 @@
 <?php
 // Include config file
 require_once "../../config.php";
-require __DIR__ . '/../../../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -21,9 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $club_id = $_POST['club_id'];
     $moderator_id = $_POST['moderator_id'];
 
-    // Debug log: initial data received
-    echo "<script>console.log('Form data received:', " . json_encode($_POST) . ");</script>";
-
     // Get current date and time for dateAdded and dateModified
     $currentDateTime = date('Y-m-d H:i:s');
 
@@ -33,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     try {
         $pdo->beginTransaction();
-        echo "<script>console.log('Starting transaction');</script>";
 
         // Insert event into tbl_events
         $stmt = $pdo->prepare($sql);
@@ -50,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':club_id' => $club_id,
             ':moderator_id' => $moderator_id
         ]);
-        echo "<script>console.log('Event inserted successfully');</script>";
 
         // Get the club name
         $club_sql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
@@ -58,7 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $club_stmt->execute([':club_id' => $club_id]);
         $club = $club_stmt->fetch(PDO::FETCH_ASSOC);
         $clubName = $club['clubName'];
-        echo "<script>console.log('Retrieved club name: " . addslashes($clubName) . "');</script>";
 
         // Insert into tbl_activity_logs without club_id
         $activity = "You added an event for " . $clubName;
@@ -70,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':dateAdded' => $currentDateTime,
             ':moderator_id' => $moderator_id
         ]);
-        echo "<script>console.log('Activity log added');</script>";
 
         // Notify all active students registered in the club
         $student_sql = "SELECT tbl_students.student_id, tbl_students.instiEmail, 
@@ -124,7 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Insert notification for each student
             $notification_sql = "INSERT INTO tbl_notifications (notification, student_id, club_id, event_id, is_read, dateAdded)
-                                VALUES ('New event: {$title}', :student_id, :club_id, LAST_INSERT_ID(), 0, NOW())";
+                                VALUES ('Posted an event', :student_id, :club_id, LAST_INSERT_ID(), 0, NOW())";
+                                // VALUES ('Posted an event: {$title}', :student_id, :club_id, LAST_INSERT_ID(), 0, NOW())";
             $notification_stmt = $pdo->prepare($notification_sql);
             $notification_stmt->execute([
                 ':student_id' => $student['student_id'],
@@ -134,14 +128,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
-        echo "<script>console.log('Transaction committed successfully');</script>";
 
         // Redirect to home.php after successful insertion
         header("Location: /esas/esas_moderator/public/home.php?success=1&club_id=" . urlencode($club_id));
         exit();
     } catch (PDOException $e) {
         $pdo->rollBack();
-        echo "<script>console.log('Error during transaction: " . addslashes($e->getMessage()) . "');</script>";
+        echo "Error: " . $e->getMessage();
     }
 }
 ?>
