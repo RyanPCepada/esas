@@ -34,6 +34,7 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
                 r.dateRequested, 
                 r.dateModified,
                 s.firstName,
+                s.middleName,
                 s.lastName,
                 s.profilePic,
                 s.student_id
@@ -59,7 +60,7 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
                 $requestLetter = htmlspecialchars($row["requestLetter"] ?? ''); // New requestLetter variable
                 $dateRequested = !empty($row["dateRequested"]) ? date("F j, Y", strtotime($row["dateRequested"])) : 'None';
                 $dateModified = !empty($row["dateModified"]) ? date("F j, Y", strtotime($row["dateModified"])) : 'None';
-                $requestedByName = htmlspecialchars($row["firstName"] . ' ' . $row["lastName"] ?? '');
+                $requestedByName = htmlspecialchars(trim($row["firstName"] . ' ' . ($row["middleName"] ?? '') . ' ' . $row["lastName"]));
                 $profilePic = htmlspecialchars($row["profilePic"] ?: "default-profile.jpg");
                 $student_id = htmlspecialchars($row["student_id"] ?? ''); 
 
@@ -157,8 +158,8 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                 $mail->isHTML(true);
                 $mail->Subject = "Club Request " . ucfirst($newStatus);
                 $mail->Body = "
-                    <p>Dear Student,</p>
-                    <p>Your request for a new club has been <strong>" . $newStatus . "</strong>.</p>
+                    <p>Dear $requestedByName,</p>
+                    <p>Your club request <strong>" . $clubName . "</strong> has been <strong>" . $newStatus . "</strong>.</p>
                     <p>If you have any questions, feel free to contact us.</p>
                     <p>Thank you!</p>";
 
