@@ -65,7 +65,7 @@ try {
             SET is_read = 1 
             WHERE student_id = :student_id 
             AND club_id = :club_id 
-            AND notification = 'Posted an announcement'"; 
+            AND (notification = 'Posted an announcement' OR notification = 'Posted an event')"; 
 
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
