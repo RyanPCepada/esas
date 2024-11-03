@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                        
         // Prepare the email content
         $subject = "New Event in {$clubName}";
-        $body = "Dear Student,<br><br>A new event has been scheduled: <b>{$title}</b>.<br>Description: {$description}<br>Date: {$date}<br>Time: {$timeStarts} - {$timeEnds}<br>Location: {$location}<br><br>For more details, please check your club's dashboard.";
+        $body = "Dear Student,<br><br>A new event has been scheduled: <b>{$title}</b>.<br>Description: {$description}<br>Date: {$date}<br>Time: {$timeStarts} - {$timeEnds}<br>Location: {$location}<br><br>For more details, please check your club's home page.";
 
         // Send notifications to each active student
         foreach ($students as $student) {
