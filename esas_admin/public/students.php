@@ -212,27 +212,53 @@ try {
 
                                     $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
 
-                                    // SQL query to fetch all students with their registered clubs and active status
-                                    $sql = "SELECT 
-                                                s.student_id,
-                                                s.firstName,
-                                                s.middleName,
-                                                s.lastName,
-                                                s.instiEmail,
-                                                s.phoneNumber,
-                                                s.department,
-                                                s.course,
-                                                s.year,
-                                                s.profilePic,
-                                                r.application_id,
-                                                c.club_id,
-                                                GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
-                                            FROM tbl_students s
-                                            LEFT JOIN tbl_application r ON s.student_id = r.student_id
-                                            LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
-                                            WHERE r.status = 'active' -- Filter for active status
-                                            GROUP BY s.student_id
-                                            ORDER BY s.student_id ASC";
+                                    // // SQL query to fetch all students with their registered clubs and active status
+                                    // ORIGINAL QUERY
+                                    // $sql = "SELECT 
+                                    //             s.student_id,
+                                    //             s.firstName,
+                                    //             s.middleName,
+                                    //             s.lastName,
+                                    //             s.instiEmail,
+                                    //             s.phoneNumber,
+                                    //             s.department,
+                                    //             s.course,
+                                    //             s.year,
+                                    //             s.profilePic,
+                                    //             r.application_id,
+                                    //             c.club_id,
+                                    //             GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
+                                    //         FROM tbl_students s
+                                    //         LEFT JOIN tbl_application r ON s.student_id = r.student_id
+                                    //         LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
+                                    //         WHERE r.status = 'active' 
+                                    //         GROUP BY s.student_id
+                                    //         ORDER BY s.student_id ASC";
+
+                                      $sql = "SELECT 
+                                            s.student_id,
+                                            s.firstName,
+                                            s.middleName,
+                                            s.lastName,
+                                            s.instiEmail,
+                                            s.phoneNumber,
+                                            s.department,
+                                            s.course,
+                                            s.year,
+                                            s.profilePic,
+                                            r.application_id,
+                                            GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
+                                        FROM 
+                                            tbl_students s
+                                        LEFT JOIN 
+                                            tbl_application r ON s.student_id = r.student_id AND r.status = 'active' 
+                                        LEFT JOIN 
+                                            tbl_clubs c ON r.club_id = c.club_id
+                                        GROUP BY 
+                                            s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail, s.phoneNumber, s.department, s.course, s.year, s.profilePic, r.application_id
+                                        ORDER BY 
+                                            s.student_id ASC;
+                                        ";
 
                                     if ($result = $pdo->query($sql)) {
                                         $totalRows = $result->rowCount();
@@ -257,7 +283,7 @@ try {
 
                                                     while ($row = $result->fetch()) {
                                                         $application_id = htmlspecialchars($row['application_id']);
-                                                        $club_id = htmlspecialchars($row['club_id']);
+                                                        // $club_id = htmlspecialchars($row['club_id']);
                                                         $firstName = htmlspecialchars($row['firstName']);
                                                         $middleName = htmlspecialchars($row['middleName']);
                                                         $lastName = htmlspecialchars($row['lastName']);

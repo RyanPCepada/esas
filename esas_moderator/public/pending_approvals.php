@@ -327,49 +327,55 @@ try {
                                 $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
 
                                 // SQL query to fetch distinct students with their pending applications, including application_id
-                                $sql = "SELECT 
-                                            s.student_id,
-                                            s.firstName,
-                                            s.middleName,
-                                            s.lastName,
-                                            s.gender,
-                                            s.department,
-                                            s.course,
-                                            s.profilePic,
-                                            MIN(r.dateApplied) AS dateApplied,
-                                            c.club_id,
-                                            r.application_id
-                                        FROM tbl_students s
-                                        LEFT JOIN tbl_application r ON s.student_id = r.student_id
-                                        LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
-                                        WHERE r.status = 'pending'";
+                           $sql = "SELECT 
+                                        s.student_id,
+                                        s.firstName,
+                                        s.middleName,
+                                        s.lastName,
+                                        s.gender,
+                                        s.department,
+                                        s.course,
+                                        s.profilePic,
+                                        MIN(r.dateApplied) AS dateApplied,
+                                        c.club_id,
+                                        r.application_id
+                                    FROM 
+                                        tbl_students s
+                                    LEFT JOIN 
+                                        tbl_application r ON s.student_id = r.student_id
+                                    LEFT JOIN 
+                                        tbl_clubs c ON r.club_id = c.club_id
+                                    WHERE 
+                                        r.status = 'pending'";
 
-                                // Add filtering by club_id if provided
-                                if ($selectedClubId) {
-                                    $sql .= " AND c.club_id = :club_id";
-                                }
+                            // Add filtering by club_id if provided
+                            if (!empty($selectedClubId)) {
+                                $sql .= " AND c.club_id = :club_id";
+                            }
 
-                                // This condition accumulates students from the start of the selected month to the current month
-                                if ($selectedMonth) {
-                                    $sql .= " AND MONTH(r.dateApplied) <= :selectedMonth";
-                                }
+                            // Condition to filter by month if selected
+                            if (!empty($selectedMonth)) {
+                                $sql .= " AND MONTH(r.dateApplied) <= :selectedMonth";
+                            }
 
-                                $sql .= " GROUP BY s.student_id
-                                        ORDER BY MIN(r.dateApplied) ASC"; // Order by the earliest date applied
+                            $sql .= " GROUP BY 
+                                        s.student_id, s.firstName, s.middleName, s.lastName, s.gender, 
+                                        s.department, s.course, s.profilePic, c.club_id, r.application_id
+                                    ORDER BY 
+                                        dateApplied ASC"; // Order by the earliest date applied
 
-                                $stmt = $pdo->prepare($sql);
+                            $stmt = $pdo->prepare($sql);
 
-                                // Bind parameters
-                                $params = [];
-                                if ($selectedClubId) {
-                                    $params['club_id'] = $selectedClubId;
-                                }
-                                if ($selectedMonth) {
-                                    $params['selectedMonth'] = $selectedMonth;
-                                }
+                            // Bind parameters
+                            if (!empty($selectedClubId)) {
+                                $stmt->bindParam(':club_id', $selectedClubId, PDO::PARAM_INT);
+                            }
+                            if (!empty($selectedMonth)) {
+                                $stmt->bindParam(':selectedMonth', $selectedMonth, PDO::PARAM_INT);
+                            }
 
-                                // Execute the SQL statement
-                                $stmt->execute($params);
+                            // Execute the SQL statement
+                            $stmt->execute();
 
                                 $totalRows = $stmt->rowCount(); // Get the total rows from the prepared statement
 
