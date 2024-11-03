@@ -13,33 +13,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = trim($_POST['password']);
     
     // Function to check moderator login with hashed password
-    // function checkModerator($pdo, $moderator_id, $password) {
-    //     $query = "SELECT * FROM tbl_moderators WHERE moderator_id = :moderator_id";
-    //     $stmt = $pdo->prepare($query);
-    //     $stmt->execute(['moderator_id' => $moderator_id]);
-    //     $moderator = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-    //     // If the moderator exists, verify the password
-    //     // if ($moderator) {
-    //     //     return password_verify($password, $moderator['password']) ? $moderator : false;
-    //     // }
-    //     return false; // Moderator not found
-    // }
-
     function checkModerator($pdo, $moderator_id, $password) {
         $query = "SELECT * FROM tbl_moderators WHERE moderator_id = :moderator_id";
         $stmt = $pdo->prepare($query);
         $stmt->execute(['moderator_id' => $moderator_id]);
         $moderator = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        // If the moderator exists, verify the password directly (no hashing)
+        // If the moderator exists, verify the password
         if ($moderator) {
-            return $password === $moderator['password'] ? $moderator : false;
+            return password_verify($password, $moderator['password']) ? $moderator : false;
         }
-        
         return false; // Moderator not found
     }
-    
+
     // Function to insert activity log
     function insertActivityLog($pdo, $moderator_id) {
         $query = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
