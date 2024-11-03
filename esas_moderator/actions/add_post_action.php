@@ -31,6 +31,7 @@ if (isset($_POST['club_id'])) {
 
     // Check for errors before inserting into the database
     if (empty($postContent_err)) {
+        
         try {
             // Begin transaction
             $pdo->beginTransaction();
@@ -49,15 +50,32 @@ if (isset($_POST['club_id'])) {
                 // Get the ID of the inserted post
                 $post_id = $pdo->lastInsertId();
 
-                // Notify all students registered in the club
-                $sql = "SELECT student_id FROM tbl_application WHERE club_id = :club_id AND status = 'active'";
-                $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-                $stmt->execute();
-                $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+              
+
+                $student_sql = "SELECT
+                tbl_students.student_id, 
+                tbl_students.instiEmail, 
+                tbl_students.firstName, 
+                tbl_students.middleName, 
+                tbl_students.lastName, 
+                tbl_clubs.clubName
+            FROM
+                tbl_students
+                INNER JOIN tbl_application ON tbl_students.student_id = tbl_application.student_id
+                INNER JOIN tbl_clubs ON tbl_application.club_id = tbl_clubs.club_id
+            WHERE
+                tbl_application.club_id = :club_id AND
+                tbl_application.`status` = 'active'";
+            $student_stmt = $pdo->prepare($student_sql);
+            $student_stmt->execute([':club_id' => $club_id]);
+            $students = $student_stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo "<script>console.log('Retrieved active students:', " . json_encode($students) . ");</script>";
+            
 
                 // Check if any students were found
                 if (!empty($students)) {
+                    $clubName = $students[0]['clubName'];
+
                     foreach ($students as $student) {
                         // Get the student's email and full name
                         $final_email = $student['instiEmail'];
@@ -89,6 +107,8 @@ if (isset($_POST['club_id'])) {
                         } catch (Exception $e) {
                             // Log or handle the error
                             error_log("Message could not be sent to {$fullName}. Mailer Error: {$mail->ErrorInfo}");
+                            echo "<script>console.log('Message could not be sent to {$fullName}. Mailer Error: {$mail->ErrorInfo}');</script>";
+          
                         }
 
                         // Insert notification for each student
@@ -113,21 +133,23 @@ if (isset($_POST['club_id'])) {
 
                 // Commit transaction
                 $pdo->commit();
+                echo "<script>console.log('Transaction committed successfully');</script>";
 
-                // Return a JSON response
-                echo json_encode([
-                    "success" => true,
-                    "message" => "Post created successfully!",
-                    "redirect_url" => "/esas/esas_moderator/public/home.php?club_id={$club_id}"
-                ]);
+            
+                header("Location: " . $_SERVER['PHP_SELF'] . "?club_id=" . $club_id);
+             
             } else {
                 throw new Exception("Post insertion failed.");
+                echo "<script>console.log('Error during transaction: " . addslashes($e->getMessage()) . "');</script>";
+  
             }
 
         } catch (Exception $e) {
             // Rollback transaction on error
             $pdo->rollBack();
             echo json_encode(["success" => false, "message" => "Oops! Something went wrong. Please try again later."]);
+            echo "<script>console.log('Error during transaction: " . addslashes($e->getMessage()) . "');</script>";
+  
         }
     } else {
         echo json_encode(["success" => false, "message" => $postContent_err]);

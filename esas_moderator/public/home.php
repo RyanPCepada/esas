@@ -328,7 +328,7 @@ unset($pdo);
                                     </div>
                                     <div class="card-body">
                                     <form id="postForm" method="POST" action="../actions/add_post_action.php" enctype="multipart/form-data">
-                                    <input type="hidden" name="club_id" value="<?php echo $club_id; ?>"> <!-- Add this hidden field -->
+                                        <input type="hidden" name="club_id" value="<?php echo $club_id; ?>"> <!-- Add this hidden field -->
                                             <div class="form-group mb-0">
                                                 <label for="postContent">What's on your mind?</label>
                                                 <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
