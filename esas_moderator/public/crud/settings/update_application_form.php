@@ -76,6 +76,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     .delete-icon:hover {
         background-color: #8f8f8f;
     }
+    
+    body.modal-open {
+        padding-right: 0 !important;
+    }
 </style>
 
 <h4 class="text-muted mb-3">Update Application Questions</h4>
@@ -104,6 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                         </div>
                     <?php endforeach; ?>
                     <button type="submit" class="btn btn-primary mb-3">Update Questions</button>
+<button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#appQuestionAddModal">Add New Question</button>
+
                 </form>
                 <div class="dashed-border"></div>
             </ul>
@@ -113,7 +119,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     <p>No questions found for this moderator.</p>
 <?php endif; ?>
 
+<!-- Add New Application Question Modal -->
+<div class="modal fade" id="appQuestionAddModal" tabindex="-1" aria-labelledby="appQuestionAddModalLabel" aria-hidden="true">
+    <div class="modal-dialog app-question-modal-dialog">
+        <div class="modal-content app-question-modal-content">
+            <div class="modal-header app-question-modal-header">
+                <h5 class="modal-title app-question-modal-title" id="appQuestionAddModalLabel">Add New Application Question</h5>
+                <button type="button" class="close app-question-modal-close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="appQuestionAddForm" action="add_question_action.php" method="post">
+                <div class="modal-body app-question-modal-body">
+                    <div class="form-group app-question-form-group">
+                        <label for="appNewQuestion" class="app-question-label">Question</label>
+                        <textarea class="form-control app-question-textarea" id="appNewQuestion" name="new_question" rows="4" required></textarea>
+                    </div>
+                    <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($clubQuestionsArray[0]['club_id']); ?>">
+                </div>
+                <div class="modal-footer app-question-modal-footer">
+                    <button type="button" class="btn btn-secondary app-question-cancel-btn" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary app-question-add-btn">Add Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>|
+<!-- jQuery and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 function deleteQuestion(questionId) {
     if (confirm("Are you sure you want to delete this question?")) {
@@ -131,4 +169,28 @@ function deleteQuestion(questionId) {
         });
     }
 }
+
+
+<script>
+$(document).ready(function() {
+    $('#addQuestionForm').on('submit', function(event) {
+        event.preventDefault();
+
+        $.ajax({
+            url: '/esas/esas_moderator/actions/add_question_action.php',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                alert(response); // Optional: Display response message
+                $('#addQuestionModal').modal('hide'); // Close the modal
+                location.reload(); // Reload to update the question list
+            },
+            error: function() {
+                alert('Error adding new question.');
+            }
+        });
+    });
+});
+</script>
+
 </script>
