@@ -316,7 +316,7 @@ if ($previousClubCount === 1) {
                     <?php if ($isActiveOrInactive): ?>
                         <a href="student_update.php?application_id=<?php echo $application_id; ?>&student_id=<?php echo $student_id; ?>&club_id=<?php echo $_GET['club_id']; ?>" class="btn btn-warning">Update</a>
                     <?php endif; ?>
-                    <a href="student_delete.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $_GET['club_id']; ?>" class="btn btn-danger">Delete</a>
+                    <!-- <a href="student_delete.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $_GET['club_id']; ?>" class="btn btn-danger">Delete</a> -->
                     <a href="../../students.php" class="btn btn-secondary">Go Back</a>
                 </div>
             </div>
