@@ -8,9 +8,9 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id'];
 
-// Fetch application questions for the clubs handled by the active moderator
+// Fetch application questions along with club names for the club handled by the active moderator
 $sql = "
-    SELECT q.question_id, q.question, c.clubName, q.dateAdded, q.dateModified
+    SELECT q.question_id, q.question, c.clubName, q.club_id 
     FROM tbl_application_questions AS q
     JOIN tbl_clubs AS c ON q.club_id = c.club_id
     JOIN tbl_clubs_and_moderators AS cm ON c.club_id = cm.club_id
@@ -21,10 +21,12 @@ $stmt->execute([$moderator_id]);
 $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Process form submission for updating application questions
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $updatedCount = 0; // To count how many questions have been updated
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
+    $clubId = $_POST['club_id'];
+    $updatedQuestions = $_POST['questions']; // Array of questions
 
-    foreach ($_POST['questions'] as $questionId => $question) {
+    // Loop through each question and update it
+    foreach ($updatedQuestions as $questionId => $questionText) {
         // Update application question
         $updateSql = "
             UPDATE tbl_application_questions 
@@ -32,25 +34,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             WHERE question_id = ?";
         
         $updateStmt = $pdo->prepare($updateSql);
-        if ($updateStmt->execute([$question, $questionId])) {
+        if ($updateStmt->execute([$questionText, $questionId])) {
             // Log the activity after a successful update
             $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
             $logStmt = $pdo->prepare($logSql);
             $logStmt->execute([
-                'activity' => "You updated a question (ID: $questionId)",
+                'activity' => "You updated a question with ID $questionId",
                 'dateAdded' => date('Y-m-d H:i:s'),
                 'moderator_id' => $moderator_id
             ]);
-            $updatedCount++; // Increment count for successful updates
         }
     }
-    
-    if ($updatedCount > 0) {
-        echo "$updatedCount questions updated successfully!";
-    } else {
-        echo "No questions were updated.";
-    }
-    header("location: ../../../settings.php"); // Redirect to settings page
+
+    echo "Questions updated successfully!";
+    header("location: ../../../settings.php");
     exit();
 }
 ?>
@@ -59,58 +56,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <?php if ($questions): ?>
     <div class="question-list">
-        <ul>
-            <?php 
-            $currentClub = ''; // Variable to keep track of the current club
-            $clubQuestions = []; // Array to hold questions for the current club
-
-            foreach ($questions as $question): 
-                // Check if the club name has changed
-                if ($currentClub !== $question['clubName']): 
-                    // If we have questions for the previous club, output the form
-                    if ($clubQuestions): ?>
-                        <li>
-                            <strong><?php echo htmlspecialchars($currentClub); ?></strong> <!-- Display the club name -->
-                        </li>
-                        <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                            <?php foreach ($clubQuestions as $clubQuestion): ?>
-                                <div class="form-group">
-                                    <input type="hidden" name="questions[<?php echo htmlspecialchars($clubQuestion['question_id']); ?>]" value="<?php echo htmlspecialchars($clubQuestion['question']); ?>">
-                                    <textarea class="form-control mt-2" name="questions[<?php echo htmlspecialchars($clubQuestion['question_id']); ?>]" rows="4" required><?php echo htmlspecialchars($clubQuestion['question']); ?></textarea>
-                                </div>
-                            <?php endforeach; ?>
-                            <button type="submit" class="btn btn-primary mb-3">Update Questions</button>
-                        </form>
-                    <?php 
-                    // Reset club questions for the new club
-                    $clubQuestions = []; 
-                    endif; 
-                    
-                    // Update the current club
-                    $currentClub = $question['clubName']; 
-                endif; 
-
-                // Add the current question to the club's question array
-                $clubQuestions[] = $question; 
-            endforeach; 
-
-            // Close the form for the last club
-            if ($clubQuestions): ?>
+        <?php 
+        // Group questions by club
+        $clubQuestions = [];
+        foreach ($questions as $question) {
+            $clubQuestions[$question['clubName']][] = $question;
+        }
+        
+        // Display each club and its questions
+        foreach ($clubQuestions as $clubName => $clubQuestionsArray): ?>
+            <ul>
                 <li>
-                    <strong><?php echo htmlspecialchars($currentClub); ?></strong> <!-- Display the club name -->
+                    <strong><?php echo htmlspecialchars($clubName); ?></strong>
                 </li>
                 <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                    <?php foreach ($clubQuestions as $clubQuestion): ?>
+                    <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($clubQuestionsArray[0]['club_id']); ?>">
+                    <?php foreach ($clubQuestionsArray as $question): ?>
                         <div class="form-group">
-                            <input type="hidden" name="questions[<?php echo htmlspecialchars($clubQuestion['question_id']); ?>]" value="<?php echo htmlspecialchars($clubQuestion['question']); ?>">
-                            <textarea class="form-control mt-2" name="questions[<?php echo htmlspecialchars($clubQuestion['question_id']); ?>]" rows="4" required><?php echo htmlspecialchars($clubQuestion['question']); ?></textarea>
+                            <textarea class="form-control" id="question_<?php echo htmlspecialchars($question['question_id']); ?>" name="questions[<?php echo htmlspecialchars($question['question_id']); ?>]" rows="4" required><?php echo htmlspecialchars($question['question']); ?></textarea>
                         </div>
                     <?php endforeach; ?>
                     <button type="submit" class="btn btn-primary mb-3">Update Questions</button>
                 </form>
-            <?php endif; ?>
-        </ul>
+            </ul>
+        <?php endforeach; ?>
     </div>
 <?php else: ?>
-    <p>No application questions found for this club.</p>
+    <p>No questions found for this moderator.</p>
 <?php endif; ?>
