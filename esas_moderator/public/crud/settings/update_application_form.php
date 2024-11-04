@@ -86,8 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                     <?php endforeach; ?>
                     <button type="submit" class="btn btn-primary mb-3">Update Questions</button>
                 </form>
+                <div class="dashed-border"></div>
             </ul>
-            <div class="dashed-border"></div>
         <?php endforeach; ?>
     </div>
 <?php else: ?>
