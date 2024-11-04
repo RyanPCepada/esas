@@ -42,22 +42,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Get the inserted application ID
         $application_id = $pdo->lastInsertId();
 
+        // Fetch the questions for the specified club
+        $questionSql = "SELECT question_id, question FROM tbl_application_questions WHERE club_id = :club_id";
+        $questionStmt = $pdo->prepare($questionSql);
+        $questionStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $questionStmt->execute();
+        $questions = $questionStmt->fetchAll(PDO::FETCH_ASSOC);
+
         // Loop through each answer in POST data to insert into tbl_application_answers
         foreach ($_POST as $key => $answer) {
             if (strpos($key, 'question') === 0 && !empty($answer)) {
                 // Extract question_id from the form field name (e.g., "question1" => 1)
-                $question_id = intval(substr($key, 8));
-                
-                // Insert answer into tbl_application_answers
-                $answerSql = "INSERT INTO tbl_application_answers (answer, question_id, application_id, student_id, club_id, dateAdded)
-                              VALUES (:answer, :question_id, :application_id, :student_id, :club_id, NOW())";
-                $answerStmt = $pdo->prepare($answerSql);
-                $answerStmt->bindParam(":answer", $answer, PDO::PARAM_STR);
-                $answerStmt->bindParam(":question_id", $question_id, PDO::PARAM_INT);
-                $answerStmt->bindParam(":application_id", $application_id, PDO::PARAM_INT);
-                $answerStmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
-                $answerStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-                $answerStmt->execute();
+                $question_index = intval(substr($key, 8)) - 1; // Adjust for zero-based index
+                if (isset($questions[$question_index])) {
+                    $question_text = $questions[$question_index]['question'];
+                    $question_id = $questions[$question_index]['question_id'];
+                    
+                    // Insert answer into tbl_application_answers
+                    $answerSql = "INSERT INTO tbl_application_answers (answer, question_id, question, application_id, student_id, club_id, dateAdded)
+                                  VALUES (:answer, :question_id, :question, :application_id, :student_id, :club_id, NOW())";
+                    $answerStmt = $pdo->prepare($answerSql);
+                    $answerStmt->bindParam(":answer", $answer, PDO::PARAM_STR);
+                    $answerStmt->bindParam(":question_id", $question_id, PDO::PARAM_INT);
+                    $answerStmt->bindParam(":question", $question_text, PDO::PARAM_STR);
+                    $answerStmt->bindParam(":application_id", $application_id, PDO::PARAM_INT);
+                    $answerStmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
+                    $answerStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+                    $answerStmt->execute();
+                }
             }
         }
 
