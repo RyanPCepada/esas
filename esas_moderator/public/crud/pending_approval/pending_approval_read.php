@@ -25,6 +25,7 @@ echo $final_email;
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
+
 // Check existence of student_id, club_id, and application_id parameter before processing further
 if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"])) 
     && isset($_GET["club_id"]) && !empty(trim($_GET["club_id"])) 
@@ -90,41 +91,55 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
 
     // Close statement
     unset($stmt);
+    
+    // Prepare a select statement to fetch dateApplied from tbl_application
+    $sql_application = "SELECT dateApplied FROM tbl_application WHERE application_id = :application_id AND student_id = :student_id AND club_id = :club_id";
+    echo "<script>console.log('Preparing SQL to fetch application dateApplied');</script>";
 
-    // Prepare a select statement to fetch questions and dateApplied from tbl_application
-    $sql_questions = "SELECT question1, question2, question3, dateApplied FROM tbl_application WHERE student_id = :student_id AND club_id = :club_id";
-
-    echo "<script>console.log('Preparing SQL to fetch application questions and dateApplied');</script>";
-
-    if ($stmt = $pdo->prepare($sql_questions)) {
-        // Bind variables to the prepared statement as parameters
+    if ($stmt = $pdo->prepare($sql_application)) {
+        $stmt->bindParam(":application_id", $param_application_id);
         $stmt->bindParam(":student_id", $param_student_id);
         $stmt->bindParam(":club_id", $param_club_id);
 
-        // Attempt to execute the prepared statement
+        if ($stmt->execute()) {
+            $application = $stmt->fetch(PDO::FETCH_ASSOC);
+            $dateApplied = $application['dateApplied'] ?? '';
+            echo "<script>console.log('Date Applied: " . $dateApplied . "');</script>";
+        }
+    }
+
+    unset($stmt);
+
+    // NEW SECTION: Fetch questions and answers based on the new schema
+    $questions = [];
+    $sql_questions = "SELECT q.question, a.answer 
+                    FROM tbl_application_questions q 
+                    LEFT JOIN tbl_application_answers a 
+                    ON q.question_id = a.question_id 
+                    WHERE a.club_id = :club_id 
+                    AND a.application_id = :application_id
+                    AND a.student_id = :student_id"; // Include student_id in the query
+
+    echo "<script>console.log('Preparing SQL to fetch application questions and answers');</script>";
+
+    if ($stmt = $pdo->prepare($sql_questions)) {
+        $stmt->bindParam(":application_id", $param_application_id);
+        $stmt->bindParam(":club_id", $param_club_id);
+        $stmt->bindParam(":student_id", $param_student_id); // Bind the student_id parameter
+
         if ($stmt->execute()) {
             echo "<script>console.log('SQL executed successfully for questions');</script>";
-            // Fetch the questions and dateApplied together in one call
-            $questions = $stmt->fetch(PDO::FETCH_ASSOC); 
-
-            if ($questions) {
-                $dateApplied = $questions['dateApplied']; 
-                echo "<script>console.log('Date Applied: " . $dateApplied . "');</script>";
-            } else {
-                echo "<script>console.log('No application details found');</script>";
-                echo "No application details found.";
-            }
+            $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } else {
             echo "<script>console.log('Error executing the questions query');</script>";
             echo "Could not fetch questions. Please try again later.";
         }
     }
 
-    // Close statement
+
     unset($stmt);
-    
+
 } else {
-    // URL doesn't contain student_id or club_id parameter. Redirect to error page
     echo "<script>console.log('Missing required parameters in URL');</script>";
     header("location: ../public/error.php");
     exit();
@@ -393,35 +408,41 @@ $disapprovedCount = $stmt->fetchColumn();
                             <hr>
 
                             <h5>Application Details:</h5>
-                            <!-- Display the questions -->
                             <div class="container mt-3 p-0">
-                                <div class="card mb-3 bg-light">
-                                    <div class="card-body">
-                                        <p><strong>Why do you want to join this club?</strong><br><?php echo htmlspecialchars($questions['question1']); ?></p>
-                                    </div>
-                                </div>
-                                
-                                <div class="card mb-3 bg-light">
-                                    <div class="card-body">
-                                        <p><strong>What skills or experiences do you have that will contribute to the club's activities?</strong><br><?php echo htmlspecialchars($questions['question2']); ?></p>
-                                    </div>
-                                </div>
-                                
-                                <div class="card mb-3 bg-light">
-                                    <div class="card-body">
-                                        <p><strong>How do you plan to balance your time between club activities and your academic responsibilities?</strong><br><?php echo htmlspecialchars($questions['question3']); ?></p>
-                                    </div>
-                                </div>
+                                <?php if ($questions): ?>
+                                    <?php foreach ($questions as $index => $question): ?>
+                                        <div class="card mb-3 bg-light">
+                                            <div class="card-body">
+                                                <p><strong><?php echo htmlspecialchars($question['question']); ?></strong><br><?php echo htmlspecialchars($question['answer']); ?></p>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p>No questions found for this club.</p>
+                                <?php endif; ?>
                             </div>
 
                             <div class="d-flex justify-content-end">
+                                <p>Date Applied: 
+                                    <?php 
+                                    if ($dateApplied) {
+                                        $formattedDate = (new DateTime($dateApplied))->format('F d, Y');
+                                        echo htmlspecialchars($formattedDate);
+                                    } else {
+                                        echo "Not available";
+                                    }
+                                    ?>
+                                </p>
+                            </div>
+
+                            <!-- <div class="d-flex justify-content-end">
                                 <p>Date Applied: 
                                     <?php 
                                     $formattedDate = (new DateTime($dateApplied))->format('F d, Y'); 
                                     echo htmlspecialchars($formattedDate); 
                                     ?>
                                 </p>
-                            </div>
+                            </div> -->
 
 
                         </div>
