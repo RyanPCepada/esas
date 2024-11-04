@@ -58,15 +58,19 @@ if (!$club) {
     exit;
 }
 
-// Fetch questions and answers for the specific application
 $sql_questions_answers = "SELECT q.question, a.answer 
                           FROM tbl_application_questions q
-                          LEFT JOIN tbl_application_answers a ON q.question_id = a.question_id 
-                          AND a.application_id = ? AND a.student_id = ? AND a.club_id = ?
-                          WHERE a.application_id = ? AND a.student_id = ?";
+                          LEFT JOIN tbl_application_answers a 
+                          ON q.question_id = a.question_id 
+                          AND a.application_id = ? 
+                          AND a.student_id = ? 
+                          AND a.club_id = ?
+                          WHERE a.application_id = ? 
+                          AND a.student_id = ?";
 $stmt_questions_answers = $pdo->prepare($sql_questions_answers);
 $stmt_questions_answers->execute([$application_id, $student_id, $club_id, $application_id, $student_id]);
 $questions_answers = $stmt_questions_answers->fetchAll(PDO::FETCH_ASSOC);
+
 
 // Determine the status icon
 $status = strtolower($application['status']);
