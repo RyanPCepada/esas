@@ -6,8 +6,8 @@ require_once "../../config.php";
 date_default_timezone_set('Asia/Manila');
 
 // Define variables and initialize with empty values
-$question1 = $question2 = $question3 = $club_id = $status = "";
-$question1_err = $question2_err = $question3_err = $club_id_err = "";
+$club_id = $status = "";
+$club_id_err = "";
 
 // Start the session
 session_start();
@@ -23,30 +23,6 @@ $student_id = $_SESSION['student_id'];
 
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validate question1
-    $input_question1 = trim($_POST["question1"]);
-    if (empty($input_question1)) {
-        $question1_err = "Please answer question 1.";
-    } else {
-        $question1 = $input_question1;
-    }
-
-    // Validate question2
-    $input_question2 = trim($_POST["question2"]);
-    if (empty($input_question2)) {
-        $question2_err = "Please answer question 2.";
-    } else {
-        $question2 = $input_question2;
-    }
-
-    // Validate question3
-    $input_question3 = trim($_POST["question3"]);
-    if (empty($input_question3)) {
-        $question3_err = "Please answer question 3.";
-    } else {
-        $question3 = $input_question3;
-    }
-
     // Validate club_id
     $input_club_id = trim($_POST["club_id"]);
     if (empty($input_club_id)) {
@@ -58,61 +34,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Check input errors before inserting into the database
-    if (empty($question1_err) && empty($question2_err) && empty($question3_err) && empty($club_id_err)) {
-        // Fetch the club name based on the club ID
-        $clubSql = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
-        $clubStmt = $pdo->prepare($clubSql);
-        $clubStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-        $clubStmt->execute();
-        $club = $clubStmt->fetch(PDO::FETCH_ASSOC);
+    if (empty($club_id_err)) {
+        // Prepare an insert statement for answers
+        $sql = "INSERT INTO tbl_application_answers (answer, question_id, student_id, club_id) VALUES (:answer, :question_id, :student_id, :club_id)";
         
-        if ($club) {
-            $clubName = $club['clubName'];
+        // Prepare the statement
+        $stmt = $pdo->prepare($sql);
 
-            // Prepare an insert statement
-            $sql = "INSERT INTO tbl_application (student_id, question1, question2, question3, status, club_id) 
-                    VALUES (:student_id, :question1, :question2, :question3, :status, :club_id)";
+        // Prepare to insert answers
+        $questions = [
+            'question1' => 1, // Assuming question1 corresponds to question_id 1
+            'question2' => 2, // Assuming question2 corresponds to question_id 2
+            'question3' => 3  // Assuming question3 corresponds to question_id 3
+        ];
 
-            $stmt = $pdo->prepare($sql);
+        $status = 'pending'; // Default status if needed for other tables
 
-            // Bind variables to the prepared statement as parameters
-            $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
-            $stmt->bindParam(":question1", $question1);
-            $stmt->bindParam(":question2", $question2);
-            $stmt->bindParam(":question3", $question3);
-            $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        foreach ($questions as $question_key => $question_id) {
+            // Validate each question answer
+            $input_answer = trim($_POST[$question_key]);
+            if (!empty($input_answer)) {
+                // Bind variables to the prepared statement as parameters
+                $stmt->bindParam(":answer", $input_answer);
+                $stmt->bindParam(":question_id", $question_id, PDO::PARAM_INT);
+                $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
+                $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
 
-            // Add status with default value "pending"
-            $status = 'pending';
-            $stmt->bindParam(":status", $status);
-
-            // Attempt to execute the prepared statement
-            if ($stmt->execute()) {
-                // Log the activity in tbl_activity_logs
-                $activity = "You submitted an application to join $clubName";
-                $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, student_id) VALUES (:activity, NOW(), :student_id)";
-                $logStmt = $pdo->prepare($logSql);
-                $logStmt->bindParam(":activity", $activity);
-                $logStmt->bindParam(":student_id", $student_id);
-                $logStmt->execute(); // Execute the log insertion
-
-                // Records created successfully. Redirect to landing page
-                echo "<script>alert('Application submitted successfully!');</script>";
-                echo "<script>window.location.href = '/esas/esas_student/all_clubs.php';</script>";
-                exit();
-            } else {
-                echo "Oops! Something went wrong. Please try again later.";
-                // Debug: echo $stmt->errorInfo(); // Uncomment for debugging
+                // Attempt to execute the prepared statement
+                if (!$stmt->execute()) {
+                    echo "Oops! Something went wrong while submitting the answer. Please try again later.";
+                    exit();
+                }
             }
-        } else {
-            echo "Club not found."; // Handle the case where the club ID does not exist
         }
-    }
 
-    // Close statement
-    unset($stmt);
+        // Log the activity in tbl_activity_logs
+        $activity = "You submitted an application to join the club with ID $club_id";
+        $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, student_id) VALUES (:activity, NOW(), :student_id)";
+        $logStmt = $pdo->prepare($logSql);
+        $logStmt->bindParam(":activity", $activity);
+        $logStmt->bindParam(":student_id", $student_id);
+        $logStmt->execute(); // Execute the log insertion
+
+        // Redirect to landing page
+        echo "<script>alert('Application submitted successfully!');</script>";
+        echo "<script>window.location.href = '/esas/esas_student/all_clubs.php';</script>";
+        exit();
+    }
 }
 
-// Close connection (if not using persistent connection)
-// unset($pdo); // Uncomment if $pdo is not a persistent connection
+// Close statement
+unset($stmt);
 ?>

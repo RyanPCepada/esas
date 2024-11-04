@@ -16,6 +16,7 @@ $moderator_id = $_SESSION['moderator_id'];
 $postContent = "";
 $postContent_err = "";
 $club_id = ""; 
+// $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
 
 // Check if club_id is provided in the POST request
 if (isset($_POST['club_id'])) {
@@ -88,13 +89,13 @@ if (isset($_POST['club_id'])) {
                             $mail->isSMTP();                                        // Send using SMTP
                             $mail->Host       = 'smtp.gmail.com';                  // Set the SMTP server to send through
                             $mail->SMTPAuth   = true;                              // Enable SMTP authentication
-                            $mail->Username   = 'sportsnbscesas@gmail.com';         // SMTP username
-                            $mail->Password   = 'wubj bmsj ckmj nope';             // SMTP password
+                            $mail->Username   = 'nbsc.esas@gmail.com';         // SMTP username
+                            $mail->Password   = 'cxef aobn ozbq qpxv';             // SMTP password
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;    // Enable TLS encryption
                             $mail->Port       = 587;                               // TCP port to connect to
 
                             // Recipients
-                            $mail->setFrom('sportsnbscesas@gmail.com', 'NBSC Club Organizations');
+                            $mail->setFrom('nbsc.esas@gmail.com', 'NBSC Club Organizations');
                             $mail->addAddress($final_email, $fullName);           // Add a recipient
 
                             // Content

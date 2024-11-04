@@ -144,12 +144,12 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username   = 'sportsnbscesas@gmail.com';
-            $mail->Password   = 'wubj bmsj ckmj nope'; 
+            $mail->Username   = 'nbsc.esas@gmail.com';
+            $mail->Password   = 'cxef aobn ozbq qpxv'; 
      
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
-            $mail->setFrom('sportsnbscesas@gmail.com', 'NBSC Club Organizations');
+            $mail->setFrom('nbsc.esas@gmail.com', 'NBSC Club Organizations'); 
                        
 
             // Send instiEmail to the requester
