@@ -58,17 +58,14 @@ if (!$club) {
     exit;
 }
 
-$sql_questions_answers = "SELECT q.question, a.answer 
-                          FROM tbl_application_questions q
-                          LEFT JOIN tbl_application_answers a 
-                          ON q.question_id = a.question_id 
-                          AND a.application_id = ? 
-                          AND a.student_id = ? 
-                          AND a.club_id = ?
+// Fetch questions and answers directly from tbl_application_answers
+$sql_questions_answers = "SELECT a.answer, a.question 
+                          FROM tbl_application_answers a 
                           WHERE a.application_id = ? 
-                          AND a.student_id = ?";
+                          AND a.student_id = ? 
+                          AND a.club_id = ?";
 $stmt_questions_answers = $pdo->prepare($sql_questions_answers);
-$stmt_questions_answers->execute([$application_id, $student_id, $club_id, $application_id, $student_id]);
+$stmt_questions_answers->execute([$application_id, $student_id, $club_id]);
 $questions_answers = $stmt_questions_answers->fetchAll(PDO::FETCH_ASSOC);
 
 
