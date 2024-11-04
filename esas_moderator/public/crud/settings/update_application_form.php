@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
             UPDATE tbl_application_questions 
             SET question = ?, dateModified = NOW() 
             WHERE question_id = ?";
-        
+
         $updateStmt = $pdo->prepare($updateSql);
         if ($updateStmt->execute([$questionText, $questionId])) {
             // Log the activity after a successful update
@@ -45,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
             ]);
         }
     }
-
     echo "Questions updated successfully!";
     header("location: ../../../settings.php");
     exit();
@@ -57,6 +56,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
         height: 2px; /* Thickness of the border */
         border-top: 2px dashed #ccc; /* Dashed line */
         margin: 30px 0; /* Space above and below */
+    }
+
+    .delete-icon {
+        position: absolute; /* Use absolute positioning */
+        top: -5px; /* Adjust positioning */
+        right: -10px; /* Adjust positioning */
+        cursor: pointer;
+        background-color: #a9a9a9;
+        border-radius: 50%;
+        color: white;
+        width: 22px;
+        height: 22px;
+        text-align: center;
+        line-height: 21px; /* Center the text vertically */
+        border: none; /* Remove default button styling */
+    }
+
+    .delete-icon:hover {
+        background-color: #8f8f8f;
     }
 </style>
 
@@ -80,8 +98,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                 <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                     <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($clubQuestionsArray[0]['club_id']); ?>">
                     <?php foreach ($clubQuestionsArray as $question): ?>
-                        <div class="form-group">
+                        <div class="form-group position-relative">
                             <textarea class="form-control" id="question_<?php echo htmlspecialchars($question['question_id']); ?>" name="questions[<?php echo htmlspecialchars($question['question_id']); ?>]" rows="4" required><?php echo htmlspecialchars($question['question']); ?></textarea>
+                            <span class="delete-icon" title="Delete Question" onclick="deleteQuestion(<?php echo htmlspecialchars($question['question_id']); ?>)"><i class="fas fa-times"></i></span>
                         </div>
                     <?php endforeach; ?>
                     <button type="submit" class="btn btn-primary mb-3">Update Questions</button>
@@ -93,3 +112,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
 <?php else: ?>
     <p>No questions found for this moderator.</p>
 <?php endif; ?>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+function deleteQuestion(questionId) {
+    if (confirm("Are you sure you want to delete this question?")) {
+        $.ajax({
+            url: '/esas/esas_moderator/actions/delete_question_action.php', // Change to the path of your deletion script
+            type: 'POST',
+            data: { delete_question_id: questionId },
+            success: function(response) {
+                // alert(response); // Show success message
+                location.reload(); // Reload the page to update the question list
+            },
+            error: function() {
+                alert('Error deleting question.');
+            }
+        });
+    }
+}
+</script>
