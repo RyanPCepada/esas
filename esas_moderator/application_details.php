@@ -6,8 +6,9 @@ if (!isset($_SESSION['moderator_id'])) {
     echo "Moderator ID is not set in the session.";
     exit;
 }
-//Application
-$moderator_id = $_SESSION['moderator_id']; // Get student ID from session
+
+// Application
+$moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -18,12 +19,8 @@ $student_id = isset($_GET['student_id']) ? $_GET['student_id'] : null;
 $application_id = isset($_GET['application_id']) ? $_GET['application_id'] : null;
 $fullName = isset($_GET['fullName']) ? $_GET['fullName'] : null;
 
-// Check if club_id and application_id are provided
-if (!$club_id) {
-    echo "Club ID is not provided.";
-    exit;
-} else if (!$application_id) {
-    echo "Application ID is not provided.";
+if (!$club_id || !$application_id) {
+    echo "Club ID or Application ID is not provided.";
     exit;
 }
 
@@ -31,49 +28,51 @@ if (!$club_id) {
 $sql = "SELECT * FROM tbl_students WHERE student_id = ?";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$student_id]);
-$student = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch as associative array
+$student = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Check if the student was found
 if (!$student) {
     echo "Student not found.";
-    exit; // Exit if the student is not found
+    exit;
 }
 
 // Fetch application details for the specified club and student
-$sql_application = "SELECT *, remark FROM tbl_application 
-                    WHERE student_id = ? 
-                    AND club_id = ? 
-                    AND application_id = ?
-                    AND status IN ('active', 'inactive', 'disapproved', 'departed')";
-                    //AND (status = 'pending' OR status = 'active' OR status = 'disapproved')";
+$sql_application = "SELECT remark, status, dateApplied, dateDecided, dateModified FROM tbl_application 
+                    WHERE student_id = ? AND club_id = ? AND application_id = ?";
 $stmt_application = $pdo->prepare($sql_application);
 $stmt_application->execute([$student_id, $club_id, $application_id]);
-$application = $stmt_application->fetch(PDO::FETCH_ASSOC); // Fetch application details
+$application = $stmt_application->fetch(PDO::FETCH_ASSOC);
 
-
-// Check if the application was found
 if (!$application) {
     echo "Application not found.";
-    exit; // Exit if the application is not found
+    exit;
 }
 
-// Fetch the club name
+// Fetch club name
 $sql_club = "SELECT clubName FROM tbl_clubs WHERE club_id = ?";
 $stmt_club = $pdo->prepare($sql_club);
 $stmt_club->execute([$club_id]);
-$club = $stmt_club->fetch(PDO::FETCH_ASSOC); // Fetch club details
+$club = $stmt_club->fetch(PDO::FETCH_ASSOC);
 
-// Check if the club was found
 if (!$club) {
     echo "Club not found.";
-    exit; // Exit if the club is not found
+    exit;
 }
+
+// Fetch questions and answers
+$sql_questions_answers = "SELECT q.question, a.answer 
+                          FROM tbl_application_questions q 
+                          LEFT JOIN tbl_application_answers a 
+                          ON q.question_id = a.question_id 
+                          WHERE a.application_id = ? AND a.student_id = ? AND q.club_id = ?";
+$stmt_questions_answers = $pdo->prepare($sql_questions_answers);
+$stmt_questions_answers->execute([$application_id, $student_id, $club_id]);
+$questions_answers = $stmt_questions_answers->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch activities of the current student
 $sql_activities = "SELECT * FROM tbl_activity_logs WHERE student_id = ? ORDER BY dateAdded DESC";
 $stmt_activities = $pdo->prepare($sql_activities);
 $stmt_activities->execute([$student_id]);
-$activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activities
+$activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC);
 
 // Format date function
 function formatDate($date) {
@@ -81,31 +80,26 @@ function formatDate($date) {
 }
 
 // Determine the status and icon based on the fetched application
-$status = strtolower($application['status']); // Get the status from the application details
+$status = strtolower($application['status']);
 $icon = '';
 switch ($status) {
     case 'active':
-        $icon = '<i class="fas fa-check-circle text-success"></i>'; // Approved icon
+        $icon = '<i class="fas fa-check-circle text-success"></i>';
         break;
     case 'disapproved':
-        $icon = '<i class="fas fa-times-circle text-danger"></i>'; // Disapproved icon
+        $icon = '<i class="fas fa-times-circle text-danger"></i>';
         break;
     case 'inactive':
-        $icon = '<i class="fas fa-user-times text-warning"></i>'; // Active icon
+        $icon = '<i class="fas fa-user-times text-warning"></i>';
         break;
     case 'departed':
-        $icon = '<i class="fas fa-user-slash text-secondary"></i>'; // Active icon
+        $icon = '<i class="fas fa-user-slash text-secondary"></i>';
         break;
     case 'pending':
     default:
-        $icon = '<i class="fas fa-hourglass-start text-warning"></i>'; // Pending icon
+        $icon = '<i class="fas fa-hourglass-start text-warning"></i>';
         break;
 }
-
-// // Display the status
-// echo "Status: " . $icon . " <strong>" . ucfirst($status) . "</strong><br>";
-// echo "Club ID: " . htmlspecialchars($club_id) . "<br>";
-// echo "Application ID: " . htmlspecialchars($application_id) . "<br>";
 ?>
 
 <!DOCTYPE html>
@@ -141,51 +135,39 @@ switch ($status) {
     </style>
 </head>
 <body>
-    
     <div class="wrapper">
-            <h2 class="mt-5">Application Details</h2>
-            <div class="justify-content-between">
-                <p class="text-muted">Review <strong><?php echo htmlspecialchars($fullName); ?></strong>'s application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
-                <p>Status: <?php echo $icon; ?> <strong><?php echo ucfirst($status); ?></strong></p>
-            </div>
-            <div class="container-fluid container mb-5 auto-scroll">
-                <div class="row">
-                    <div class="col">
-                        <p><strong>Why do you want to join this club?</strong><br><?php echo htmlspecialchars($application['question1']); ?></p>
-                        <p><strong>What skills or experiences do you have that will contribute to the club's activities?</strong><br><?php echo htmlspecialchars($application['question2']); ?></p>
-                        <p><strong>How do you plan to balance your time between club activities and your academic responsibilities?</strong><br><?php echo htmlspecialchars($application['question3']); ?></p>
-                        
-                        
-                        <?php if ($status === 'disapproved'): ?>
-                            <p class="text-danger"><strong>Disapproval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
-                            <hr>
-                            <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                            <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
-
-                        <?php elseif ($status === 'active'): ?>
-                            <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
-                            <hr>
-                            <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                            <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
-
-                        <?php elseif ($status === 'inactive'): ?>
-                            <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
-                            <hr>
-                            <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                            <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
-                            <p><strong>Date Inactivated:</strong> <?php echo formatDate($application['dateModified']); ?></p>
-
-                        <?php elseif ($status === 'departed'): ?>
-                            <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
-                            <hr>
-                            <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                            <p><strong>Date Departed:</strong> <?php echo formatDate($application['dateModified']); ?></p>
-                        <?php endif; ?>
-
-
-                    </div>
+        <h2 class="mt-5">Application Details</h2>
+        <div class="justify-content-between">
+            <p class="text-muted">Review <strong><?php echo htmlspecialchars($fullName); ?></strong>'s application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
+            <p>Status: <?php echo $icon; ?> <strong><?php echo ucfirst($status); ?></strong></p>
+        </div>
+        <div class="container mb-5">
+            <div class="row">
+                <div class="col">
+                    <?php foreach ($questions_answers as $qa): ?>
+                        <p><strong><?php echo htmlspecialchars($qa['question']); ?></strong><br><?php echo htmlspecialchars($qa['answer']); ?></p>
+                    <?php endforeach; ?>
+                    
+                    <?php if ($status === 'disapproved'): ?>
+                        <p class="text-danger"><strong>Disapproval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
+                        <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
+                        <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
+                    <?php elseif ($status === 'active'): ?>
+                        <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
+                        <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
+                        <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
+                    <?php elseif ($status === 'inactive'): ?>
+                        <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
+                        <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
+                        <p><strong>Date Inactivated:</strong> <?php echo formatDate($application['dateModified']); ?></p>
+                    <?php elseif ($status === 'departed'): ?>
+                        <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
+                        <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
+                        <p><strong>Date Departed:</strong> <?php echo formatDate($application['dateModified']); ?></p>
+                    <?php endif; ?>
                 </div>
             </div>
+        </div>
     </div>
 </body>
 </html>
