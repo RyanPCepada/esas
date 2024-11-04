@@ -43,6 +43,29 @@ $stmt_all_clubs = $pdo->prepare($sql_all_clubs);
 $stmt_all_clubs->execute([$student_id]);
 $applications = $stmt_all_clubs->fetchAll(PDO::FETCH_ASSOC);
 
+// Fetch questions related to the club
+$sql_questions = "SELECT * FROM tbl_application_questions WHERE club_id = ?";
+$stmt_questions = $pdo->prepare($sql_questions);
+$stmt_questions->execute([$club_id]);
+$questions = $stmt_questions->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch answers for the application
+$sql_answers = "
+    SELECT aa.answer, aq.question_id 
+    FROM tbl_application_answers aa 
+    JOIN tbl_application_questions aq ON aa.question_id = aq.question_id 
+    WHERE aa.application_id = ? AND aa.student_id = ? AND aa.club_id = ?
+";
+$stmt_answers = $pdo->prepare($sql_answers);
+$stmt_answers->execute([$application_id, $student_id, $club_id]);
+$answers = $stmt_answers->fetchAll(PDO::FETCH_ASSOC);
+
+// Format answers by question_id
+$formatted_answers = [];
+foreach ($answers as $answer) {
+    $formatted_answers[$answer['question_id']] = htmlspecialchars($answer['answer']);
+}
+
 function formatDate($date) {
     return (new DateTime($date))->format('F j, Y');
 }
@@ -75,7 +98,7 @@ foreach ($applications as $application) {
     </style>
 </head>
 <body>
- 
+  
 <div class="wrapper">
     <h2 class="mt-5">Application Details</h2>
     <p class="text-muted">Review <strong><?php echo htmlspecialchars($fullName); ?></strong>'s application details across all clubs</p>
@@ -110,17 +133,48 @@ foreach ($applications as $application) {
                 <?php if (isset($grouped_applications[$status])): ?>
                     <?php foreach ($grouped_applications[$status] as $application): ?>
                         <?php
+                        // Fetch club name
                         $sql_club = "SELECT clubName FROM tbl_clubs WHERE club_id = ?";
                         $stmt_club = $pdo->prepare($sql_club);
                         $stmt_club->execute([$application['club_id']]);
                         $club = $stmt_club->fetch(PDO::FETCH_ASSOC);
+
+                        // Fetch questions related to the club
+                        $sql_questions = "SELECT * FROM tbl_application_questions WHERE club_id = ?";
+                        $stmt_questions = $pdo->prepare($sql_questions);
+                        $stmt_questions->execute([$application['club_id']]); // Use application club_id here
+                        $questions = $stmt_questions->fetchAll(PDO::FETCH_ASSOC);
+
+                        // Fetch answers for the application
+                        $sql_answers = "
+                            SELECT aa.answer, aq.question_id 
+                            FROM tbl_application_answers aa 
+                            JOIN tbl_application_questions aq ON aa.question_id = aq.question_id 
+                            WHERE aa.application_id = ? AND aa.student_id = ? AND aa.club_id = ?
+                        ";
+                        $stmt_answers = $pdo->prepare($sql_answers);
+                        $stmt_answers->execute([$application['application_id'], $student_id, $application['club_id']]); // Use application details here
+                        $answers = $stmt_answers->fetchAll(PDO::FETCH_ASSOC);
+
+                        // Format answers by question_id
+                        $formatted_answers = [];
+                        foreach ($answers as $answer) {
+                            $formatted_answers[$answer['question_id']] = htmlspecialchars($answer['answer']);
+                        }
                         ?>
 
                         <div class="container-fluid container mb-5">
                             <h5 class="mb-4"><strong><i class="fas fa-university text-primary" style="font-size: 25px;"></i></strong> <strong class="text-muted"><?php echo htmlspecialchars($club['clubName']); ?></strong></h5>
-                            <p><strong>Why do you want to join this club?</strong><br><?php echo htmlspecialchars($application['question1']); ?></p>
-                            <p><strong>What skills or experiences do you have that will contribute to the club's activities?</strong><br><?php echo htmlspecialchars($application['question2']); ?></p>
-                            <p><strong>How do you plan to balance your time between club activities and your academic responsibilities?</strong><br><?php echo htmlspecialchars($application['question3']); ?></p>
+                            
+                            <?php
+                                // Display questions and answers
+                                foreach ($questions as $question) {
+                                    echo "<p><strong>" . htmlspecialchars($question['question']) . "</strong><br>";
+                                    $answer = !empty($formatted_answers[$question['question_id']]) ? $formatted_answers[$question['question_id']] : 'No answer provided.';
+                                    echo html_entity_decode(htmlspecialchars($answer)); // Decode and then display the answer
+                                    echo "</p>";
+                                }
+                            ?>
                             
                             <?php if ($status === 'active'): ?>
                                 <div class="status-block">
