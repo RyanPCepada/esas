@@ -120,6 +120,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
 }
 ?>
 
+<style>
+    .dashed-border {
+        height: 2px; /* Thickness of the border */
+        border-top: 2px dashed #ccc; /* Dashed line */
+        margin: 30px 0; /* Space above and below */
+    }
+</style>
 
 <h4 class="text-muted mb-3">Update Club Officers</h4>
 
@@ -231,6 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                     </div> -->
                     </form>
                 </li>
+                <div class="dashed-border"></div>
             <?php endforeach; ?>
         </ul>
     </div>
