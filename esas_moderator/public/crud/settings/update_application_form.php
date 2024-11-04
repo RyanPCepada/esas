@@ -108,8 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                         </div>
                     <?php endforeach; ?>
                     <button type="submit" class="btn btn-primary mb-3">Update Questions</button>
-<button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#appQuestionAddModal">Add New Question</button>
-
+                    <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#appQuestionAddModal" data-club-id="<?php echo htmlspecialchars($clubQuestionsArray[0]['club_id']); ?>">Add New Question</button>
                 </form>
                 <div class="dashed-border"></div>
             </ul>
@@ -129,13 +128,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="appQuestionAddForm" action="add_question_action.php" method="post">
+            <form id="appQuestionAddForm" action="../esas_moderator/actions/add_question_action.php" method="post">
                 <div class="modal-body app-question-modal-body">
                     <div class="form-group app-question-form-group">
                         <label for="appNewQuestion" class="app-question-label">Question</label>
                         <textarea class="form-control app-question-textarea" id="appNewQuestion" name="new_question" rows="4" required></textarea>
                     </div>
-                    <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($clubQuestionsArray[0]['club_id']); ?>">
+                    <input type="hidden" id="club_id" name="club_id" value="">
                 </div>
                 <div class="modal-footer app-question-modal-footer">
                     <button type="button" class="btn btn-secondary app-question-cancel-btn" data-dismiss="modal">Cancel</button>
@@ -146,51 +145,57 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     </div>
 </div>
 
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>|
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- jQuery and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-function deleteQuestion(questionId) {
-    if (confirm("Are you sure you want to delete this question?")) {
-        $.ajax({
-            url: '/esas/esas_moderator/actions/delete_question_action.php', // Change to the path of your deletion script
-            type: 'POST',
-            data: { delete_question_id: questionId },
-            success: function(response) {
-                // alert(response); // Show success message
-                location.reload(); // Reload the page to update the question list
-            },
-            error: function() {
-                alert('Error deleting question.');
-            }
-        });
+    function deleteQuestion(questionId) {
+        if (confirm("Are you sure you want to delete this question?")) {
+            $.ajax({
+                url: '/esas/esas_moderator/actions/delete_question_action.php', // Change to the path of your deletion script
+                type: 'POST',
+                data: { delete_question_id: questionId },
+                success: function(response) {
+                    // alert(response); // Show success message
+                    location.reload(); // Reload the page to update the question list
+                },
+                error: function() {
+                    alert('Error deleting question.');
+                }
+            });
+        }
     }
-}
 
-
-<script>
-$(document).ready(function() {
-    $('#addQuestionForm').on('submit', function(event) {
-        event.preventDefault();
-
-        $.ajax({
-            url: '/esas/esas_moderator/actions/add_question_action.php',
-            type: 'POST',
-            data: $(this).serialize(),
-            success: function(response) {
-                alert(response); // Optional: Display response message
-                $('#addQuestionModal').modal('hide'); // Close the modal
-                location.reload(); // Reload to update the question list
-            },
-            error: function() {
-                alert('Error adding new question.');
-            }
+    //Populate club_id in Modal
+    $(document).ready(function() {
+        $('#appQuestionAddModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var clubId = button.data('club-id'); // Extract info from data-* attributes
+            var modal = $(this);
+            modal.find('#club_id').val(clubId); // Set the club_id value
         });
     });
-});
-</script>
+
+    $(document).ready(function() {
+        $('#addQuestionForm').on('submit', function(event) {
+            event.preventDefault();
+
+            $.ajax({
+                url: '/esas/esas_moderator/actions/add_question_action.php',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    alert(response); // Optional: Display response message
+                    $('#addQuestionModal').modal('hide'); // Close the modal
+                    location.reload(); // Reload to update the question list
+                },
+                error: function() {
+                    alert('Error adding new question.');
+                }
+            });
+        });
+    });
 
 </script>
