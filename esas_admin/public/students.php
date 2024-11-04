@@ -254,6 +254,8 @@ try {
                                             tbl_application r ON s.student_id = r.student_id AND r.status = 'active' 
                                         LEFT JOIN 
                                             tbl_clubs c ON r.club_id = c.club_id
+                                        WHERE
+                                            status = 'active' 
                                         GROUP BY 
                                             s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail, s.phoneNumber, s.department, s.course, s.year, s.profilePic, r.application_id
                                         ORDER BY 
