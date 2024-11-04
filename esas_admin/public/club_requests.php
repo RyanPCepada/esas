@@ -279,7 +279,7 @@ try {
                                                 <td class="text-center">
                                                     <a href="../public/crud/club_requests/club_request_read.php?request_id=' . $requestId . '" class="mr-2" title="View Request" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                                     <!--<a href="../public/crud/club_requests/club_request_update.php?request_id=' . $requestId . '" class="mr-2" title="Update Request" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>-->
-                                                    <a href="../public/crud/club_requests/club_request_delete.php?request_id=' . $requestId . '" class="text-danger" title="Delete Request" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                                    <!--<a href="../public/crud/club_requests/club_request_delete.php?request_id=' . $requestId . '" class="text-danger" title="Delete Request" data-toggle="tooltip"><span class="fa fa-trash"></span></a>-->
                                                 </td>
                                             </tr>';
                                         }
