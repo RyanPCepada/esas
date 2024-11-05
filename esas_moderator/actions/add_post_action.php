@@ -124,7 +124,7 @@ if (isset($_POST['club_id'])) {
                 }
                 
                 // Log the post creation activity in tbl_activity_logs
-                $activity = "You created a post in the club with ID {$club_id}";
+                $activity = "You created a post in {$clubName}";
                 $sql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
                         VALUES (:activity, NOW(), NULL, :moderator_id, NULL)";
                 $stmt = $pdo->prepare($sql);
