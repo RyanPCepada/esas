@@ -591,9 +591,136 @@ try {
                                 
                     </div>
         </div>
-        <div class="col-md-6"> 
-            hi
+        <div class="col-md-6">
+    <!-- Engagement Line Chart -->
+    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+        <p>Club Engagement</p>
+        <div style="height: 200px; width: 100%; overflow-x: auto;">
+            <canvas id="engagementChart"></canvas>
         </div>
+        <p id="noDataMessageEngagement" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;"><em>No engagement.</em></p>
+
+        <?php
+        try {
+            $student_id = $_SESSION['student_id'] ?? null;
+
+            if ($student_id) {
+                // Query to get all engagement dates and counts
+                $sql = "
+                    SELECT DATE(dateAdded) as engagementDate, COUNT(*) as loginCount
+                    FROM tbl_activity_logs
+                    WHERE activity = 'You logged in to your account' AND student_id = :student_id
+                    GROUP BY DATE(dateAdded)
+                    ORDER BY engagementDate;
+                ";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+                $stmt->execute();
+                $engagementData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Fetch the earliest and latest engagement dates
+                $startDateQuery = "
+                    SELECT MIN(DATE(dateAdded)) AS startDate, MAX(DATE(dateAdded)) AS endDate
+                    FROM tbl_activity_logs
+                    WHERE student_id = :student_id AND activity = 'You logged in to your account';
+                ";
+                $dateStmt = $pdo->prepare($startDateQuery);
+                $dateStmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+                $dateStmt->execute();
+                $dateRange = $dateStmt->fetch(PDO::FETCH_ASSOC);
+
+                // Set start and end dates
+                $startDate = new DateTime($dateRange['startDate']);
+                $endDate = new DateTime($dateRange['endDate']);
+
+                // Initialize dates and counts with zeros
+                $engagementDates = [];
+                $loginCounts = [];
+                $currentDate = clone $startDate;
+
+                while ($currentDate <= $endDate) {
+                    $formattedDate = $currentDate->format('Y-m-d');
+                    $engagementDates[] = $formattedDate;
+                    $loginCounts[$formattedDate] = 0;  // Default to zero if no engagement
+                    $currentDate->modify('+1 day');
+                }
+
+                // Populate counts from the engagement data
+                foreach ($engagementData as $row) {
+                    $loginCounts[$row['engagementDate']] = (int)$row['loginCount'];
+                }
+
+                // Separate keys and values for the chart
+                $engagementDates = array_keys($loginCounts);
+                $loginCounts = array_values($loginCounts);
+
+                // Max login count for y-axis scale
+                $maxLoginCount = max($loginCounts);
+            } else {
+                $engagementDates = [];
+                $loginCounts = [];
+                $maxLoginCount = 1;
+            }
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+        ?>
+
+        <!-- Include Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+            const engagementDates = <?php echo json_encode($engagementDates); ?>;
+            const loginCounts = <?php echo json_encode($loginCounts); ?>;
+            const hasDataEngagement = loginCounts.some(count => count > 0);
+            const maxLoginCount = <?php echo $maxLoginCount; ?>;
+
+            const engagementChartElement = document.getElementById('engagementChart');
+            const noDataMessageEngagement = document.getElementById('noDataMessageEngagement');
+
+            if (!hasDataEngagement) {
+                engagementChartElement.style.display = 'none';
+                noDataMessageEngagement.style.display = 'block';
+            } else {
+                const engagementData = {
+                    labels: engagementDates,
+                    datasets: [{
+                        label: 'Logins',
+                        data: loginCounts,
+                        fill: true,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.1
+                    }]
+                };
+
+                const engagementConfig = {
+                    type: 'line',
+                    data: engagementData,
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: maxLoginCount
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                };
+
+                new Chart(engagementChartElement, engagementConfig);
+            }
+        </script>
+    </div>
+</div>
+
+
             
 
                             </div>
