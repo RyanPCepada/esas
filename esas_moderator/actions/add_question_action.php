@@ -32,7 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['new_question'], $_POST
             'dateAdded' => date('Y-m-d H:i:s'),
             'moderator_id' => $moderator_id
         ]);
-        echo "New question added successfully!";
+        // echo "New question added successfully!";
+        header("location: ../settings.php");
     } else {
         echo "Error adding new question.";
     }
