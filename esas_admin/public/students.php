@@ -213,6 +213,7 @@ try {
                                     $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
 
 
+                                    
                                     $sql = "SELECT 
                                     s.student_id,
                                     s.firstName,
@@ -236,9 +237,10 @@ try {
                                 WHERE
                                     r.status = 'active' 
                                 GROUP BY 
-                                    s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail, s.phoneNumber, s.department, s.course, s.year, s.profilePic, r.application_id, r.club_id
+                                    s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail, s.phoneNumber, s.department, s.course, s.year, s.profilePic
                                 ORDER BY 
                                     s.student_id ASC;";
+
                             
                             if ($result = $pdo->query($sql)) {
                                 $totalRows = $result->rowCount();
