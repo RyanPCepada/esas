@@ -10,9 +10,9 @@ $moderator_id = $_SESSION['moderator_id'];
 
 // Fetch application questions along with club names for the club handled by the active moderator
 $sql = "
-    SELECT q.question_id, q.question, c.clubName, q.club_id 
-    FROM tbl_application_questions AS q
-    JOIN tbl_clubs AS c ON q.club_id = c.club_id
+    SELECT c.club_id, c.clubName, q.question_id, q.question
+    FROM tbl_clubs AS c
+    LEFT JOIN tbl_application_questions AS q ON c.club_id = q.club_id
     JOIN tbl_clubs_and_moderators AS cm ON c.club_id = cm.club_id
     WHERE cm.moderator_id = ?
 ";
