@@ -666,8 +666,9 @@ try {
         }
         ?>
 
-        <!-- Include Chart.js -->
+        <!-- Include Chart.js and the Zoom Plugin -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
 
         <script>
             const engagementDates = <?php echo json_encode($engagementDates); ?>;
@@ -682,6 +683,7 @@ try {
                 engagementChartElement.style.display = 'none';
                 noDataMessageEngagement.style.display = 'block';
             } else {
+                // Chart.js data and configuration with initial 10 visible data points and zoom/pan enabled
                 const engagementData = {
                     labels: engagementDates,
                     datasets: [{
@@ -699,6 +701,10 @@ try {
                     data: engagementData,
                     options: {
                         scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 10 // Show only 10 dates initially
+                            },
                             y: {
                                 beginAtZero: true,
                                 max: maxLoginCount
@@ -707,6 +713,24 @@ try {
                         plugins: {
                             legend: {
                                 display: false
+                            },
+                            zoom: {
+                                pan: {
+                                    enabled: true,
+                                    mode: 'x',
+                                    onPanComplete: function() {
+                                        engagementChart.update();
+                                    }
+                                },
+                                zoom: {
+                                    wheel: {
+                                        enabled: true
+                                    },
+                                    pinch: {
+                                        enabled: true
+                                    },
+                                    mode: 'x'
+                                }
                             }
                         },
                         responsive: true,
@@ -714,14 +738,11 @@ try {
                     }
                 };
 
-                new Chart(engagementChartElement, engagementConfig);
+                const engagementChart = new Chart(engagementChartElement, engagementConfig);
             }
         </script>
     </div>
 </div>
-
-
-            
 
                             </div>
                             <!-- ROW-1 CARDS END -->
