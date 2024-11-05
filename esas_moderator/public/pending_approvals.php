@@ -187,7 +187,7 @@ try {
     // Fetch and display pending approvals notification count
     function fetchPendingApprovalsNotificationCount() {
         $.ajax({
-            url: '/esas/esas_student/apis/notifications/pendingapprovals-notifications-api.php',
+            url: '/esas/esas_moderator/apis/notifications/pendingapprovals-notifications-api.php',
             method: 'GET',
             success: function(response) {
                 const data = JSON.parse(response);
