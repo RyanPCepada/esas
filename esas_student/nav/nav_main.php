@@ -68,7 +68,7 @@
                     <a class="dropdown-item py-1">Admission</a>
                     <a class="dropdown-item py-1">Library Resource</a>
                     <a class="dropdown-item py-1">Election Voting</a>
-                    <a class="dropdown-item py-1 position-relative" href="dashboard.php">Club Application
+                    <a class="dropdown-item py-1 position-relative" href="dashboard.php">Club Membership
                         <span id="dropdown-notification-count" class="dropdown-notification-badge" style="display:none;"></span>
                     </a>
                     <!-- <a class="dropdown-item py-1" href="clubs_old_v2.php">Club Application Old</a> -->
