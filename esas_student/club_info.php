@@ -635,7 +635,7 @@ $encodedClubName = addslashes($clubName);
                     </div>
                 <?php elseif ($clubsCount >= 2 && $disapprovedCount >= 3): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
-                        <p class="lead mb-0">You are already applyed in 2 clubs and reached the maximum number of applications allowed for this club.</p>
+                        <p class="lead mb-0">You already have 2 club memberships and reached the maximum number of applications allowed for this club.</p>
                     </div>
                 <?php elseif ($clubsCount >= 2): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
