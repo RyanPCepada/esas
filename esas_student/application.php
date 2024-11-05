@@ -89,7 +89,8 @@ if (isset($_GET['club_id'])) {
                     <?php if (!empty($questions)): ?>
                         <?php foreach ($questions as $index => $question): ?>
                             <div class="form-group">
-                                <label><?php echo htmlspecialchars($question['question_id']) . ". " . htmlspecialchars($question['question']); ?></label>
+                                <!-- <label><?php echo htmlspecialchars($question['question_id']); ?></label> -->
+                                <label><?php echo htmlspecialchars($question['question']); ?></label>
                                 <textarea name="question<?php echo $index + 1; ?>" rows="3" class="form-control" required></textarea>
                             </div>
                         <?php endforeach; ?>
