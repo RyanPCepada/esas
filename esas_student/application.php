@@ -40,12 +40,18 @@ if (isset($_GET['club_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eSAS - Student Application</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
-        body {
+        /* body {
             font: 14px Helvetica;
+        } */
+        body {
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
         }
         .wrapper {
             width: 100%;
@@ -56,17 +62,13 @@ if (isset($_GET['club_id'])) {
         .container-fluid {
             padding: 20px;
         }
-        .navbar-darkblue {
-            background-color: #003366;
-        }
-        .navbar-darkblue .navbar-toggler {
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-        .navbar-darkblue .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-        }
-        #dashboard_navigations {
-            float: flex-end;
+        .form-group {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            /* margin-bottom: 15px; */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            /* box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2); */
         }
         .form-group select {
             max-height: auto !important;
@@ -82,7 +84,7 @@ if (isset($_GET['club_id'])) {
             <div class="col-md-12">
                 <?php if (!empty($clubName)): ?>
                     <h2><strong><?php echo htmlspecialchars($clubName); ?></strong></h2>
-                    <h4 class="text-muted">Student Application</h4>
+                    <h4 class="text-muted">Student Application <i class="fas fa-file-alt"></i></h4>
                 <?php endif; ?>
                 <p class="mb-5">Please fill this form and submit to apply.</p>
                 <form action="../esas_student/actions/application_action.php" method="post">
@@ -90,13 +92,14 @@ if (isset($_GET['club_id'])) {
                         <?php foreach ($questions as $index => $question): ?>
                             <div class="form-group">
                                 <!-- <label><?php echo htmlspecialchars($question['question_id']); ?></label> -->
-                                <label><?php echo htmlspecialchars($question['question']); ?></label>
+                                <label><strong><?php echo htmlspecialchars($question['question']); ?></strong></label>
                                 <textarea name="question<?php echo $index + 1; ?>" rows="3" class="form-control" required></textarea>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <p>No questions are available for this club at the moment.</p>
                     <?php endif; ?>
+                    <br>
                     <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($club_id); ?>">
                     <input type="submit" class="btn btn-primary" value="Submit">
                     <a href="#" onclick="window.history.back();" class="btn btn-secondary">Cancel</a>
