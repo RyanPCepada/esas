@@ -458,8 +458,13 @@ try {
                                     <h4 class="text-muted mb-0">Application Status Summary</h4>
                                 </div>
 
+        <div class="col-md-6 p-1">
                                 <!-- Card for STUDENT TOTAL REGISTRATIONS -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+
+                    <div class="row px-2">
+
+                                
+                                <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -490,7 +495,7 @@ try {
                                 </div>
                                 
                                 <!-- Card for STUDENT TOTAL ACTIVE CLUBS -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -520,10 +525,13 @@ try {
                                         <p>Total Active Club</p>
                                     </div>
                                 </div>
+                                
+                    </div>
+                    <div class="row px-2">
 
 
                                 <!-- Card for STUDENT TOTAL PENDING APPROVAL -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -553,7 +561,7 @@ try {
 
 
                                 <!-- Card for STUDENT TOTAL DISAPPROVAL -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -580,6 +588,13 @@ try {
                                         <p>Total Disapproval</p>
                                     </div>
                                 </div>
+                                
+                    </div>
+        </div>
+        <div class="col-md-6"> 
+            hi
+        </div>
+            
 
                             </div>
                             <!-- ROW-1 CARDS END -->
