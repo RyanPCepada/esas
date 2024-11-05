@@ -114,8 +114,24 @@ try {
             background-color: #f5f5f5;
             cursor: pointer;
         }
-        
-/*HERE*/
+
+
+.pendingapprovals-notification-badge {
+    position: absolute;
+    min-width: 20px;
+    height: auto;
+    top: 5px;
+    right: 5px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 4px 4px;
+    font-size: 12px;
+    display: inline-block;
+    text-align: center;
+    line-height: 1;
+    z-index: 1000;
+}
 
 
 
@@ -162,8 +178,33 @@ try {
                         <li>
                             <a href="../../esas_moderator/public/pending_approvals.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="pending-approvals">
                                 <i class="fas fa-hourglass-half"></i> Pending Approvals
+                                <span id="pendingapprovals-notification-count" class="pendingapprovals-notification-badge" style="display:none;"></span>
                             </a>
                         </li>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Fetch and display pending approvals notification count
+    function fetchPendingApprovalsNotificationCount() {
+        $.ajax({
+            url: '/esas/esas_student/apis/notifications/pendingapprovals-notifications-api.php',
+            method: 'GET',
+            success: function(response) {
+                const data = JSON.parse(response);
+                if (data.unread_count > 0) {
+                    $('#pendingapprovals-notification-count').text(data.unread_count).show();
+                } else {
+                    $('#pendingapprovals-notification-count').hide();
+                }
+            }
+        });
+    }
+
+    // Fetch pending approvals notifications every 10 seconds
+    setInterval(fetchPendingApprovalsNotificationCount, 10000);
+    fetchPendingApprovalsNotificationCount();
+
+</script>
                         <li>
                             <a href="../../esas_moderator/public/departure_requests.php" class="nav-link left-sidebar text-dark" id="departure-requests">
                                 <i class="fas fa-door-open"></i> Departure Requests
