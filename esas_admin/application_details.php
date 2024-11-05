@@ -43,27 +43,20 @@ $stmt_all_clubs = $pdo->prepare($sql_all_clubs);
 $stmt_all_clubs->execute([$student_id]);
 $applications = $stmt_all_clubs->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch questions related to the club
-$sql_questions = "SELECT * FROM tbl_application_questions WHERE club_id = ?";
-$stmt_questions = $pdo->prepare($sql_questions);
-$stmt_questions->execute([$club_id]);
-$questions = $stmt_questions->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch answers for the application
+// Fetch answers for the application, including questions directly from tbl_application_answers
 $sql_answers = "
-    SELECT aa.answer, aq.question_id 
-    FROM tbl_application_answers aa 
-    JOIN tbl_application_questions aq ON aa.question_id = aq.question_id 
-    WHERE aa.application_id = ? AND aa.student_id = ? AND aa.club_id = ?
+    SELECT answer, question 
+    FROM tbl_application_answers 
+    WHERE application_id = ? AND student_id = ? AND club_id = ?
 ";
 $stmt_answers = $pdo->prepare($sql_answers);
 $stmt_answers->execute([$application_id, $student_id, $club_id]);
 $answers = $stmt_answers->fetchAll(PDO::FETCH_ASSOC);
 
-// Format answers by question_id
+// Format answers by question for easy display
 $formatted_answers = [];
 foreach ($answers as $answer) {
-    $formatted_answers[$answer['question_id']] = htmlspecialchars($answer['answer']);
+    $formatted_answers[$answer['question']] = htmlspecialchars($answer['answer']);
 }
 
 function formatDate($date) {
@@ -139,27 +132,20 @@ foreach ($applications as $application) {
                         $stmt_club->execute([$application['club_id']]);
                         $club = $stmt_club->fetch(PDO::FETCH_ASSOC);
 
-                        // Fetch questions related to the club
-                        $sql_questions = "SELECT * FROM tbl_application_questions WHERE club_id = ?";
-                        $stmt_questions = $pdo->prepare($sql_questions);
-                        $stmt_questions->execute([$application['club_id']]); // Use application club_id here
-                        $questions = $stmt_questions->fetchAll(PDO::FETCH_ASSOC);
-
                         // Fetch answers for the application
                         $sql_answers = "
-                            SELECT aa.answer, aq.question_id 
-                            FROM tbl_application_answers aa 
-                            JOIN tbl_application_questions aq ON aa.question_id = aq.question_id 
-                            WHERE aa.application_id = ? AND aa.student_id = ? AND aa.club_id = ?
+                            SELECT answer, question 
+                            FROM tbl_application_answers 
+                            WHERE application_id = ? AND student_id = ? AND club_id = ?
                         ";
                         $stmt_answers = $pdo->prepare($sql_answers);
-                        $stmt_answers->execute([$application['application_id'], $student_id, $application['club_id']]); // Use application details here
+                        $stmt_answers->execute([$application['application_id'], $student_id, $application['club_id']]);
                         $answers = $stmt_answers->fetchAll(PDO::FETCH_ASSOC);
 
-                        // Format answers by question_id
+                        // Format answers by question
                         $formatted_answers = [];
                         foreach ($answers as $answer) {
-                            $formatted_answers[$answer['question_id']] = htmlspecialchars($answer['answer']);
+                            $formatted_answers[$answer['question']] = htmlspecialchars($answer['answer']);
                         }
                         ?>
 
@@ -168,10 +154,9 @@ foreach ($applications as $application) {
                             
                             <?php
                                 // Display questions and answers
-                                foreach ($questions as $question) {
-                                    echo "<p><strong>" . htmlspecialchars($question['question']) . "</strong><br>";
-                                    $answer = !empty($formatted_answers[$question['question_id']]) ? $formatted_answers[$question['question_id']] : 'No answer provided.';
-                                    echo html_entity_decode(htmlspecialchars($answer)); // Decode and then display the answer
+                                foreach ($formatted_answers as $question => $answer) {
+                                    echo "<p><strong>" . htmlspecialchars($question) . "</strong><br>";
+                                    echo html_entity_decode($answer); // Decode and then display the answer
                                     echo "</p>";
                                 }
                             ?>
@@ -197,28 +182,17 @@ foreach ($applications as $application) {
                                 </div>
                             <?php elseif ($status === 'inactive'): ?>
                                 <div class="status-block">
-                                    <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
                                     <hr>
                                     <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                                    <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
-                                    <p><strong>Date Inactivated:</strong> <?php echo formatDate($application['dateModified']); ?></p>
+                                    <p><strong>Date Inactivated:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
                                 </div>
                             <?php elseif ($status === 'departed'): ?>
                                 <div class="status-block">
-                                    <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
                                     <hr>
                                     <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                                    <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
-                                    <p><strong>Date Departed:</strong> <?php echo formatDate($application['dateModified']); ?></p>
-                                </div>
-                            <?php elseif ($status === 'maxed'): ?>
-                                <div class="status-block">
-                                    <hr>
-                                    <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                                    <p><strong>Date Maxed:</strong> <?php echo formatDate($application['dateModified']); ?></p>
+                                    <p><strong>Date Departed:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
                                 </div>
                             <?php endif; ?>
-
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -229,8 +203,6 @@ foreach ($applications as $application) {
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
