@@ -175,7 +175,10 @@ $(document).ready(function() {
                                 <a href="../settings.php">Edit Information in Settings</a>
 
                                 <div class="dashed-border"></div>
-                                <p class="club_moderators text-muted my-2">${moderatorsCount} Club Moderators <i class="fas fa-shield-alt text-danger" style="font-size: 20px;"></i></p>
+                                <p class="club_moderators text-muted my-2">
+                                    ${moderatorsCount} ${moderatorsCount === 1 ? "Club Moderator" : "Club Moderators"} 
+                                    <i class="fas fa-shield-alt text-danger" style="font-size: 20px;"></i>
+                                </p>
                                 <div class="about-row">
                                     ${buildCards(club.moderators, 'moderator')}
                                 </div>
