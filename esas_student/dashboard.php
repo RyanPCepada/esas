@@ -639,7 +639,7 @@ try {
                 $currentDate = clone $startDate;
 
                 while ($currentDate <= $endDate) {
-                    $formattedDate = $currentDate->format('Y-m-d');
+                    $formattedDate = $currentDate->format('m-d-y'); // Change to MM-DD-YY format
                     $engagementDates[] = $formattedDate;
                     $loginCounts[$formattedDate] = 0;  // Default to zero if no engagement
                     $currentDate->modify('+1 day');
@@ -647,7 +647,7 @@ try {
 
                 // Populate counts from the engagement data
                 foreach ($engagementData as $row) {
-                    $loginCounts[$row['engagementDate']] = (int)$row['loginCount'];
+                    $loginCounts[date('m-d-y', strtotime($row['engagementDate']))] = (int)$row['loginCount'];
                 }
 
                 // Separate keys and values for the chart
@@ -683,7 +683,7 @@ try {
                 engagementChartElement.style.display = 'none';
                 noDataMessageEngagement.style.display = 'block';
             } else {
-                // Chart.js data and configuration with initial 10 visible data points and zoom/pan enabled
+                // Chart.js data and configuration without tension for straight lines
                 const engagementData = {
                     labels: engagementDates,
                     datasets: [{
@@ -692,7 +692,7 @@ try {
                         fill: true,
                         borderColor: 'rgba(54, 162, 235, 1)',
                         backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        tension: 0.1
+                        tension: 0 // No tension for straight lines
                     }]
                 };
 
@@ -743,6 +743,7 @@ try {
         </script>
     </div>
 </div>
+
 
                             </div>
                             <!-- ROW-1 CARDS END -->
