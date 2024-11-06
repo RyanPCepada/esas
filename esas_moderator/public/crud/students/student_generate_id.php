@@ -87,9 +87,6 @@ if (!$club) {
             overflow: hidden;
             flex: 0 1 280px; /* Prevent card from growing too much, maintain width */
         }
-        .school-header, .student-info {
-            padding: 10px;
-        }
         .school-header {
             padding: 5px 10px;
             font-size: 12px;
@@ -241,13 +238,7 @@ if (!$club) {
                                     margin: 3px 0;">  <!-- Adjusted margin -->
                             <strong>Email:</strong> <?php echo htmlspecialchars($student['instiEmail']); ?>
                         </h5>
-                        <h5 style="color: black; text-shadow: 
-                                    0 0 5px rgba(255, 255, 255, 0.7),  
-                                    0 0 10px rgba(255, 255, 255, 0.5),  
-                                    0 0 15px rgba(255, 255, 255, 0.3);
-                                    margin: 3px 0;">  <!-- Adjusted margin -->
-                            <strong>Contact #:</strong> <?php echo htmlspecialchars($student['phoneNumber']); ?>
-                        </h5>
+                        
                     </div>
 
                 </div>
@@ -273,56 +264,145 @@ if (!$club) {
 
 
             <div class="id-card-back" style="background-image: url('/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>');">
-    <!-- Cover photo at the back -->
-    <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>" alt="Cover Photo" 
-         style="width: 100%; height: 100%; border-radius: 10px; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 0; 
-                opacity: 1; filter: brightness(0.5);">
+                <!-- Cover photo at the back -->
+                <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>" alt="Cover Photo" 
+                    style="width: 100%; height: 100%; border-radius: 10px; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 0; 
+                            opacity: 1; filter: brightness(0.5);">
 
-    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-                background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, .95), rgba(255, 255, 255, 0.1)); 
-                border-radius: 10px; z-index: 1;"></div>
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+                            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, .95), rgba(255, 255, 255, 0.1)); 
+                            border-radius: 10px; z-index: 1;"></div>
 
-    <!-- ID Background in front of cover photo -->
-    <img src="/esas/esas_admin/images/ID_BACKGROUND.png" alt="ID Background" 
-         style="width: 100%; height: 100%; border-radius: 10px; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;">
+                <!-- ID Background in front of cover photo -->
+                <img src="/esas/esas_admin/images/ID_BACKGROUND.png" alt="ID Background" 
+                    style="width: 100%; height: 100%; border-radius: 10px; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;">
 
-    <div class="school-details" style="position: relative; z-index: 2; display: flex; justify-content: center; margin: 0;">
-        <div style="text-align: center; color: rgba(255, 255, 255, 1);">
-            <p style="font-size: 8px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">VALIDATION ID CARD</p>
-            <p style="font-size: 10px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);"><strong>MEMBERSHIP VALIDATION</strong></p>
-        </div>
-    </div>
+                <div class="student-details" style="position: relative; z-index: 2; display: flex; justify-content: center;">
+                        <div style="text-align: start; color: rgba(255, 255, 255, 1);">
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                                <div style="display: flex; justify-content: flex-start;">
+                                    <h5 style="color: white; text-shadow: 0 3px 5px rgba(0, 0, 0, .5); width: 35%; margin: 0;">
+                                        <strong>Gender:</strong>
+                                    </h5>
+                                    <h5 style="color: white; text-shadow: 0 3px 5px rgba(0, 0, 0, .5); width: 65%; flex-grow: 1; margin: 0;">
+                                        <?php echo htmlspecialchars($student['gender']); ?>
+                                    </h5>
+                                </div>
+                                <div style="display: flex; justify-content: flex-start;">
+                                    <h5 style="color: white; text-shadow: 0 3px 5px rgba(0, 0, 0, .5); width: 35%; margin: 0;">
+                                        <strong>Birthdate:</strong>
+                                    </h5>
+                                    <h5 style="color: white; text-shadow: 0 3px 5px rgba(0, 0, 0, .5); width: 65%; flex-grow: 1; margin: 0;">
+                                        <?php echo date("m/d/Y", strtotime($student['birthday'])); ?>
+                                    </h5>
+                                </div>
+                                <div style="display: flex; justify-content: flex-start;">
+                                    <h5 style="color: white; text-shadow: 0 3px 5px rgba(0, 0, 0, .5); width: 35%; margin: 0;">
+                                        <strong>Blood Type:</strong>
+                                    </h5>
+                                    <h5 style="color: white; text-shadow: 0 3px 5px rgba(0, 0, 0, .5); width: 65%; flex-grow: 1; margin: 0;">
+                                        <?php echo htmlspecialchars($student['bloodType']); ?>
+                                    </h5>
+                                </div>
+                                <div style="display: flex; justify-content: flex-start;">
+                                    <h5 style="color: white; text-shadow: 0 3px 5px rgba(0, 0, 0, .5); width: 35%; margin: 0;">
+                                        <strong>Contact #:</strong>
+                                    </h5>
+                                    <h5 style="color: white; text-shadow: 0 3px 5px rgba(0, 0, 0, .5); width: 65%; flex-grow: 1; margin: 0;">
+                                        <?php echo htmlspecialchars($student['phoneNumber']); ?>
+                                    </h5>
+                                </div>
+                                <div style="display: flex; justify-content: flex-start;">
+                                    <h5 style="color: white; text-shadow: 0 3px 5px rgba(0, 0, 0, .5); width: 35%; margin: 0;">
+                                        <strong>Address:</strong>
+                                    </h5>
+                                    <h5 style="color: white; text-shadow: 0 3px 5px rgba(0, 0, 0, .5); width: 65%; flex-grow: 1; margin: 0;">
+                                        <?php 
+                                            echo htmlspecialchars($student['street']) . ', ' . 
+                                                htmlspecialchars($student['barangay']) . ', ' . 
+                                                htmlspecialchars($student['municipality']) . ', ' . 
+                                                htmlspecialchars($student['province']); 
+                                        ?>
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                </div>
 
-    <div class="student-info" style="position: relative; z-index: 2; text-align: center; padding-top: 20px;">
-        <!-- Club Name -->
-        <h3 style="font-size: 21px; color: gold; line-height: 1; text-shadow: 0 3px 3px rgba(0, 0, 0, 1);">
-            <em><strong><?php echo htmlspecialchars($club['clubName']); ?></strong></em>
-        </h3>
+                <div class="guardian" style="position: relative; z-index: 2; text-align: center; margin-top: 5px;">
+                    
+                    <!-- Guardian Table -->
+                    <table style="width: 100%; margin: 10px auto; border-collapse: collapse; font-size: 13px; z-index: 2;">
+                        <thead>
+                            <tr>
+                                <th colspan="4" style="border: 1px solid #fff; padding: 3px; color: white; background: rgba(0, 0, 0, 0.5);">INCASE OF EMERGENCY PLEASE NOTIFY</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="2" style="border: 1px solid #fff; padding: 5px; color: white; background: rgba(0, 0, 0, 0.3);">
+                                    <strong>
+                                        Mr. & Mrs. <?php echo htmlspecialchars($student['fatherFirstName']) . ' ' . htmlspecialchars($student['fatherLastName']); ?>
+                                    </strong><br>Parent/Guardian
+                                </td>
+                                <td colspan="2" style="border: 1px solid #fff; padding: 5px; color: white; background: rgba(0, 0, 0, 0.3);">
+                                    <strong><?php echo htmlspecialchars($student['guardianPhoneNumber']); ?></strong><br>Contact #
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-        <!-- Validity Table -->
-        <table style="width: 100%; margin-top: 20px; border-collapse: collapse; z-index: 2;">
-            <thead>
-                <tr>
-                    <th style="border: 1px solid #fff; padding: 5px; color: white;">Year</th>
-                    <th style="border: 1px solid #fff; padding: 5px; color: white;">Signature</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                for ($i = 0; $i < 5; $i++) {
-                    $year = date("Y") + $i; // Current year and next four years
-                    echo "<tr style='text-align: center;'>
-                            <td style='border: 1px solid #fff; padding: 5px; color: white;'>$year</td>
-                            <td style='border: 1px solid #fff; padding: 5px; color: white;'>____________________</td>
-                          </tr>";
-                }
-                ?>
-            </tbody>
-        </table>
+                </div>
 
-    </div>
 
-</div>
+                <div class="validation" style="position: relative; z-index: 2; text-align: center; margin-top: 5px;">
+                    
+                    <!-- Validity Table -->
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px; z-index: 2;">
+                        <thead>
+                            <tr>
+                                <th colspan="4" style="border: 1px solid #fff; padding: 3px; color: white; background: rgba(0, 0, 0, 0.5);">VALIDATION</th>
+                            </tr>
+                            <tr>
+                                <th style="border: 1px solid #fff; padding: 3px; color: white; background: rgba(0, 0, 0, 0.4);">A.Y.</th>
+                                <th style="border: 1px solid #fff; padding: 3px; color: white; background: rgba(0, 0, 0, 0.4);">1st Sem</th>
+                                <th style="border: 1px solid #fff; padding: 3px; color: white; background: rgba(0, 0, 0, 0.4);">2nd Sem</th>
+                                <th style="border: 1px solid #fff; padding: 3px; color: white; background: rgba(0, 0, 0, 0.4);">Summer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            // Use the date student was added to calculate starting academic year
+                            $startYear = date("Y", strtotime($student['dateAdded'])); // Extract the year from dateAdded
+
+                            // Loop to generate rows for five academic years
+                            for ($i = 0; $i < 5; $i++) {
+                                $year1 = $startYear + $i;
+                                $year2 = $year1 + 1;
+                                $academicYear = $year1 . '-' . $year2; // Format like "2022-2023"
+                                echo "<tr style='text-align: center;'>
+                                        <td style='border: 1px solid #fff; padding: 5px; color: #333333;'>$academicYear</td>
+                                        <td style='border: 1px solid #fff; padding: 5px; color: #333333;'></td>
+                                        <td style='border: 1px solid #fff; padding: 5px; color: #333333;'></td>
+                                        <td style='border: 1px solid #fff; padding: 5px; color: #333333;'></td>
+                                    </tr>";
+                        
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                
+                <div class="validation" style="position: relative; z-index: 2; text-align: center; margin-top: 5px;">
+                    
+                    <h5 style="color: white; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">
+                        <p style="margin-bottom: 3px;">____________________</p>Student Signature
+                    </h5>
+
+                </div>
+            </div>
 
 
 
