@@ -22,6 +22,12 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
 // Set default timezone
 date_default_timezone_set('Asia/Manila');
 
+// Fetch club name
+$sql_club = "SELECT clubName FROM tbl_clubs WHERE club_id = ?";
+$stmt_club = $pdo->prepare($sql_club);
+$stmt_club->execute([$club_id]);
+$club = $stmt_club->fetch(PDO::FETCH_ASSOC); 
+
 // Fetch accomplishment reports for the student in this club
 $sql = "SELECT * FROM tbl_accomplishment_reports WHERE student_id = :student_id AND club_id = :club_id ORDER BY dateAdded DESC";
 $stmt = $pdo->prepare($sql);
@@ -30,47 +36,36 @@ $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
 $stmt->execute();
 $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Check if the form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $title = trim($_POST["title"]);
-    $description = trim($_POST["description"]);
-    $student_id = $_POST["student_id"];
-    $club_id = $_POST["club_id"];
+// Function to label reports by date
+function getDateLabel($date) {
+    $today = new DateTime('today');
+    $yesterday = new DateTime('yesterday');
+    $dateObj = new DateTime($date);
 
-    // File upload configuration
-    $targetDir = "../../uploads/"; // Correct path for file uploads
-    $fileName = basename($_FILES["accReportFile"]["name"]);
-    $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
-    // Check if file is a PDF
-    if ($fileType != "pdf") {
-        echo "Only PDF files are allowed.";
-        exit;
-    }
-
-    // Move file to target directory
-    $filePath = $targetDir . uniqid() . "_" . $fileName;
-    if (move_uploaded_file($_FILES["accReportFile"]["tmp_name"], $filePath)) {
-        // Insert record into the database
-        $sql = "INSERT INTO tbl_accomplishment_reports (title, description, accReportFile, student_id, club_id, dateAdded) VALUES (:title, :description, :accReportFile, :student_id, :club_id, NOW())";
-        if ($stmt = $pdo->prepare($sql)) {
-            $stmt->bindParam(":title", $title, PDO::PARAM_STR);
-            $stmt->bindParam(":description", $description, PDO::PARAM_STR);
-            $stmt->bindParam(":accReportFile", $filePath, PDO::PARAM_STR);
-            $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
-            $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-
-            if ($stmt->execute()) {
-                header("Location: accomplishment_report.php?club_id=" . $club_id);
-                exit();
-            } else {
-                echo "Something went wrong. Please try again.";
-            }
-        }
-        unset($stmt);
+    if ($dateObj >= $today) {
+        return "Today";
+    } elseif ($dateObj >= $yesterday) {
+        return "Yesterday";
+    } elseif ($dateObj >= new DateTime('last monday')) {
+        return "Earlier This Week";
+    } elseif ($dateObj >= new DateTime('last sunday -1 week')) {
+        return "Last Week";
+    } elseif ($dateObj->format('Y-m') === $today->format('Y-m')) {
+        return "Earlier This Month";
+    } elseif ($dateObj->format('Y-m') === $today->modify('-1 month')->format('Y-m')) {
+        return "Last Month";
+    } elseif ($dateObj->format('Y') === $today->format('Y')) {
+        return $dateObj->format('F');
     } else {
-        echo "Failed to upload file.";
+        return "Last Year";
     }
+}
+
+// Group reports by their date label
+$groupedReports = [];
+foreach ($reports as $report) {
+    $label = getDateLabel($report['dateAdded']);
+    $groupedReports[$label][] = $report;
 }
 ?>
 
@@ -80,8 +75,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>eSAS - Accomplishment Reports</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
-    <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
@@ -92,117 +85,187 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin: 0;
             padding: 0;
         }
+
         .wrapper {
             width: 100%;
-            max-width: 700px; /* Increased to occupy more space */
+            max-width: 1200px;
             margin: 0 auto;
             padding: 15px;
         }
+
         .container {
             height: auto;
             background-color: white;
             padding: 25px;
         }
+
         .no-report {
             text-align: center;
             padding: 50px 0;
         }
+
         .no-report i {
             font-size: 50px;
             color: #ccc;
         }
+
         .btn-plus {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 30px;
+            font-size: 60px;
             color: #007bff;
             background-color: transparent;
             border: none;
             cursor: pointer;
         }
+
         .btn-plus:hover {
             color: #0056b3;
+        }
+
+        #fileIconPreview {
+            width: 100px;
+            height: auto;
+            display: none;
+        }
+
+        .reports-list {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .report-item {
+            width: 180px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border: solid 1px lightgrey;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .report-item:hover {
+            background-color: #f1f1f1;
+            border: solid 1px grey;
+            cursor: pointer;
+        }
+
+        .report-item img {
+            width: 100%;
+            height: auto;
+        }
+
+        .report-item h3,
+        .report-item p,
+        .report-item .date {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     </style>
 </head>
 <body>
 <div class="wrapper">
-    <h2 class="mt-5">Accomplishment Reports</h2>
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div class="row">
+            <h2 class="mt-5">Accomplishment Reports</h2>
+            <p class="text-muted">All your accomplishment reports submitted in <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
+        </div>
+        <button class="btn-plus" onclick="openAccomplishmentReportModal()">+</button>
+    </div>
+
     <div class="container-fluid container mb-5 auto-scroll">
-    <?php if (count($reports) > 0): ?>
-            <div class="reports-list">
-                <?php foreach ($reports as $report): ?>
-                    <div class="report-item">
-                        <h3><?php echo htmlspecialchars($report['title']); ?></h3>
-                        <p><?php echo htmlspecialchars($report['description']); ?></p>
-                        <a href="../../uploads/<?php echo htmlspecialchars($report['accReportFile']); ?>" target="_blank">View Report</a>
-                        <p class="date">Submitted on: <?php echo htmlspecialchars($report['dateAdded']); ?></p>
-                    </div>
-                <?php endforeach; ?>
-            </div>
+        <?php if (!empty($groupedReports)): ?>
+            <?php foreach ($groupedReports as $label => $reports): ?>
+                <h4 class="mb-4"><?php echo htmlspecialchars($label); ?></h4>
+                <div class="reports-list">
+                    <?php foreach ($reports as $report): ?>
+                        <div class="report-item" onclick="openTab('<?php echo htmlspecialchars($report['accReportFile']); ?>')">
+                            <img src="/esas/esas_student/icons/ICON_PDF.png" alt="PDF Icon">
+                            <h3 title="<?php echo htmlspecialchars($report['title']); ?>"><?php echo htmlspecialchars($report['title']); ?></h3>
+                            <p class="date" title="<?php echo htmlspecialchars($report['dateAdded']); ?>">
+                                <?php echo date('m/d/Y h:i A', strtotime($report['dateAdded'])); ?>
+                            </p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endforeach; ?>
         <?php else: ?>
             <div class="no-report">
                 <p>No accomplishment reports found.</p>
-                <!-- Use an icon for no reports -->
                 <i class="fas fa-file-pdf"></i>
             </div>
         <?php endif; ?>
 
-        <!-- Plus icon button to open modal -->
-<button class="btn-plus" onclick="openAccomplishmentReportModal()">+</button>
-
         <!-- Accomplishment Report Modal -->
-<div id="accomplishmentReportModal" class="modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); background-color: rgba(0,0,0,0.4);">
-    <div style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;">
-        <span style="color: #4CAF50; font-weight: bold;">Add Accomplishment Report</span>
-        <p>Please fill out the form to upload your accomplishment report.</p>
-        <form id="accomplishmentReportForm" action="../actions/add_accreport_action.php" method="post" enctype="multipart/form-data" onsubmit="submitAccomplishmentReport(event)">
-            <div class="form-group">
-                <label for="reportTitle">Title:</label>
-                <input type="text" name="title" id="reportTitle" class="form-control" required>
+        <div id="accomplishmentReportModal" class="modal" style="display:none;">
+            <div style="background-color: white; margin: 4% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;">
+                <span style="color: #4CAF50; font-weight: bold;">Add Accomplishment Report</span>
+                <p>Please fill out the form to upload your accomplishment report.</p>
+                <form id="accomplishmentReportForm" action="../actions/accomplishment_report_action.php" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="reportTitle">Title:</label>
+                        <input type="text" name="title" id="reportTitle" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reportDescription">Description:</label>
+                        <textarea name="description" id="reportDescription" class="form-control" required></textarea>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="accReportFile">Upload PDF:</label>
+                        <input type="file" name="accReportFile" id="accReportFile" accept="application/pdf" class="form-control" required onchange="previewFile(event)">
+                        <small class="form-text text-muted">Accepted format: PDF only.</small>
+                    </div>
+                    <div class="form-group mb-3">
+                        <img id="fileIconPreview" src="#" alt="File Icon Preview" style="display: none;" />
+                        <p id="fileNamePreview" style="display:none;"></p>
+                    </div>
+                    <input type="hidden" name="student_id" value="<?php echo $student_id; ?>">
+                    <input type="hidden" name="club_id" value="<?php echo $club_id; ?>">
+                    <button type="submit" class="btn btn-success">Submit Report</button>
+                    <button type="button" class="btn btn-danger" onclick="closeAccomplishmentReportModal()">Close</button>
+                </form>
             </div>
-
-            <div class="form-group">
-                <label for="reportDescription">Description:</label>
-                <textarea name="description" id="reportDescription" class="form-control" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="accReportFile">Upload PDF:</label>
-                <input type="file" name="accReportFile" id="accReportFile" accept="application/pdf" class="form-control" required>
-            </div>
-
-            <input type="hidden" name="student_id" value="<?php echo $student_id; ?>">
-            <input type="hidden" name="club_id" value="<?php echo $club_id; ?>">
-
-            <button type="submit" class="btn btn-success">Submit Report</button>
-            <button type="button" class="btn btn-secondary" onclick="closeAccomplishmentReportModal()">Cancel</button>
-        </form>
+        </div>
     </div>
 </div>
 
 <script>
-    // Function to open the modal
-    function openAccomplishmentReportModal() {
-        document.getElementById("accomplishmentReportModal").style.display = "block";
-    }
+// Function to preview selected file's icon
+function previewFile(event) {
+    const fileInput = event.target;
+    const fileIconPreview = document.getElementById("fileIconPreview");
+    const fileNamePreview = document.getElementById("fileNamePreview");
 
-    // Function to close the modal
-    function closeAccomplishmentReportModal() {
-        document.getElementById("accomplishmentReportModal").style.display = "none";
+    if (fileInput.files && fileInput.files[0]) {
+        fileIconPreview.style.display = "block";
+        fileIconPreview.src = "/esas/esas_student/icons/ICON_PDF.png";
+        fileNamePreview.style.display = "block";
+        fileNamePreview.textContent = fileInput.files[0].name;
+    } else {
+        fileIconPreview.style.display = "none";
+        fileNamePreview.style.display = "none";
     }
+}
 
-    // Function to handle the form submission (for custom handling if needed)
-    function submitAccomplishmentReport(event) {
-        event.preventDefault();
-        var form = document.getElementById("accomplishmentReportForm");
-        
-        // If using AJAX or any custom handling, you can handle it here
-        form.submit();  // This will submit the form normally
-    }
+// Function to open report in a new tab
+function openTab(fileName) {
+    window.open(fileName, '_blank');
+}
+
+// Function to open modal
+function openAccomplishmentReportModal() {
+    document.getElementById("accomplishmentReportModal").style.display = "block";
+}
+
+// Function to close modal
+function closeAccomplishmentReportModal() {
+    document.getElementById("accomplishmentReportModal").style.display = "none";
+}
 </script>
-
-
 </body>
 </html>
