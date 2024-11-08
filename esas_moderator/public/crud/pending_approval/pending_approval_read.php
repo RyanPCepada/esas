@@ -146,10 +146,11 @@ if (isset($_GET["student_id"]) && !empty(trim($_GET["student_id"]))
 }
 
 // Function to update the application status and remark
-function updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $newStatus, $remark) {
+function updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $newStatus, $remark, $moderator_id) {
     echo "<script>console.log('Updating application status to " . $newStatus . "');</script>";
+
     $updateSql = "UPDATE tbl_application 
-                  SET status = :status, dateDecided = NOW(), remark = :remark 
+                  SET status = :status, dateDecided = NOW(), remark = :remark, moderator_id = :moderator_id 
                   WHERE student_id = :student_id 
                   AND club_id = :club_id 
                   AND application_id = :application_id";
@@ -157,11 +158,13 @@ function updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $
     $stmt = $pdo->prepare($updateSql);
     $stmt->execute([
         ':status' => $newStatus,
-        ':remark' => $remark, // Add the remark parameter here
+        ':remark' => $remark,
+        ':moderator_id' => $moderator_id,
         ':student_id' => $student_id,
         ':club_id' => $club_id,
         ':application_id' => $application_id,
     ]);
+
     $rowCount = $stmt->rowCount();
     echo "<script>console.log('Rows affected: " . $rowCount . "');</script>";
     return $rowCount;
@@ -217,7 +220,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
     // Update applications status
     echo "<script>console.log('Updating applications status...');</script>";
-    if (updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $newStatus, $_POST['remark']) > 0) {
+    if (updateApplicationStatus($pdo, $student_id, $club_id, $application_id, $newStatus, $_POST['remark'], $moderator_id) > 0) {
         echo "<script>console.log('Applications status updated successfully');</script>";
         
         // Check the current active memberships after approval
