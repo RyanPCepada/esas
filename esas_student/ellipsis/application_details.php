@@ -124,11 +124,21 @@ function formatDate($date) {
             background-color: white;
             padding: 25px;
         }
+        h2 {
+            margin-top: 48px;
+        }
+
+        
+        @media (max-width: 767px) {
+            h2 {
+                margin-top: 5px;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="wrapper">
-    <h2 class="mt-5">Application Details</h2>
+    <h2>Application Details</h2>
     <div class="justify-content-between">
         <p class="text-muted">Review your application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
         <p>Status: <?php echo $icon; ?> <strong><?php echo ucfirst($status); ?></strong></p>
