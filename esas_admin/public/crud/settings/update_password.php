@@ -2,19 +2,19 @@
 require_once "../../../../config.php";
 session_start();
 
-if (!isset($_SESSION['moderator_id'])) {
+if (!isset($_SESSION['admin_id'])) {
     die("You are not logged in.");
 }
 
-$moderator_id = $_SESSION['moderator_id'];
+$admin_id = $_SESSION['admin_id'];
 
-$sql = "SELECT * FROM tbl_moderators WHERE moderator_id = ?";
+$sql = "SELECT * FROM tbl_admin WHERE admin_id = ?";
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$moderator_id]);
-$moderator = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt->execute([$admin_id]);
+$admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$moderator) {
-    die("Moderator not found.");
+if (!$admin) {
+    die("Admin not found.");
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $response = [];
 
     // Step 1: Verify current password using password_verify
-    if (!password_verify($currentPassword, $moderator['password'])) {
+    if (!password_verify($currentPassword, $admin['password'])) {
         $response['error'] = "Current password is incorrect.";
     }
     // Step 2: Check if new password matches confirmation password
@@ -39,17 +39,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
         // Update password in database
-        $updateSql = "UPDATE tbl_moderators SET password = ? WHERE moderator_id = ?";
+        $updateSql = "UPDATE tbl_admin SET password = ? WHERE admin_id = ?";
         $updateStmt = $pdo->prepare($updateSql);
 
-        if ($updateStmt->execute([$hashedPassword, $moderator_id])) {
+        if ($updateStmt->execute([$hashedPassword, $admin_id])) {
             // Log the activity
-            $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
+            $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id) VALUES (:activity, :dateAdded, :admin_id)";
             $logStmt = $pdo->prepare($logSql);
             $logStmt->execute([
                 'activity' => 'You changed your password',
                 'dateAdded' => date('Y-m-d H:i:s'),
-                'moderator_id' => $moderator_id
+                'admin_id' => $admin_id
             ]);
             $response['success'] = "Password updated successfully!";
         } else {
@@ -84,7 +84,7 @@ $(document).ready(function() {
         e.preventDefault();
 
         $.ajax({
-            url: '../esas_moderator/public/crud/settings/update_password.php',
+            url: '../esas_admin/public/crud/settings/update_password.php',
             type: 'POST',
             data: $(this).serialize(),
             dataType: 'json',
