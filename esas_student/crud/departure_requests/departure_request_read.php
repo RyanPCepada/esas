@@ -76,11 +76,21 @@ try {
             background-color: white;
             padding: 20px;
         }
+        h2 {
+            margin-top: 48px;
+        }
+
+        
+        @media (max-width: 767px) {
+            h2 {
+                margin-top: 5px;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="wrapper">
-    <h3 class="text-muted mt-5 mb-3">Departure Request</h3>
+    <h2 class="text-muted mb-3">Departure Request</h2>
     <div class="container-fluid container">
         <div class="row">
             <?php if (!empty($departureRequests)): ?>
