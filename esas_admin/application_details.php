@@ -131,6 +131,16 @@ foreach ($applications as $application) {
                         $stmt_club = $pdo->prepare($sql_club);
                         $stmt_club->execute([$application['club_id']]);
                         $club = $stmt_club->fetch(PDO::FETCH_ASSOC);
+                        
+// Fetch moderator's full name by concatenating firstName, middleName, and lastName
+$sql_moderator = "
+SELECT CONCAT(firstName, ' ', IFNULL(middleName, ''), ' ', lastName) AS fullname 
+FROM tbl_moderators 
+WHERE moderator_id = ?
+";
+$stmt_moderator = $pdo->prepare($sql_moderator);
+$stmt_moderator->execute([$application['moderator_id']]);
+$moderator = $stmt_moderator->fetch(PDO::FETCH_ASSOC);
 
                         // Fetch answers for the application
                         $sql_answers = "
@@ -164,6 +174,7 @@ foreach ($applications as $application) {
                             <?php if ($status === 'active'): ?>
                                 <div class="status-block">
                                     <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
+                                    <p class="text-primary"><strong>Approved by:<br></strong><?php echo htmlspecialchars($moderator['fullname']); ?></p>
                                     <hr>
                                     <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                                     <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
@@ -171,6 +182,7 @@ foreach ($applications as $application) {
                             <?php elseif ($status === 'disapproved'): ?>
                                 <div class="status-block">
                                     <p class="text-danger"><strong>Disapproval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
+                                    <p class="text-primary"><strong>Disapproved by:<br></strong><?php echo htmlspecialchars($moderator['fullname']); ?></p>
                                     <hr>
                                     <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                                     <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
@@ -182,15 +194,25 @@ foreach ($applications as $application) {
                                 </div>
                             <?php elseif ($status === 'inactive'): ?>
                                 <div class="status-block">
+                                    <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
+                                    <p class="text-primary"><strong>Approved by:<br></strong><?php echo htmlspecialchars($moderator['fullname']); ?></p>
                                     <hr>
                                     <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                                    <p><strong>Date Inactivated:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
+                                    <p><strong>Date Inactivated:</strong> <?php echo formatDate($application['dateModified']); ?></p>
                                 </div>
                             <?php elseif ($status === 'departed'): ?>
                                 <div class="status-block">
+                                    <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
+                                    <p class="text-primary"><strong>Approved by:<br></strong><?php echo htmlspecialchars($moderator['fullname']); ?></p>
                                     <hr>
                                     <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                                    <p><strong>Date Departed:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
+                                    <p><strong>Date Departed:</strong> <?php echo formatDate($application['dateModified']); ?></p>
+                                </div>
+                            <?php elseif ($status === 'maxed'): ?>
+                                <div class="status-block">
+                                    <hr>
+                                    <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
+                                    <p><strong>Date Maxed:</strong> <?php echo formatDate($application['dateModified']); ?></p>
                                 </div>
                             <?php endif; ?>
                         </div>
