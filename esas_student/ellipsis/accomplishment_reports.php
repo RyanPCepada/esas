@@ -128,44 +128,49 @@ foreach ($reports as $report) {
         }
 
         .reports-list {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 20px;
-            justify-content: center;
-        }
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
 
-        .report-item {
-            width: 180px;
-            background-color: #f9f9f9;
-            padding: 15px;
-            border: solid 1px lightgrey;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+.report-item {
+    width: 180px;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border: solid 1px lightgrey;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
 
-        .report-item:hover {
-            background-color: #f1f1f1;
-            border: solid 1px grey;
-            cursor: pointer;
-        }
+.report-item:hover {
+    background-color: #f1f1f1;
+    border: solid 1px grey;
+    cursor: pointer;
+}
 
-        .report-item img {
-            width: 100%;
-            height: auto;
-        }
+.report-item img {
+    width: 100%;
+    height: auto;
+}
 
-        .report-item h3,
-        .report-item p,
-        .report-item .date {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+.report-item h5 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit to 2 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
+
+.report-item .date {
+    display: none; /* Hide date visually but keep in title */
+}
+
     </style>
 </head>
 <body>
@@ -179,17 +184,16 @@ foreach ($reports as $report) {
     </div>
 
     <div class="container-fluid container mb-5 auto-scroll">
-        <?php if (!empty($groupedReports)): ?>
+        <?php if (!empty($groupedReports)): ?> 
             <?php foreach ($groupedReports as $label => $reports): ?>
                 <h4 class="mb-4"><?php echo htmlspecialchars($label); ?></h4>
                 <div class="reports-list">
                     <?php foreach ($reports as $report): ?>
-                        <div class="report-item" onclick="openTab('<?php echo htmlspecialchars($report['accReportFile']); ?>')">
+                        <div class="report-item" 
+                            title="<?php echo htmlspecialchars($report['originalFileName']) . "\n" . date('m/d/Y h:i A', strtotime($report['dateAdded'])); ?>" 
+                            onclick="openTab('<?php echo htmlspecialchars($report['accReportFile']); ?>')">
                             <img src="/esas/esas_student/icons/ICON_PDF.png" alt="PDF Icon">
-                            <h3 title="<?php echo htmlspecialchars($report['title']); ?>"><?php echo htmlspecialchars($report['title']); ?></h3>
-                            <p class="date" title="<?php echo htmlspecialchars($report['dateAdded']); ?>">
-                                <?php echo date('m/d/Y h:i A', strtotime($report['dateAdded'])); ?>
-                            </p>
+                            <h5><?php echo htmlspecialchars($report['originalFileName']); ?></h5>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -207,14 +211,6 @@ foreach ($reports as $report) {
                 <span style="color: #4CAF50; font-weight: bold;">Add Accomplishment Report</span>
                 <p>Please fill out the form to upload your accomplishment report.</p>
                 <form id="accomplishmentReportForm" action="../actions/accomplishment_report_action.php" method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="reportTitle">Title:</label>
-                        <input type="text" name="title" id="reportTitle" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reportDescription">Description:</label>
-                        <textarea name="description" id="reportDescription" class="form-control" required></textarea>
-                    </div>
                     <div class="form-group mb-3">
                         <label for="accReportFile">Upload PDF:</label>
                         <input type="file" name="accReportFile" id="accReportFile" accept="application/pdf" class="form-control" required onchange="previewFile(event)">
@@ -231,6 +227,7 @@ foreach ($reports as $report) {
                 </form>
             </div>
         </div>
+
     </div>
 </div>
 

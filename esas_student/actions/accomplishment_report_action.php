@@ -1,60 +1,73 @@
 <?php
-// Include config file
-require_once "../../config.php";
+// Start the session to access session variables
 session_start();
 
-if (!isset($_SESSION['student_id'])) {
-    echo "Student ID is not set in the session.";
-    exit;
-}
-
-$student_id = $_SESSION['student_id'];
-
-if (isset($_POST["club_id"])) {
-    $club_id = $_POST["club_id"];
-} else {
-    echo "Club ID is required.";
-    exit;
-}
+// Include database configuration file
+require_once '../../config.php';
 
 // Set default timezone
 date_default_timezone_set('Asia/Manila');
 
-// File upload configuration
-$reportTargetDir = "/esas/esas_student/accomplishment_reports/"; // Full server path
-$fileName = basename($_FILES["accReportFile"]["name"]);
-$fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve form data
+    $student_id = $_POST['student_id'];
+    $club_id = $_POST['club_id'];
+    $dateAdded = date('Y-m-d H:i:s'); // Current timestamp
+    $dateModified = $dateAdded; // Default modified date
 
-// Check if file is a PDF
-if ($fileType != "pdf") {
-    echo "Only PDF files are allowed.";
-    exit;
-}
+    // File upload logic for accomplishment report
+    $accReportFile = '';
+    $targetDir = "/esas/esas_student/accomplishment_reports/"; // Directory for uploaded reports
+    $allowedTypes = ['pdf']; // Allowed types for accomplishment reports
 
-// Move file to target directory
-$filePath = $reportTargetDir . uniqid() . "_" . $fileName;
-if (move_uploaded_file($_FILES["accReportFile"]["tmp_name"], $filePath)) {
-    // Insert record into the database
-    $title = trim($_POST["title"]);
-    $description = trim($_POST["description"]);
-
-    $sql = "INSERT INTO tbl_accomplishment_reports (title, description, accReportFile, student_id, club_id, dateAdded) VALUES (:title, :description, :accReportFile, :student_id, :club_id, NOW())";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(":title", $title, PDO::PARAM_STR);
-    $stmt->bindParam(":description", $description, PDO::PARAM_STR);
-    $stmt->bindParam(":accReportFile", $filePath, PDO::PARAM_STR);
-    $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
-    $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-
-    if ($stmt->execute()) {
-        // Redirect back with success message
-        header("Location: /esas/esas_student/ellipsis/accomplishment_reports.php?club_id=" . urlencode($club_id) . "");
-        exit();
+    if (isset($_FILES['accReportFile']) && $_FILES['accReportFile']['error'] == 0) {
+        $fileName = basename($_FILES['accReportFile']['name']); // Original filename
+        $originalFileName = $fileName; // Store the original name for the database
+        $fileSize = $_FILES['accReportFile']['size'];
+        $fileTmpName = $_FILES['accReportFile']['tmp_name'];
+        $fileType = pathinfo($fileName, PATHINFO_EXTENSION);
+    
+        // Validate file type and size (10MB limit)
+        if (in_array(strtolower($fileType), $allowedTypes) && $fileSize <= 10 * 1024 * 1024) {
+            $newFileName = uniqid() . "." . $fileType; // Generate unique file name
+            $targetFilePath = $_SERVER['DOCUMENT_ROOT'] . $targetDir . $newFileName;
+    
+            if (move_uploaded_file($fileTmpName, $targetFilePath)) {
+                $accReportFile = $newFileName; // Store the unique file name for the database
+            } else {
+                die("Error uploading the accomplishment report.");
+            }
+        } else {
+            die("Invalid accomplishment report type or file too large. Only PDF under 10MB allowed.");
+        }
     } else {
-        echo "Something went wrong. Please try again.";
+        die("Please upload an accomplishment report.");
     }
     
-} else {
-    echo "Failed to upload file.";
+    // Insert data into the database with original filename
+    $sql = "INSERT INTO tbl_accomplishment_reports (accReportFile, originalFileName, student_id, club_id, dateAdded, dateModified) 
+            VALUES (:accReportFile, :originalFileName, :student_id, :club_id, :dateAdded, :dateModified)";
+    
+    try {
+        // Prepare the SQL statement
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':accReportFile', $accReportFile); // Unique filename
+        $stmt->bindParam(':originalFileName', $originalFileName); // Original filename
+        $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+        $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+        $stmt->bindParam(':dateAdded', $dateAdded);
+        $stmt->bindParam(':dateModified', $dateModified);
+    
+        // Execute the query
+        if ($stmt->execute()) {
+            // Redirect to success page or show success message
+            echo "<script>alert('Accomplishment report submitted successfully!'); window.location.href = '../accomplishment_reports.php';</script>";
+        } else {
+            echo "Something went wrong. Please try again.";
+        }
+    } catch (PDOException $e) {
+        die("Error: " . $e->getMessage());
+    }
+    
 }
 ?>
