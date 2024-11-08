@@ -202,7 +202,7 @@ foreach ($reports as $report) {
         <?php endif; ?>
 
         <!-- Accomplishment Report Modal -->
-        <div id="accomplishmentReportModal" class="modal" style="display:none;">
+        <div id="accomplishmentReportModal" class="modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); background-color: rgba(0,0,0,0.4);">
             <div style="background-color: white; margin: 4% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px;">
                 <span style="color: #4CAF50; font-weight: bold;">Add Accomplishment Report</span>
                 <p>Please fill out the form to upload your accomplishment report.</p>

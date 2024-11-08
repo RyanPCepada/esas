@@ -21,7 +21,7 @@ if (isset($_POST["club_id"])) {
 date_default_timezone_set('Asia/Manila');
 
 // File upload configuration
-$targetDir = $_SERVER['DOCUMENT_ROOT'] . "/esas/esas_student/accomplishment_reports/"; // Full server path
+$reportTargetDir = "/esas/esas_student/accomplishment_reports/"; // Full server path
 $fileName = basename($_FILES["accReportFile"]["name"]);
 $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
@@ -32,7 +32,7 @@ if ($fileType != "pdf") {
 }
 
 // Move file to target directory
-$filePath = $targetDir . uniqid() . "_" . $fileName;
+$filePath = $reportTargetDir . uniqid() . "_" . $fileName;
 if (move_uploaded_file($_FILES["accReportFile"]["tmp_name"], $filePath)) {
     // Insert record into the database
     $title = trim($_POST["title"]);
