@@ -105,31 +105,55 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
         foreach ($questions as $question) {
             $clubQuestions[$question['clubName']][] = $question;
         }
-        
-        // Display each club and its questions
+
+        // Get unique club names without questions if any club exists for the moderator
+        $clubsWithoutQuestions = [];
+        foreach ($questions as $question) {
+            if (empty($question['question'])) {
+                $clubsWithoutQuestions[$question['clubName']] = [
+                    'club_id' => $question['club_id'],
+                    'clubName' => $question['clubName']
+                ];
+            }
+        }
+
+        // Display each club and its questions if available
         foreach ($clubQuestions as $clubName => $clubQuestionsArray): ?>
             <ul>
                 <li>
                     <strong><?php echo htmlspecialchars($clubName); ?></strong>
                 </li>
-                <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                    <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($clubQuestionsArray[0]['club_id']); ?>">
-                    <?php foreach ($clubQuestionsArray as $question): ?>
-                        <div class="form-group position-relative">
-                            <textarea class="form-control" id="question_<?php echo htmlspecialchars($question['question_id']); ?>" name="questions[<?php echo htmlspecialchars($question['question_id']); ?>]" rows="4" required><?php echo htmlspecialchars($question['question']); ?></textarea>
-                            <span class="delete-icon" title="Delete Question" onclick="deleteQuestion(<?php echo htmlspecialchars($question['question_id']); ?>)"><i class="fas fa-times"></i></span>
-                        </div>
-                    <?php endforeach; ?>
-                    <button type="submit" class="btn btn-primary mb-3">Update Questions</button>
-                    <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#appQuestionAddModal" data-club-id="<?php echo htmlspecialchars($clubQuestionsArray[0]['club_id']); ?>">Add New Question</button>
-                </form>
+
+                <?php if (!empty($clubQuestionsArray[0]['question'])): ?>
+                    <!-- Form only appears if questions exist for this club -->
+                    <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                        <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($clubQuestionsArray[0]['club_id']); ?>">
+                        <?php foreach ($clubQuestionsArray as $question): ?>
+                            <div class="form-group position-relative">
+                                <textarea class="form-control" id="question_<?php echo htmlspecialchars($question['question_id']); ?>" name="questions[<?php echo htmlspecialchars($question['question_id']); ?>]" rows="4" required><?php echo htmlspecialchars($question['question']); ?></textarea>
+                                <span class="delete-icon" title="Delete Question" onclick="deleteQuestion(<?php echo htmlspecialchars($question['question_id']); ?>)"><i class="fas fa-times"></i></span>
+                            </div>
+                        <?php endforeach; ?>
+                        <button type="submit" class="btn btn-primary mb-3">Update Questions</button>
+                        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#appQuestionAddModal" data-club-id="<?php echo htmlspecialchars($clubQuestionsArray[0]['club_id']); ?>"><i class="fas fa-plus"></i> Add New Question</button>
+                    </form>
+                <?php else: ?>
+                    <!-- Display a message if no questions are found for the club -->
+                    <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                        <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($clubQuestionsArray[0]['club_id']); ?>">
+                        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#appQuestionAddModal" data-club-id="<?php echo htmlspecialchars($clubQuestionsArray[0]['club_id']); ?>"><i class="fas fa-plus"></i> Add New Question</button>
+                    </form>
+                <?php endif; ?>
+
                 <div class="dashed-border"></div>
             </ul>
         <?php endforeach; ?>
+
     </div>
 <?php else: ?>
     <p>No questions found for this moderator.</p>
 <?php endif; ?>
+
 
 <!-- Add New Application Question Modal -->
 <div class="modal fade" id="appQuestionAddModal" tabindex="-1" aria-labelledby="appQuestionAddModalLabel" aria-hidden="true">
