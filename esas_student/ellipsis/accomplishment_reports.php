@@ -163,11 +163,14 @@ foreach ($reports as $report) {
 
 .report-item h5 {
     display: -webkit-box;
-    -webkit-line-clamp: 2; /* Limit to 2 lines */
+    -webkit-line-clamp: 3; /* Limit to 3 lines */
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: normal;
+    line-height: 1.2em; /* Adjust line height for better fit */
+    max-height: 3.6em; /* Ensure three full lines fit */
+    overflow-wrap: break-word; /* Allows words to break cleanly */
 }
 
 .report-item .date {
@@ -228,7 +231,7 @@ h2 {
                     <?php foreach ($reports as $report): ?>
                         <div class="report-item" 
                             title="<?php echo htmlspecialchars($report['originalFileName']) . "\n" . date('m/d/Y h:i A', strtotime($report['dateAdded'])); ?>" 
-                            onclick="openTab('<?php echo htmlspecialchars($report['accReportFile']); ?>')">
+                            onclick="window.open('/esas/esas_student/accomplishment_reports/<?php echo urlencode($report['accReportFile']); ?>', '_blank')">
                             <img src="/esas/esas_student/icons/ICON_PDF.png" alt="PDF Icon">
                             <h5 id="original-filename"><?php echo htmlspecialchars($report['originalFileName']); ?></h5>
                         </div>
@@ -241,6 +244,7 @@ h2 {
                 <i class="fas fa-file-pdf"></i>
             </div>
         <?php endif; ?>
+
 
         <!-- Accomplishment Report Modal -->
         <div id="accomplishmentReportModal" class="modal" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(0,0,0); background-color: rgba(0,0,0,0.4);">
@@ -301,11 +305,6 @@ function closeAccomplishmentReportModal() {
     document.getElementById("accomplishmentReportModal").style.display = "none";
 }
 
-function openTab(fileName) {
-    // Assuming all files are stored in /esas/esas_student/accomplishments/
-    const basePath = "/esas/esas_student/accomplishment_reports/";
-    window.open(basePath + fileName, '_blank');
-}
 
 </script>
 </body>

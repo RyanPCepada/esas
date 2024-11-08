@@ -398,13 +398,15 @@ document.addEventListener('DOMContentLoaded', function () {
     position: fixed; 
     z-index: 1000; 
     left: 70%; 
-    top: 31%; 
+    /* top: 31%;  */
+    bottom: 0%;
     width: 350px; 
     max-height: 450px; 
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); 
     transition: bottom 0.4s ease; 
     border-radius: 10px 10px 0 0; 
+    border-radius: 10px 10px 10px 10px; 
     /* padding: 15px;  */
     transform: translateX(-50%); 
     overflow-y: hidden; 
