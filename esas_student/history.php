@@ -121,13 +121,23 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
         .history-x-btn:hover {
             color: darkgrey;
         }
+        h2 {
+            margin-top: 48px;
+        }
+
+        
+        @media (max-width: 767px) {
+            h2 {
+                margin-top: 5px;
+            }
+        }
     </style>
 </head>
 <body>
     
     <div class="wrapper">
         <form method="post" action="../esas_student/actions/history_delete.php">
-            <h2 class="mt-5">History</h2>
+            <h2>History</h2>
             <div class="d-flex justify-content-between mb-2">
                 <p class="text-muted">All your interactions within the system</p>
                 <div>
