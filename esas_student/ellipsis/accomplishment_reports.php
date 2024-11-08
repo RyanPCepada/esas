@@ -98,6 +98,7 @@ foreach ($reports as $report) {
             height: auto;
             background-color: white;
             padding: 25px;
+            padding-top: 0px;
         }
 
         .no-report {
@@ -129,7 +130,8 @@ foreach ($reports as $report) {
         }
 
         .reports-list {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
     gap: 20px;
     justify-content: center;
 }
@@ -181,6 +183,30 @@ h2 {
             h2 {
                 margin-top: 5px;
             }
+
+            .report-item {
+                width: 140px;
+                background-color: #f9f9f9;
+                padding: 15px;
+                border: solid 1px lightgrey;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                text-align: center;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+            .reports-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            #original-filename {
+                font-size: 14px;
+            }
+            h4 {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
@@ -197,14 +223,14 @@ h2 {
     <div class="container-fluid container mb-5 auto-scroll">
         <?php if (!empty($groupedReports)): ?> 
             <?php foreach ($groupedReports as $label => $reports): ?>
-                <h4 class="mb-4"><?php echo htmlspecialchars($label); ?></h4>
+                <h4 class="mt-4 mb-4"><?php echo htmlspecialchars($label); ?></h4>
                 <div class="reports-list">
                     <?php foreach ($reports as $report): ?>
                         <div class="report-item" 
                             title="<?php echo htmlspecialchars($report['originalFileName']) . "\n" . date('m/d/Y h:i A', strtotime($report['dateAdded'])); ?>" 
                             onclick="openTab('<?php echo htmlspecialchars($report['accReportFile']); ?>')">
                             <img src="/esas/esas_student/icons/ICON_PDF.png" alt="PDF Icon">
-                            <h5><?php echo htmlspecialchars($report['originalFileName']); ?></h5>
+                            <h5 id="original-filename"><?php echo htmlspecialchars($report['originalFileName']); ?></h5>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -274,6 +300,13 @@ function openAccomplishmentReportModal() {
 function closeAccomplishmentReportModal() {
     document.getElementById("accomplishmentReportModal").style.display = "none";
 }
+
+function openTab(fileName) {
+    // Assuming all files are stored in /esas/esas_student/accomplishments/
+    const basePath = "/esas/esas_student/accomplishment_reports/";
+    window.open(basePath + fileName, '_blank');
+}
+
 </script>
 </body>
 </html>
