@@ -327,37 +327,43 @@ unset($pdo);
                                         <h4 class="mb-0">Share Something Exciting!</h4>
                                     </div>
                                     <div class="card-body">
-                                    <form id="postForm" method="POST" action="../actions/add_post_action.php" enctype="multipart/form-data">
-                                        <input type="hidden" name="club_id" value="<?php echo $club_id; ?>"> <!-- Add this hidden field -->
+                                        <!-- Form to Post Content -->
+                                        <form id="postForm" method="POST" action="../actions/add_post_action.php" enctype="multipart/form-data">
+                                            <input type="hidden" name="club_id" value="<?php echo $club_id; ?>"> <!-- Add this hidden field -->
                                             <div class="form-group mb-0">
                                                 <label for="postContent">What's on your mind?</label>
                                                 <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
                                                 <span class="text-danger"><?php echo $postContent_err; ?></span>
                                             </div>
 
-                                            <!-- Icon Buttons for Uploading Images, Files, and Videos -->
-                                            <!-- <div class="form-group d-flex justify-content-end mt-0 mb-0">
-                                                <button type="button" class="btn btn-outline px-1 py-0 m-1" id="imageUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
-                                                    <i class="fa fa-image text-info"></i>
-                                                    <input type="file" name="images[]" id="imageUpload" accept="image/*" multiple style="display: none;">
-                                                </button>
-                                                <button type="button" class="btn btn-outline px-1 py-0 m-1" id="fileUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
-                                                    <i class="fa fa-file text-info"></i>
-                                                    <input type="file" name="files[]" id="fileUpload" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" multiple style="display: none;">
-                                                </button>
-                                                <button type="button" class="btn btn-outline px-1 py-0 m-1" id="videoUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
-                                                    <i class="fa fa-video text-info"></i>
-                                                    <input type="file" name="videos[]" id="videoUpload" accept="video/*" multiple style="display: none;">
-                                                </button>
-                                            </div> -->
-
                                             <div class="d-flex justify-content-between align-items-center mt-3">
-                                                <button type="submit" class="btn btn-primary" style="border-radius: 3px;"><i class="fa fa-paper-plane"></i> Post</button>
+                                                <button type="submit" class="btn btn-primary" style="border-radius: 3px;" id="postButton"><i class="fa fa-paper-plane"></i> Post</button>
                                                 <div class="text-muted ml-2">
                                                     <p>Let your club members know what's happening!</p>
                                                 </div>
                                             </div>
                                         </form>
+
+                                        <script>
+                                            // Ensure no other handlers are attached to the form
+                                            document.getElementById('postForm').addEventListener('submit', function(event) {
+                                                event.preventDefault(); // Prevent form from submitting immediately
+
+                                                // Check if the button is already disabled to prevent multiple submissions
+                                                if (document.getElementById('postButton').disabled) {
+                                                    return; // Exit the function if the button is already disabled
+                                                }
+
+                                                // Disable the post button to prevent multiple submissions
+                                                document.getElementById('postButton').disabled = true;
+
+                                                // Change the button text to "Posting..."
+                                                document.getElementById('postButton').innerHTML = 'Posting...';
+                                            });
+
+                                        </script>
+
+
                                     </div>
                                 </div>
                             </div>

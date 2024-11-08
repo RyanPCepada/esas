@@ -16,7 +16,6 @@ $moderator_id = $_SESSION['moderator_id'];
 $postContent = "";
 $postContent_err = "";
 $club_id = ""; 
-// $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
 
 // Check if club_id is provided in the POST request
 if (isset($_POST['club_id'])) {
@@ -32,7 +31,6 @@ if (isset($_POST['club_id'])) {
 
     // Check for errors before inserting into the database
     if (empty($postContent_err)) {
-        
         try {
             // Begin transaction
             $pdo->beginTransaction();
@@ -51,27 +49,24 @@ if (isset($_POST['club_id'])) {
                 // Get the ID of the inserted post
                 $post_id = $pdo->lastInsertId();
 
-              
-
+                // Retrieve active students for email notifications
                 $student_sql = "SELECT
-                tbl_students.student_id, 
-                tbl_students.instiEmail, 
-                tbl_students.firstName, 
-                tbl_students.middleName, 
-                tbl_students.lastName, 
-                tbl_clubs.clubName
-            FROM
-                tbl_students
-                INNER JOIN tbl_application ON tbl_students.student_id = tbl_application.student_id
-                INNER JOIN tbl_clubs ON tbl_application.club_id = tbl_clubs.club_id
-            WHERE
-                tbl_application.club_id = :club_id AND
-                tbl_application.`status` = 'active'";
-            $student_stmt = $pdo->prepare($student_sql);
-            $student_stmt->execute([':club_id' => $club_id]);
-            $students = $student_stmt->fetchAll(PDO::FETCH_ASSOC);
-            echo "<script>console.log('Retrieved active students:', " . json_encode($students) . ");</script>";
-            
+                    tbl_students.student_id, 
+                    tbl_students.instiEmail, 
+                    tbl_students.firstName, 
+                    tbl_students.middleName, 
+                    tbl_students.lastName, 
+                    tbl_clubs.clubName
+                FROM
+                    tbl_students
+                    INNER JOIN tbl_application ON tbl_students.student_id = tbl_application.student_id
+                    INNER JOIN tbl_clubs ON tbl_application.club_id = tbl_clubs.club_id
+                WHERE
+                    tbl_application.club_id = :club_id AND
+                    tbl_application.`status` = 'active'";
+                $student_stmt = $pdo->prepare($student_sql);
+                $student_stmt->execute([':club_id' => $club_id]);
+                $students = $student_stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 // Check if any students were found
                 if (!empty($students)) {
@@ -109,7 +104,6 @@ if (isset($_POST['club_id'])) {
                             // Log or handle the error
                             error_log("Message could not be sent to {$fullName}. Mailer Error: {$mail->ErrorInfo}");
                             echo "<script>console.log('Message could not be sent to {$fullName}. Mailer Error: {$mail->ErrorInfo}');</script>";
-          
                         }
 
                         // Insert notification for each student
@@ -134,15 +128,15 @@ if (isset($_POST['club_id'])) {
 
                 // Commit transaction
                 $pdo->commit();
-                echo "<script>console.log('Transaction committed successfully');</script>";
 
-            
-                header("Location: " . $_SERVER['PHP_SELF'] . "?club_id=" . $club_id);
-             
+                // Return a JSON response (no redirect, stays on the same page)
+                echo json_encode([
+                    "success" => true,
+                    "message" => "Post created successfully!",
+                    "redirect_url" => "/esas/esas_moderator/public/home.php?club_id={$club_id}"
+                ]);
             } else {
                 throw new Exception("Post insertion failed.");
-                echo "<script>console.log('Error during transaction: " . addslashes($e->getMessage()) . "');</script>";
-  
             }
 
         } catch (Exception $e) {
@@ -150,7 +144,6 @@ if (isset($_POST['club_id'])) {
             $pdo->rollBack();
             echo json_encode(["success" => false, "message" => "Oops! Something went wrong. Please try again later."]);
             echo "<script>console.log('Error during transaction: " . addslashes($e->getMessage()) . "');</script>";
-  
         }
     } else {
         echo json_encode(["success" => false, "message" => $postContent_err]);
