@@ -12,12 +12,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $admin_id = trim($_POST['admin_id']);
     $password = trim($_POST['password']);
     
-    // Function to check admin login with plain text password
+    // Function to check admin login with hashed password
     function checkAdmin($pdo, $admin_id, $password) {
-        $query = "SELECT * FROM tbl_admin WHERE admin_id = :admin_id AND password = :password";
+        $query = "SELECT * FROM tbl_admin WHERE admin_id = :admin_id";
         $stmt = $pdo->prepare($query);
-        $stmt->execute(['admin_id' => $admin_id, 'password' => $password]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->execute(['admin_id' => $admin_id]);
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // If the admin exists, verify the password
+        if ($admin) {
+            return password_verify($password, $admin['password']) ? $admin : false;
+        }
+        return false; // Admin not found
+    }
+
+    // Function to insert activity log
+    function insertActivityLog($pdo, $admin_id) {
+        $query = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id) VALUES (:activity, :dateAdded, :admin_id)";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([
+            'activity' => 'You logged in to your account',
+            'dateAdded' => date('Y-m-d H:i:s'), // current timestamp
+            'admin_id' => $admin_id
+        ]);
     }
     
     // Assuming $pdo is correctly initialized in your config.php
@@ -25,19 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $admin_result = checkAdmin($pdo, $admin_id, $password);
     if ($admin_result) {
         $_SESSION['admin_id'] = $admin_result['admin_id'];
-
-        // Log the activity
-        $activity = "You logged in to your account";
-        $admin_id = $_SESSION['admin_id'];
-        $dateAdded = date('Y-m-d H:i:s'); // Current date and time
-
-        $insertActivityQuery = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id) VALUES (:activity, :dateAdded, :admin_id)";
-        $activityStmt = $pdo->prepare($insertActivityQuery);
-        $activityStmt->execute([
-            'activity' => $activity,
-            'dateAdded' => $dateAdded,
-            'admin_id' => $admin_id
-        ]);
+        
+        // Insert the activity log after successful login
+        insertActivityLog($pdo, $admin_result['admin_id']);
 
         // Redirect to clubs.php upon successful login
         echo "<script>alert('Logged in successfully!');</script>";
