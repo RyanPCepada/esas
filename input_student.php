@@ -5,6 +5,18 @@ include('config.php');
 // Set default timezone
 date_default_timezone_set('Asia/Manila');
 
+// Query to fetch student IDs with only one or zero active club memberships
+$sql = "SELECT s.student_id
+        FROM tbl_students s
+        LEFT JOIN tbl_application a ON s.student_id = a.student_id AND a.status = 'active'
+        WHERE DATE(s.dateAdded) = '2024-11-08'
+        GROUP BY s.student_id
+        HAVING COUNT(a.application_id) <= 1";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get form values
@@ -80,12 +92,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin: 0 auto;
             padding: 20px;
         }
+        .dropdown{
+            position: absolute;
+            top: 0px;
+            left: 0%;
+            border-radius: 50%;
+        }
+        #studentsDropdown{
+        }
     </style>
 </head>
 <body>
 
 <div class="wrapper mb-5">
     <h2 class="wrapper mb-4" style="margin-left: -20px;">System Testing Form</h2>
+
+    <!-- Students Button Dropdown -->
+    <div class="dropdown mb-4 d-flex">
+        <button class="btn btn-light dropdown-toggle" type="button" id="studentsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+        <div class="dropdown-menu" aria-labelledby="studentsDropdown">
+            <?php foreach ($students as $student): ?>
+                <a class="dropdown-item" href="#"><?php echo htmlspecialchars($student['student_id']); ?></a>
+            <?php endforeach; ?>
+        </div>
+    </div>
 
     <form action="input_student.php" method="POST">
 
