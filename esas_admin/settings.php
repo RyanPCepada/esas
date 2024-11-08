@@ -157,7 +157,7 @@ if (!$clubs) {
     
     <div class="wrapper">
         <h2 class="mt-5">Account Settings</h2>
-        <p class="text-muted">Change your profile, account, and club settings</p>
+        <p class="text-muted">Change your account and club settings</p>
 
         <div class="container-fluid container">
             <div class="row">
