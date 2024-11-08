@@ -218,7 +218,7 @@ h2 {
     <div style="display: flex; align-items: center; justify-content: space-between;">
         <div class="row">
             <h2>Accomplishment Reports</h2>
-            <p class="text-muted">All your accomplishment reports submitted in <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
+            <!-- <p class="text-muted">All your accomplishment reports submitted in <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p> -->
         </div>
         <button class="btn-plus" onclick="openAccomplishmentReportModal()">+</button>
     </div>
