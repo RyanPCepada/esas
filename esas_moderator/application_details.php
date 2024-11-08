@@ -35,12 +35,23 @@ if (!$student) {
     exit;
 }
 
-// Fetch application details for the specified club and student
-$sql_application = "SELECT remark, status, dateApplied, dateDecided, dateModified FROM tbl_application 
-                    WHERE student_id = ? AND club_id = ? AND application_id = ?";
+// Fetch application details along with the moderator's name for the specified club and student
+$sql_application = "SELECT 
+                        a.remark, a.status, a.dateApplied, a.dateDecided, a.dateModified, 
+                        m.firstName, m.middleName, m.lastName 
+                    FROM tbl_application a
+                    JOIN tbl_moderators m ON a.moderator_id = m.moderator_id
+                    WHERE a.student_id = ? AND a.club_id = ? AND a.application_id = ?";
+
 $stmt_application = $pdo->prepare($sql_application);
 $stmt_application->execute([$student_id, $club_id, $application_id]);
 $application = $stmt_application->fetch(PDO::FETCH_ASSOC);
+
+if ($application) {
+    // Combine firstName, middleName, and lastName into a single full name
+    $moderatorFullName = trim("{$application['firstName']} {$application['middleName']} {$application['lastName']}");
+}
+
 
 if (!$application) {
     echo "Application not found.";
@@ -150,18 +161,22 @@ switch ($status) {
                     
                     <?php if ($status === 'disapproved'): ?>
                         <p class="text-danger"><strong>Disapproval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
+                        <p class="text-primary"><strong>Disapproved by:</strong><br><?php echo !empty($moderatorFullName) ? htmlspecialchars($moderatorFullName) : 'No moderator available.'; ?></p>
                         <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                         <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
                     <?php elseif ($status === 'active'): ?>
                         <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
+                        <p class="text-primary"><strong>Approved by:</strong><br><?php echo !empty($moderatorFullName) ? htmlspecialchars($moderatorFullName) : 'No moderator available.'; ?></p>
                         <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                         <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
                     <?php elseif ($status === 'inactive'): ?>
                         <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
+                        <p class="text-primary"><strong>Approved by:</strong><br><?php echo !empty($moderatorFullName) ? htmlspecialchars($moderatorFullName) : 'No moderator available.'; ?></p>
                         <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                         <p><strong>Date Inactivated:</strong> <?php echo formatDate($application['dateModified']); ?></p>
                     <?php elseif ($status === 'departed'): ?>
                         <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remarks available.'; ?></p>
+                        <p class="text-primary"><strong>Approved by:</strong><br><?php echo !empty($moderatorFullName) ? htmlspecialchars($moderatorFullName) : 'No moderator available.'; ?></p>
                         <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                         <p><strong>Date Departed:</strong> <?php echo formatDate($application['dateModified']); ?></p>
                     <?php endif; ?>
