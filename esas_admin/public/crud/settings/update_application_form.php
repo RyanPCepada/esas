@@ -2,65 +2,28 @@
 require_once "../../../../config.php"; // Include your database config file
 session_start();
 
-if (!isset($_SESSION['moderator_id'])) {
+if (!isset($_SESSION['admin_id'])) {
     die("You are not logged in.");
 }
 
-$moderator_id = $_SESSION['moderator_id'];
+$admin_id = $_SESSION['admin_id'];
 
-// Fetch application questions along with club names for the club handled by the active moderator
+// Fetch all clubs and their associated questions, if available
 $sql = "
     SELECT c.club_id, c.clubName, q.question_id, q.question
     FROM tbl_clubs AS c
     LEFT JOIN tbl_application_questions AS q ON c.club_id = q.club_id
-    JOIN tbl_clubs_and_moderators AS cm ON c.club_id = cm.club_id
-    WHERE cm.moderator_id = ?
 ";
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$moderator_id]);
+$stmt->execute();
 $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Check if there are questions to update
-$clubName = !empty($questions) ? $questions[0]['clubName'] : null;
-
-// Process form submission for updating application questions
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
-    $clubId = $_POST['club_id'];
-    $updatedQuestions = $_POST['questions']; // Array of questions
-
-    // Initialize a flag to check if any questions were updated
-    $anyUpdate = false;
-
-    // Loop through each question and update it
-    foreach ($updatedQuestions as $questionId => $questionText) {
-        // Update application question
-        $updateSql = "
-            UPDATE tbl_application_questions 
-            SET question = ?, dateModified = NOW() 
-            WHERE question_id = ?";
-
-        $updateStmt = $pdo->prepare($updateSql);
-        if ($updateStmt->execute([$questionText, $questionId])) {
-            // Set flag to true if at least one question was updated
-            $anyUpdate = true;
-        }
-    }
-
-    // Log the activity only if at least one question was updated
-    if ($anyUpdate) {
-        $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
-        $logStmt = $pdo->prepare($logSql);
-        $logStmt->execute([
-            'activity' => "You updated the questions in " . htmlspecialchars($clubName) . "'s application form",
-            'dateAdded' => date('Y-m-d H:i:s'),
-            'moderator_id' => $moderator_id
-        ]);
-    }
-
-    echo "Questions updated successfully!";
-    header("location: ../../../settings.php");
-    exit();
+// Group questions by club
+$clubQuestions = [];
+foreach ($questions as $question) {
+    $clubQuestions[$question['clubName']][] = $question;
 }
+
 ?>
 
 
@@ -97,34 +60,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
 
 <h4 class="text-muted mb-3">Update Application Questions</h4>
 
-<?php if ($questions): ?>
+<?php if ($clubQuestions): ?>
     <div class="question-list">
-        <?php 
-        // Group questions by club
-        $clubQuestions = [];
-        foreach ($questions as $question) {
-            $clubQuestions[$question['clubName']][] = $question;
-        }
-
-        // Get unique club names without questions if any club exists for the moderator
-        $clubsWithoutQuestions = [];
-        foreach ($questions as $question) {
-            if (empty($question['question'])) {
-                $clubsWithoutQuestions[$question['clubName']] = [
-                    'club_id' => $question['club_id'],
-                    'clubName' => $question['clubName']
-                ];
-            }
-        }
-
-        // Display each club and its questions if available
-        foreach ($clubQuestions as $clubName => $clubQuestionsArray): ?>
+        <?php foreach ($clubQuestions as $clubName => $clubQuestionsArray): ?>
             <ul>
                 <li>
                     <strong><?php echo htmlspecialchars($clubName); ?></strong>
                 </li>
 
-                <?php if (!empty($clubQuestionsArray[0]['question'])): ?>
+                <?php if (!empty($clubQuestionsArray[0]['question_id'])): ?>
                     <!-- Form only appears if questions exist for this club -->
                     <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                         <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($clubQuestionsArray[0]['club_id']); ?>">
@@ -148,10 +92,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                 <div class="dashed-border"></div>
             </ul>
         <?php endforeach; ?>
-
     </div>
 <?php else: ?>
-    <p>No questions found for this moderator.</p>
+    <p>No clubs found.</p>
 <?php endif; ?>
 
 
@@ -165,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="appQuestionAddForm" action="../esas_moderator/actions/add_question_action.php" method="post">
+            <form id="appQuestionAddForm" action="../esas_admin/actions/add_question_action.php" method="post">
                 <div class="modal-body app-question-modal-body">
                     <div class="form-group app-question-form-group">
                         <label for="appNewQuestion" class="app-question-label">Question</label>
@@ -191,11 +134,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     function deleteQuestion(questionId) {
         if (confirm("Are you sure you want to delete this question?")) {
             $.ajax({
-                url: '/esas/esas_moderator/actions/delete_question_action.php', // Change to the path of your deletion script
+                url: '/esas/esas_admin/actions/delete_question_action.php', // Change to the path of your deletion script
                 type: 'POST',
                 data: { delete_question_id: questionId },
                 success: function(response) {
-                    // alert(response); // Show success message
                     location.reload(); // Reload the page to update the question list
                 },
                 error: function() {
@@ -205,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
         }
     }
 
-    //Populate club_id in Modal
+    // Populate club_id in Modal
     $(document).ready(function() {
         $('#appQuestionAddModal').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
@@ -214,25 +156,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
             modal.find('#club_id').val(clubId); // Set the club_id value
         });
     });
-
-    $(document).ready(function() {
-        $('#addQuestionForm').on('submit', function(event) {
-            event.preventDefault();
-
-            $.ajax({
-                url: '/esas/esas_moderator/actions/add_question_action.php',
-                type: 'POST',
-                data: $(this).serialize(),
-                success: function(response) {
-                    alert(response); // Optional: Display response message
-                    $('#addQuestionModal').modal('hide'); // Close the modal
-                    location.reload(); // Reload to update the question list
-                },
-                error: function() {
-                    alert('Error adding new question.');
-                }
-            });
-        });
-    });
-
 </script>
