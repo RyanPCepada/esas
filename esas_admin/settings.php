@@ -165,7 +165,7 @@ if (!$clubs) {
                 <div class="col-md-3 sidebar">
                     <!-- <a href="../esas_admin/public/crud/settings/update_profile.php"><i class="fas fa-user-edit"></i> Profile</a> -->
                     <a href="../esas_admin/public/crud/settings/update_password.php"><i class="fas fa-lock"></i> Password</a>
-                    <a href="../esas_admin/public/crud/settings/update_club_info.php"><i class="fas fa-university"></i> Club Information</a>
+                    <!-- <a href="../esas_admin/public/crud/settings/update_club_info.php"><i class="fas fa-university"></i> Club Information</a> -->
                     <!-- <a href="../esas_admin/public/crud/settings/update_club_officers.php"><i class="fas fa-user-tie"></i> Club Officers</a> -->
                     <a href="../esas_admin/public/crud/settings/update_application_form.php"><i class="fas fa-user-tie"></i> Application Form</a>
                 </div>
