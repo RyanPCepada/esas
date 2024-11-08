@@ -73,6 +73,7 @@ foreach ($reports as $report) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eSAS - Accomplishment Reports</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
@@ -171,13 +172,23 @@ foreach ($reports as $report) {
     display: none; /* Hide date visually but keep in title */
 }
 
+h2 {
+            margin-top: 48px;
+        }
+
+        
+        @media (max-width: 767px) {
+            h2 {
+                margin-top: 5px;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="wrapper">
     <div style="display: flex; align-items: center; justify-content: space-between;">
         <div class="row">
-            <h2 class="mt-5">Accomplishment Reports</h2>
+            <h2>Accomplishment Reports</h2>
             <p class="text-muted">All your accomplishment reports submitted in <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
         </div>
         <button class="btn-plus" onclick="openAccomplishmentReportModal()">+</button>
