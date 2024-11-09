@@ -70,6 +70,13 @@ if (!$club) {
             align-items: center; /* Center vertically */
             min-height: 100vh; /* Set a minimum height for vertical centering */
         }
+
+/* Container for each pair of front and back cards */
+.id-card-pair {
+    display: flex;
+    flex-direction: row; /* Align front and back side-by-side */
+    gap: 10px; /* Space between front and back */
+}
         .id-card-front, .id-card-back {
             border-radius: 10px;
             width: 280px;
@@ -167,6 +174,26 @@ if (!$club) {
             body {
                 margin: 0;
             }
+            
+            .id-container {
+                margin-top: 0;
+                display: block; /* Ensure it uses block layout in print */
+                width: 100%;
+            }
+
+            /* Ensure background images and colors are printed */
+            .id-card-front, .id-card-back {
+                background-image: inherit;
+                -webkit-print-color-adjust: exact; /* For Webkit browsers */
+                print-color-adjust: exact; /* For other browsers */
+            }
+
+            /* Keep card pairs together on the same page */
+            .id-card-pair {
+                display: flex;
+                flex-direction: row;
+                page-break-inside: avoid; /* Avoid breaking card pairs across pages */
+            }
         }
     </style>
 </head>
@@ -180,7 +207,10 @@ if (!$club) {
 
 <div class="id-container" id="id-container">
     <?php if ($club): ?>
+            
+        <div class="id-card-pair">
 
+            <!-- FRONT -->
             <div class="id-card-front" style="background-image: url('/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>');">
                 
                 <!-- Cover photo at the back -->
@@ -263,6 +293,7 @@ if (!$club) {
 
 
 
+            <!-- BACK -->
             <div class="id-card-back" style="background-image: url('/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>');">
                 <!-- Cover photo at the back -->
                 <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($club['coverPhoto']); ?>" alt="Cover Photo" 
@@ -403,6 +434,7 @@ if (!$club) {
 
                 </div>
             </div>
+        </div>
 
 
 
