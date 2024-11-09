@@ -8,117 +8,80 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id'];
 
-// Fetch clubs handled by the active moderator
+// Fetch officers and positions for the club handled by the active moderator
 $sql = "
-    SELECT c.club_id, c.clubName 
+    SELECT c.club_id, c.clubName, o.officer_id, o.position, o.student_id
     FROM tbl_clubs AS c
+    LEFT JOIN tbl_club_officers AS o ON c.club_id = o.club_id
     JOIN tbl_clubs_and_moderators AS cm ON c.club_id = cm.club_id
     WHERE cm.moderator_id = ?
 ";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$moderator_id]);
-$clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$officers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch members (students with 'active' status) of the selected club
-function getActiveMembers($pdo, $clubId) {
-    $sql = "
-        SELECT s.student_id, s.firstName, s.lastName, s.profilePic 
-        FROM tbl_students AS s
-        JOIN tbl_application AS r ON s.student_id = r.student_id
-        WHERE r.club_id = ? AND r.status = 'active'
-    ";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$clubId]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+// Check if there are officers to display
+$clubName = !empty($officers) ? $officers[0]['clubName'] : null;
 
-// Fetch existing officers for the club
-function getClubOfficers($pdo, $clubId) {
-    $sql = "
-        SELECT o.president, o.vicePresident, o.secretary, o.treasurer, o.pio, o.srgtAtArms,
-               s1.firstName AS presidentFirstName, s1.lastName AS presidentLastName, s1.profilePic AS presidentPic,
-               s2.firstName AS vicePresidentFirstName, s2.lastName AS vicePresidentLastName, s2.profilePic AS vicePresidentPic,
-               s3.firstName AS secretaryFirstName, s3.lastName AS secretaryLastName, s3.profilePic AS secretaryPic,
-               s4.firstName AS treasurerFirstName, s4.lastName AS treasurerLastName, s4.profilePic AS treasurerPic,
-               s5.firstName AS pioFirstName, s5.lastName AS pioLastName, s5.profilePic AS pioPic,
-               s6.firstName AS srgtAtArmsFirstName, s6.lastName AS srgtAtArmsLastName, s6.profilePic AS srgtAtArmsPic
-        FROM tbl_club_officers AS o
-        LEFT JOIN tbl_students AS s1 ON o.president = s1.student_id
-        LEFT JOIN tbl_students AS s2 ON o.vicePresident = s2.student_id
-        LEFT JOIN tbl_students AS s3 ON o.secretary = s3.student_id
-        LEFT JOIN tbl_students AS s4 ON o.treasurer = s4.student_id
-        LEFT JOIN tbl_students AS s5 ON o.pio = s5.student_id
-        LEFT JOIN tbl_students AS s6 ON o.srgtAtArms = s6.student_id
-        WHERE o.club_id = ?
-    ";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$clubId]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    return $result ? $result : []; // Return an empty array if no officers are found
-}
-
-// Process form submission for updating club officers
+// Process form submission for updating officers
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     $clubId = $_POST['club_id'];
-    
-    // Assign values from POST and set to NULL if empty
-    $president_id = !empty($_POST['president']) ? $_POST['president'] : null;
-    $vice_president_id = !empty($_POST['vice_president']) ? $_POST['vice_president'] : null;
-    $secretary_id = !empty($_POST['secretary']) ? $_POST['secretary'] : null;
-    $treasurer_id = !empty($_POST['treasurer']) ? $_POST['treasurer'] : null;
-    $pio_id = !empty($_POST['pio']) ? $_POST['pio'] : null;
-    $srgtAtArms_id = !empty($_POST['srgt_at_arms']) ? $_POST['srgt_at_arms'] : null;
+    $updatedOfficers = $_POST['officers']; // Array of officers with student_id and position
 
-    // Fetch the club name for logging purposes
-    $clubNameSql = "SELECT clubName FROM tbl_clubs WHERE club_id = ?";
-    $clubNameStmt = $pdo->prepare($clubNameSql);
-    $clubNameStmt->execute([$clubId]);
-    $clubName = $clubNameStmt->fetchColumn();
+    // Initialize a flag to check if any officer was updated
+    $anyUpdate = false;
 
-    // Check if officers already exist for the club
-    $checkSql = "SELECT officer_id FROM tbl_club_officers WHERE club_id = ?";
-    $checkStmt = $pdo->prepare($checkSql);
-    $checkStmt->execute([$clubId]);
-    $existingOfficer = $checkStmt->fetch(PDO::FETCH_ASSOC);
+    // Loop through each officer and update it
+    foreach ($updatedOfficers as $officerId => $officerData) {
+        $studentId = $officerData['student_id'];
+        $position = $officerData['position'];
 
-    if ($existingOfficer) {
-        // Update existing officers
+        // Update officer details
         $updateSql = "
-            UPDATE tbl_club_officers 
-            SET president = ?, vicePresident = ?, secretary = ?, treasurer = ?, pio = ?, srgtAtArms = ?, dateModified = NOW()
-            WHERE club_id = ?
+            UPDATE tbl_club_officers
+            SET student_id = ?, position = ?, dateModified = NOW()
+            WHERE officer_id = ? AND club_id = ?
         ";
         $updateStmt = $pdo->prepare($updateSql);
-        $success = $updateStmt->execute([$president_id, $vice_president_id, $secretary_id, $treasurer_id, $pio_id, $srgtAtArms_id, $clubId]);
-    } else {
-        // Insert new officers
-        $insertSql = "
-            INSERT INTO tbl_club_officers (president, vicePresident, secretary, treasurer, pio, srgtAtArms, club_id, dateAdded, dateModified)
-            VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
-        ";
-        $insertStmt = $pdo->prepare($insertSql);
-        $success = $insertStmt->execute([$president_id, $vice_president_id, $secretary_id, $treasurer_id, $pio_id, $srgtAtArms_id, $clubId]);
+        if ($updateStmt->execute([$studentId, $position, $officerId, $clubId])) {
+            // Set flag to true if at least one officer was updated
+            $anyUpdate = true;
+        }
     }
 
-    if ($success) {
-        // Log the activity after a successful update/insert
+    // Log the activity only if at least one officer was updated
+    if ($anyUpdate) {
         $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
         $logStmt = $pdo->prepare($logSql);
         $logStmt->execute([
-            'activity' => "You updated the club officers for $clubName",
+            'activity' => "You updated the officers in " . htmlspecialchars($clubName) . "'s application form",
             'dateAdded' => date('Y-m-d H:i:s'),
             'moderator_id' => $moderator_id
         ]);
-
-        echo "Club officers updated successfully!";
-        header("location: ../../../settings.php");
-        exit();
-    } else {
-        echo "Error updating club officers.";
     }
+
+    echo "Officers updated successfully!";
+    header("location: ../../../settings.php");
+    exit();
 }
+
+// Fetch active students for dropdown, filtered by current club
+$studentsSql = "
+    SELECT DISTINCT s.student_id, CONCAT(s.firstName, ' ', s.lastName) AS fullName
+    FROM tbl_students s
+    JOIN tbl_application a ON s.student_id = a.student_id
+    WHERE a.status = 'active' AND a.club_id = ?
+    ORDER BY fullName
+";
+$studentsStmt = $pdo->prepare($studentsSql);
+$club_id = isset($officers[0]['club_id']) ? $officers[0]['club_id'] : 0; // Ensure $club_id is correctly set
+$studentsStmt->execute([$club_id]);
+
+// Fetch the students
+$students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
+
 
 <style>
     .dashed-border {
@@ -126,122 +89,193 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
         border-top: 2px dashed #ccc; /* Dashed line */
         margin: 30px 0; /* Space above and below */
     }
+
+    .delete-icon {
+        position: absolute; /* Use absolute positioning */
+        top: -5px; /* Adjust positioning */
+        right: -10px; /* Adjust positioning */
+        cursor: pointer;
+        background-color: #a9a9a9;
+        border-radius: 50%;
+        color: white;
+        width: 22px;
+        height: 22px;
+        text-align: center;
+        line-height: 21px; /* Center the text vertically */
+        border: none; /* Remove default button styling */
+    }
+
+    .delete-icon:hover {
+        background-color: #8f8f8f;
+    }
+    
+    body.modal-open {
+        padding-right: 0 !important;
+    }
 </style>
 
 <h4 class="text-muted mb-3">Update Club Officers</h4>
 
-<?php if ($clubs): ?>
-    <div class="club-list">
-        <ul>
-            <?php foreach ($clubs as $club): ?>
-                <?php 
-                // Fetch active members and existing officers for the current club
-                $activeMembers = getActiveMembers($pdo, $club['club_id']);
-                $officers = getClubOfficers($pdo, $club['club_id']);
-                ?>
+<?php if ($officers): ?>
+    <div class="officer-list">
+        <?php 
+        // Group officers by club
+        $clubOfficers = [];
+        foreach ($officers as $officer) {
+            $clubOfficers[$officer['clubName']][] = $officer;
+        }
+
+        foreach ($clubOfficers as $clubName => $officersArray): ?>
+            <ul>
                 <li>
-                    <strong><?php echo htmlspecialchars($club['clubName']); ?></strong><br>
+                    <strong><?php echo htmlspecialchars($clubName); ?></strong>
+                </li>
 
-                    <!-- Update Officers Form -->
+                
+                <?php if (!empty($officersArray[0]['position'])): ?>
                     <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                        <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($club['club_id']); ?>">
+                        <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
 
-                        <!-- President -->
-                        <div class="form-group">
-                            <label for="president">President</label>
-                            <select class="form-control" id="president" name="president">
-                                <option value="">-- Select President --</option>
-                                <?php foreach ($activeMembers as $member): ?>
-                                    <option value="<?php echo $member['student_id']; ?>" 
-                                        <?php echo (isset($officers['president']) && $member['student_id'] == $officers['president']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                        <?php foreach ($officersArray as $officer): ?>
+                            <div class="form-group">
+                                <label for="officer_position_<?php echo htmlspecialchars($officer['officer_id']); ?>">
+                                    <?php echo htmlspecialchars($officer['position']) ?>
+                                </label>
+                                <input type="text" class="form-control mb-1" id="officer_position_<?php echo htmlspecialchars($officer['officer_id']); ?>" name="officers[<?php echo htmlspecialchars($officer['officer_id']); ?>][position]" value="<?php echo htmlspecialchars($officer['position']); ?>" placeholder="Add Position here..." required>
 
-                        <!-- Vice President -->
-                        <div class="form-group">
-                            <label for="vice_president">Vice President</label>
-                            <select class="form-control" id="vice_president" name="vice_president">
-                                <option value="">-- Select Vice President --</option>
-                                <?php foreach ($activeMembers as $member): ?>
-                                    <option value="<?php echo $member['student_id']; ?>" 
-                                        <?php echo (isset($officers['vicePresident']) && $member['student_id'] == $officers['vicePresident']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <!-- Secretary -->
-                        <div class="form-group">
-                            <label for="secretary">Secretary</label>
-                            <select class="form-control" id="secretary" name="secretary">
-                                <option value="">-- Select Secretary --</option>
-                                <?php foreach ($activeMembers as $member): ?>
-                                    <option value="<?php echo $member['student_id']; ?>" 
-                                        <?php echo (isset($officers['secretary']) && $member['student_id'] == $officers['secretary']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <!-- Treasurer -->
-                        <div class="form-group">
-                            <label for="treasurer">Treasurer</label>
-                            <select class="form-control" id="treasurer" name="treasurer">
-                                <option value="">-- Select Treasurer --</option>
-                                <?php foreach ($activeMembers as $member): ?>
-                                    <option value="<?php echo $member['student_id']; ?>" 
-                                        <?php echo (isset($officers['treasurer']) && $member['student_id'] == $officers['treasurer']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <!-- PIO -->
-                        <div class="form-group">
-                            <label for="pio">PIO</label>
-                            <select class="form-control" id="pio" name="pio">
-                                <option value="">-- Select PIO --</option>
-                                <?php foreach ($activeMembers as $member): ?>
-                                    <option value="<?php echo $member['student_id']; ?>" 
-                                        <?php echo (isset($officers['pio']) && $member['student_id'] == $officers['pio']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <!-- Sergeant at Arms -->
-                        <div class="form-group">
-                            <label for="srgt_at_arms">Sergeant at Arms</label>
-                            <select class="form-control" id="srgt_at_arms" name="srgt_at_arms">
-                                <option value="">-- Select Sergeant at Arms --</option>
-                                <?php foreach ($activeMembers as $member): ?>
-                                    <option value="<?php echo $member['student_id']; ?>" 
-                                        <?php echo (isset($officers['srgtAtArms']) && $member['student_id'] == $officers['srgtAtArms']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($member['firstName'] . ' ' . $member['lastName']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
+                                <!-- <label for="officer_student_<?php echo htmlspecialchars($officer['officer_id']); ?>">Officer: </label> -->
+                                <select class="form-control" id="officer_student_<?php echo htmlspecialchars($officer['officer_id']); ?>" name="officers[<?php echo htmlspecialchars($officer['officer_id']); ?>][student_id]" required>
+                                    <option value="">-- Select student --</option>
+                                    <?php 
+                                    // Fetch students for the current club
+                                    $studentsSql = "
+                                        SELECT DISTINCT s.student_id, CONCAT(s.firstName, ' ', s.lastName) AS fullName
+                                        FROM tbl_students s
+                                        JOIN tbl_application a ON s.student_id = a.student_id
+                                        WHERE a.status = 'active' AND a.club_id = ?
+                                        ORDER BY fullName
+                                    ";
+                                    $studentsStmt = $pdo->prepare($studentsSql);
+                                    $studentsStmt->execute([$officer['club_id']]);  // Use the club_id of the current officer's club
+                                    $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
+                                    
+                                    foreach ($students as $student): ?>
+                                        <option value="<?php echo htmlspecialchars($student['student_id']); ?>" <?php echo $student['student_id'] == $officer['student_id'] ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($student['fullName']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        <?php endforeach; ?>
 
                         <button type="submit" class="btn btn-primary mb-3">Update Officers</button>
-                        
-                    <!-- <div class="mt-2 text-center align-items-center justify-content-center">
-                        <a href="public/home.php" class="btn btn-secondary">Go Back</a>
-                    </div> -->
+                        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal"><i class="fas fa-plus"></i> Add New Position</button>
                     </form>
-                </li>
+                    
+                <?php else: ?>
+                    <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                        <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
+                        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal"><i class="fas fa-plus"></i> Add New Position</button>
+                    </form>
+
+                <?php endif; ?>
+
                 <div class="dashed-border"></div>
-            <?php endforeach; ?>
-        </ul>
+            </ul>
+        <?php endforeach; ?>
     </div>
 <?php else: ?>
-    <p>No clubs assigned to you.</p>
+    <p>No officers found for this moderator.</p>
 <?php endif; ?>
+
+<!-- Add New Officer Modal -->
+<div class="modal fade" id="addOfficerModal" tabindex="-1" aria-labelledby="addOfficerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addOfficerModalLabel">Add New Officer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="addOfficerForm" action="../esas_moderator/actions/add_officer_action.php" method="post">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="officer_position">Position</label>
+                        <input type="text" class="form-control" id="officer_position" name="position" placeholder="Enter Position" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="officer_student">Select Officer (Student)</label>
+                        <select class="form-control" id="officer_student" name="student_id" required>
+                            <option value="">-- Select Student --</option>
+                            <!-- Student options will be populated here dynamically via JavaScript -->
+                        </select>
+                    </div>
+                    <input type="hidden" id="club_id" name="club_id" value="">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Officer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- jQuery and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Delete Officer Function
+    function deleteOfficer(officerId) {
+        if (confirm("Are you sure you want to delete this officer?")) {
+            $.ajax({
+                url: '/esas/esas_moderator/actions/delete_officer_action.php', // Change to the path of your officer deletion script
+                type: 'POST',
+                data: { delete_officer_id: officerId },
+                success: function(response) {
+                    // alert(response); // Show success message
+                    location.reload(); // Reload the page to update the officer list
+                },
+                error: function() {
+                    alert('Error deleting officer.');
+                }
+            });
+        }
+    }
+
+    // Populate club_id in Officer Add Modal
+    $(document).ready(function() {
+        $('#addOfficerModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var clubId = button.data('club-id'); // Extract info from data-* attributes
+            var modal = $(this);
+            modal.find('#club_id').val(clubId); // Set the club_id value
+        });
+    });
+
+    // Handle the form submission for adding an officer
+    $(document).ready(function() {
+        $('#addOfficerForm').on('submit', function(event) {
+            event.preventDefault();
+
+            $.ajax({
+                url: '/esas/esas_moderator/actions/add_officer_action.php', // Path for adding officers
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    alert(response); // Optional: Display response message
+                    $('#addOfficerModal').modal('hide'); // Close the modal
+                    location.reload(); // Reload to update the officer list
+                },
+                error: function() {
+                    alert('Error adding new officer.');
+                }
+            });
+        });
+    });
+</script>
+
