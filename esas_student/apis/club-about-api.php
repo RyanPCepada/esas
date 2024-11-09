@@ -32,10 +32,7 @@ if (isset($_GET['club_id'])) {
                 GROUP_CONCAT(DISTINCT CONCAT(s.firstName, ' ', s.middleName, ' ', s.lastName, '|', s.profilePic, '|', s.department, '|', s.year, '|', r.dateDecided) 
                             ORDER BY s.firstName SEPARATOR ', ') AS members,
                 r.dateApplied AS applicationDate,
-                r.status AS applicationStatus,
-                r.question1,
-                r.question2,
-                r.question3
+                r.status AS applicationStatus
             FROM 
                 tbl_clubs c
             LEFT JOIN 

@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Loop through each answer in POST data to insert into tbl_application_answers
         foreach ($_POST as $key => $answer) {
             if (strpos($key, 'question') === 0 && !empty($answer)) {
-                // Extract question_id from the form field name (e.g., "question1" => 1)
+                // Extract question_id from the form field name (e.g., "question" => 1)
                 $question_index = intval(substr($key, 8)) - 1; // Adjust for zero-based index
                 if (isset($questions[$question_index])) {
                     $question_text = $questions[$question_index]['question'];
