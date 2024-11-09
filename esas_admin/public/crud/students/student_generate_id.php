@@ -262,13 +262,6 @@ $clubs = $clubQuery->fetchAll();
                                             margin: 3px 0;">  <!-- Adjusted margin -->
                                     <strong>Email:</strong> <?php echo htmlspecialchars($student['instiEmail']); ?>
                                 </h5>
-                                <h5 style="color: black; text-shadow: 
-                                            0 0 5px rgba(255, 255, 255, 0.7),  
-                                            0 0 10px rgba(255, 255, 255, 0.5),  
-                                            0 0 15px rgba(255, 255, 255, 0.3);
-                                            margin: 3px 0;">  <!-- Adjusted margin -->
-                                    <strong>Contact #:</strong> <?php echo htmlspecialchars($student['phoneNumber']); ?>
-                                </h5>
                             </div>
 
                         </div>
