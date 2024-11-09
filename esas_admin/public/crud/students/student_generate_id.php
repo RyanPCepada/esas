@@ -150,18 +150,38 @@ $clubs = $clubQuery->fetchAll();
             background-color: #0056b3;
         }
 
-        /* Hide buttons when printing */
         @media print {
+            /* Hide buttons when printing */
             .button-container {
                 display: none;
             }
+
+            /* Set body and container margins for print */
             body {
                 margin: 0;
             }
+
             .id-container {
-                margin-top: 0px;
+                margin-top: 0;
+                display: block; /* Ensure it uses block layout in print */
+                width: 100%;
+            }
+
+            /* Ensure background images and colors are printed */
+            .id-card-front, .id-card-back {
+                background-image: inherit;
+                -webkit-print-color-adjust: exact; /* For Webkit browsers */
+                print-color-adjust: exact; /* For other browsers */
+            }
+
+            /* Keep card pairs together on the same page */
+            .id-card-pair {
+                display: flex;
+                flex-direction: row;
+                page-break-inside: avoid; /* Avoid breaking card pairs across pages */
             }
         }
+
     </style>
 </head>
 <body>
