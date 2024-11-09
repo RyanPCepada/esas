@@ -241,21 +241,23 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
 <script>
     // Delete Officer Function
     function deletePosition(officerId) {
-        if (confirm("Are you sure you want to delete this position and its officer?")) {
-            $.ajax({
-                url: '/esas/esas_moderator/actions/delete_officer_action.php', // Change to the path of your officer deletion script
-                type: 'POST',
-                data: { delete_officer_id: officerId },
-                success: function(response) {
-                    // alert(response); // Show success message
-                    location.reload(); // Reload the page to update the officer list
-                },
-                error: function() {
-                    alert('Error deleting position and officer.');
-                }
-            });
-        }
+    console.log('Deleting officer with ID:', officerId); // Debugging line
+    if (confirm("Are you sure you want to delete this position and its officer?")) {
+        $.ajax({
+            url: '/esas/esas_moderator/actions/delete_officer_action.php',
+            type: 'POST',
+            data: { delete_officer_id: officerId },
+            success: function(response) {
+                console.log('Response:', response); // Log the response
+                location.reload(); // Reload the page to update the officer list
+            },
+            error: function() {
+                alert('Error deleting position and officer.');
+            }
+        });
     }
+}
+
 
     // Populate club_id in Officer Add Modal
     $(document).ready(function() {
