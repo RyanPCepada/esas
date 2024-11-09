@@ -90,10 +90,15 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
         margin: 30px 0; /* Space above and below */
     }
 
+    .form-group {
+        position: relative; /* Ensure the delete icon is positioned relative to this container */
+    }
+
     .delete-icon {
-        position: absolute; /* Use absolute positioning */
-        top: -5px; /* Adjust positioning */
-        right: -10px; /* Adjust positioning */
+        position: absolute;
+        top: 30%;
+        right: -10px; /* Adjust the right distance as needed */
+        transform: translateY(-50%); /* Vertically center the icon */
         cursor: pointer;
         background-color: #a9a9a9;
         border-radius: 50%;
@@ -134,14 +139,19 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                 
                 <?php if (!empty($officersArray[0]['position'])): ?>
                     <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                        <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
+                        <input type="hidden" name="officer_id" value="<?php echo htmlspecialchars($officersArray[0]['officer_id']); ?>">
 
                         <?php foreach ($officersArray as $officer): ?>
                             <div class="form-group">
                                 <label for="officer_position_<?php echo htmlspecialchars($officer['officer_id']); ?>">
                                     <?php echo htmlspecialchars($officer['position']) ?>
+                                    Officer ID: <?php echo htmlspecialchars($officer['officer_id']) ?>
                                 </label>
-                                <input type="text" class="form-control mb-1" id="officer_position_<?php echo htmlspecialchars($officer['officer_id']); ?>" name="officers[<?php echo htmlspecialchars($officer['officer_id']); ?>][position]" value="<?php echo htmlspecialchars($officer['position']); ?>" placeholder="Add Position here..." required>
+
+                                <span class="delete-icon" title="Delete Position" onclick="deletePosition(<?php echo htmlspecialchars($officer['officer_id']); ?>)"><i class="fas fa-times"></i></span>
+                                <input type="text" class="form-control mb-1" id="officer_position_<?php echo htmlspecialchars($officer['officer_id']); ?>"
+                                    name="officers[<?php echo htmlspecialchars($officer['officer_id']); ?>][position]" value="<?php echo htmlspecialchars($officer['position']); ?>" placeholder="Add Position here..." required>
+                                
 
                                 <!-- <label for="officer_student_<?php echo htmlspecialchars($officer['officer_id']); ?>">Officer: </label> -->
                                 <select class="form-control" id="officer_student_<?php echo htmlspecialchars($officer['officer_id']); ?>" name="officers[<?php echo htmlspecialchars($officer['officer_id']); ?>][student_id]" required>
@@ -174,7 +184,7 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                     
                 <?php else: ?>
                     <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                        <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
+                        <input type="hidden" name="officer_id" value="<?php echo htmlspecialchars($officersArray[0]['officer_id']); ?>">
                         <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal"><i class="fas fa-plus"></i> Add New Position</button>
                     </form>
 
@@ -230,8 +240,8 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 <script>
     // Delete Officer Function
-    function deleteOfficer(officerId) {
-        if (confirm("Are you sure you want to delete this officer?")) {
+    function deletePosition(officerId) {
+        if (confirm("Are you sure you want to delete this position and its officer?")) {
             $.ajax({
                 url: '/esas/esas_moderator/actions/delete_officer_action.php', // Change to the path of your officer deletion script
                 type: 'POST',
@@ -241,7 +251,7 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                     location.reload(); // Reload the page to update the officer list
                 },
                 error: function() {
-                    alert('Error deleting officer.');
+                    alert('Error deleting position and officer.');
                 }
             });
         }
