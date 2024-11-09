@@ -8,6 +8,9 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id'];
 
+$officer_id = $data['officer_id'];
+$club_id = $data['club_id'];
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_officer_id'])) {
     $officerId = $_POST['delete_officer_id'];
 
@@ -23,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_officer_id'])) 
     // If club is found, proceed with deletion
     if ($club) {
         // Deletion logic
-        $deleteSql = "DELETE FROM tbl_club_officers WHERE officer_id = ?";
+        $deleteSql = "DELETE FROM tbl_club_officers WHERE officer_id = ? AND club_id = ?";
         $deleteStmt = $pdo->prepare($deleteSql);
         if ($deleteStmt->execute([$officerId])) {
             // Log the deletion activity with the actual club name

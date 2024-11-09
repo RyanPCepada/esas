@@ -145,16 +145,22 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="form-group">
                                 <label for="officer_position_<?php echo htmlspecialchars($officer['officer_id']); ?>">
                                     <?php echo htmlspecialchars($officer['position']) ?>
+                                    Club ID: <?php echo htmlspecialchars($officer['club_id']) ?>
                                     Officer ID: <?php echo htmlspecialchars($officer['officer_id']) ?>
                                 </label>
 
-                                <span class="delete-icon" title="Delete Position" onclick="deletePosition(<?php echo htmlspecialchars($officer['officer_id']); ?>)"><i class="fas fa-times"></i></span>
+                                <span class="delete-icon" title="Delete Position" onclick="deletePosition(<?php echo htmlspecialchars($officer['officer_id']); ?>, <?php echo htmlspecialchars($officer['club_id']); ?>)">
+                                    <i class="fas fa-times"></i>
+                                </span>
+
                                 <input type="text" class="form-control mb-1" id="officer_position_<?php echo htmlspecialchars($officer['officer_id']); ?>"
-                                    name="officers[<?php echo htmlspecialchars($officer['officer_id']); ?>][position]" value="<?php echo htmlspecialchars($officer['position']); ?>" placeholder="Add Position here..." required>
+                                    name="officers[<?php echo htmlspecialchars($officer['officer_id']); ?>][position]" value="<?php echo htmlspecialchars($officer['position']); ?>" placeholder="Add Position here...">
                                 
+                                <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
+
 
                                 <!-- <label for="officer_student_<?php echo htmlspecialchars($officer['officer_id']); ?>">Officer: </label> -->
-                                <select class="form-control" id="officer_student_<?php echo htmlspecialchars($officer['officer_id']); ?>" name="officers[<?php echo htmlspecialchars($officer['officer_id']); ?>][student_id]" required>
+                                <select class="form-control" id="officer_student_<?php echo htmlspecialchars($officer['officer_id']); ?>" name="officers[<?php echo htmlspecialchars($officer['officer_id']); ?>][student_id]">
                                     <option value="">-- Select student --</option>
                                     <?php 
                                     // Fetch students for the current club
