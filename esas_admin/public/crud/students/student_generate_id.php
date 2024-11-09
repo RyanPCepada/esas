@@ -174,6 +174,12 @@ $clubs = $clubQuery->fetchAll();
                 print-color-adjust: exact; /* For other browsers */
             }
 
+            /* Prevent shrinking of ID cards */
+            @page {
+                size: auto;
+                margin: 0; /* Remove default margins */
+            }
+
             /* Keep card pairs together on the same page */
             .id-card-pair {
                 display: flex;
