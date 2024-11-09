@@ -170,7 +170,7 @@ if (!$club) {
                     <a href="../esas_moderator/public/crud/settings/update_password.php"><i class="fas fa-lock"></i> Password</a>
                     <a href="../esas_moderator/public/crud/settings/update_club_info.php"><i class="fas fa-university"></i> Club Information</a>
                     <a href="../esas_moderator/public/crud/settings/update_club_officers.php"><i class="fas fa-user-tie"></i> Club Officers</a>
-                    <a href="../esas_moderator/public/crud/settings/update_application_form.php"><i class="fas fa-user-tie"></i> Application Form</a>
+                    <a href="../esas_moderator/public/crud/settings/update_application_form.php"><i class="fas fa-file-alt"></i> Application Form</a>
                 </div>
                 <!-- Main Content Area -->
                 <div class="col-md-9 main-content">
