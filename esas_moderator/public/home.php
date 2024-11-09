@@ -294,7 +294,7 @@ unset($pdo);
             <!-- Main Body Section with Cover Photo -->
             <div class="">
                 <div class="cover-photo-container mb-3">
-                    <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
+                    <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
                 </div>
                 <div class="overlay-text">
                     <div class="d-flex align-items-center">
