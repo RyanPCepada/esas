@@ -71,12 +71,13 @@ if (!$club) {
             min-height: 100vh; /* Set a minimum height for vertical centering */
         }
 
-/* Container for each pair of front and back cards */
-.id-card-pair {
-    display: flex;
-    flex-direction: row; /* Align front and back side-by-side */
-    gap: 10px; /* Space between front and back */
-}
+        /* Container for each pair of front and back cards */
+        .id-card-pair {
+            display: flex;
+            flex-direction: row; /* Align front and back side-by-side */
+            gap: 10px; /* Space between front and back */
+        }
+        
         .id-card-front, .id-card-back {
             border-radius: 10px;
             width: 280px;
@@ -188,6 +189,12 @@ if (!$club) {
                 print-color-adjust: exact; /* For other browsers */
             }
 
+            /* Prevent shrinking of ID cards */
+            @page {
+                size: auto;
+                margin: 0; /* Remove default margins */
+            }
+            
             /* Keep card pairs together on the same page */
             .id-card-pair {
                 display: flex;
