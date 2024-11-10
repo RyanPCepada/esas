@@ -179,13 +179,13 @@ foreach ($reports as $report) {
 
         .reports-list {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
             justify-content: center;
         }
 
         .report-item {
-            width: 180px;
+            width: 130px;
             background-color: #f9f9f9;
             padding: 15px;
             border: solid 1px lightgrey;
