@@ -12,6 +12,7 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 
+//FOR VAV_MAIN FULL NAME PURPOSES
 try {
     // Fetch moderator's name
     $sqlModerator = "SELECT firstName, middleName, lastName FROM tbl_moderators WHERE moderator_id = :moderator_id";

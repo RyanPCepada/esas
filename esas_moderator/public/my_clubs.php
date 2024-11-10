@@ -12,6 +12,7 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 
+//FOR VAV_MAIN FULL NAME PURPOSES
 try {
     // Use the existing PDO instance from config.php
     global $pdo;
