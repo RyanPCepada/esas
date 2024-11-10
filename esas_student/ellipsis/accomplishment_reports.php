@@ -29,9 +29,8 @@ $stmt_club->execute([$club_id]);
 $club = $stmt_club->fetch(PDO::FETCH_ASSOC); 
 
 // Fetch accomplishment reports for the student in this club
-$sql = "SELECT * FROM tbl_accomplishment_reports WHERE student_id = :student_id AND club_id = :club_id ORDER BY dateAdded DESC";
+$sql = "SELECT * FROM tbl_accomplishment_reports WHERE club_id = :club_id ORDER BY dateAdded DESC";
 $stmt = $pdo->prepare($sql);
-$stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
 $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
 $stmt->execute();
 $reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
