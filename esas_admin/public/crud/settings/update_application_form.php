@@ -8,6 +8,9 @@ if (!isset($_SESSION['admin_id'])) {
 
 $admin_id = $_SESSION['admin_id'];
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Fetch all clubs and their associated questions, if available
 $sql = "
     SELECT c.club_id, c.clubName, q.question_id, q.question
