@@ -4,7 +4,7 @@
             <h5 class="text-muted mb-3" style="font-size: 1.2em;">Club Officers</h5>
         </div>
     </div>
-    <div class="officers-list auto-scroll" id="officersList">
+    <div class="officers-list" id="officersList">
         <div class="officers-info">
             <div class="officer-row top-row"></div>
             <div class="officer-row bottom-row"></div>
@@ -28,7 +28,7 @@
     }
 
     .officer-card {
-        min-width: 180px;
+        width: 180px;
         border: 1px solid #ddd; 
         border: 1px solid #fff; 
         border-radius: 8px; 
@@ -109,12 +109,10 @@
     }
 </style>
 
+
 <script>
 $(document).ready(function() {
     const clubId = getQueryParameter('club_id');
-
-    // Define the officer positions in the required order
-    const positions = ['President', 'Vice President', 'Secretary', 'Treasurer', 'P.I.O.', 'Sergeant at Arms'];
 
     if (clubId) {
         $.ajax({
@@ -123,73 +121,38 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 const officersSection = $('.officers-list');
-                
-                // Create officers info section
-                // officersSection.append('<div class="officers-info"><div class="officer-row top-row"></div><div class="officer-row bottom-row"></div><div class="text-end mt-3"><a href="../settings.php">Edit Officers in Settings</a></div>');
                 const topRow = $('.officer-row.top-row');
                 const bottomRow = $('.officer-row.bottom-row');
 
-                // Initialize an empty array to track existing officer positions
-                const existingPositions = {};
+                // Clear previous entries in case of re-rendering
+                topRow.empty();
+                bottomRow.empty();
 
                 if (response.success) {
                     const officers = response.officers;
 
-                    // Loop through existing officers and store their information based on position
-                    officers.forEach(officer => {
-                        const profilePicPath = officer.profilePic ? `/esas/esas_student/images/${officer.profilePic}` : '/esas/esas_student/images/PROF_PIC.png';
-                        existingPositions[officer.position] = officer;  // Store the officer by position
-                    });
-                }
+                    if (officers.length > 0) {
+                        officers.forEach((officer, index) => {
+                            const profilePicPath = officer.profilePic ? `/esas/esas_student/images/${officer.profilePic}` : '/esas/esas_student/images/PROF_PIC.png';
+                            const officerCard = `
+                                <div class="officer-card">
+                                    <img src="${profilePicPath}" alt="${officer.fullName}">
+                                    <h6>${officer.fullName}</h6>
+                                    <p>${officer.position}</p>
+                                </div>
+                            `;
 
-                // Render officers in the specified order
-                positions.forEach(position => {
-                    if (existingPositions[position]) {
-                        const officer = existingPositions[position];
-                        const profilePicPath = officer.profilePic ? `/esas/esas_student/images/${officer.profilePic}` : '/esas/esas_student/images/PROF_PIC.png';
-                        
-                        if (position === 'President' || position === 'Vice President') {
-                            topRow.append(`
-                                <div class="officer-card">
-                                    <img src="${profilePicPath}" alt="${officer.fullName}">
-                                    <h6>${officer.fullName}</h6>
-                                    <p>${officer.position}</p>
-                                </div>
-                            `);
-                        } else {
-                            bottomRow.append(`
-                                <div class="officer-card">
-                                    <img src="${profilePicPath}" alt="${officer.fullName}">
-                                    <h6>${officer.fullName}</h6>
-                                    <p>${officer.position}</p>
-                                </div>
-                            `);
-                        }
+                            // Place the first two officers in the top row, others in the bottom row
+                            if (index < 2) {
+                                topRow.append(officerCard);
+                            } else {
+                                bottomRow.append(officerCard);
+                            }
+                        });
                     } else {
-                        // If no officer is found for this position, add a placeholder
-                        if (position === 'President' || position === 'Vice President') {
-                            topRow.append(`
-                                <div class="officer-card">
-                                    <img src="/esas/esas_student/images/PROF_PIC.png" alt="No ${position} selected">
-                                    <h6>None</h6>
-                                    <p>${position}</p>
-                                </div>
-                            `);
-                        } else {
-                            bottomRow.append(`
-                                <div class="officer-card">
-                                    <img src="/esas/esas_student/images/PROF_PIC.png" alt="No ${position} selected">
-                                    <h6>None</h6>
-                                    <p>${position}</p>
-                                </div>
-                            `);
-                        }
+                        // Display message if no officers are elected
+                        officersSection.append('<p>No officers have been assigned to this club.</p>');
                     }
-                });
-
-                // Display a message if there are no officers and placeholders are shown
-                if (officers.length === 0) {
-                    officersSection.append('<p>No officers have been assigned to this club.</p>');
                 }
             },
             error: function() {
