@@ -303,7 +303,7 @@ try {
             <div class="d-flex flex-column flex-shrink-0 px-2 bg-body-tertiary">
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li>
-                        <a href="../../esas_moderator/public/dashboard.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="dashboard">
+                        <a href="../../esas_moderator/public/dashboard.php" class="nav-link left-sidebar text-dark" id="dashboard">
                             <i class="fas fa-chart-line"></i> Dashboard
                         </a>
                     </li>
@@ -364,9 +364,9 @@ try {
                         <div class="card p-2">
                             <!-- ALL STUDENT TABLE START -->
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
-                                <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
+                                <!-- <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
                                     <h4 class="text-muted mb-0">Accomplishment Reports</h4>
-                                </div>
+                                </div> -->
 
                                 <!-- Dropdown for clubs and search input -->
                                 <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
@@ -436,74 +436,74 @@ try {
 
             <script>
                 // Function to update the record count and hide labels with no matching reports
-function updateReportsDisplay() {
-    const searchQuery = document.getElementById('studentSearch').value.toLowerCase();
-    const clubId = document.getElementById('clubSelect').value;
-    const reportGroups = document.querySelectorAll('.report-group');
-    let matchedCount = 0;
-    let totalReportItems = 0; // Reset totalReportItems at the start of the function
+                function updateReportsDisplay() {
+                    const searchQuery = document.getElementById('studentSearch').value.toLowerCase();
+                    const clubId = document.getElementById('clubSelect').value;
+                    const reportGroups = document.querySelectorAll('.report-group');
+                    let matchedCount = 0;
+                    let totalReportItems = 0; // Reset totalReportItems at the start of the function
 
-    reportGroups.forEach(group => {
-        const reportItemsInGroup = group.querySelectorAll('.report-item');
-        let groupMatchedCount = 0; // Reset matched count per group for selected club
-        let groupHasMatch = false;
+                    reportGroups.forEach(group => {
+                        const reportItemsInGroup = group.querySelectorAll('.report-item');
+                        let groupMatchedCount = 0; // Reset matched count per group for selected club
+                        let groupHasMatch = false;
 
-        reportItemsInGroup.forEach(item => {
-            const filename = item.querySelector('.original-filename').textContent.toLowerCase();
-            const itemClubId = item.dataset.clubId;
-            const isMatch = filename.includes(searchQuery) && (clubId === '' || itemClubId === clubId);
+                        reportItemsInGroup.forEach(item => {
+                            const filename = item.querySelector('.original-filename').textContent.toLowerCase();
+                            const itemClubId = item.dataset.clubId;
+                            const isMatch = filename.includes(searchQuery) && (clubId === '' || itemClubId === clubId);
 
-            if (isMatch) {
-                item.style.display = 'block';
-                matchedCount++;
-                groupMatchedCount++;
-                groupHasMatch = true;
+                            if (isMatch) {
+                                item.style.display = 'block';
+                                matchedCount++;
+                                groupMatchedCount++;
+                                groupHasMatch = true;
 
-                // Highlight search term in the filename
-                const regex = new RegExp(searchQuery, 'gi');
-                const highlightedText = filename.replace(regex, match => `<span class="highlight">${match}</span>`);
-                item.querySelector('.original-filename').innerHTML = highlightedText;
-            } else {
-                item.style.display = 'none';
-            }
+                                // Highlight search term in the filename
+                                const regex = new RegExp(searchQuery, 'gi');
+                                const highlightedText = filename.replace(regex, match => `<span class="highlight">${match}</span>`);
+                                item.querySelector('.original-filename').innerHTML = highlightedText;
+                            } else {
+                                item.style.display = 'none';
+                            }
 
-            // Count all reports in the group, not just matching ones
-            if (clubId === '' || itemClubId === clubId) {
-                totalReportItems++;
-            }
-        });
+                            // Count all reports in the group, not just matching ones
+                            if (clubId === '' || itemClubId === clubId) {
+                                totalReportItems++;
+                            }
+                        });
 
-        // Update group label with the matched count of reports for the selected club only if there's a match
-        const groupLabel = group.querySelector('.date-label');
-        if (groupLabel) {
-            const originalText = groupLabel.dataset.originalText || groupLabel.textContent.split(" (")[0];
-            groupLabel.dataset.originalText = originalText; // Store original label text if not already set
-            groupLabel.innerHTML = `${originalText} (${groupMatchedCount})`;
-        }
+                        // Update group label with the matched count of reports for the selected club only if there's a match
+                        const groupLabel = group.querySelector('.date-label');
+                        if (groupLabel) {
+                            const originalText = groupLabel.dataset.originalText || groupLabel.textContent.split(" (")[0];
+                            groupLabel.dataset.originalText = originalText; // Store original label text if not already set
+                            groupLabel.innerHTML = `${originalText} (${groupMatchedCount})`;
+                        }
 
-        // Hide or show the label and report list for this group based on matching items
-        group.style.display = groupHasMatch ? 'block' : 'none';
-    });
+                        // Hide or show the label and report list for this group based on matching items
+                        group.style.display = groupHasMatch ? 'block' : 'none';
+                    });
 
-    // Update the record count
-    document.getElementById('rowCountDisplay').textContent = `Showing ${matchedCount} / ${totalReportItems} Records`;
+                    // Update the record count
+                    document.getElementById('rowCountDisplay').textContent = `Showing ${matchedCount} / ${totalReportItems} Records`;
 
-    // Show or hide the "No reports found" message
-    const noResultsMessage = document.getElementById('noResultsMessage');
-    noResultsMessage.style.display = matchedCount === 0 ? 'block' : 'none';
-}
+                    // Show or hide the "No reports found" message
+                    const noResultsMessage = document.getElementById('noResultsMessage');
+                    noResultsMessage.style.display = matchedCount === 0 ? 'block' : 'none';
+                }
 
-// Event listeners for dropdown and search input
-document.getElementById('clubSelect').addEventListener('change', updateReportsDisplay);
-document.getElementById('studentSearch').addEventListener('input', updateReportsDisplay);
+                // Event listeners for dropdown and search input
+                document.getElementById('clubSelect').addEventListener('change', updateReportsDisplay);
+                document.getElementById('studentSearch').addEventListener('input', updateReportsDisplay);
 
-// Store the original label text on page load
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.date-label').forEach(label => {
-        label.dataset.originalText = label.textContent.split(" (")[0]; // Save original text without count
-    });
-    updateReportsDisplay(); // Initialize reports display
-});
+                // Store the original label text on page load
+                document.addEventListener('DOMContentLoaded', () => {
+                    document.querySelectorAll('.date-label').forEach(label => {
+                        label.dataset.originalText = label.textContent.split(" (")[0]; // Save original text without count
+                    });
+                    updateReportsDisplay(); // Initialize reports display
+                });
 
             </script>
 

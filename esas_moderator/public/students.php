@@ -328,7 +328,7 @@ try {
                                                     <!-- Dropdown for filtering by status -->
                                                     <div class="col-12 col-md-8 d-flex align-items-center">
                                                         <select id="statusSelect" class="form-select me-2" style="width: 20%;">
-                                                            <optgroup label="Select Club Request Status">
+                                                            <optgroup label="Select Status">
                                                                 <option value="" selected>All</option>
                                                                 <option value="active">Active</option>
                                                                 <option value="inactive">Inactive</option>
