@@ -8,6 +8,9 @@ if (!isset($_SESSION['admin_id'])) {
 
 $admin_id = $_SESSION['admin_id'];
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 $sql = "SELECT * FROM tbl_admin WHERE admin_id = ?";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$admin_id]);
