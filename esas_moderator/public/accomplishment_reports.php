@@ -16,73 +16,67 @@ try {
     // Use the existing PDO instance from config.php
     global $pdo;
 
-    // Prepare and execute the SQL statement
-    $sql = "SELECT email FROM tbl_moderators WHERE moderator_id = :moderator_id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-    $stmt->execute();
-    
-    // Fetch the result
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Fetch moderator's associated clubs
+    $sql_club = "SELECT c.club_id, c.clubName 
+                 FROM tbl_clubs c
+                 JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                 WHERE cm.moderator_id = :moderator_id";
+    $stmt_club = $pdo->prepare($sql_club);
+    $stmt_club->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+    $stmt_club->execute();
+    $clubs = $stmt_club->fetchAll(PDO::FETCH_ASSOC);
 
-    // Check if a result was found
-    if ($result) {
-        $email = strtoupper($result['email']);
+    // Fetch all accomplishment reports for the moderator's clubs
+    $clubIds = array_column($clubs, 'club_id'); // Extract club IDs
+    if (!empty($clubIds)) {
+        $clubIdsPlaceholder = implode(',', array_fill(0, count($clubIds), '?'));
+        $sql_reports = "SELECT * FROM tbl_accomplishment_reports 
+                        WHERE club_id IN ($clubIdsPlaceholder)
+                        ORDER BY dateAdded DESC";
+        $stmt_reports = $pdo->prepare($sql_reports);
+        $stmt_reports->execute($clubIds);
+        $reports = $stmt_reports->fetchAll(PDO::FETCH_ASSOC);
     } else {
-        // Handle the case where no data is found
-        $email = "UNKNOWN";
+        $reports = [];
+    }
+
+    // Function to label reports by date
+    function getDateLabel($date) {
+        $today = new DateTime('today');
+        $yesterday = new DateTime('yesterday');
+        $dateObj = new DateTime($date);
+
+        if ($dateObj >= $today) {
+            return "Today";
+        } elseif ($dateObj >= $yesterday) {
+            return "Yesterday";
+        } elseif ($dateObj >= new DateTime('last monday')) {
+            return "Earlier This Week";
+        } elseif ($dateObj >= new DateTime('last sunday -1 week')) {
+            return "Last Week";
+        } elseif ($dateObj->format('Y-m') === $today->format('Y-m')) {
+            return "Earlier This Month";
+        } elseif ($dateObj->format('Y-m') === $today->modify('-1 month')->format('Y-m')) {
+            return "Last Month";
+        } elseif ($dateObj->format('Y') === $today->format('Y')) {
+            return $dateObj->format('F');
+        } else {
+            return "Last Year";
+        }
+    }
+
+    // Group reports by their date label
+    $groupedReports = [];
+    foreach ($reports as $report) {
+        $label = getDateLabel($report['dateAdded']);
+        $groupedReports[$label][] = $report;
     }
 
 } catch (PDOException $e) {
     // Handle database connection or query error
     die("Database error: " . $e->getMessage());
 }
-
-// Fetch all clubs
-$sql_club = "SELECT club_id, clubName FROM tbl_clubs";
-$stmt_club = $pdo->prepare($sql_club);
-$stmt_club->execute();
-$clubs = $stmt_club->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch all accomplishment reports
-$sql_reports = "SELECT * FROM tbl_accomplishment_reports ORDER BY dateAdded DESC";
-$stmt_reports = $pdo->prepare($sql_reports);
-$stmt_reports->execute();
-$reports = $stmt_reports->fetchAll(PDO::FETCH_ASSOC);
-
-// Function to label reports by date
-function getDateLabel($date) {
-    $today = new DateTime('today');
-    $yesterday = new DateTime('yesterday');
-    $dateObj = new DateTime($date);
-
-    if ($dateObj >= $today) {
-        return "Today";
-    } elseif ($dateObj >= $yesterday) {
-        return "Yesterday";
-    } elseif ($dateObj >= new DateTime('last monday')) {
-        return "Earlier This Week";
-    } elseif ($dateObj >= new DateTime('last sunday -1 week')) {
-        return "Last Week";
-    } elseif ($dateObj->format('Y-m') === $today->format('Y-m')) {
-        return "Earlier This Month";
-    } elseif ($dateObj->format('Y-m') === $today->modify('-1 month')->format('Y-m')) {
-        return "Last Month";
-    } elseif ($dateObj->format('Y') === $today->format('Y')) {
-        return $dateObj->format('F');
-    } else {
-        return "Last Year";
-    }
-}
-
-// Group reports by their date label
-$groupedReports = [];
-foreach ($reports as $report) {
-    $label = getDateLabel($report['dateAdded']);
-    $groupedReports[$label][] = $report;
-}
 ?>
-
 
 
 <!DOCTYPE html>
@@ -442,70 +436,74 @@ foreach ($reports as $report) {
 
             <script>
                 // Function to update the record count and hide labels with no matching reports
-                function updateReportsDisplay() {
-                    const searchQuery = document.getElementById('studentSearch').value.toLowerCase();
-                    const clubId = document.getElementById('clubSelect').value;
-                    const reportGroups = document.querySelectorAll('.report-group');
-                    let matchedCount = 0;
-                    let totalReportItems = 0;
+function updateReportsDisplay() {
+    const searchQuery = document.getElementById('studentSearch').value.toLowerCase();
+    const clubId = document.getElementById('clubSelect').value;
+    const reportGroups = document.querySelectorAll('.report-group');
+    let matchedCount = 0;
+    let totalReportItems = 0; // Reset totalReportItems at the start of the function
 
-                    reportGroups.forEach(group => {
-                        const reportItemsInGroup = group.querySelectorAll('.report-item');
-                        let groupMatchedCount = 0; // Reset matched count per group for selected club
-                        let groupHasMatch = false;
+    reportGroups.forEach(group => {
+        const reportItemsInGroup = group.querySelectorAll('.report-item');
+        let groupMatchedCount = 0; // Reset matched count per group for selected club
+        let groupHasMatch = false;
 
-                        reportItemsInGroup.forEach(item => {
-                            const filename = item.querySelector('.original-filename').textContent.toLowerCase();
-                            const itemClubId = item.dataset.clubId;
-                            const isMatch = filename.includes(searchQuery) && (clubId === '' || itemClubId === clubId);
+        reportItemsInGroup.forEach(item => {
+            const filename = item.querySelector('.original-filename').textContent.toLowerCase();
+            const itemClubId = item.dataset.clubId;
+            const isMatch = filename.includes(searchQuery) && (clubId === '' || itemClubId === clubId);
 
-                            if (isMatch) {
-                                item.style.display = 'block';
-                                matchedCount++;
-                                groupMatchedCount++;
-                                groupHasMatch = true;
+            if (isMatch) {
+                item.style.display = 'block';
+                matchedCount++;
+                groupMatchedCount++;
+                groupHasMatch = true;
 
-                                // Highlight search term in the filename
-                                const regex = new RegExp(searchQuery, 'gi');
-                                const highlightedText = filename.replace(regex, match => `<span class="highlight">${match}</span>`);
-                                item.querySelector('.original-filename').innerHTML = highlightedText;
-                            } else {
-                                item.style.display = 'none';
-                            }
-                        });
+                // Highlight search term in the filename
+                const regex = new RegExp(searchQuery, 'gi');
+                const highlightedText = filename.replace(regex, match => `<span class="highlight">${match}</span>`);
+                item.querySelector('.original-filename').innerHTML = highlightedText;
+            } else {
+                item.style.display = 'none';
+            }
 
-                        // Update group label with the matched count of reports for the selected club only if there's a match
-                        const groupLabel = group.querySelector('.date-label');
-                        if (groupLabel) {
-                            const originalText = groupLabel.dataset.originalText || groupLabel.textContent.split(" (")[0];
-                            groupLabel.dataset.originalText = originalText; // Store original label text if not already set
-                            groupLabel.innerHTML = `${originalText} (${groupMatchedCount})`;
-                        }
+            // Count all reports in the group, not just matching ones
+            if (clubId === '' || itemClubId === clubId) {
+                totalReportItems++;
+            }
+        });
 
-                        // Hide or show the label and report list for this group based on matching items
-                        group.style.display = groupHasMatch ? 'block' : 'none';
-                        totalReportItems += reportItemsInGroup.length;
-                    });
+        // Update group label with the matched count of reports for the selected club only if there's a match
+        const groupLabel = group.querySelector('.date-label');
+        if (groupLabel) {
+            const originalText = groupLabel.dataset.originalText || groupLabel.textContent.split(" (")[0];
+            groupLabel.dataset.originalText = originalText; // Store original label text if not already set
+            groupLabel.innerHTML = `${originalText} (${groupMatchedCount})`;
+        }
 
-                    // Update the record count
-                    document.getElementById('rowCountDisplay').textContent = `Showing ${matchedCount} / ${totalReportItems} Records`;
+        // Hide or show the label and report list for this group based on matching items
+        group.style.display = groupHasMatch ? 'block' : 'none';
+    });
 
-                    // Show or hide the "No reports found" message
-                    const noResultsMessage = document.getElementById('noResultsMessage');
-                    noResultsMessage.style.display = matchedCount === 0 ? 'block' : 'none';
-                }
+    // Update the record count
+    document.getElementById('rowCountDisplay').textContent = `Showing ${matchedCount} / ${totalReportItems} Records`;
 
-                // Event listeners for dropdown and search input
-                document.getElementById('clubSelect').addEventListener('change', updateReportsDisplay);
-                document.getElementById('studentSearch').addEventListener('input', updateReportsDisplay);
+    // Show or hide the "No reports found" message
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    noResultsMessage.style.display = matchedCount === 0 ? 'block' : 'none';
+}
 
-                // Store the original label text on page load
-                document.addEventListener('DOMContentLoaded', () => {
-                    document.querySelectorAll('.date-label').forEach(label => {
-                        label.dataset.originalText = label.textContent.split(" (")[0]; // Save original text without count
-                    });
-                    updateReportsDisplay(); // Initialize reports display
-                });
+// Event listeners for dropdown and search input
+document.getElementById('clubSelect').addEventListener('change', updateReportsDisplay);
+document.getElementById('studentSearch').addEventListener('input', updateReportsDisplay);
+
+// Store the original label text on page load
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.date-label').forEach(label => {
+        label.dataset.originalText = label.textContent.split(" (")[0]; // Save original text without count
+    });
+    updateReportsDisplay(); // Initialize reports display
+});
 
             </script>
 
