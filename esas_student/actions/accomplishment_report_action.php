@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Execute the query
         if ($stmt->execute()) {
             // Redirect to success page or show success message
-            echo "<script>alert('Accomplishment report submitted successfully!'); window.location.href = '../accomplishment_reports.php';</script>";
+            echo "<script>alert('Accomplishment report submitted successfully!'); window.location.href = '../ellipsis/accomplishment_reports.php?student_id=$student_id&club_id=$club_id';</script>";
         } else {
             echo "Something went wrong. Please try again.";
         }
