@@ -144,8 +144,8 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="form-group">
                                 <label for="officer_position_<?php echo htmlspecialchars($officer['officer_id']); ?>">
                                     <?php echo htmlspecialchars($officer['position']) ?>
-                                    Club ID: <?php echo htmlspecialchars($officer['club_id']) ?>
-                                    Officer ID: <?php echo htmlspecialchars($officer['officer_id']) ?>
+                                    <!-- Club ID: <?php echo htmlspecialchars($officer['club_id']) ?>
+                                    Officer ID: <?php echo htmlspecialchars($officer['officer_id']) ?> -->
                                 </label>
 
                                 <span class="delete-icon" title="Delete Officer" onclick="deleteOfficer(<?php echo htmlspecialchars($officer['officer_id']); ?>, <?php echo htmlspecialchars($officer['club_id']); ?>)">
@@ -210,6 +210,7 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
     <p>No officers found for this moderator.</p>
 <?php endif; ?>
 
+
 <!-- Add New Officer Modal -->
 <div class="modal fade" id="addOfficerModal" tabindex="-1" aria-labelledby="addOfficerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -227,10 +228,27 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                         <input type="text" class="form-control" id="officer_position" name="position" placeholder="Enter Position" required>
                     </div>
                     <div class="form-group">
-                        <label for="officer_student">Select Officer (Student)</label>
+                        <label for="officer_student">Select Student</label>
                         <select class="form-control" id="officer_student" name="student_id">
-                            <option value="">-- Select Student --</option>
-                            <!-- Student options will be populated here dynamically via JavaScript -->
+                            <option value="">None</option>
+                            <?php
+                            // Fetch students for the current club
+                            $studentsSql = "
+                                SELECT DISTINCT s.student_id, CONCAT(s.firstName, ' ', s.lastName) AS fullName
+                                FROM tbl_students s
+                                JOIN tbl_application a ON s.student_id = a.student_id
+                                WHERE a.status = 'active' AND a.club_id = :club_id
+                                ORDER BY fullName
+                            ";
+                            $studentsStmt = $pdo->prepare($studentsSql);
+                            $studentsStmt->execute(['club_id' => $club_id]); // Use the dynamic club_id
+                            $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($students as $student): ?>
+                                <option value="<?php echo htmlspecialchars($student['student_id']); ?>">
+                                    <?php echo htmlspecialchars($student['fullName']); ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <!-- Use the first officer's club_id to populate the modal -->
@@ -274,58 +292,57 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
     // Function to add an officer
-function addOfficer() {
-    // Get values from form fields
-    var officerPosition = $('#position').val(); // Assume you have a field for position
-    var studentId = $('#student_id').val(); // Assume you have a field for student ID
-    var clubId = $('#club_id').val(); // This is populated dynamically in the modal
+    function addOfficer() {
+        // Get values from form fields
+        var officerPosition = $('#position').val(); // Assume you have a field for position
+        var studentId = $('#student_id').val(); // Assume you have a field for student ID
+        var clubId = $('#club_id').val(); // This is populated dynamically in the modal
 
-    // Validate that necessary fields are filled
-    if (officerPosition && studentId && clubId) {
-        $.ajax({
-            url: '/esas/esas_moderator/actions/add_officer_action.php', 
-            type: 'POST',
-            data: {
-                position: officerPosition,
-                student_id: studentId,
-                club_id: clubId
-            },
-            success: function(response) {
-                if (response.startsWith("Success")) {
-                    alert(response); // Display success message
-                    location.reload(); // Reload the page to update the officer list
-                } else {
-                    alert(response); // Display error message if any
+        // Validate that necessary fields are filled
+        if (officerPosition && studentId && clubId) {
+            $.ajax({
+                url: '/esas/esas_moderator/actions/add_officer_action.php', 
+                type: 'POST',
+                data: {
+                    position: officerPosition,
+                    student_id: studentId,
+                    club_id: clubId
+                },
+                success: function(response) {
+                    if (response.startsWith("Success")) {
+                        alert(response); // Display success message
+                        location.reload(); // Reload the page to update the officer list
+                    } else {
+                        alert(response); // Display error message if any
+                    }
+                },
+                error: function() {
+                    alert('Error adding officer.');
                 }
-            },
-            error: function() {
-                alert('Error adding officer.');
-            }
-        });
-    } else {
-        alert("Please fill all fields.");
+            });
+        } else {
+            alert("Please fill all fields.");
+        }
     }
-}
 
 
 
     // Handle the form submission for adding an officer
-    // Populate club_id in Officer Add Modal
-$(document).ready(function() {
-    $('#addOfficerModal').on('show.bs.modal', function(event) {
-        var button = $(event.relatedTarget); // Button that triggered the modal
-        var club_id = button.data('club-id'); // Get the club_id from the button's data attribute
-        
-        var modal = $(this);
-        modal.find('#club_id').val(club_id); // Set the hidden input field's value
-        
-        // Remove any previously added club_id info
-        modal.find('.modal-body p').remove();
+    $(document).ready(function() {
+        $('#addOfficerModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var club_id = button.data('club-id'); // Get the club_id from the button's data attribute
+            
+            var modal = $(this);
+            modal.find('#club_id').val(club_id); // Set the hidden input field's value
+            
+            // Remove any previously added club_id info
+            modal.find('.modal-body p').remove();
 
-        // Display the current club_id in the modal body
-        modal.find('.modal-body').prepend('<p><strong>Club ID:</strong> ' + club_id + '</p>');
+            // Display the current club_id in the modal body
+            // modal.find('.modal-body').prepend('<p><strong>Club ID:</strong> ' + club_id + '</p>');
+        });
     });
-});
 
 
 </script>
