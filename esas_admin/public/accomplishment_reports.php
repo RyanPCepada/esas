@@ -1,0 +1,259 @@
+<?php 
+session_start();
+require_once "../../config.php";  // Assuming this file holds your PDO connection
+
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
+if (!isset($_SESSION['admin_id'])) {
+    echo "Admin ID is not set in the session.";
+    exit;
+}
+
+$admin_id = $_SESSION['admin_id']; // Get admin ID from session
+
+try {
+    // Use the existing PDO instance from config.php
+    global $pdo;
+
+    // Prepare and execute the SQL statement
+    $sql = "SELECT email FROM tbl_admin WHERE admin_id = :admin_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':admin_id', $admin_id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    // Fetch the result
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check if a result was found
+    if ($result) {
+        $email = strtoupper($result['email']);
+    } else {
+        // Handle the case where no data is found
+        $email = "UNKNOWN";
+    }
+
+} catch (PDOException $e) {
+    // Handle database connection or query error
+    die("Database error: " . $e->getMessage());
+}
+
+?>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ESAS - Students List</title>
+    <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
+    <script src="../../assets/js/jquery-3.6.0.js"></script>
+    <link href="../../assets/css/styles.css" rel="stylesheet" />
+    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <style>
+        .nav-link.active {
+          color: white !important;
+          background-color: black;
+        }
+        .left-sidebar {
+            font-size: 16px;
+            text-align: start;
+        }
+        .mainbar h2 {
+            margin-left: 15px;
+            margin-bottom: 32px;
+        }
+        .card-body {
+            width: 100%;
+            /* max-width: 600px; */
+            margin: 0 auto;
+            padding: 50px;
+        }
+        
+
+        @media (max-width: 768px) {
+            .col-auto {
+                width: auto;
+            }
+            .icon-style {
+                width: 6% !important;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    
+    <div class="container-fluid">
+        <div class="row g-0 h-100">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
+                <a class="navbar-brand ps-2" href="#">
+                    <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
+                    ESAS - Admin</a>
+                </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse hide" id="main_nav">
+                    <div class="navbar-collapse flex-grow-1 text-right" id="sampleid" style="padding-left: 20px">
+                        <?php include '../nav/nav_main.php' ?>
+                    </div>
+                </div>
+            </nav>
+            <!-- LEFT SIDEBAR -->
+            <div class="col-12 col-md-2 pt-3 border-end">
+
+            <div class="d-flex flex-column flex-shrink-0 px-2 bg-body-tertiary">
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li>
+                        <a href="../../esas_admin/public/dashboard.php" class="nav-link left-sidebar text-dark" id="dashboard">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../../esas_admin/public/all_clubs.php" class="nav-link left-sidebar text-dark" id="all-clubs">
+                            <i class="fas fa-university"></i> All Clubs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../../esas_admin/public/moderators.php" class="nav-link left-sidebar text-dark" id="moderators">
+                            <i class="fa fa-user-shield"></i> Moderators
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../../esas_admin/public/students.php" class="nav-link left-sidebar text-dark" id="students">
+                            <i class="fas fa-users"></i> Students
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../../esas_admin/public/club_requests.php" class="nav-link left-sidebar text-dark" id="club-requests">
+                            <i class="fas fa-envelope"></i> Club Requests
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../../esas_admin/public/reports.php" class="nav-link left-sidebar text-dark" id="reports">
+                            <i class="fas fa-file-alt"></i> Reports
+                        </a>
+                    </li>
+                    <br>
+                    Others
+                    <li>
+                        <a href="../../esas_admin/public/officers_charts.php" class="nav-link left-sidebar text-dark" id="officers_charts">
+                            <i class="fas fa-user-tie"></i> CSG & SBO Officers
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../../esas_admin/public/accomplishment_reports.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="accomplishment_reports" 
+                            style="display: flex; gap: 7px; align-items: flex-start;">
+                        
+                            <span class="icon-column" style="flex-shrink: 0;">
+                                <i class="fas fa-file-alt"></i>
+                            </span>
+                            
+                            <span class="text-column" style="line-height: 1.2;">
+                                Accomplishment Reports
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            </div>
+            <!-- LEFT SIDEBAR END -->
+
+
+            
+            
+            <!-- MAINPAGE BAR -->
+            <div class="col-12 col-md-10 bg-lgrey auto-scroll">
+                <div class="row g-0 h-100">
+                    <div class="row g-0 p-4 px-2 pt-2 h-100">
+
+                        <!-- THE MAIN PAGE START -->
+                        <div class="card p-2">
+
+                            <!-- ALL STUDENT TABLE START -->
+                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+                                
+                                <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
+                                    <h4 class="text-muted mb-0">Accomplishment Reports</h4>
+                                    <a href="../public/crud/students/student_create.php" class="btn btn-danger disabled" style="visibility: hidden;">
+                                        <i class="fa fa-plus"></i> Add New Student
+                                    </a>
+                                </div>
+
+                                
+
+                                <?php
+                                    // Include config file
+                                    require_once "../../config.php";
+
+                                    $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
+
+
+                                    
+                                    $sql = "SELECT 
+                                    s.student_id,
+                                    s.firstName,
+                                    s.middleName,
+                                    s.lastName,
+                                    s.instiEmail,
+                                    s.phoneNumber,
+                                    s.department,
+                                    s.course,
+                                    s.year,
+                                    s.profilePic,
+                                    r.application_id,
+                                    r.club_id,  -- Add this line to select club_id
+                                    GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
+                                FROM 
+                                    tbl_students s
+                                LEFT JOIN 
+                                    tbl_application r ON s.student_id = r.student_id AND r.status = 'active' 
+                                LEFT JOIN 
+                                    tbl_clubs c ON r.club_id = c.club_id
+                                WHERE
+                                    r.status = 'active' 
+                                GROUP BY 
+                                    s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail, s.phoneNumber, s.department, s.course, s.year, s.profilePic
+                                ORDER BY 
+                                    s.student_id ASC;";
+
+                            
+                            
+                                ?>
+
+                            </div>
+                            <!-- ALL STUDENT TABLE END -->
+
+                        </div>
+                        <!-- THE MAIN PAGE END -->
+
+
+
+
+                    </div>
+                </div>
+            </div>
+            <!-- MAINPAGE BAR END -->
+
+
+        </div>
+    </div>
+
+    <!-- <?php include 'assets/components/modals.php' ?> -->
+    <script src="../../assets/js/jquery.dataTables.min.js"></script>
+    <script src="../../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/global_script.js"></script>
+
+
+
+
+</body>
+</html>
