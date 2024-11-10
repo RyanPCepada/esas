@@ -174,6 +174,20 @@ try {
                                 <i class="fas fa-file-alt"></i> Reports
                             </a>
                         </li>
+                        Others
+                        <li>
+                            <a href="../../esas_moderator/public/accomplishment_reports.php" class="nav-link left-sidebar text-dark" id="accomplishment_reports" 
+                                style="display: flex; gap: 7px; align-items: flex-start;">
+                            
+                                <span class="icon-column" style="flex-shrink: 0;">
+                                    <i class="fas fa-file-alt"></i>
+                                </span>
+                                    
+                                <span class="text-column" style="line-height: 1.2;">
+                                    Accomplishment Reports
+                                </span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
