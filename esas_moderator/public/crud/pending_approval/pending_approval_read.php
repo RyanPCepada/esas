@@ -14,6 +14,9 @@ if (!isset($_SESSION['moderator_id'])) {
     die("You are not logged in.");
 }
 
+// Set default timezone
+date_default_timezone_set('Asia/Manila');
+
 $moderator_id = $_SESSION['moderator_id'];
 
 $final_email ='';
