@@ -237,6 +237,11 @@ foreach ($reports as $report) {
             transform: translateX(20px); /* Start from the right */
             animation: slideInReport 0.6s forwards;
         }
+        
+        .highlight {
+            background-color: yellow;
+            font-weight: bold;
+        }
 
         @keyframes slideInReport {
             from {
@@ -363,158 +368,151 @@ foreach ($reports as $report) {
             
             
             <!-- MAINPAGE BAR -->
-<div class="col-12 col-md-10 bg-lgrey auto-scroll">
-    <div class="row g-0 h-100">
-        <div class="row g-0 p-4 px-2 pt-2 h-100">
-            <!-- THE MAIN PAGE START -->
-            <div class="card p-2">
-                <!-- ALL STUDENT TABLE START -->
-                <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
-                    <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
-                        <h4 class="text-muted mb-0">Accomplishment Reports</h4>
-                    </div>
+            <div class="col-12 col-md-10 bg-lgrey auto-scroll">
+                <div class="row g-0 h-100">
+                    <div class="row g-0 p-4 px-2 pt-2 h-100">
+                        <!-- THE MAIN PAGE START -->
+                        <div class="card p-2">
+                            <!-- ALL STUDENT TABLE START -->
+                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+                                <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
+                                    <h4 class="text-muted mb-0">Accomplishment Reports</h4>
+                                </div>
 
-                    <!-- Dropdown for clubs and search input -->
-                    <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
-                        <thead>
-                            <tr>
-                                <th colspan="9">
-                                    <div class="row">
-                                        <div class="col-12 col-md-8 d-flex align-items-center">
-                                            <select id="clubSelect" class="form-select me-2" style="width: 20%;">
-                                                <optgroup label="Select Club">
-                                                    <option value="" selected>All</option>
-                                                    <?php foreach ($clubs as $club): ?>
-                                                        <option value="<?php echo htmlspecialchars($club['club_id']); ?>"><?php echo htmlspecialchars($club['clubName']); ?></option>
+                                <!-- Dropdown for clubs and search input -->
+                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="9">
+                                                <div class="row">
+                                                    <div class="col-12 col-md-8 d-flex align-items-center">
+                                                        <select id="clubSelect" class="form-select me-2" style="width: 20%;">
+                                                            <optgroup label="Select Club">
+                                                                <option value="" selected>All</option>
+                                                                <?php foreach ($clubs as $club): ?>
+                                                                    <option value="<?php echo htmlspecialchars($club['club_id']); ?>"><?php echo htmlspecialchars($club['clubName']); ?></option>
+                                                                <?php endforeach; ?>
+                                                            </optgroup>
+                                                        </select>
+                                                        <input id="studentSearch" class="form-control" type="search" placeholder="Search reports here..." aria-label="Search">
+                                                    </div>
+                                                    <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
+                                                        <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6> <!-- Updated row count display -->
+                                                    </div>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                </table>
+
+                                <!-- Display filtered reports -->
+                                <div id="reportsDisplay">
+                                    <?php if (!empty($groupedReports)): ?> 
+                                        <?php foreach ($groupedReports as $label => $reports): ?>
+                                            <div class="report-group">
+                                                <h5 class="date-label mt-4 mb-4"><?php echo htmlspecialchars($label); ?> (<?php echo count($reports); ?> reports)</h5>
+                                                <div class="reports-list">
+                                                    <?php foreach ($reports as $report): ?>
+                                                        <div class="report-item" data-club-id="<?php echo htmlspecialchars($report['club_id']); ?>" 
+                                                            title="<?php echo htmlspecialchars($report['originalFileName']) . "\n" . date('m/d/Y h:i A', strtotime($report['dateAdded'])); ?>" 
+                                                            onclick="window.open('/esas/esas_student/accomplishment_reports/<?php echo urlencode($report['accReportFile']); ?>', '_blank')">
+                                                            <img src="/esas/esas_student/icons/ICON_PDF.png" alt="PDF Icon">
+                                                            <h6 class="original-filename"><?php echo htmlspecialchars($report['originalFileName']); ?></h6>
+                                                        </div>
                                                     <?php endforeach; ?>
-                                                </optgroup>
-                                            </select>
-                                            <input id="studentSearch" class="form-control" type="search" placeholder="Search reports here..." aria-label="Search">
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <div class="no-report">
+                                            <p>No accomplishment reports found.</p>
+                                            <i class="fas fa-file-pdf"></i>
                                         </div>
-                                        <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
-                                            <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6> <!-- Updated row count display -->
-                                        </div>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                    </table>
+                                    <?php endif; ?>
+                                </div>
+                                
+                            </div>
+                            <!-- ALL STUDENT TABLE END -->
 
-                    <!-- Display filtered reports -->
-<div id="reportsDisplay">
-    <?php if (!empty($groupedReports)): ?> 
-        <?php foreach ($groupedReports as $label => $reports): ?>
-            <div class="report-group">
-                <h5 class="date-label mt-4 mb-4"><?php echo htmlspecialchars($label); ?> (<?php echo count($reports); ?> reports)</h5>
-                <div class="reports-list">
-                    <?php foreach ($reports as $report): ?>
-                        <div class="report-item" data-club-id="<?php echo htmlspecialchars($report['club_id']); ?>" 
-                             title="<?php echo htmlspecialchars($report['originalFileName']) . "\n" . date('m/d/Y h:i A', strtotime($report['dateAdded'])); ?>" 
-                             onclick="window.open('/esas/esas_student/accomplishment_reports/<?php echo urlencode($report['accReportFile']); ?>', '_blank')">
-                            <img src="/esas/esas_student/icons/ICON_PDF.png" alt="PDF Icon">
-                            <h6 class="original-filename"><?php echo htmlspecialchars($report['originalFileName']); ?></h6>
+                            <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
+                                <em>No reports found for the selected club.</em>
+                            </div>
+                            
                         </div>
-                    <?php endforeach; ?>
+                        <!-- THE MAIN PAGE END -->
+                    </div>
                 </div>
             </div>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <div class="no-report">
-            <p>No accomplishment reports found.</p>
-            <i class="fas fa-file-pdf"></i>
-        </div>
-    <?php endif; ?>
-</div>
-                </div>
-                <!-- ALL STUDENT TABLE END -->
+            <!-- MAINPAGE BAR END -->
 
-                <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
-                    <em>No reports found for the selected club.</em>
-                </div>
-                
-            </div>
-            <!-- THE MAIN PAGE END -->
-        </div>
-    </div>
-</div>
-<!-- MAINPAGE BAR END -->
+            <script>
+                // Function to update the record count and hide labels with no matching reports
+                function updateReportsDisplay() {
+                    const searchQuery = document.getElementById('studentSearch').value.toLowerCase();
+                    const clubId = document.getElementById('clubSelect').value;
+                    const reportGroups = document.querySelectorAll('.report-group');
+                    let matchedCount = 0;
+                    let totalReportItems = 0;
 
-<script>
-// Function to update the record count and hide labels with no matching reports
-function updateReportsDisplay() {
-    const searchQuery = document.getElementById('studentSearch').value.toLowerCase();
-    const clubId = document.getElementById('clubSelect').value;
-    const reportGroups = document.querySelectorAll('.report-group');
-    let matchedCount = 0;
-    let totalReportItems = 0;
+                    reportGroups.forEach(group => {
+                        const reportItemsInGroup = group.querySelectorAll('.report-item');
+                        let groupMatchedCount = 0; // Reset matched count per group for selected club
+                        let groupHasMatch = false;
 
-    reportGroups.forEach(group => {
-        const reportItemsInGroup = group.querySelectorAll('.report-item');
-        let groupMatchedCount = 0; // Reset matched count per group for selected club
-        let groupHasMatch = false;
+                        reportItemsInGroup.forEach(item => {
+                            const filename = item.querySelector('.original-filename').textContent.toLowerCase();
+                            const itemClubId = item.dataset.clubId;
+                            const isMatch = filename.includes(searchQuery) && (clubId === '' || itemClubId === clubId);
 
-        reportItemsInGroup.forEach(item => {
-            const filename = item.querySelector('.original-filename').textContent.toLowerCase();
-            const itemClubId = item.dataset.clubId;
-            const isMatch = filename.includes(searchQuery) && (clubId === '' || itemClubId === clubId);
+                            if (isMatch) {
+                                item.style.display = 'block';
+                                matchedCount++;
+                                groupMatchedCount++;
+                                groupHasMatch = true;
 
-            if (isMatch) {
-                item.style.display = 'block';
-                matchedCount++;
-                groupMatchedCount++;
-                groupHasMatch = true;
+                                // Highlight search term in the filename
+                                const regex = new RegExp(searchQuery, 'gi');
+                                const highlightedText = filename.replace(regex, match => `<span class="highlight">${match}</span>`);
+                                item.querySelector('.original-filename').innerHTML = highlightedText;
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
 
-                // Highlight search term in the filename
-                const regex = new RegExp(searchQuery, 'gi');
-                const highlightedText = filename.replace(regex, match => `<span class="highlight">${match}</span>`);
-                item.querySelector('.original-filename').innerHTML = highlightedText;
-            } else {
-                item.style.display = 'none';
-            }
-        });
+                        // Update group label with the matched count of reports for the selected club only if there's a match
+                        const groupLabel = group.querySelector('.date-label');
+                        if (groupLabel) {
+                            const originalText = groupLabel.dataset.originalText || groupLabel.textContent.split(" (")[0];
+                            groupLabel.dataset.originalText = originalText; // Store original label text if not already set
+                            groupLabel.innerHTML = `${originalText} (${groupMatchedCount})`;
+                        }
 
-        // Update group label with the matched count of reports for the selected club only if there's a match
-        const groupLabel = group.querySelector('.date-label');
-        if (groupLabel) {
-            const originalText = groupLabel.dataset.originalText || groupLabel.textContent.split(" (")[0];
-            groupLabel.dataset.originalText = originalText; // Store original label text if not already set
-            groupLabel.innerHTML = `${originalText} (${groupMatchedCount})`;
-        }
+                        // Hide or show the label and report list for this group based on matching items
+                        group.style.display = groupHasMatch ? 'block' : 'none';
+                        totalReportItems += reportItemsInGroup.length;
+                    });
 
-        // Hide or show the label and report list for this group based on matching items
-        group.style.display = groupHasMatch ? 'block' : 'none';
-        totalReportItems += reportItemsInGroup.length;
-    });
+                    // Update the record count
+                    document.getElementById('rowCountDisplay').textContent = `Showing ${matchedCount} / ${totalReportItems} Records`;
 
-    // Update the record count
-    document.getElementById('rowCountDisplay').textContent = `Showing ${matchedCount} / ${totalReportItems} Records`;
+                    // Show or hide the "No reports found" message
+                    const noResultsMessage = document.getElementById('noResultsMessage');
+                    noResultsMessage.style.display = matchedCount === 0 ? 'block' : 'none';
+                }
 
-    // Show or hide the "No reports found" message
-    const noResultsMessage = document.getElementById('noResultsMessage');
-    noResultsMessage.style.display = matchedCount === 0 ? 'block' : 'none';
-}
+                // Event listeners for dropdown and search input
+                document.getElementById('clubSelect').addEventListener('change', updateReportsDisplay);
+                document.getElementById('studentSearch').addEventListener('input', updateReportsDisplay);
 
-// Event listeners for dropdown and search input
-document.getElementById('clubSelect').addEventListener('change', updateReportsDisplay);
-document.getElementById('studentSearch').addEventListener('input', updateReportsDisplay);
+                // Store the original label text on page load
+                document.addEventListener('DOMContentLoaded', () => {
+                    document.querySelectorAll('.date-label').forEach(label => {
+                        label.dataset.originalText = label.textContent.split(" (")[0]; // Save original text without count
+                    });
+                    updateReportsDisplay(); // Initialize reports display
+                });
 
-// Store the original label text on page load
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.date-label').forEach(label => {
-        label.dataset.originalText = label.textContent.split(" (")[0]; // Save original text without count
-    });
-    updateReportsDisplay(); // Initialize reports display
-});
-
-</script>
-
-<style>
-    .highlight {
-        background-color: yellow;
-        font-weight: bold;
-    }
-</style>
-
+            </script>
 
         </div>
     </div>
