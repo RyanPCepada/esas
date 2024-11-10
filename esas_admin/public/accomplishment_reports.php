@@ -187,7 +187,7 @@ foreach ($reports as $report) {
 
         .report-item {
             background-color: #f9f9f9;
-            padding: 15px;
+            padding: 10px;
             border: solid 1px lightgrey;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -210,7 +210,7 @@ foreach ($reports as $report) {
             height: auto;
         }
 
-        .report-item h5 {
+        .report-item h6 {
             display: -webkit-box;
             -webkit-line-clamp: 3; /* Limit to 3 lines */
             -webkit-box-orient: vertical;
@@ -230,7 +230,24 @@ foreach ($reports as $report) {
             margin-top: 48px;
         }
 
-        
+        /* Add slide-in animation for report-item */
+        .report-item {
+            opacity: 0;
+            transform: translateX(20px); /* Start from the right */
+            animation: slideInReport 0.6s forwards;
+        }
+
+        @keyframes slideInReport {
+            from {
+                opacity: 0;
+                transform: translateX(20px); /* Start from the right */
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0); /* End at normal position */
+            }
+        }
+
         @media (max-width: 767px) {
             h2 {
                 margin-top: 5px;
@@ -350,39 +367,62 @@ foreach ($reports as $report) {
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
 
                         <!-- THE MAIN PAGE START -->
-                        <div class="card p-2">
+<div class="card p-2">
 
-                            <!-- ALL STUDENT TABLE START -->
-                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
-                                
-                                <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
-                                    <h4 class="text-muted mb-0">Accomplishment Reports</h4>
-                                    <a href="../public/crud/students/student_create.php" class="btn btn-danger disabled" style="visibility: hidden;">
-                                        <i class="fa fa-plus"></i> Add New Student
-                                    </a>
-                                </div>
+<!-- ALL STUDENT TABLE START -->
+<div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+    
+    <div class="mt-1 mb-3 d-flex justify-content-between align-items-center">
+        <h4 class="text-muted mb-0">Accomplishment Reports</h4>
+        <a href="../public/crud/students/student_create.php" class="btn btn-danger disabled" style="visibility: hidden;">
+            <i class="fa fa-plus"></i> Add New Student
+        </a>
+    </div>
 
-                                
+    <!-- Dropdown for clubs and search input -->
+    <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> 
+        <thead>
+            <tr>
+                <th colspan="9">
+                    <div class="row">
+                        <div class="col-12 col-md-8 d-flex align-items-center">
+                            <select id="clubSelect" class="form-select me-2" style="width: 20%;">
+                                <optgroup label="Select Club">
+                                    <option value="" selected>All</option>
+                                    <?php
+                                    // Fetch clubs from tbl_clubs
+                                    $clubSql = "SELECT club_id, clubName FROM tbl_clubs";
+                                    $clubs = $pdo->query($clubSql);
+                                    while ($club = $clubs->fetch()) {
+                                        echo '<option value="' . htmlspecialchars($club['club_id']) . '">' . htmlspecialchars($club['clubName']) . '</option>';
+                                    }
+                                    ?>
+                                </optgroup>
+                            </select>
+                            <input id="studentSearch" class="form-control" type="search" placeholder="Search reports here..." aria-label="Search">
+                        </div>
+                        <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
+                            <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6> <!-- Updated row count display -->
+                        </div>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+    </table>
 
-                                
-    <div class="container-fluid container mb-5 auto-scroll">
+    <!-- Display filtered reports -->
+    <div id="reportsDisplay">
         <?php if (!empty($groupedReports)): ?> 
             <?php foreach ($groupedReports as $label => $reports): ?>
                 <h5 class="mt-4 mb-4"><?php echo htmlspecialchars($label); ?></h5>
-                
-                <!-- <div class="row mt-5 m-0">
-                    <div class="col-md-5 p-0"><hr></div>
-                    <div class="col-md-2 text-center"><label>or</label></div>
-                    <div class="col-md-5 p-0"><hr></div>
-                </div> -->
-                
+
                 <div class="reports-list">
                     <?php foreach ($reports as $report): ?>
                         <div class="report-item" 
-                            title="<?php echo htmlspecialchars($report['originalFileName']) . "\n" . date('m/d/Y h:i A', strtotime($report['dateAdded'])); ?>" 
-                            onclick="window.open('/esas/esas_student/accomplishment_reports/<?php echo urlencode($report['accReportFile']); ?>', '_blank')">
+                             title="<?php echo htmlspecialchars($report['originalFileName']) . "\n" . date('m/d/Y h:i A', strtotime($report['dateAdded'])); ?>" 
+                             onclick="window.open('/esas/esas_student/accomplishment_reports/<?php echo urlencode($report['accReportFile']); ?>', '_blank')">
                             <img src="/esas/esas_student/icons/ICON_PDF.png" alt="PDF Icon">
-                            <h5 id="original-filename"><?php echo htmlspecialchars($report['originalFileName']); ?></h5>
+                            <h6 class="original-filename"><?php echo htmlspecialchars($report['originalFileName']); ?></h6>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -393,14 +433,57 @@ foreach ($reports as $report) {
                 <i class="fas fa-file-pdf"></i>
             </div>
         <?php endif; ?>
-                            
-                            
+    </div>
+</div>
+<!-- ALL STUDENT TABLE END -->
 
-                            </div>
-                            <!-- ALL STUDENT TABLE END -->
+<script>
+// Function to update the record count and highlight search terms
+function updateReportsDisplay() {
+    const searchQuery = document.getElementById('studentSearch').value.toLowerCase();
+    const clubId = document.getElementById('clubSelect').value;
+    const reportItems = document.querySelectorAll('.report-item');
+    let matchedCount = 0;
 
-                        </div>
-                        <!-- THE MAIN PAGE END -->
+    reportItems.forEach(item => {
+        const filename = item.querySelector('.original-filename').textContent.toLowerCase();
+        const isMatch = filename.includes(searchQuery) && 
+                        (clubId === '' || item.dataset.clubId === clubId);
+
+        if (isMatch) {
+            item.style.display = 'block'; // Show the item
+            matchedCount++;
+
+            // Highlight search term in the filename
+            const regex = new RegExp(searchQuery, 'gi');
+            const highlightedText = filename.replace(regex, match => `<span class="highlight">${match}</span>`);
+            item.querySelector('.original-filename').innerHTML = highlightedText;
+        } else {
+            item.style.display = 'none'; // Hide non-matching items
+        }
+    });
+
+    // Update the record count
+    document.getElementById('rowCountDisplay').textContent = `Showing ${matchedCount} / ${reportItems.length} Records`;
+}
+
+// Event listeners for dropdown and search input
+document.getElementById('clubSelect').addEventListener('change', updateReportsDisplay);
+document.getElementById('studentSearch').addEventListener('input', updateReportsDisplay);
+
+// Initialize reports display on page load
+document.addEventListener('DOMContentLoaded', updateReportsDisplay);
+</script>
+
+<style>
+    .highlight {
+        background-color: yellow;
+        font-weight: bold;
+    }
+</style>
+
+</div>
+<!-- THE MAIN PAGE END -->
 
 
 
@@ -422,6 +505,22 @@ foreach ($reports as $report) {
 
 
     <script>
+
+        // Function to animate report items
+        function animateReportItems() {
+            const reportItems = document.querySelectorAll('.report-item');
+            reportItems.forEach((item, index) => {
+                // Set a delay for each item based on its index
+                item.style.animationDelay = `${index * 100}ms`; // Add delay for wave effect
+            });
+        }
+
+        // Trigger animation when the page has fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            animateReportItems(); // Animate all report items with delay
+        });
+
+
         // Function to open report in a new tab
         function openTab(fileName) {
             window.open(fileName, '_blank');
