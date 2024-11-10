@@ -1,0 +1,46 @@
+<?php
+require_once "../../config.php";
+session_start();
+
+// Ensure moderator is logged in
+if (!isset($_SESSION['moderator_id'])) {
+    die("You are not logged in.");
+}
+
+$moderator_id = $_SESSION['moderator_id'];
+
+// Check if form data is submitted
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['position'], $_POST['student_id'], $_POST['club_id'])) {
+    $position = $_POST['position'];
+    $studentId = $_POST['student_id'];
+    $clubId = $_POST['club_id'];
+
+    // Fetch the club name based on club_id
+    $clubNameSql = "SELECT clubName FROM tbl_clubs WHERE club_id = ?";
+    $clubNameStmt = $pdo->prepare($clubNameSql);
+    $clubNameStmt->execute([$clubId]);
+    $clubNameRow = $clubNameStmt->fetch(PDO::FETCH_ASSOC);
+    $clubName = $clubNameRow ? $clubNameRow['clubName'] : 'Unknown Club';
+
+    // Insert new officer into the database
+    $insertSql = "INSERT INTO tbl_club_officers (club_id, student_id, position, dateAdded) VALUES (?, ?, ?, NOW())";
+    $insertStmt = $pdo->prepare($insertSql);
+
+    if ($insertStmt->execute([$clubId, $studentId, $position])) {
+        // Log the addition activity
+        $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
+        $logStmt = $pdo->prepare($logSql);
+        $logStmt->execute([
+            'activity' => "You added a new officer ($position) to " . htmlspecialchars($clubName),
+            'dateAdded' => date('Y-m-d H:i:s'),
+            'moderator_id' => $moderator_id
+        ]);
+
+        // Send a success response to the AJAX call
+        // echo "Success: Officer added!";
+    } else {
+        // Send an error response to the AJAX call
+        echo "Error adding new officer.";
+    }
+}
+?>

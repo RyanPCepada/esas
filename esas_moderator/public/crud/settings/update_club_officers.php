@@ -149,7 +149,7 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                                     Officer ID: <?php echo htmlspecialchars($officer['officer_id']) ?>
                                 </label>
 
-                                <span class="delete-icon" title="Delete Position" onclick="deletePosition(<?php echo htmlspecialchars($officer['officer_id']); ?>, <?php echo htmlspecialchars($officer['club_id']); ?>)">
+                                <span class="delete-icon" title="Delete Position" onclick="deleteOfficer(<?php echo htmlspecialchars($officer['officer_id']); ?>, <?php echo htmlspecialchars($officer['club_id']); ?>)">
                                     <i class="fas fa-times"></i>
                                 </span>
 
@@ -185,13 +185,25 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php endforeach; ?>
 
                         <button type="submit" class="btn btn-primary mb-3">Update Officers</button>
-                        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal"><i class="fas fa-plus"></i> Add New Position</button>
+                        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal" data-club-id="<?php echo htmlspecialchars($officer['club_id']); ?>">
+                            <i class="fas fa-plus"></i> Add New Officer
+                        </button>
+                        <a href="../esas_moderator/actions/delete_officer_action.php?officer_id=<?php echo urlencode($officer['officer_id']); ?>&club_id=<?php echo urlencode($officer['club_id']); ?>" >
+                            Delete Officer
+                        </a>
+                    
                     </form>
                     
                 <?php else: ?>
                     <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                         <input type="hidden" name="officer_id" value="<?php echo htmlspecialchars($officersArray[0]['officer_id']); ?>">
-                        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal"><i class="fas fa-plus"></i> Add New Position</button>
+                        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal" data-club-id="<?php echo htmlspecialchars($officer['club_id']); ?>">
+                            <i class="fas fa-plus"></i> Add New Officer
+                        </button>
+
+                        <a href="../esas_moderator/actions/delete_officer_action.php?officer_id=<?php echo urlencode($officer['officer_id']); ?>&club_id=<?php echo urlencode($officer['club_id']); ?>" >
+                        Delete Officer
+                        </a>
                     </form>
 
                 <?php endif; ?>
@@ -222,7 +234,7 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="form-group">
                         <label for="officer_student">Select Officer (Student)</label>
-                        <select class="form-control" id="officer_student" name="student_id" required>
+                        <select class="form-control" id="officer_student" name="student_id">
                             <option value="">-- Select Student --</option>
                             <!-- Student options will be populated here dynamically via JavaScript -->
                         </select>
@@ -244,56 +256,48 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-    // Delete Officer Function
-    function deletePosition(officerId) {
-    console.log('Deleting officer with ID:', officerId); // Debugging line
-    if (confirm("Are you sure you want to delete this position and its officer?")) {
-        $.ajax({
-            url: '/esas/esas_moderator/actions/delete_officer_action.php',
-            type: 'POST',
-            data: { delete_officer_id: officerId },
-            success: function(response) {
-                console.log('Response:', response); // Log the response
-                location.reload(); // Reload the page to update the officer list
-            },
-            error: function() {
-                alert('Error deleting position and officer.');
-            }
-        });
-    }
-}
 
+<script>
+    function deleteOfficer(officerId, clubId) {
+        if (confirm("Are you sure you want to delete this officer from club ID " + clubId + " and officer ID " + officerId + "?")) {
+            // Make an AJAX request to delete the officer
+            window.location.href = "../esas_moderator/actions/delete_officer_action.php?officer_id=" + officerId + "&club_id=" + clubId;
+        }
+    }
 
     // Populate club_id in Officer Add Modal
     $(document).ready(function() {
-        $('#addOfficerModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget); // Button that triggered the modal
-            var clubId = button.data('club-id'); // Extract info from data-* attributes
-            var modal = $(this);
-            modal.find('#club_id').val(clubId); // Set the club_id value
-        });
+    $('#addOfficerModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var clubId = button.data('club-id'); // Get the club_id from the button's data attribute
+        
+        var modal = $(this);
+        modal.find('#club_id').val(clubId); // Set the hidden input field's value
+        
+        // Display the club_id in the modal, e.g., in a label or paragraph if desired
+        modal.find('.modal-body').prepend('<p><strong>Club ID:</strong> ' + clubId + '</p>');
     });
+});
+
 
     // Handle the form submission for adding an officer
-    $(document).ready(function() {
-        $('#addOfficerForm').on('submit', function(event) {
-            event.preventDefault();
+    // Populate club_id in Officer Add Modal
+$(document).ready(function() {
+    $('#addOfficerModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var clubId = button.data('club-id'); // Get the club_id from the button's data attribute
+        
+        var modal = $(this);
+        modal.find('#club_id').val(clubId); // Set the hidden input field's value
+        
+        // Remove any previously added club_id info
+        modal.find('.modal-body p').remove();
 
-            $.ajax({
-                url: '/esas/esas_moderator/actions/add_officer_action.php', // Path for adding officers
-                type: 'POST',
-                data: $(this).serialize(),
-                success: function(response) {
-                    alert(response); // Optional: Display response message
-                    $('#addOfficerModal').modal('hide'); // Close the modal
-                    location.reload(); // Reload to update the officer list
-                },
-                error: function() {
-                    alert('Error adding new officer.');
-                }
-            });
-        });
+        // Display the current club_id in the modal body
+        modal.find('.modal-body').prepend('<p><strong>Club ID:</strong> ' + clubId + '</p>');
     });
+});
+
+
 </script>
 
