@@ -8,6 +8,9 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id'];
 
+// Set default timezone
+date_default_timezone_set('Asia/Manila');
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_question_id'])) {
     $questionId = $_POST['delete_question_id'];
 
