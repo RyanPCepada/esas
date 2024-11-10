@@ -249,6 +249,7 @@ try {
                                 <i class="fas fa-file-alt"></i> Reports
                             </a>
                         </li>
+                        <br>
                         Others
                         <li>
                             <a href="../../esas_moderator/public/accomplishment_reports.php" class="nav-link left-sidebar text-dark" id="accomplishment_reports" 
