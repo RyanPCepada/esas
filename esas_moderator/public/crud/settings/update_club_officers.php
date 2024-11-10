@@ -25,14 +25,14 @@ $clubName = !empty($officers) ? $officers[0]['clubName'] : null;
 
 // Process form submission for updating officers
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
-    $clubId = $_POST['club_id'];
+    $club_id = $_POST['club_id'];
     $updatedOfficers = $_POST['officers']; // Array of officers with student_id and position
 
     // Initialize a flag to check if any officer was updated
     $anyUpdate = false;
 
     // Loop through each officer and update it
-    foreach ($updatedOfficers as $officerId => $officerData) {
+    foreach ($updatedOfficers as $officer_id => $officerData) {
         $studentId = $officerData['student_id'];
         $position = $officerData['position'];
 
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
             WHERE officer_id = ? AND club_id = ?
         ";
         $updateStmt = $pdo->prepare($updateSql);
-        if ($updateStmt->execute([$studentId, $position, $officerId, $clubId])) {
+        if ($updateStmt->execute([$studentId, $position, $officer_id, $club_id])) {
             // Set flag to true if at least one officer was updated
             $anyUpdate = true;
         }
@@ -149,7 +149,7 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                                     Officer ID: <?php echo htmlspecialchars($officer['officer_id']) ?>
                                 </label>
 
-                                <span class="delete-icon" title="Delete Position" onclick="deleteOfficer(<?php echo htmlspecialchars($officer['officer_id']); ?>, <?php echo htmlspecialchars($officer['club_id']); ?>)">
+                                <span class="delete-icon" title="Delete Officer" onclick="deleteOfficer(<?php echo htmlspecialchars($officer['officer_id']); ?>, <?php echo htmlspecialchars($officer['club_id']); ?>)">
                                     <i class="fas fa-times"></i>
                                 </span>
 
@@ -258,24 +258,37 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 <script>
-    function deleteOfficer(officerId, clubId) {
-        if (confirm("Are you sure you want to delete this officer from club ID " + clubId + " and officer ID " + officerId + "?")) {
-            // Make an AJAX request to delete the officer
-            window.location.href = "../esas_moderator/actions/delete_officer_action.php?officer_id=" + officerId + "&club_id=" + clubId;
-        }
+    function deleteOfficer(officer_id, club_id) {
+    if (confirm("Are you sure you want to delete this officer from club ID " + club_id + " and officer ID " + officer_id + "?")) {
+        $.ajax({
+            url: '/esas/esas_moderator/actions/delete_officer_action.php', // Corrected concatenation
+            type: 'POST',
+            data: { 
+                officer_id: officer_id,
+                club_id: club_id // Pass the club ID along with the officer ID
+            },
+            success: function(response) {
+                console.log('Response:', response); // Log the response
+                location.reload(); // Reload the page to update the officer list
+            },
+            error: function() {
+                alert('Error deleting position and officer.');
+            }
+        });
     }
+}
 
     // Populate club_id in Officer Add Modal
     $(document).ready(function() {
     $('#addOfficerModal').on('show.bs.modal', function(event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
-        var clubId = button.data('club-id'); // Get the club_id from the button's data attribute
+        var club_id = button.data('club-id'); // Get the club_id from the button's data attribute
         
         var modal = $(this);
-        modal.find('#club_id').val(clubId); // Set the hidden input field's value
+        modal.find('#club_id').val(club_id); // Set the hidden input field's value
         
         // Display the club_id in the modal, e.g., in a label or paragraph if desired
-        modal.find('.modal-body').prepend('<p><strong>Club ID:</strong> ' + clubId + '</p>');
+        modal.find('.modal-body').prepend('<p><strong>Club ID:</strong> ' + club_id + '</p>');
     });
 });
 
@@ -285,16 +298,16 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
 $(document).ready(function() {
     $('#addOfficerModal').on('show.bs.modal', function(event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
-        var clubId = button.data('club-id'); // Get the club_id from the button's data attribute
+        var club_id = button.data('club-id'); // Get the club_id from the button's data attribute
         
         var modal = $(this);
-        modal.find('#club_id').val(clubId); // Set the hidden input field's value
+        modal.find('#club_id').val(club_id); // Set the hidden input field's value
         
         // Remove any previously added club_id info
         modal.find('.modal-body p').remove();
 
         // Display the current club_id in the modal body
-        modal.find('.modal-body').prepend('<p><strong>Club ID:</strong> ' + clubId + '</p>');
+        modal.find('.modal-body').prepend('<p><strong>Club ID:</strong> ' + club_id + '</p>');
     });
 });
 

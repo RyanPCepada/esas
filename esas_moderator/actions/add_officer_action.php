@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['position'], $_POST['st
         $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
         $logStmt = $pdo->prepare($logSql);
         $logStmt->execute([
-            'activity' => "You added a new officer ($position) to " . htmlspecialchars($clubName),
+            'activity' => "You added a new officer to " . htmlspecialchars($clubName),
             'dateAdded' => date('Y-m-d H:i:s'),
             'moderator_id' => $moderator_id
         ]);
