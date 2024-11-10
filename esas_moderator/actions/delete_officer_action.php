@@ -8,6 +8,9 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id'];
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 $officer_id = $_POST['officer_id'];
 $club_id = $_POST['club_id'];
 
