@@ -136,7 +136,6 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                     <strong><?php echo htmlspecialchars($clubName); ?></strong>
                 </li>
 
-                
                 <?php if (!empty($officersArray[0]['position'])): ?>
                     <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                         <input type="hidden" name="officer_id" value="<?php echo htmlspecialchars($officersArray[0]['officer_id']); ?>">
@@ -158,10 +157,8 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                                 
                                 <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
 
-
-                                <!-- <label for="officer_student_<?php echo htmlspecialchars($officer['officer_id']); ?>">Officer: </label> -->
                                 <select class="form-control" id="officer_student_<?php echo htmlspecialchars($officer['officer_id']); ?>" name="officers[<?php echo htmlspecialchars($officer['officer_id']); ?>][student_id]">
-                                    <option value="">-- Select student --</option>
+                                    <option value="">None</option>
                                     <?php 
                                     // Fetch students for the current club
                                     $studentsSql = "
@@ -185,25 +182,22 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php endforeach; ?>
 
                         <button type="submit" class="btn btn-primary mb-3">Update Officers</button>
-                        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal" data-club-id="<?php echo htmlspecialchars($officer['club_id']); ?>">
+                        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal" data-club-id="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
                             <i class="fas fa-plus"></i> Add New Officer
                         </button>
-                        <a href="../esas_moderator/actions/delete_officer_action.php?officer_id=<?php echo urlencode($officer['officer_id']); ?>&club_id=<?php echo urlencode($officer['club_id']); ?>" >
-                            Delete Officer
-                        </a>
                     
                     </form>
                     
                 <?php else: ?>
                     <form class="mt-3" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                        
+                        <input type="hidden" name="club_id" value="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
                         <input type="hidden" name="officer_id" value="<?php echo htmlspecialchars($officersArray[0]['officer_id']); ?>">
-                        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal" data-club-id="<?php echo htmlspecialchars($officer['club_id']); ?>">
+                        
+                        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal" data-club-id="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
                             <i class="fas fa-plus"></i> Add New Officer
                         </button>
 
-                        <a href="../esas_moderator/actions/delete_officer_action.php?officer_id=<?php echo urlencode($officer['officer_id']); ?>&club_id=<?php echo urlencode($officer['club_id']); ?>" >
-                        Delete Officer
-                        </a>
                     </form>
 
                 <?php endif; ?>
@@ -239,7 +233,8 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                             <!-- Student options will be populated here dynamically via JavaScript -->
                         </select>
                     </div>
-                    <input type="hidden" id="club_id" name="club_id" value="">
+                    <!-- Use the first officer's club_id to populate the modal -->
+                    <input type="hidden" id="club_id" name="club_id" value="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -278,19 +273,40 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 
-    // Populate club_id in Officer Add Modal
-    $(document).ready(function() {
-    $('#addOfficerModal').on('show.bs.modal', function(event) {
-        var button = $(event.relatedTarget); // Button that triggered the modal
-        var club_id = button.data('club-id'); // Get the club_id from the button's data attribute
-        
-        var modal = $(this);
-        modal.find('#club_id').val(club_id); // Set the hidden input field's value
-        
-        // Display the club_id in the modal, e.g., in a label or paragraph if desired
-        modal.find('.modal-body').prepend('<p><strong>Club ID:</strong> ' + club_id + '</p>');
-    });
-});
+    // Function to add an officer
+function addOfficer() {
+    // Get values from form fields
+    var officerPosition = $('#position').val(); // Assume you have a field for position
+    var studentId = $('#student_id').val(); // Assume you have a field for student ID
+    var clubId = $('#club_id').val(); // This is populated dynamically in the modal
+
+    // Validate that necessary fields are filled
+    if (officerPosition && studentId && clubId) {
+        $.ajax({
+            url: '/esas/esas_moderator/actions/add_officer_action.php', 
+            type: 'POST',
+            data: {
+                position: officerPosition,
+                student_id: studentId,
+                club_id: clubId
+            },
+            success: function(response) {
+                if (response.startsWith("Success")) {
+                    alert(response); // Display success message
+                    location.reload(); // Reload the page to update the officer list
+                } else {
+                    alert(response); // Display error message if any
+                }
+            },
+            error: function() {
+                alert('Error adding officer.');
+            }
+        });
+    } else {
+        alert("Please fill all fields.");
+    }
+}
+
 
 
     // Handle the form submission for adding an officer

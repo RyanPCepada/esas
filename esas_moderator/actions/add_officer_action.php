@@ -38,9 +38,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['position'], $_POST['st
 
         // Send a success response to the AJAX call
         // echo "Success: Officer added!";
+        header("location: ../settings.php");
+        exit();
     } else {
         // Send an error response to the AJAX call
-        echo "Error adding new officer.";
+        // echo "Error adding new officer.";
+        header("location: ../settings.php");
+        exit();
     }
 }
 ?>
