@@ -8,6 +8,9 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id'];
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Fetch moderator data to pre-fill the form
 $sql = "SELECT * FROM tbl_moderators WHERE moderator_id = ?";
 $stmt = $pdo->prepare($sql);
