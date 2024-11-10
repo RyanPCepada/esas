@@ -61,7 +61,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - Officers</title>
+    <title>ESAS - Officers</title>
     <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
@@ -227,7 +227,7 @@ try {
         <div class="row g-0 h-100">
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
-                    <img src="../../assets/img/SAS_LOGO.png" alt="eSAS Logo" style="height: .4in; vertical-align: middle;">
+                    <img src="../../assets/img/SAS_LOGO.png" alt="ESAS Logo" style="height: .4in; vertical-align: middle;">
                     <!-- <img src="../../assets/img/nbsclogo.png" style="height: 0.3in;"> NBSC SIS -->
                     </a>
                 </button>
@@ -244,8 +244,8 @@ try {
             <!-- Header -->
             <!-- <div class="header">
                 <h1>
-                    <img src="../../assets/img/SAS_LOGO.png" alt="eSAS Logo" style="height: 1in; vertical-align: middle;">
-                    eSAS
+                    <img src="../../assets/img/SAS_LOGO.png" alt="ESAS Logo" style="height: 1in; vertical-align: middle;">
+                    ESAS
                 </h1>
             </div> -->
 
@@ -353,6 +353,6 @@ try {
             </div>
         </div>
         <hr style="border-color: rgba(255, 255, 255, 0.2);">
-        <p class="mb-0" style="font-size: 1em;">©eSAS2024. All rights reserved.</p>
+        <p class="mb-0" style="font-size: 1em;">©ESAS2024. All rights reserved.</p>
     </div>
 </footer>

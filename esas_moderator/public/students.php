@@ -64,7 +64,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - Students List</title>
+    <title>ESAS - Students List</title>
     <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
@@ -129,7 +129,7 @@ try {
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
                     <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
-                    eSAS - Moderator</a>
+                    ESAS - Moderator</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
                     <span class="navbar-toggler-icon"></span>

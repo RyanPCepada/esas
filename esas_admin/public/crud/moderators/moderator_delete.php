@@ -97,7 +97,7 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Delete Moderator</title>
+    <title>ESAS - Delete Moderator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
