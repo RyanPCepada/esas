@@ -179,13 +179,13 @@ foreach ($reports as $report) {
 
         .reports-list {
             display: grid;
-            grid-template-columns: repeat(10, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); /* Automatically adjust column count */
             gap: 10px;
             justify-content: center;
+            /* Ensure reports will wrap to the next row if needed */
         }
 
         .report-item {
-            width: 130px;
             background-color: #f9f9f9;
             padding: 15px;
             border: solid 1px lightgrey;
@@ -196,8 +196,9 @@ foreach ($reports as $report) {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            width: 100%; /* Ensure full width within grid item */
         }
-
+        
         .report-item:hover {
             background-color: #f1f1f1;
             border: solid 1px grey;
