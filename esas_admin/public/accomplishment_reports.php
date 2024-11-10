@@ -38,6 +38,48 @@ try {
     die("Database error: " . $e->getMessage());
 }
 
+// Fetch club name
+$sql_club = "SELECT clubName FROM tbl_clubs";
+$stmt_club = $pdo->prepare($sql_club);
+$club = $stmt_club->fetch(PDO::FETCH_ASSOC); 
+
+// Fetch accomplishment reports for the student in this club
+$sql = "SELECT * FROM tbl_accomplishment_reports ORDER BY dateAdded DESC";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$reports = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Function to label reports by date
+function getDateLabel($date) {
+    $today = new DateTime('today');
+    $yesterday = new DateTime('yesterday');
+    $dateObj = new DateTime($date);
+
+    if ($dateObj >= $today) {
+        return "Today";
+    } elseif ($dateObj >= $yesterday) {
+        return "Yesterday";
+    } elseif ($dateObj >= new DateTime('last monday')) {
+        return "Earlier This Week";
+    } elseif ($dateObj >= new DateTime('last sunday -1 week')) {
+        return "Last Week";
+    } elseif ($dateObj->format('Y-m') === $today->format('Y-m')) {
+        return "Earlier This Month";
+    } elseif ($dateObj->format('Y-m') === $today->modify('-1 month')->format('Y-m')) {
+        return "Last Month";
+    } elseif ($dateObj->format('Y') === $today->format('Y')) {
+        return $dateObj->format('F');
+    } else {
+        return "Last Year";
+    }
+}
+
+// Group reports by their date label
+$groupedReports = [];
+foreach ($reports as $report) {
+    $label = getDateLabel($report['dateAdded']);
+    $groupedReports[$label][] = $report;
+}
 ?>
 
 
@@ -86,6 +128,137 @@ try {
             }
         }
 
+        
+        body {
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .container {
+            height: auto;
+            background-color: white;
+            padding: 25px;
+            padding-top: 0px;
+        }
+
+        .no-report {
+            text-align: center;
+            padding: 50px 0;
+        }
+
+        .no-report i {
+            font-size: 50px;
+            color: #ccc;
+        }
+
+        .btn-plus {
+            font-size: 60px;
+            color: #007bff;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-plus:hover {
+            color: #0056b3;
+        }
+
+        #fileIconPreview {
+            width: 100px;
+            height: auto;
+            display: none;
+        }
+
+        .reports-list {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .report-item {
+            width: 180px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border: solid 1px lightgrey;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .report-item:hover {
+            background-color: #f1f1f1;
+            border: solid 1px grey;
+            cursor: pointer;
+        }
+
+        .report-item img {
+            width: 100%;
+            height: auto;
+        }
+
+        .report-item h5 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* Limit to 3 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            line-height: 1.2em; /* Adjust line height for better fit */
+            max-height: 3.6em; /* Ensure three full lines fit */
+            overflow-wrap: break-word; /* Allows words to break cleanly */
+        }
+
+        .report-item .date {
+            display: none; /* Hide date visually but keep in title */
+        }
+
+        h2 {
+            margin-top: 48px;
+        }
+
+        
+        @media (max-width: 767px) {
+            h2 {
+                margin-top: 5px;
+            }
+
+            .report-item {
+                width: 140px;
+                background-color: #f9f9f9;
+                padding: 15px;
+                border: solid 1px lightgrey;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                text-align: center;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+            .reports-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            #original-filename {
+                font-size: 14px;
+            }
+            h4 {
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -190,44 +363,37 @@ try {
 
                                 
 
-                                <?php
-                                    // Include config file
-                                    require_once "../../config.php";
-
-                                    $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
-
-
-                                    
-                                    $sql = "SELECT 
-                                    s.student_id,
-                                    s.firstName,
-                                    s.middleName,
-                                    s.lastName,
-                                    s.instiEmail,
-                                    s.phoneNumber,
-                                    s.department,
-                                    s.course,
-                                    s.year,
-                                    s.profilePic,
-                                    r.application_id,
-                                    r.club_id,  -- Add this line to select club_id
-                                    GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
-                                FROM 
-                                    tbl_students s
-                                LEFT JOIN 
-                                    tbl_application r ON s.student_id = r.student_id AND r.status = 'active' 
-                                LEFT JOIN 
-                                    tbl_clubs c ON r.club_id = c.club_id
-                                WHERE
-                                    r.status = 'active' 
-                                GROUP BY 
-                                    s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail, s.phoneNumber, s.department, s.course, s.year, s.profilePic
-                                ORDER BY 
-                                    s.student_id ASC;";
-
+                                
+    <div class="container-fluid container mb-5 auto-scroll">
+        <?php if (!empty($groupedReports)): ?> 
+            <?php foreach ($groupedReports as $label => $reports): ?>
+                <h5 class="mt-4 mb-4"><?php echo htmlspecialchars($label); ?></h5>
+                
+                <!-- <div class="row mt-5 m-0">
+                    <div class="col-md-5 p-0"><hr></div>
+                    <div class="col-md-2 text-center"><label>or</label></div>
+                    <div class="col-md-5 p-0"><hr></div>
+                </div> -->
+                
+                <div class="reports-list">
+                    <?php foreach ($reports as $report): ?>
+                        <div class="report-item" 
+                            title="<?php echo htmlspecialchars($report['originalFileName']) . "\n" . date('m/d/Y h:i A', strtotime($report['dateAdded'])); ?>" 
+                            onclick="window.open('/esas/esas_student/accomplishment_reports/<?php echo urlencode($report['accReportFile']); ?>', '_blank')">
+                            <img src="/esas/esas_student/icons/ICON_PDF.png" alt="PDF Icon">
+                            <h5 id="original-filename"><?php echo htmlspecialchars($report['originalFileName']); ?></h5>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="no-report">
+                <p>No accomplishment reports found.</p>
+                <i class="fas fa-file-pdf"></i>
+            </div>
+        <?php endif; ?>
                             
                             
-                                ?>
 
                             </div>
                             <!-- ALL STUDENT TABLE END -->
@@ -254,6 +420,12 @@ try {
 
 
 
+    <script>
+        // Function to open report in a new tab
+        function openTab(fileName) {
+            window.open(fileName, '_blank');
+        }
+    </script>
 
 </body>
 </html>
