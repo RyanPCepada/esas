@@ -9,6 +9,9 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id'];
 
+// Set the default timezone to Asia/Manila
+date_default_timezone_set('Asia/Manila');
+
 // Check if form data is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['position'], $_POST['student_id'], $_POST['club_id'])) {
     $position = $_POST['position'];
