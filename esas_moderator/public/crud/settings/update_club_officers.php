@@ -275,7 +275,8 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 <script>
     function deleteOfficer(officer_id, club_id) {
-    if (confirm("Are you sure you want to delete this officer from club ID " + club_id + " and officer ID " + officer_id + "?")) {
+    // if (confirm("Are you sure you want to delete this officer from club ID " + club_id + " and officer ID " + officer_id + "?")) {
+    if (confirm("Are you sure you want to delete this officer?")) {
         $.ajax({
             url: '/esas/esas_moderator/actions/delete_officer_action.php', // Corrected concatenation
             type: 'POST',
