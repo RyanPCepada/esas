@@ -170,52 +170,56 @@ function formatDate($date) {
     </style>
 </head>
 <body>
-<div class="wrapper">
-    <a href="javascript:history.back()" class="back-button">
-        <i class="fa fa-arrow-left"></i>
-    </a>
-    <h2>Application Details</h2>
-    <div class="justify-content-between">
-        <p class="text-muted">Review your application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
-        <p>Status: <?php echo $icon; ?> <strong><?php echo ucfirst($status); ?></strong></p>
-    </div>
-    <div class="container-fluid container mb-5 auto-scroll">
-        <div class="row">
-            <div class="col">
-                <?php foreach ($questions_answers as $qa): ?>
-                    <p><strong><?php echo htmlspecialchars($qa['question']); ?></strong><br><?php echo htmlspecialchars($qa['answer']); ?></p>
-                <?php endforeach; ?>
+    <div class="wrapper">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fa fa-arrow-left"></i>
+        </a>
+        <h2>Application Details</h2>
+        <div class="justify-content-between">
+            <p class="text-muted">Review your application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
+            <p>Status: <?php echo $icon; ?> <strong><?php echo ucfirst($status); ?></strong></p>
+        </div>
+        <div class="container-fluid container mb-5 auto-scroll">
+            <div class="row">
+                <div class="col">
+                    <?php foreach ($questions_answers as $qa): ?>
+                        <p><strong><?php echo htmlspecialchars($qa['question']); ?></strong><br><?php echo htmlspecialchars($qa['answer']); ?></p>
+                    <?php endforeach; ?>
 
-                <?php if ($status === 'pending'): ?>
-                    <hr>
-                    <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                <?php elseif ($status === 'disapproved'): ?>
-                    <p class="text-danger"><strong>Disapproval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remark available.'; ?></p>
-                    <p class="text-primary"><strong>Disapproved by:</strong><br><?php echo !empty($moderatorFullName) ? htmlspecialchars($moderatorFullName) : 'No moderator available.'; ?></p>
-                    <hr>
-                    <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                    <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
-                <?php elseif ($status === 'active'): ?>
-                    <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remark available.'; ?></p>
-                    <p class="text-primary"><strong>Approved by:</strong><br><?php echo !empty($moderatorFullName) ? htmlspecialchars($moderatorFullName) : 'No moderator available.'; ?></p>
-                    <hr>
-                    <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
-                    <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
-                <?php endif; ?>
-
-                <div class="text-end">
-                    <!-- Cancel Application button (only if status is 'pending') -->
                     <?php if ($status === 'pending'): ?>
-                        <!-- <?php echo $fromPendingPage?> -->
-                        <button class="btn btn-danger mt-3" onclick="showConfirm(<?php echo $application_id; ?>, <?php echo $club_id; ?>, '<?php echo $fromPendingPage; ?>')">
-                            Cancel Application
-                        </button>
-                        <?php endif; ?>
-                        </div>
+                        <hr>
+                        <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
+                    <?php elseif ($status === 'disapproved'): ?>
+                        <p class="text-danger"><strong>Disapproval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remark available.'; ?></p>
+                        <p class="text-primary"><strong>Disapproved by:</strong><br><?php echo !empty($moderatorFullName) ? htmlspecialchars($moderatorFullName) : 'No moderator available.'; ?></p>
+                        <hr>
+                        <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
+                        <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
+                    <?php elseif ($status === 'active'): ?>
+                        <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remark available.'; ?></p>
+                        <p class="text-primary"><strong>Approved by:</strong><br><?php echo !empty($moderatorFullName) ? htmlspecialchars($moderatorFullName) : 'No moderator available.'; ?></p>
+                        <hr>
+                        <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
+                        <p><strong>Date Approved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
+                    <?php endif; ?>
 
+                    <div class="text-center">
+                        <!-- Cancel Application button (only if status is 'pending') -->
+                        <?php if ($status === 'pending'): ?>
+                            <!-- <?php echo $fromPendingPage?> -->
+                            <button class="btn btn-danger mt-5 mb-2" onclick="showConfirm(<?php echo $application_id; ?>, <?php echo $club_id; ?>, '<?php echo $fromPendingPage; ?>')">
+                                Cancel Application
+                            </button>
+                            <br>
+                            <a href="/esas/esas_student/club_info.php?application_id=<?php echo $application_id; ?>&club_id=<?php echo $club_id; ?>" style="font-size: 16px;">
+                                Club Information
+                            </a>
+                        <?php endif; ?>
                     </div>
+
                 </div>
             </div>
+        </div>
     </div>
 
     <script>
