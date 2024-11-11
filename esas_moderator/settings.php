@@ -100,6 +100,35 @@ if (!$club) {
         .main-content {
             padding: 30px 40px;
         }
+
+        .back-button {
+            position: absolute;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            background-color: lightgrey;
+            color: #36454F;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: grey;
+            color: white;
+        }
+
+        @media (max-width: 767px) {
+            h2 {
+                margin-top: 5px;
+            }
+            /* .back-button {
+                position: relative;
+            } */
+        }
     </style>
     <script src="../assets/js/jquery-3.6.0.js"></script>
     <script>
@@ -157,8 +186,10 @@ if (!$club) {
     </script>
 </head>
 <body>
-    
     <div class="wrapper">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fa fa-arrow-left"></i>
+        </a>
         <h2 class="mt-5">Account Settings</h2>
         <p class="text-muted">Change your profile, account, and club settings</p>
 
