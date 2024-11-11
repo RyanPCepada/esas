@@ -129,61 +129,81 @@ foreach ($reports as $report) {
         }
 
         .reports-list {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
-    justify-content: center;
-}
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            justify-content: center;
+        }
 
-.report-item {
-    width: 180px;
-    background-color: #f9f9f9;
-    padding: 15px;
-    border: solid 1px lightgrey;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
+        .report-item {
+            width: 180px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border: solid 1px lightgrey;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
-.report-item:hover {
-    background-color: #f1f1f1;
-    border: solid 1px grey;
-    cursor: pointer;
-}
+        .report-item:hover {
+            background-color: #f1f1f1;
+            border: solid 1px grey;
+            cursor: pointer;
+        }
 
-.report-item img {
-    width: 100%;
-    height: auto;
-}
+        .report-item img {
+            width: 100%;
+            height: auto;
+        }
 
-.report-item h5 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* Limit to 3 lines */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: normal;
-    line-height: 1.2em; /* Adjust line height for better fit */
-    max-height: 3.6em; /* Ensure three full lines fit */
-    overflow-wrap: break-word; /* Allows words to break cleanly */
-}
+        .report-item h5 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* Limit to 3 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal;
+            line-height: 1.2em; /* Adjust line height for better fit */
+            max-height: 3.6em; /* Ensure three full lines fit */
+            overflow-wrap: break-word; /* Allows words to break cleanly */
+        }
 
-.report-item .date {
-    display: none; /* Hide date visually but keep in title */
-}
+        .report-item .date {
+            display: none; /* Hide date visually but keep in title */
+        }
 
-h2 {
-            margin-top: 48px;
+        h2 {    
+            margin-top: 40px !important;
+        }
+
+        .back-button {
+            position: absolute;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            background-color: lightgrey;
+            color: #36454F;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: grey;
+            color: white;
         }
 
         
         @media (max-width: 767px) {
             h2 {
-                margin-top: 5px;
+                margin-top: 5px !important;
             }
 
             .report-item {
@@ -209,11 +229,17 @@ h2 {
             h4 {
                 font-size: 18px;
             }
+            .back-button {
+                position: relative;
+            }
         }
     </style>
 </head>
 <body>
 <div class="wrapper">
+    <a href="javascript:history.back()" class="back-button">
+        <i class="fa fa-arrow-left"></i>
+    </a>
     <div style="display: flex; align-items: center; justify-content: space-between;">
         <div class="row">
             <h2>Accomplishment Reports</h2>
