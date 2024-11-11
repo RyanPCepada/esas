@@ -88,11 +88,43 @@ foreach ($applications as $application) {
         body { background-color: #f4f4f9; }
         .wrapper { max-width: 700px; margin: 0 auto; padding: 15px; }
         .container { background-color: white; padding: 25px; }
+
+        .back-button {
+            position: absolute;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            background-color: lightgrey;
+            color: #36454F;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: grey;
+            color: white;
+        }
+
+        @media (max-width: 767px) {
+            h2 {
+                margin-top: 5px;
+            }
+            /* .back-button {
+                position: relative;
+            } */
+        }
     </style>
 </head>
 <body>
   
 <div class="wrapper">
+    <a href="javascript:history.back()" class="back-button">
+        <i class="fa fa-arrow-left"></i>
+    </a>
     <h2 class="mt-5">Application Details</h2>
     <p class="text-muted">Review <strong><?php echo htmlspecialchars($fullName); ?></strong>'s application details across all clubs</p>
 
@@ -132,15 +164,15 @@ foreach ($applications as $application) {
                         $stmt_club->execute([$application['club_id']]);
                         $club = $stmt_club->fetch(PDO::FETCH_ASSOC);
                         
-// Fetch moderator's full name by concatenating firstName, middleName, and lastName
-$sql_moderator = "
-SELECT CONCAT(firstName, ' ', IFNULL(middleName, ''), ' ', lastName) AS fullname 
-FROM tbl_moderators 
-WHERE moderator_id = ?
-";
-$stmt_moderator = $pdo->prepare($sql_moderator);
-$stmt_moderator->execute([$application['moderator_id']]);
-$moderator = $stmt_moderator->fetch(PDO::FETCH_ASSOC);
+                        // Fetch moderator's full name by concatenating firstName, middleName, and lastName
+                        $sql_moderator = "
+                        SELECT CONCAT(firstName, ' ', IFNULL(middleName, ''), ' ', lastName) AS fullname 
+                        FROM tbl_moderators 
+                        WHERE moderator_id = ?
+                        ";
+                        $stmt_moderator = $pdo->prepare($sql_moderator);
+                        $stmt_moderator->execute([$application['moderator_id']]);
+                        $moderator = $stmt_moderator->fetch(PDO::FETCH_ASSOC);
 
                         // Fetch answers for the application
                         $sql_answers = "
