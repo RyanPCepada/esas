@@ -176,9 +176,9 @@ switch ($status) {
 </head>
 <body>
     <div class="wrapper">
-    <a href="javascript:history.back()" class="back-button">
-        <i class="fa fa-arrow-left"></i>
-    </a>
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fa fa-arrow-left"></i>
+        </a>
         <h2 class="mt-5">Application Details</h2>
         <div class="justify-content-between">
             <p class="text-muted">Review <strong><?php echo htmlspecialchars($fullName); ?></strong>'s application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>

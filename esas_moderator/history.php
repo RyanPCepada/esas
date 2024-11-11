@@ -121,13 +121,49 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
         .history-x-btn:hover {
             color: darkgrey;
         }
+
+        .back-button {
+            position: absolute;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            background-color: lightgrey;
+            color: #36454F;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: grey;
+            color: white;
+        }
+        
+        
+        
+        @media (max-width: 767px) {
+            h2 {
+                margin-top: 5px;
+            }
+            /* .back-button {
+                position: relative !important;
+            } */
+        }
     </style>
 </head>
 <body>
-    
     <div class="wrapper">
+        <!-- <a href="../esas_moderator/public/dashboard.php" class="back-button">
+            <i class="fa fa-arrow-left"></i>
+        </a> -->
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fa fa-arrow-left"></i>
+        </a>
+        <h2 class="mt-5">History</h2>
         <form method="post" action="../esas_moderator/actions/history_delete.php">
-            <h2 class="mt-5">History</h2>
             <div class="d-flex justify-content-between mb-2">
                 <p class="text-muted">All your interactions within the system</p>
                 <div>
