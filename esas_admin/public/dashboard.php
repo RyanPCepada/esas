@@ -541,26 +541,36 @@ try {
                                                 const noDataMessage = document.getElementById('noDataMessage');
                                                 const customLegend = document.getElementById('customLegend');
 
+                                                // Generate 50 distinct colors for clubs
                                                 const backgroundColors = [
-                                                    'rgba(65, 105, 225, 0.8)',   // Bright Royal Blue
-                                                    'rgba(255, 105, 180, 0.8)',  // Hot Pink
-                                                    'rgba(255, 215, 0, 0.8)',    // Gold
-                                                    'rgba(0, 255, 255, 0.8)',    // Cyan
-                                                    'rgba(255, 165, 0, 0.8)',    // Orange
-                                                    'rgba(0, 255, 0, 0.8)'       // Lime Green
+                                                    'rgba(65, 105, 225, 0.8)', 'rgba(255, 105, 180, 0.8)', 'rgba(255, 215, 0, 0.8)', 'rgba(0, 255, 255, 0.8)',
+                                                    'rgba(255, 165, 0, 0.8)', 'rgba(0, 255, 0, 0.8)', 'rgba(138, 43, 226, 0.8)', 'rgba(255, 69, 0, 0.8)',
+                                                    'rgba(139, 0, 0, 0.8)', 'rgba(0, 0, 139, 0.8)', 'rgba(144, 238, 144, 0.8)', 'rgba(32, 178, 170, 0.8)',
+                                                    'rgba(218, 112, 214, 0.8)', 'rgba(255, 20, 147, 0.8)', 'rgba(255, 182, 193, 0.8)', 'rgba(210, 105, 30, 0.8)',
+                                                    'rgba(255, 160, 122, 0.8)', 'rgba(70, 130, 180, 0.8)', 'rgba(189, 183, 107, 0.8)', 'rgba(0, 191, 255, 0.8)',
+                                                    'rgba(255, 228, 181, 0.8)', 'rgba(152, 251, 152, 0.8)', 'rgba(100, 149, 237, 0.8)', 'rgba(233, 150, 122, 0.8)',
+                                                    'rgba(255, 215, 0, 0.8)', 'rgba(186, 85, 211, 0.8)', 'rgba(128, 0, 128, 0.8)', 'rgba(255, 99, 71, 0.8)',
+                                                    'rgba(250, 128, 114, 0.8)', 'rgba(95, 158, 160, 0.8)', 'rgba(123, 104, 238, 0.8)', 'rgba(255, 250, 205, 0.8)',
+                                                    'rgba(72, 209, 204, 0.8)', 'rgba(175, 238, 238, 0.8)', 'rgba(173, 255, 47, 0.8)', 'rgba(124, 252, 0, 0.8)',
+                                                    'rgba(240, 128, 128, 0.8)', 'rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)',
+                                                    'rgba(75, 192, 192, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 159, 64, 0.8)', 'rgba(199, 21, 133, 0.8)',
+                                                    'rgba(255, 140, 0, 0.8)', 'rgba(255, 69, 0, 0.8)', 'rgba(34, 139, 34, 0.8)', 'rgba(106, 90, 205, 0.8)',
+                                                    'rgba(127, 255, 212, 0.8)', 'rgba(240, 230, 140, 0.8)', 'rgba(189, 183, 107, 0.8)', 'rgba(255, 228, 225, 0.8)'
                                                 ];
 
+                                                // If there's no data, display the "No students" message
                                                 if (counts.length === 0 || labelsWithPercentages.length === 0) {
                                                     document.getElementById('pieChart').style.display = 'none';
                                                     noDataMessage.style.display = 'block';
                                                 } else {
+                                                    // Initialize the pie chart
                                                     const pieChart = new Chart(ctx, {
                                                         type: 'pie',
                                                         data: {
                                                             labels: labelsWithPercentages,
                                                             datasets: [{
                                                                 data: counts,
-                                                                backgroundColor: backgroundColors,
+                                                                backgroundColor: backgroundColors.slice(0, counts.length),
                                                                 borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
                                                                 borderWidth: 1
                                                             }]
@@ -595,6 +605,7 @@ try {
                                                     customLegend.innerHTML = legendHtml;
                                                 }
                                             </script>
+
                                         </div>
                                     </div>
                                 </div>
@@ -614,62 +625,62 @@ try {
                                                 <p id="noDataMessageSY" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;"><em>No students.</em></p>
 
                                                 <?php
-try {
-    // Fetch the count of members per academic year
-    $sql = "
-        SELECT 
-            CONCAT(
-                CASE 
-                    WHEN MONTH(r.dateDecided) >= 8 
-                    THEN YEAR(r.dateDecided) 
-                    ELSE YEAR(r.dateDecided) - 1 
-                END, 
-                '-', 
-                CASE 
-                    WHEN MONTH(r.dateDecided) >= 8 
-                    THEN YEAR(r.dateDecided) + 1 
-                    ELSE YEAR(r.dateDecided) 
-                END
-            ) AS academicYear,
-            COUNT(s.student_id) AS memberCount -- Count the number of students for each academic year
-        FROM tbl_students s
-        JOIN tbl_application r ON s.student_id = r.student_id
-        WHERE r.status = 'active'
-        GROUP BY academicYear -- Group by academic year
-        ORDER BY academicYear ASC;
-    ";
+                                                    try {
+                                                        // Fetch the count of members per academic year
+                                                        $sql = "
+                                                            SELECT 
+                                                                CONCAT(
+                                                                    CASE 
+                                                                        WHEN MONTH(r.dateDecided) >= 8 
+                                                                        THEN YEAR(r.dateDecided) 
+                                                                        ELSE YEAR(r.dateDecided) - 1 
+                                                                    END, 
+                                                                    '-', 
+                                                                    CASE 
+                                                                        WHEN MONTH(r.dateDecided) >= 8 
+                                                                        THEN YEAR(r.dateDecided) + 1 
+                                                                        ELSE YEAR(r.dateDecided) 
+                                                                    END
+                                                                ) AS academicYear,
+                                                                COUNT(s.student_id) AS memberCount -- Count the number of students for each academic year
+                                                            FROM tbl_students s
+                                                            JOIN tbl_application r ON s.student_id = r.student_id
+                                                            WHERE r.status = 'active'
+                                                            GROUP BY academicYear -- Group by academic year
+                                                            ORDER BY academicYear ASC;
+                                                        ";
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $registryPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                        $stmt = $pdo->prepare($sql);
+                                                        $stmt->execute();
+                                                        $registryPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Initialize arrays for chart data
-    $academicYears = [];
-    $memberCountsPerSY = [];
+                                                        // Initialize arrays for chart data
+                                                        $academicYears = [];
+                                                        $memberCountsPerSY = [];
 
-    // Populate the arrays with data
-    foreach ($registryPerSYData as $row) {
-        $academicYears[] = $row['academicYear'];  // Just the academic year
-        $memberCountsPerSY[] = $row['memberCount'];  // Number of members for each academic year
-    }
+                                                        // Populate the arrays with data
+                                                        foreach ($registryPerSYData as $row) {
+                                                            $academicYears[] = $row['academicYear'];  // Just the academic year
+                                                            $memberCountsPerSY[] = $row['memberCount'];  // Number of members for each academic year
+                                                        }
 
-    // Fetch the total number of students for max value
-    $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
-    $totalStudentsStmt->execute();
-    $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
-    $totalStudentCount = $totalStudentsData ? (int)$totalStudentsData['totalCount'] : 0;
+                                                        // Fetch the total number of students for max value
+                                                        $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
+                                                        $totalStudentsStmt->execute();
+                                                        $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
+                                                        $totalStudentCount = $totalStudentsData ? (int)$totalStudentsData['totalCount'] : 0;
 
-    // Function to round up to the nearest even number
-    function roundUpToEven($number) {
-        return $number % 2 === 0 ? $number : $number + 1;
-    }
+                                                        // Function to round up to the nearest even number
+                                                        function roundUpToEven($number) {
+                                                            return $number % 2 === 0 ? $number : $number + 1;
+                                                        }
 
-    // Adjust max value to nearest even number
-    $maxMemberCount = roundUpToEven($totalStudentCount);
-} catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
-}
-?>
+                                                        // Adjust max value to nearest even number
+                                                        $maxMemberCount = roundUpToEven($totalStudentCount);
+                                                    } catch (PDOException $e) {
+                                                        echo "Error: " . $e->getMessage();
+                                                    }
+                                                ?>
 
                                                 <!-- Include Chart.js -->
                                                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
