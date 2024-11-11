@@ -54,7 +54,7 @@ if ($application) {
 }
 
 if (!$application) {
-    echo "<script>window.location.href = '/esas/esas_student/my_clubs.php';</script>";
+    echo "Application not found.";
     exit;
 }
 

@@ -143,10 +143,42 @@ switch ($status) {
             background-color: white;
             padding: 25px;
         }
+
+        .back-button {
+            position: absolute;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            background-color: lightgrey;
+            color: #36454F;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: grey;
+            color: white;
+        }
+        
+        @media (max-width: 767px) {
+            h2 {
+                margin-top: 5px;
+            }
+            .back-button {
+                position: relative;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="wrapper">
+    <a href="javascript:history.back()" class="back-button">
+        <i class="fa fa-arrow-left"></i>
+    </a>
         <h2 class="mt-5">Application Details</h2>
         <div class="justify-content-between">
             <p class="text-muted">Review <strong><?php echo htmlspecialchars($fullName); ?></strong>'s application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
