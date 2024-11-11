@@ -16,6 +16,7 @@ if (!isset($_SESSION['student_id'])) {
 
 // Retrieve student_id from the session
 $student_id = $_SESSION['student_id'];
+$fromPendingPage = $_GET['from_pending_page'] ?? '';
 
 // Check if application_id and club_id are provided in the request (GET or POST method)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['application_id']) && isset($_POST['club_id'])) {
@@ -33,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['application_id']) && i
 
 try {
     // Use the PDO instance created in config.php
-    global $pdo; // Access the global PDO variable
+    global $pdo;
 
     // Prepare the SQL statement to update the status
     $sql = "UPDATE tbl_application SET status = 'cancelled', dateModified = NOW() WHERE application_id = :application_id AND student_id = :student_id";
@@ -55,7 +56,7 @@ try {
                 alert('Application has been cancelled successfully.');
                 window.location.href = '/esas/esas_student/club_info.php?club_id=" . urlencode($club_id) . "&application_id=" . urlencode($application_id) . "';
             </script>";
-        }
+        }        
     } else {
         echo "<script>alert('Failed to cancel application. Please try again.'); window.history.back();</script>";
     }
@@ -64,6 +65,6 @@ try {
 }
 
 // Close the database connection
-$pdo = null; // Optional: closing the connection is handled automatically at the end of the script
+$pdo = null;
 
 ?>

@@ -54,7 +54,7 @@ if ($application) {
 }
 
 if (!$application) {
-    echo "Application not found.";
+    echo "<script>window.location.href = '/esas/esas_student/my_clubs.php';</script>";
     exit;
 }
 
@@ -206,9 +206,10 @@ function formatDate($date) {
                 <div class="text-end">
                     <!-- Cancel Application button (only if status is 'pending') -->
                     <?php if ($status === 'pending'): ?>
-                            <button class="btn btn-danger mt-3" onclick="showConfirm(<?php echo $application_id; ?>, <?php echo $club_id; ?>)">
-                                Cancel Application
-                            </button>
+                        <!-- <?php echo $fromPendingPage?> -->
+                        <button class="btn btn-danger mt-3" onclick="showConfirm(<?php echo $application_id; ?>, <?php echo $club_id; ?>, '<?php echo $fromPendingPage; ?>')">
+                            Cancel Application
+                        </button>
                         <?php endif; ?>
                         </div>
 
@@ -218,11 +219,13 @@ function formatDate($date) {
     </div>
 
     <script>
-        function showConfirm(applicationId, clubId) {
+        function showConfirm(applicationId, clubId, fromPendingPage) {
+            console.log("fromPendingPage:", fromPendingPage);  // Check the value in console
             const userConfirmed = confirm("Are you sure you want to cancel your application?");
             if (userConfirmed) {
-                // Redirect to the cancellation action with application_id and club_id
-                window.location.href = "/esas/esas_student/actions/cancel_application_action.php?application_id=" + applicationId + "&club_id=" + clubId;
+                window.location.href = "/esas/esas_student/actions/cancel_application_action.php?application_id=" + applicationId +
+                                        "&club_id=" + clubId +
+                                        "&from_pending_page=" + encodeURIComponent(fromPendingPage);
             }
         }
     </script>
