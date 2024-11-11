@@ -13,6 +13,7 @@ date_default_timezone_set('Asia/Manila'); // Set timezone
 // Get club_id and application_id from the URL
 $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
 $application_id = isset($_GET['application_id']) ? $_GET['application_id'] : null;
+$fromPendingPage = isset($_GET['from_pending_page']) ? $_GET['from_pending_page'] : null;
 
 // Check if club_id and application_id are provided
 if (!$club_id) {
