@@ -657,7 +657,7 @@ $encodedClubName = addslashes($clubName);
                     <button class="btn btn-primary btn-lg mt-3" onclick="applyNow(<?php echo $club_id; ?>, '<?php echo htmlspecialchars($clubName, ENT_QUOTES); ?>', '<?php echo $status; ?>', <?php echo $clubsCount; ?>, <?php echo $disapprovedCount; ?>)">Apply Now</button>
                 <?php endif; ?>
                 <div class="mt-3">
-                    <a href="all_clubs.php" class="btn btn-secondary mb-5">Go Back</a>
+                    <a href="all_clubs.php" class="btn btn-secondary mb-5">Back to Clubs List</a>
                 </div>
             </div>
 
