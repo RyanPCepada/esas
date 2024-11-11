@@ -80,16 +80,42 @@ try {
             margin-top: 48px;
         }
 
+        .back-button {
+            position: absolute;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            background-color: lightgrey;
+            color: #36454F;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: grey;
+            color: white;
+        }
+
         
         @media (max-width: 767px) {
             h2 {
                 margin-top: 5px;
+            }
+            .back-button {
+                position: relative;
             }
         }
     </style>
 </head>
 <body>
 <div class="wrapper">
+    <a href="../../home.php?club_id=<?php echo htmlspecialchars($club_id); ?>" class="back-button">
+        <i class="fa fa-arrow-left"></i>
+    </a>
     <h2 class="text-muted mb-3">Departure Request</h2>
     <div class="container-fluid container">
         <div class="row">
@@ -133,9 +159,9 @@ try {
                                     Withdraw Request
                                 </button>
                             </div>
-                            <button class="btn btn-primary btn-sm mt-2">
+                            <!-- <button class="btn btn-primary btn-sm mt-2">
                                 <a class="text-light" href="../../home.php?club_id=<?php echo $_GET['club_id']; ?>" style="text-decoration: none;">Go Back</a>
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -146,11 +172,11 @@ try {
                         <div>Departure request has been withdrawn.</div>
                     </div>
                 </div>
-                <div class="p-3 d-flex justify-content-end">
+                <!-- <div class="p-3 d-flex justify-content-end">
                     <button class="btn btn-outline-info btn-sm mt-2">
                         <a class="text-dark" style="text-decoration: none;" href="../../home.php?club_id=<?php echo $_GET['club_id']; ?>">Go Back</a>
                     </button>
-                </div> 
+                </div>  -->
             <?php endif; ?>
         </div>
     </div>
