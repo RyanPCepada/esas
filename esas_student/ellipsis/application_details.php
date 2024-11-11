@@ -138,16 +138,41 @@ function formatDate($date) {
             margin-top: 48px;
         }
 
+        .back-button {
+            position: absolute;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            background-color: lightgrey;
+            color: #36454F;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background-color: grey;
+            color: white;
+        }
         
         @media (max-width: 767px) {
             h2 {
                 margin-top: 5px;
+            }
+            .back-button {
+                position: relative;
             }
         }
     </style>
 </head>
 <body>
 <div class="wrapper">
+    <a href="javascript:history.back()" class="back-button">
+        <i class="fa fa-arrow-left"></i>
+    </a>
     <h2>Application Details</h2>
     <div class="justify-content-between">
         <p class="text-muted">Review your application details for <strong><?php echo htmlspecialchars($club['clubName']); ?></strong></p>
