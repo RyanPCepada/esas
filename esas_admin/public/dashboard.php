@@ -978,24 +978,30 @@ try {
                                                                     }]
                                                                 };
 
-                                                                // Configurations for the chart
+                                                                const maxDataCount = Math.max(...dataCounts); // Get the highest count from dataCounts
+                                                                const buffer = Math.ceil(maxDataCount * 0.1); // Calculate 10% buffer space
+
                                                                 const config = {
                                                                     type: 'bar',
                                                                     data: data,
                                                                     options: {
-                                                                        indexAxis: 'y', // Horizontal bar chart
+                                                                        responsive: true,
+                                                                        maintainAspectRatio: false,
                                                                         scales: {
-                                                                            x: {
-                                                                                beginAtZero: true,
-                                                                                suggestedMax: totalCount // Set the maximum value to the total student count
-                                                                            },
                                                                             y: {
-                                                                                // Automatically handled by Chart.js for labels
+                                                                                beginAtZero: true,
+                                                                                suggestedMax: maxDataCount + buffer, // Set max to highest data value plus buffer
+                                                                                ticks: {
+                                                                                    callback: function(value) {
+                                                                                        return Number.isInteger(value) ? value : Math.floor(value); // Ensure no decimal points
+                                                                                    },
+                                                                                    stepSize: 1 // Force y-axis steps of 1 to avoid decimals
+                                                                                }
                                                                             }
                                                                         },
                                                                         plugins: {
                                                                             legend: {
-                                                                                display: false // Hide the legend
+                                                                                display: false // Remove the legend
                                                                             }
                                                                         }
                                                                     }
