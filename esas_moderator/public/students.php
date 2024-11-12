@@ -426,6 +426,7 @@ try {
                                                     <th>Age</th>
                                                     <th>Email</th>
                                                     <th>Phone</th>
+                                                    <th>Year</th>
                                                     <th>Course</th>
                                                     <th>Status</th>
                                                     <th>Actions</th>
@@ -446,6 +447,7 @@ try {
                                             $age = htmlspecialchars($row['age']);
                                             $email = htmlspecialchars($row['instiEmail']);
                                             $phoneNumber = htmlspecialchars($row['phoneNumber']);
+                                            $year = htmlspecialchars($row['year']);
                                             $course = htmlspecialchars($row['course']);
                                             $status = htmlspecialchars($row['status']);
 
@@ -465,6 +467,7 @@ try {
                                                 <td>' . $age . '</td>
                                                 <td>' . $email . '</td>
                                                 <td>' . $phoneNumber . '</td>
+                                                <td>' . $year . '</td>
                                                 <td>' . $course . '</td>
                                                 <td>' . $status . '</td>
                                                 <td class="text-center">

@@ -753,10 +753,10 @@ try {
                                 <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
                                         
-                                        <!-- Registry per SY -->
+                                        <!-- Apllication per SY -->
                                         <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Total Registry per SY</p>
+                                                <p>Total Apllication per SY</p>
                                                 <div style="height: 100%; width: 100%; background-color: transparent;">
                                                     <canvas id="registryPerSYChart"></canvas>
                                                 </div>
@@ -811,19 +811,21 @@ try {
                                                         $memberCountsPerSY[] = $row['memberCount'];  // Number of members for each year
                                                     }
 
-                                                    // Fetch the total number of students for the max value
-                                                    $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
-                                                    $totalStudentsStmt->execute();
-                                                    $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
-                                                    $totalStudentCount = $totalStudentsData ? (int)$totalStudentsData['totalCount'] : 0;
+                                                    // Find the maximum value in the memberCountsPerSY array
+                                                    $maxMemberCount = max($memberCountsPerSY);  // Get the highest count
+
+                                                    // Define a 10% buffer to ensure the peak doesn't touch the highest count
+                                                    $bufferPercentage = 0.10;  // 10% buffer
+                                                    $buffer = $maxMemberCount * $bufferPercentage;  // Calculate 10% of the highest count
+                                                    $maxMemberCountWithBuffer = $maxMemberCount + $buffer;  // Add the buffer to the max value
 
                                                     // Function to round up to the nearest even number
                                                     function roundUpToEven($number) {
                                                         return $number % 2 === 0 ? $number : $number + 1;
                                                     }
 
-                                                    // Adjust max value to nearest even number
-                                                    $maxMemberCount = roundUpToEven($totalStudentCount);
+                                                    // Round the new value with buffer to the nearest even number
+                                                    $maxMemberCountWithBuffer = roundUpToEven($maxMemberCountWithBuffer);
 
                                                     // Fill in missing academic years with zero counts
                                                     $allAcademicYears = [];
@@ -842,6 +844,8 @@ try {
                                                             $memberCountsAllYears[$index] = $row['memberCount'];
                                                         }
                                                     }
+
+
                                                 } catch (PDOException $e) {
                                                     echo "Error: " . $e->getMessage();
                                                 }
@@ -854,7 +858,7 @@ try {
                                                     // PHP arrays passed into JavaScript
                                                     const academicYears = <?php echo json_encode($allAcademicYears); ?>;
                                                     const memberCountsPerSY = <?php echo json_encode($memberCountsAllYears); ?>;
-                                                    const maxMemberCount = <?php echo $maxMemberCount; ?>;
+                                                    const maxMemberCountWithBuffer = <?php echo $maxMemberCountWithBuffer; ?>;  // Use the buffered value
 
                                                     // Check if there is no data to display
                                                     const hasDataSY = memberCountsPerSY.some(count => count > 0);
@@ -871,7 +875,7 @@ try {
                                                         const registryPerSYData = {
                                                             labels: academicYears,
                                                             datasets: [{
-                                                                label: 'Registry per SY',
+                                                                label: 'Apllication per SY',
                                                                 data: memberCountsPerSY,
                                                                 fill: true,
                                                                 borderColor: 'rgba(75, 192, 192, 1)',
@@ -894,7 +898,14 @@ try {
                                                                     },
                                                                     y: {
                                                                         beginAtZero: true,
-                                                                        max: maxMemberCount // Adjust max count dynamically to even number
+                                                                        max: maxMemberCountWithBuffer, // Use the buffered value to set the max for y-axis
+                                                                        ticks: {
+                                                                            // Ensure the y-axis ticks are integers
+                                                                            stepSize: 1, // Force step size to be 1 (no decimals)
+                                                                            callback: function(value) {
+                                                                                return value.toFixed(0); // Display as integer
+                                                                            }
+                                                                        }
                                                                     }
                                                                 },
                                                                 plugins: {
@@ -911,6 +922,7 @@ try {
                                                         const registryPerSYChart = new Chart(registryPerSYChartElement, registryPerSYConfig);
                                                     }
                                                 </script>
+
                                             </div>
                                         </div>
 
@@ -1029,17 +1041,25 @@ try {
                                                                 }]
                                                             };
 
-                                                            // Configurations for the chart with total student count as the peak limit
+                                                            const maxDataCount = Math.max(...dataCounts); // Get the highest count from dataCounts
+                                                            const buffer = Math.ceil(maxDataCount * 0.1); // Calculate 10% buffer space
+
                                                             const config = {
                                                                 type: 'bar',
                                                                 data: data,
                                                                 options: {
-                                                                    responsive: true, // Ensure the chart resizes with the container
-                                                                    maintainAspectRatio: false, // Allow chart to adjust height and width dynamically
+                                                                    responsive: true,
+                                                                    maintainAspectRatio: false,
                                                                     scales: {
                                                                         y: {
                                                                             beginAtZero: true,
-                                                                            suggestedMax: totalStudentCount // Set the total student count as the maximum y-axis value
+                                                                            suggestedMax: maxDataCount + buffer, // Set max to highest data value plus buffer
+                                                                            ticks: {
+                                                                                callback: function(value) {
+                                                                                    return Number.isInteger(value) ? value : Math.floor(value); // Ensure no decimal points
+                                                                                },
+                                                                                stepSize: 1 // Force y-axis steps of 1 to avoid decimals
+                                                                            }
                                                                         }
                                                                     },
                                                                     plugins: {
@@ -1049,6 +1069,10 @@ try {
                                                                     }
                                                                 }
                                                             };
+
+                                                            // Render the chart
+                                                            new Chart(studentBarChartElement, config);
+
 
                                                             // Render the chart
                                                             new Chart(studentBarChartElement, config);
