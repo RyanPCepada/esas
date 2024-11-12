@@ -330,8 +330,8 @@ try {
                                 <!-- Report Title and Description -->
                                 <table>
                                     <tr>
-                                        <h2 class="label"><strong></strong></h2>
-                                        <h2 id="reportTitle"></h2>
+                                        <h3 class="label"><strong></strong></h3>
+                                        <h3 id="reportTitle"></h3>
                                     </tr>
                                     <tr>
                                         <td class="label"><strong></strong></td>
