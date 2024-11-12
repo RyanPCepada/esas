@@ -311,7 +311,9 @@ try {
                                                 echo "Error: " . htmlspecialchars($e->getMessage());
                                             }
                                             ?>
+                                            <option value="all">All</option>
                                         </select>
+
                                     </div>
 
 
@@ -400,6 +402,11 @@ function fetchReportData(reportType, clubId, schoolYear) {
         }
     };
 
+    // If 'All' is selected, send an empty string to the backend for school year
+    if (schoolYear === 'all') {
+        schoolYear = ''; // Send empty to fetch all records
+    }
+
     // Send reportType, clubId, and schoolYear in the request
     xhr.send(`reportType=${reportType}&club_id=${clubId}&schoolYear=${schoolYear}`);
 }
@@ -445,7 +452,6 @@ function generateTitleAndDescription(reportType) {
 }
 
 
-// Print report functionality
 // Print report functionality
 document.getElementById('printReport').addEventListener('click', function () {
     // Select the report sections you want to print
