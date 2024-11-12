@@ -79,16 +79,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'upcoming_events':
             // Fetch upcoming events for the current club, filtering by dateAdded
-            $query = "SELECT title AS 'Event Title', date AS 'Event Date', 
-                            time AS 'Event Time', location AS 'Event Location' 
+            $query = "SELECT title AS 'Event Title', 
+                            CONCAT(DATE_FORMAT(timeStarts, '%h:%i %p'), ' - ', DATE_FORMAT(timeEnds, '%h:%i %p')) AS 'Event Time', 
+                            location AS 'Event Location', 
+                            registrationLink AS 'Link' 
                     FROM tbl_events 
                     WHERE club_id = :club_id AND date >= CURDATE()";
+
             // Apply school year filter using dateAdded
             if (!empty($schoolYear)) {
                 $query .= " AND dateAdded BETWEEN :startDate AND :endDate";
             }
+
             $query .= " ORDER BY date ASC";
             break;
+
 
         default:
             echo '<div class="alert alert-danger"><p><em>Invalid report type selected.</em></p></div>';
