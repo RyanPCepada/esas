@@ -115,6 +115,7 @@ try {
 
         .label {
             width: 110px;
+            width: auto;
             text-align: left;
             padding-left: 15px;
             vertical-align: top;
@@ -327,12 +328,12 @@ try {
                                 <!-- Report Title and Description -->
                                 <table>
                                     <tr>
-                                        <td class="label"><strong>Report Title:</strong></td>
-                                        <td id="reportTitle"></td>
+                                        <h2 class="label"><strong></strong></h2>
+                                        <h2 id="reportTitle"></h2>
                                     </tr>
                                     <tr>
-                                        <td class="label"><strong>Description:</strong></td>
-                                        <td id="reportDescription"></td>
+                                        <td class="label"><strong></strong></td>
+                                        <p id="reportDescription"></p>
                                     </tr>
                                 </table>
 
@@ -408,45 +409,71 @@ function generateTitleAndDescription(reportType) {
     let reportTitle = '';
     let reportDescription = '';
 
+    // Get selected club name and school year
+    const clubDropdown = document.getElementById('clubDropdown');
+    const clubName = clubDropdown.options[clubDropdown.selectedIndex].text;
+    const schoolYear = document.getElementById('schoolYearDropdown').value;
+
     switch (reportType) {
         case 'club_students_list':
-            reportTitle = "List of Students in Club";
-            reportDescription = "This report shows the basic information of all students registered in this club.";
+            reportTitle = `List of Students - ${clubName}`;
+            reportDescription = `This report shows the basic information of all students registered in ${clubName} in School Year ${schoolYear}`;
             break;
         case 'pending_approvals':
-            reportTitle = "Pending Club Application Approvals";
-            reportDescription = "This report lists all the basic information of students whose applications are pending for this club.";
+            reportTitle = `Pending Club Application Approvals - ${clubName}`;
+            reportDescription = `This report lists all basic information of students whose applications are pending for ${clubName} in School Year ${schoolYear}`;
             break;
         case 'disapproved_applications':
-            reportTitle = "Disapproved Student Applications";
-            reportDescription = "This report provides a summary of the basic information of students whose applications were disapproved for this club.";
+            reportTitle = `Disapproved Student Applications - ${clubName}`;
+            reportDescription = `This report provides a summary of basic information of students whose applications were disapproved for ${clubName} in School Year ${schoolYear}`;
             break;
         case 'pending_departure_requests':
-            reportTitle = "Pending Departure Requests";
-            reportDescription = "This report lists all pending requests from students wanting to leave this club.";
+            reportTitle = `Pending Departure Requests - ${clubName}`;
+            reportDescription = `This report lists all pending requests from students wanting to leave ${clubName} in School Year ${schoolYear}`;
             break;
         case 'upcoming_events':
-            reportTitle = "Upcoming Events";
-            reportDescription = "This report displays all upcoming events organized by this club.";
+            reportTitle = `Upcoming Events - ${clubName}`;
+            reportDescription = `This report displays all upcoming events organized by ${clubName} in School Year ${schoolYear}`;
             break;
         default:
-            reportTitle = "Report";
-            reportDescription = "This is a dynamically generated report for this club.";
+            reportTitle = `Report for ${clubName}`;
+            reportDescription = `This is a dynamically generated report for ${clubName} in School Year ${schoolYear}`;
     }
 
     document.getElementById('reportTitle').innerText = reportTitle;
     document.getElementById('reportDescription').innerText = reportDescription;
 }
 
+
+// Print report functionality
 // Print report functionality
 document.getElementById('printReport').addEventListener('click', function () {
-    const printContent = document.getElementById('reportContent').innerHTML;
+    // Select the report sections you want to print
+    const reportTitle = document.getElementById('reportTitle').outerHTML;
+    const reportDescription = document.getElementById('reportDescription').outerHTML;
+    const reportContent = document.getElementById('reportContent').outerHTML;
+
+    // Combine all sections into one printable format
+    const printContent = `
+        <div>
+            <h2>${reportTitle}</h2>
+            <p>${reportDescription}</p>
+            ${reportContent}
+        </div>
+    `;
+
     const originalContent = document.body.innerHTML;
 
+    // Set the body content to only the printable content
     document.body.innerHTML = printContent;
+
+    // Trigger the print dialog
     window.print();
+
+    // Restore the original content after printing
     document.body.innerHTML = originalContent;
 });
+
 </script>
 
 
