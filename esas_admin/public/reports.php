@@ -264,7 +264,7 @@ try {
                     </div>
                 </div>
 
-                <!-- Report Content Table -->
+                <!-- Report Content Table --> 
                 <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                     <!-- Report Title and Description -->
                     <table>
@@ -278,10 +278,16 @@ try {
                         </tr>
                     </table>
 
+                    <div class="mt-3">
+                        <!-- Date will be dynamically added here -->
+                        <div id="currentDate"></div>
+                    </div>
+
                     <div class="mt-3" id="reportContent">
                         <!-- Dynamically generated table will be inserted here -->
                     </div>
                 </div>
+
 
                 <!-- No Results Message -->
                 <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
@@ -314,11 +320,14 @@ document.getElementById('generateReport').addEventListener('click', function () 
     // Dynamically generate title and description
     generateTitleAndDescription(reportType);
 
+    // Display the current date when report is generated
+    const today = new Date();
+    const currentDate = today.toLocaleDateString(); // Format the date as needed (e.g., 'MM/DD/YYYY')
+    document.getElementById('currentDate').innerText = `Date: ${currentDate}`;
+
     // Fetch and display report data, pass school year
     fetchReportData(reportType, schoolYear); // Updated to pass 'schoolYear'
 });
-
-// HERE
 
 function fetchReportData(reportType, schoolYear) {
     const xhr = new XMLHttpRequest();
@@ -390,46 +399,74 @@ function generateTitleAndDescription(reportType) {
     document.getElementById('reportDescription').innerText = reportDescription;
 }
 
-
 // Print report functionality
 document.getElementById('printReport').addEventListener('click', function () {
-    // Select the report sections you want to print
-    const reportTitle = document.getElementById('reportTitle').outerHTML;
-    const reportDescription = document.getElementById('reportDescription').outerHTML;
-    const reportContent = document.getElementById('reportContent').outerHTML;
+    // Preload the images
+    const NBSCLogoPath = "../../assets/img/NBSC_LOGO.png"; // Update the path if necessary
+    const SASLogoPath = "../../assets/img/SAS_LOGO.png"; // Update the path if necessary
+    
+    // Check if images are loaded before printing
+    const preloadLogo = new Image();
+    preloadLogo.src = NBSCLogoPath;
 
-    // Combine all sections into one printable format
-    const printContent = `
-        <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 50px;">
-                <img src="../../assets/img/NBSC_LOGO.png" style="height: 1in;">
-                <div style="text-align: center; flex-grow: 1; line-height: 1.2; padding: 0;">
-                    <div style="margin: 0;">Republic of the Philippines</div>
-                    <div style="margin: 0;"><strong>NORTHERN BUKIDNON STATE COLLEGE</strong></div>
-                    <div style="margin: 0;"><em>(Formerly Northern Bukidnon Community College)</em> R.A.11284</div>
-                    <div style="margin: 0;">Manolo Fortich, 8703 Bukidnon • 535-3873 • <span class="text-primary">nbscadmin@nbsc.edu.ph</span></div>
-                    <div style="margin: 0;">Creando futura, Transformationis vitae, Ductae a Deo</div>
+    const preloadSasLogo = new Image();
+    preloadSasLogo.src = SASLogoPath;
+
+    // Wait until both images are loaded
+    Promise.all([imageLoad(preloadLogo), imageLoad(preloadSasLogo)]).then(function () {
+        // Get the current date dynamically
+        const today = new Date();
+        const currentDate = today.toLocaleDateString();
+
+        // Generate print content after images are loaded
+        const reportTitle = document.getElementById('reportTitle').outerHTML;
+        const reportDescription = document.getElementById('reportDescription').outerHTML;
+        const reportContent = document.getElementById('reportContent').outerHTML;
+
+        // Combine all sections into one printable format
+        const printContent = `
+            <div>
+                <div style="display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 50px;">
+                    <img src="${NBSCLogoPath}" style="height: 1in; margin-right: 10px;">
+                    <div style="text-align: center; line-height: 1.2; padding: 0;">
+                        <div style="margin: 0;">Republic of the Philippines</div>
+                        <div style="margin: 0;"><strong>NORTHERN BUKIDNON STATE COLLEGE</strong></div>
+                        <div style="margin: 0;"><em>(Formerly Northern Bukidnon Community College)</em> R.A.11284</div>
+                        <div style="margin: 0;">Manolo Fortich, 8703 Bukidnon • 535-3873 • <span class="text-primary">nbscadmin@nbsc.edu.ph</span></div>
+                        <div style="margin: 0;">Creando futura, Transformationis vitae, Ductae a Deo</div>
+                    </div>
+                    <img src="${SASLogoPath}" style="height: .75in; margin-left: 10px;">
                 </div>
-                <img src="../../assets/img/SAS_LOGO.png" style="height: .75in;">
+
+                <!-- Add the current date to the printable content -->
+                <div style="text-align: center; margin-bottom: 20px;">Date: ${currentDate}</div>
+
+                <h2>${reportTitle}</h2>
+                <p>${reportDescription}</p>
+                ${reportContent}
             </div>
-            <h2>${reportTitle}</h2>
-            <p>${reportDescription}</p>
-            ${reportContent}
-        </div>
-    `;
+        `;
 
-    const originalContent = document.body.innerHTML;
+        const originalContent = document.body.innerHTML;
 
-    // Set the body content to only the printable content
-    document.body.innerHTML = printContent;
+        // Set the body content to only the printable content
+        document.body.innerHTML = printContent;
 
-    // Trigger the print dialog
-    window.print();
+        // Trigger the print dialog
+        window.print();
 
-    // Restore the original content after printing
-    document.body.innerHTML = originalContent;
+        // Restore the original content after printing
+        document.body.innerHTML = originalContent;
+    });
 });
 
+// Helper function to check if an image is loaded
+function imageLoad(img) {
+    return new Promise(function (resolve, reject) {
+        img.onload = resolve;
+        img.onerror = reject;
+    });
+}
 
 </script>
 
