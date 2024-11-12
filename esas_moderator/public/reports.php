@@ -421,30 +421,33 @@ function generateTitleAndDescription(reportType) {
     const clubName = clubDropdown.options[clubDropdown.selectedIndex].text;
     const schoolYear = document.getElementById('schoolYearDropdown').value;
 
+    // Check if 'All' is selected for the school year
+    const schoolYearText = schoolYear === 'all' ? 'all School Years' : `School Year ${schoolYear}`;
+
     switch (reportType) {
         case 'club_students_list':
             reportTitle = `List of Students - ${clubName}`;
-            reportDescription = `This report shows the basic information of all students registered in ${clubName} in School Year ${schoolYear}`;
+            reportDescription = `This report shows the basic information of all students registered in ${clubName} in ${schoolYearText}`;
             break;
         case 'pending_approvals':
             reportTitle = `Pending Club Application Approvals - ${clubName}`;
-            reportDescription = `This report lists all basic information of students whose applications are pending for ${clubName} in School Year ${schoolYear}`;
+            reportDescription = `This report lists all basic information of students whose applications are pending for ${clubName} in ${schoolYearText}`;
             break;
         case 'disapproved_applications':
             reportTitle = `Disapproved Student Applications - ${clubName}`;
-            reportDescription = `This report provides a summary of basic information of students whose applications were disapproved for ${clubName} in School Year ${schoolYear}`;
+            reportDescription = `This report provides a summary of basic information of students whose applications were disapproved for ${clubName} in ${schoolYearText}`;
             break;
         case 'pending_departure_requests':
             reportTitle = `Pending Departure Requests - ${clubName}`;
-            reportDescription = `This report lists all pending requests from students wanting to leave ${clubName} in School Year ${schoolYear}`;
+            reportDescription = `This report lists all pending requests from students wanting to leave ${clubName} in ${schoolYearText}`;
             break;
         case 'upcoming_events':
             reportTitle = `Upcoming Events - ${clubName}`;
-            reportDescription = `This report displays all upcoming events organized by ${clubName} in School Year ${schoolYear}`;
+            reportDescription = `This report displays all upcoming events organized by ${clubName} in ${schoolYearText}`;
             break;
         default:
             reportTitle = `Report for ${clubName}`;
-            reportDescription = `This is a dynamically generated report for ${clubName} in School Year ${schoolYear}`;
+            reportDescription = `This is a dynamically generated report for ${clubName} in ${schoolYearText}`;
     }
 
     document.getElementById('reportTitle').innerText = reportTitle;
