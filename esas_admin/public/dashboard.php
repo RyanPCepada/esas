@@ -847,17 +847,25 @@ try {
                                                                 }]
                                                             };
 
-                                                            // Configurations for the chart with total student count as the peak limit
+                                                            const maxDataCount = Math.max(...dataCounts); // Get the highest count from dataCounts
+                                                            const buffer = Math.ceil(maxDataCount * 0.1); // Calculate 10% buffer space
+
                                                             const config = {
                                                                 type: 'bar',
                                                                 data: data,
                                                                 options: {
-                                                                    responsive: true, // Ensure the chart resizes with the container
-                                                                    maintainAspectRatio: false, // Allow chart to adjust height and width dynamically
+                                                                    responsive: true,
+                                                                    maintainAspectRatio: false,
                                                                     scales: {
                                                                         y: {
                                                                             beginAtZero: true,
-                                                                            suggestedMax: totalStudentCount // Set the total student count as the maximum y-axis value
+                                                                            suggestedMax: maxDataCount + buffer, // Set max to highest data value plus buffer
+                                                                            ticks: {
+                                                                                callback: function(value) {
+                                                                                    return Number.isInteger(value) ? value : Math.floor(value); // Ensure no decimal points
+                                                                                },
+                                                                                stepSize: 1 // Force y-axis steps of 1 to avoid decimals
+                                                                            }
                                                                         }
                                                                     },
                                                                     plugins: {
