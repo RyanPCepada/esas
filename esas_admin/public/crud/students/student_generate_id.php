@@ -35,6 +35,7 @@ $clubs = $clubQuery->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESAS - Generate Student ID</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         /* Your existing styles */
         body {
@@ -194,8 +195,8 @@ $clubs = $clubQuery->fetchAll();
 
     <!-- Button container placed at the top-right corner -->
     <div class="button-container">
-        <button onclick="printPage()">Print</button>
-        <button onclick="downloadPDF()">Download as PDF</button>
+        <button onclick="printPage()"><i class="fas fa-print"></i> Print</button>
+        <!-- <button onclick="downloadPDF()">Download as PDF</button> -->
     </div>
 
     <div class="id-container" id="id-container">
