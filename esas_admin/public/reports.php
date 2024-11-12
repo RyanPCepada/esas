@@ -191,115 +191,127 @@ try {
             
             
             <!-- MAINPAGE BAR -->
-            <div class="col-12 col-md-10 bg-lgrey auto-scroll">
-                <div class="row g-0 h-100">
-                    <div class="row g-0 p-4 px-2 pt-2 h-100">
+<div class="col-12 col-md-10 bg-lgrey auto-scroll">
+    <div class="row g-0 h-100">
+        <div class="row g-0 p-4 px-2 pt-2 h-100">
 
-                        <!-- THE MAIN PAGE START -->
-<div class="card p-2">
+            <!-- THE MAIN PAGE START -->
+            <div class="card p-2">
 
-<!-- ALL STUDENT TABLE START -->
-<div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
-    <div class="row mb-3">
-        <div class="col-md-2">
-            <select id="reportType" class="form-control">
-                <option value="">-- Select Report Type --</option>
-                <option value="all_clubs">All Clubs Records</option>
-                <option value="all_moderators">All Moderators Records</option>
-                <option value="student_profiles">Student Profiles</option>
-                <option value="moderators_and_clubs_overview">Overview of Moderators and Clubs</option>
-                <option value="students_and_clubs_overview">Overview of Students and Clubs</option>
-                <option value="student_club_requests">Student Club Requests</option>
-                <option value="student_application_status">Student Application Status</option>
-            </select>
-        </div>
+                <div class="row mb-2 p-2">
+                    <!-- Report Type Dropdown -->
+                    <label for="reportType" class="col-auto col-form-label">Report Type:</label>
+                    <div class="col-md-2">
+                        <select id="reportType" class="form-select form-select-sm">
+                            <option value="">-- Select Report Type --</option>
+                            <option value="all_clubs">All Clubs Records</option>
+                            <option value="all_moderators">All Moderators Records</option>
+                            <option value="student_profiles">Student Profiles</option>
+                            <option value="moderators_and_clubs_overview">Overview of Moderators and Clubs</option>
+                            <option value="students_and_clubs_overview">Overview of Students and Clubs</option>
+                            <option value="student_club_requests">Student Club Requests</option>
+                            <option value="student_application_status">Student Application Status</option>
+                        </select>
+                    </div>
 
-        <!-- Club Dropdown -->
-        <div class="col-md-2">
-            <select id="clubSelect" class="form-control">
-                <option value="">-- Select Club --</option>
-                <?php
-                // Fetch clubs from the database
-                $clubSql = "SELECT club_id, clubName FROM tbl_clubs";
-                $clubs = $pdo->query($clubSql);
-                while ($club = $clubs->fetch()) {
-                    echo '<option value="' . htmlspecialchars($club['club_id']) . '">' . htmlspecialchars($club['clubName']) . '</option>';
-                }
-                ?>
-            </select>
-        </div>
+                    <!-- School Year Dropdown -->
+                    <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
+                    <div class="col-auto">
+                        <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                            <?php
+                            try {
+                                // Fetch distinct years where clubs were added
+                                $sql = "SELECT DISTINCT YEAR(dateAdded) as year FROM tbl_clubs ORDER BY year DESC";
+                                $stmt = $pdo->prepare($sql);
+                                $stmt->execute();
+                                $years = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        <div class="col-md-2">
-            <input type="text" id="startDate" class="form-control" placeholder="Start Date" onfocus="(this.type='date')">
-        </div>
-        <div class="col-md-2">
-            <input type="text" id="endDate" class="form-control" placeholder="End Date" onfocus="(this.type='date')">
-        </div>
-        
-        <div class="text-end col-md-4">
-            <button id="generateReport" class="btn btn-primary">Generate Report</button>
-            <button id="printReport" class="btn btn-secondary"><i class="fas fa-print"></i> Print Report</button>
-        </div>
-    </div>
+                                // Latest school year by default (if not set via URL)
+                                $latestYear = $years[0]['year'] ?? null;
+                                $defaultSchoolYear = $latestYear . '-' . ($latestYear + 1);
 
-    <table>
-        <tr>
-            <td class="label"><strong>Report Title:</strong></td>
-            <td id="reportTitle"></td>
-        </tr>
-        <tr>
-            <td class="label"><strong>Description:</strong></td>
-            <td id="reportDescription"></td>
-        </tr>
-    </table>
+                                // Selected school year from the URL, or default to the latest school year
+                                $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
 
-    <div class="mt-3" id="reportContent">
-        <!-- Dynamically generated table will be inserted here -->
-    </div>
-</div>
-<!-- ALL STUDENT TABLE END -->
+                                // Create school year ranges starting from August and ending in July next year
+                                foreach ($years as $year) {
+                                    $startYear = $year['year'];
+                                    $endYear = $startYear + 1;
+                                    $schoolYear = $startYear . '-' . $endYear;
 
-<div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
-    <em>No results found.</em>
-</div>
+                                    echo "<option value=\"" . htmlspecialchars($schoolYear) . "\"";
+                                    if ($selectedSchoolYear === $schoolYear) {
+                                        echo " selected";
+                                    }
+                                    echo ">" . htmlspecialchars($schoolYear) . "</option>";
+                                }
+                            } catch (PDOException $e) {
+                                echo "Error: " . htmlspecialchars($e->getMessage());
+                            }
+                            ?>
+                            <option value="all">All</option>
+                        </select>
+                    </div>
 
-</div>
-<!-- THE MAIN PAGE END -->
-
-
+                    <!-- Buttons -->
+                    <div class="text-end col-md-3">
+                        <button id="generateReport" class="btn btn-primary">Generate Report</button>
+                        <button id="printReport" class="btn btn-secondary"><i class="fas fa-print"></i> Print</button>
                     </div>
                 </div>
+
+                <!-- Report Content Table -->
+                <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+                    <!-- Report Title and Description -->
+                    <table>
+                        <tr>
+                            <h3 class="label"><strong></strong></h3>
+                            <h3 id="reportTitle"></h3>
+                        </tr>
+                        <tr>
+                            <td class="label"><strong></strong></td>
+                            <p id="reportDescription"></p>
+                        </tr>
+                    </table>
+
+                    <div class="mt-3" id="reportContent">
+                        <!-- Dynamically generated table will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- No Results Message -->
+                <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
+                    <em>No results found.</em>
+                </div>
+
             </div>
-            <!-- MAINPAGE BAR END -->
-
-
+            <!-- THE MAIN PAGE END -->
 
         </div>
     </div>
+</div>
+<!-- MAINPAGE BAR END -->
 
-    <!-- <?php include 'assets/components/modals.php' ?> -->
-    <script src="../../assets/js/jquery.dataTables.min.js"></script>
-    <script src="../../assets/js/bootstrap.bundle.min.js"></script>
-    <script src="../../assets/js/global_script.js"></script>
+<script src="../../assets/js/jquery.dataTables.min.js"></script>
+<script src="../../assets/js/bootstrap.bundle.min.js"></script>
+<script src="../../assets/js/global_script.js"></script>
 
-
-
-    <script>
+<script>
 document.getElementById('generateReport').addEventListener('click', function () {
     const reportType = document.getElementById('reportType').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
+    const schoolYear = document.getElementById('schoolYearDropdown').value;
 
-    if (!reportType) {
-        alert('Please select a report type.');
+    // Validate that a report type, and school year are selected
+    if (!reportType || !schoolYear) {
+        alert('Please select a report type and school year.');
         return;
     }
 
     // Dynamically generate title and description
     generateTitleAndDescription(reportType);
 
-    // Fetch and display report data
-    fetchReportData(reportType, startDate, endDate);
+    // Fetch and display report data, pass school year
+    fetchReportData(reportType, schoolYear); // Updated to pass 'schoolYear'
 });
 
 function generateTitleAndDescription(reportType) {
@@ -344,7 +356,8 @@ function generateTitleAndDescription(reportType) {
     document.getElementById('reportDescription').innerText = reportDescription;
 }
 
-function fetchReportData(reportType, startDate, endDate) {
+function fetchReportData(reportType) {
+    const schoolYear = document.getElementById('schoolYearDropdown').value;
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '../apis/fetch-report-api.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -355,17 +368,38 @@ function fetchReportData(reportType, startDate, endDate) {
         }
     };
 
-    xhr.send(`reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`);
+    xhr.send(`reportType=${reportType}&schoolYear=${schoolYear}`);
 }
 
+// Print report functionality
 document.getElementById('printReport').addEventListener('click', function () {
-    const printContent = document.getElementById('reportContent').innerHTML;
+    // Select the report sections you want to print
+    const reportTitle = document.getElementById('reportTitle').outerHTML;
+    const reportDescription = document.getElementById('reportDescription').outerHTML;
+    const reportContent = document.getElementById('reportContent').outerHTML;
+
+    // Combine all sections into one printable format
+    const printContent = `
+        <div>
+            <h2>${reportTitle}</h2>
+            <p>${reportDescription}</p>
+            ${reportContent}
+        </div>
+    `;
+
     const originalContent = document.body.innerHTML;
 
+    // Set the body content to only the printable content
     document.body.innerHTML = printContent;
+
+    // Trigger the print dialog
     window.print();
+
+    // Restore the original content after printing
     document.body.innerHTML = originalContent;
 });
+
+
 </script>
 
 

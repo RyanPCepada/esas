@@ -615,12 +615,12 @@ try {
                                 <div class="col-md-6" style="border: 1px solid transparent; padding: 0;">
 
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
-                                        <!-- Registry per SY -->
+                                        <!-- Application per SY -->
                                         <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Total Registry per SY</p>
+                                                <p>Total Application per SY</p>
                                                 <div style="height: 100%; width: 100%; background-color: transparent;">
-                                                    <canvas id="registryPerSYChart"></canvas>
+                                                    <canvas id="applicationPerSYChart"></canvas>
                                                 </div>
                                                 <p id="noDataMessageSY" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;"><em>No students.</em></p>
 
@@ -652,14 +652,14 @@ try {
 
                                                         $stmt = $pdo->prepare($sql);
                                                         $stmt->execute();
-                                                        $registryPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                        $applicationPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                                                         // Initialize arrays for chart data
                                                         $academicYears = [];
                                                         $memberCountsPerSY = [];
 
                                                         // Populate the arrays with data
-                                                        foreach ($registryPerSYData as $row) {
+                                                        foreach ($applicationPerSYData as $row) {
                                                             $academicYears[] = $row['academicYear'];  // Just the academic year
                                                             $memberCountsPerSY[] = $row['memberCount'];  // Number of members for each academic year
                                                         }
@@ -695,18 +695,18 @@ try {
                                                     const hasDataSY = memberCountsPerSY.some(count => count > 0);
 
                                                     // Show or hide the "No Data" message based on data availability
-                                                    const registryPerSYChartElement = document.getElementById('registryPerSYChart');
+                                                    const applicationPerSYChartElement = document.getElementById('applicationPerSYChart');
                                                     const noDataMessageSY = document.getElementById('noDataMessageSY');
 
                                                     if (!hasDataSY) {
-                                                        registryPerSYChartElement.style.display = 'none';
+                                                        applicationPerSYChartElement.style.display = 'none';
                                                         noDataMessageSY.style.display = 'block';
                                                     } else {
                                                         // Data for the chart
-                                                        const registryPerSYData = {
+                                                        const applicationPerSYData = {
                                                             labels: academicYears,
                                                             datasets: [{
-                                                                label: 'Registry per SY',
+                                                                label: 'Application per SY',
                                                                 data: memberCountsPerSY,
                                                                 fill: true,
                                                                 borderColor: 'rgba(75, 192, 192, 1)',
@@ -716,9 +716,9 @@ try {
                                                         };
 
                                                         // Configuration for the chart
-                                                        const registryPerSYConfig = {
+                                                        const applicationPerSYConfig = {
                                                             type: 'line',
-                                                            data: registryPerSYData,
+                                                            data: applicationPerSYData,
                                                             options: {
                                                                 scales: {
                                                                     x: {
@@ -743,12 +743,12 @@ try {
                                                         };
 
                                                         // Render the chart
-                                                        const registryPerSYChart = new Chart(registryPerSYChartElement, registryPerSYConfig);
+                                                        const applicationPerSYChart = new Chart(applicationPerSYChartElement, applicationPerSYConfig);
                                                     }
                                                 </script>
                                             </div>
                                         </div>
-                                        <!-- Registry per SY END-->
+                                        <!-- Application per SY END-->
                                     </div>
 
                                         
