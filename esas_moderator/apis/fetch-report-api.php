@@ -11,6 +11,7 @@ $schoolYear = $_POST['schoolYear'] ?? '';  // Fetch school year if provided
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $reportType = $_POST['reportType'];
     $club_id = $_POST['club_id'];  // Assuming the club_id of the current club is passed
+    
     // Ensure school year is in the 'YYYY-YYYY' format
     if (!empty($schoolYear)) {
         list($startYear, $endYear) = explode('-', $schoolYear);

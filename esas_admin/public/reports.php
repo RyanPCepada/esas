@@ -363,7 +363,7 @@ function generateTitleAndDescription(reportType) {
             break;
         case 'student_profiles':
             reportTitle = "Student Profiles";
-            reportDescription = "This report contains detailed profiles of all students, including their student ID, full name, contact information, department, course, and academic year.";
+            reportDescription = "This report contains detailed profiles of all students, including their student ID, full name, contact information, department, course, and clubs.";
             break;
         case 'moderators_and_clubs_overview':
             reportTitle = "Overview of Moderators and Clubs";

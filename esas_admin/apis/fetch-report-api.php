@@ -19,84 +19,118 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     switch ($reportType) {
         case 'all_clubs':
-            // Fetch all clubs' names and date added
-            $query = "SELECT clubName AS 'Club Name', 
-                             DATE_FORMAT(dateAdded, '%m-%d-%Y') AS 'Date Added' 
-                      FROM tbl_clubs";
+            // Fetch all clubs' names, date added, count of moderators, and count of members
+            $query = "SELECT c.clubName AS 'Club Name', 
+                             COUNT(DISTINCT cm.moderator_id) AS 'Number of Moderators',
+                             COUNT(DISTINCT a.student_id) AS 'Number of Students',
+                             DATE_FORMAT(c.dateAdded, '%m-%d-%Y') AS 'Date Added' 
+                      FROM tbl_clubs c
+                      LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                      LEFT JOIN tbl_application a ON c.club_id = a.club_id AND a.status = 'active'";
             
-            // Apply school year filter using dateAdded
+            // Apply school year filter using dateAdded, if applicable
             if (!empty($schoolYear)) {
-                $query .= " AND dateAdded BETWEEN :startDate AND :endDate";
+                $query .= " WHERE c.dateAdded BETWEEN :startDate AND :endDate";
             }
+        
+            // Group the results by club ID
+            $query .= " GROUP BY c.club_id";
             break;
+        
     
-        case 'all_moderators':
-            // Fetch all moderators' basic information
-            $query = "SELECT moderator_id AS 'Moderator ID', 
-                             CONCAT(firstName, ' ', lastName) AS 'Full Name', 
-                             gender AS 'Gender', 
-                             email AS 'Email', 
-                             phoneNumber AS 'Phone Number', 
-                             department AS 'Department', 
-                             DATE_FORMAT(dateAdded, '%m-%d-%Y') AS 'Date Added' 
-                      FROM tbl_moderators";
+            case 'all_moderators':
+                // Fetch all moderators' basic information without concatenating full name
+                $query = "SELECT moderator_id AS 'Moderator ID', 
+                                 CONCAT(firstName, ' ', lastName) AS 'Full Name', 
+                                 gender AS 'Gender', 
+                                 email AS 'Email', 
+                                 phoneNumber AS 'Phone Number', 
+                                 department AS 'Department', 
+                                 DATE_FORMAT(dateAdded, '%m-%d-%Y') AS 'Date Added' 
+                          FROM tbl_moderators";
+                
+                // Apply school year filter using dateAdded, if applicable
+                if (!empty($schoolYear)) {
+                    $query .= " WHERE dateAdded BETWEEN :startDate AND :endDate";
+                }
+                break;
             
-            // Apply school year filter using dateAdded
-            if (!empty($schoolYear)) {
-                $query .= " AND dateAdded BETWEEN :startDate AND :endDate";
-            }
-            break;
     
         case 'student_profiles':
-            // Fetch student profiles' information
-            $query = "SELECT student_id AS 'Student ID', 
-                             CONCAT(firstName, ' ', lastName) AS 'Full Name', 
-                             gender AS 'Gender', 
-                             instiEmail AS 'Institutional Email', 
-                             phoneNumber AS 'Phone Number', 
-                             department AS 'Department', 
-                             year AS 'Year' 
-                      FROM tbl_students";
-            
-            // Apply school year filter using dateAdded
+            // Fetch student profiles from tbl_application with active status and club names
+            $query = "SELECT DISTINCT s.student_id AS 'Student ID', 
+                                    CONCAT(s.firstName, ' ', s.lastName) AS 'Full Name', 
+                                    s.gender AS 'Gender', 
+                                    s.instiEmail AS 'Institutional Email', 
+                                    s.phoneNumber AS 'Phone Number', 
+                                    s.year AS 'Year', 
+                                    s.department AS 'Department', 
+                                    s.course AS 'Course',
+                                    GROUP_CONCAT(c.clubName ORDER BY c.clubName SEPARATOR ', ') AS 'Clubs'
+                    FROM tbl_students s
+                    INNER JOIN tbl_application a ON s.student_id = a.student_id
+                    INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+                    WHERE a.status = 'active'";
+
+            // Apply school year filter using dateApplied from tbl_application, if applicable
             if (!empty($schoolYear)) {
-                $query .= " AND dateAdded BETWEEN :startDate AND :endDate";
+                $query .= " AND a.dateApplied BETWEEN :startDate AND :endDate";
             }
+            
+            // Group by student_id to ensure each student is listed once with their clubs
+            $query .= " GROUP BY s.student_id";
+
             break;
+
+                
+                
     
         case 'moderators_and_clubs_overview':
             // Fetch moderator and club overview
-            $query = "SELECT CONCAT(m.firstName, ' ', m.lastName) AS 'Moderator Full Name', 
-                             c.clubName AS 'Club Name', 
-                             m.email AS 'Email', 
-                             DATE_FORMAT(cm.dateAdded, '%m-%d-%Y') AS 'Date Added' 
-                      FROM tbl_clubs c 
-                      JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id 
-                      JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id";
+            $query = "SELECT m.moderator_id AS 'Moderator ID', 
+                            CONCAT(m.firstName, ' ', m.lastName) AS 'Moderator Full Name', 
+                            GROUP_CONCAT(c.clubName ORDER BY c.clubName SEPARATOR ', ') AS 'Club Name(s)', 
+                            m.email AS 'Email', 
+                            DATE_FORMAT(cm.dateAdded, '%m-%d-%Y') AS 'Date Assigned' 
+                    FROM tbl_clubs c 
+                    JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id 
+                    JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id";
             
-            // Apply school year filter using dateAdded
+            // Apply school year filter using dateAdded from tbl_clubs_and_moderators, if applicable
             if (!empty($schoolYear)) {
-                $query .= " AND cm.dateAdded BETWEEN :startDate AND :endDate";
+                $query .= " WHERE cm.dateAdded BETWEEN :startDate AND :endDate";
             }
+            
+            // Group by moderator_id to show one row per moderator
+            $query .= " GROUP BY m.moderator_id";
+
             break;
+
     
         case 'students_and_clubs_overview':
             // Fetch student and club overview
-            $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS 'Student Full Name', 
-                             c.clubName AS 'Club Name', 
-                             s.instiEmail AS 'Institutional Email', 
-                             s.year AS 'Year' 
-                      FROM tbl_clubs c 
-                      JOIN tbl_application r ON c.club_id = r.club_id 
-                      JOIN tbl_students s ON r.student_id = s.student_id 
-                      WHERE r.status = 'active'";
+            $query = "SELECT s.student_id AS 'Student ID', 
+                            CONCAT(s.firstName, ' ', s.lastName) AS 'Full Name', 
+                            GROUP_CONCAT(c.clubName ORDER BY c.clubName SEPARATOR ', ') AS 'Clubs', 
+                            s.instiEmail AS 'Institutional Email', 
+                            s.year AS 'Year', 
+                            s.department AS 'Department', 
+                            s.course AS 'Course' 
+                    FROM tbl_clubs c 
+                    JOIN tbl_application a ON c.club_id = a.club_id 
+                    JOIN tbl_students s ON a.student_id = s.student_id 
+                    WHERE a.status = 'active'";
             
-            // Apply school year filter using dateAdded
+            // Apply school year filter using dateAdded from tbl_application, if applicable
             if (!empty($schoolYear)) {
-                $query .= " AND r.dateAdded BETWEEN :startDate AND :endDate";
+                $query .= " AND a.dateDecided BETWEEN :startDate AND :endDate";
             }
+            
+            // Group by student_id to show one row per student
+            $query .= " GROUP BY s.student_id";
+
             break;
-    
+
         case 'student_club_requests':
             // Fetch student club requests
             $query = "SELECT CONCAT(s.firstName, ' ', s.lastName) AS 'Student Name', 
@@ -107,9 +141,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       FROM tbl_club_requests cr 
                       JOIN tbl_students s ON cr.student_id = s.student_id";
             
-            // Apply school year filter using dateRequested
+            // Apply school year filter using dateRequested, if applicable
             if (!empty($schoolYear)) {
-                $query .= " AND cr.dateRequested BETWEEN :startDate AND :endDate";
+                $query .= " WHERE cr.dateRequested BETWEEN :startDate AND :endDate";
             }
             break;
     
@@ -123,9 +157,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       JOIN tbl_students s ON r.student_id = s.student_id 
                       JOIN tbl_clubs c ON r.club_id = c.club_id";
             
-            // Apply school year filter using dateDecided
+            // Apply school year filter using dateDecided, if applicable
             if (!empty($schoolYear)) {
-                $query .= " AND r.dateDecided BETWEEN :startDate AND :endDate";
+                $query .= " WHERE r.dateDecided BETWEEN :startDate AND :endDate";
             }
             break;
     
@@ -133,8 +167,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo '<div class="alert alert-danger"><p><em>Invalid report type selected.</em></p></div>';
             exit;
     }
-    
-    
 
     // Prepare and bind parameters
     $stmt = $pdo->prepare($query);
