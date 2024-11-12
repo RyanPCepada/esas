@@ -236,7 +236,7 @@ if (!$club) {
 
                     <div class="school-details" style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; margin: 0px;">
                         <div style="margin-right: 5px;">
-                            <img src="../../../../assets/img/nbsclogo.png" style="height: 0.4in; filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.5));">
+                            <img src="../../../../assets/img/NBSC_LOGO.png" style="height: 0.4in; filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.5));">
                         </div>
                         <div style="text-align: center; color: rgba(255, 255, 255, 1);"> <!-- Center text here -->
                             <p style="font-size: 8px; margin: 0; text-shadow: 0 3px 5px rgba(0, 0, 0, .5);">REPUBLIC OF THE PHILIPPINES</p>

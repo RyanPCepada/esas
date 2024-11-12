@@ -9,7 +9,7 @@
     <meta name="author" content="" />
     <title>ESAS - Student Login</title>
     <link href="../assets/css/styles.css" rel="stylesheet" />
-    <link href="../assets/img/nbsclogo.png" rel="icon">
+    <link href="../assets/img/NBSC_LOGO.png" rel="icon">
 </head>
 
 <body>
@@ -26,7 +26,7 @@
                             <div class="card-body py-4">
                                 <div class="py-4 pt-2">
                                     <div class="text-center">
-                                        <img src="../assets/img/nbsclogo.png" alt="NBSC Logo" class="img-fluid " width="100" height="132" />
+                                        <img src="../assets/img/NBSC_LOGO.png" alt="NBSC Logo" class="img-fluid " width="100" height="132" />
                                     </div>
                                     <form id="frmnbsclogin">
                                         <div class="mb-2">

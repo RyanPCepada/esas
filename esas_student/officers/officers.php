@@ -66,7 +66,7 @@ try {
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         /* body {
             margin: 0;
@@ -228,7 +228,7 @@ try {
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
                     <img src="../../assets/img/SAS_LOGO.png" alt="ESAS Logo" style="height: .4in; vertical-align: middle;">
-                    <!-- <img src="../../assets/img/nbsclogo.png" style="height: 0.3in;"> NBSC SIS -->
+                    <!-- <img src="../../assets/img/NBSC_LOGO.png" style="height: 0.3in;"> NBSC SIS -->
                     </a>
                 </button>
                 <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">

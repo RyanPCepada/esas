@@ -55,7 +55,7 @@ try {
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon"> <!-- TAB LOGO -->
+    <link href="../../assets/img/NBSC_LOGO.png" rel="icon"> <!-- TAB LOGO -->
     <style>
         .nav-link.active {
           color: white !important;
@@ -401,6 +401,17 @@ document.getElementById('printReport').addEventListener('click', function () {
     // Combine all sections into one printable format
     const printContent = `
         <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 50px;">
+                <img src="../../assets/img/NBSC_LOGO.png" style="height: 1in;">
+                <div style="text-align: center; flex-grow: 1; line-height: 1.2; padding: 0;">
+                    <div style="margin: 0;">Republic of the Philippines</div>
+                    <div style="margin: 0;"><strong>NORTHERN BUKIDNON STATE COLLEGE</strong></div>
+                    <div style="margin: 0;"><em>(Formerly Northern Bukidnon Community College)</em> R.A.11284</div>
+                    <div style="margin: 0;">Manolo Fortich, 8703 Bukidnon • 535-3873 • <span class="text-primary">nbscadmin@nbsc.edu.ph</span></div>
+                    <div style="margin: 0;">Creando futura, Transformationis vitae, Ductae a Deo</div>
+                </div>
+                <img src="../../assets/img/SAS_LOGO.png" style="height: .75in;">
+            </div>
             <h2>${reportTitle}</h2>
             <p>${reportDescription}</p>
             ${reportContent}

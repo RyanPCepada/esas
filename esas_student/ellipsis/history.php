@@ -44,7 +44,7 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         body {
             background-color: #f4f4f9;
