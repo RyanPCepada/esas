@@ -55,7 +55,7 @@ try {
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/img/nbsclogo.png" rel="icon"> 
     <style>
         .nav-link.active {
           color: white !important;
@@ -204,8 +204,8 @@ try {
                     <div class="col-md-2">
                         <select id="reportType" class="form-select form-select-sm">
                             <option value="">-- Select Report Type --</option>
-                            <option value="all_clubs">All Clubs Records</option>
-                            <option value="all_moderators">All Moderators Records</option>
+                            <option value="all_clubs">All Clubs Record</option>
+                            <option value="all_moderators">All Moderators Record</option>
                             <option value="student_profiles">Student Profiles</option>
                             <option value="moderators_and_clubs_overview">Overview of Moderators and Clubs</option>
                             <option value="students_and_clubs_overview">Overview of Students and Clubs</option>
@@ -213,6 +213,7 @@ try {
                             <option value="student_application_status">Student Application Status</option>
                         </select>
                     </div>
+
 
                     <!-- School Year Dropdown -->
                     <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
@@ -251,6 +252,9 @@ try {
                             ?>
                             <option value="all">All</option>
                         </select>
+                    </div>
+
+                    <div class="col-md-2">
                     </div>
 
                     <!-- Buttons -->
@@ -314,17 +318,47 @@ document.getElementById('generateReport').addEventListener('click', function () 
     fetchReportData(reportType, schoolYear); // Updated to pass 'schoolYear'
 });
 
+// HERE
+
+function fetchReportData(reportType, schoolYear) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '../apis/fetch-report-api.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    xhr.onload = function () {
+        if (this.status === 200) {
+            document.getElementById('reportContent').innerHTML = this.responseText;
+        } else {
+            document.getElementById('reportContent').innerHTML = "<div class='alert alert-danger'>Failed to load report data.</div>";
+        }
+    };
+
+    // If 'All' is selected, send an empty string to the backend for school year
+    if (schoolYear === 'all') {
+        schoolYear = ''; // Send empty to fetch all records
+    }
+
+    // Send reportType, and schoolYear in the request
+    xhr.send(`reportType=${reportType}&schoolYear=${schoolYear}`);
+}
+
 function generateTitleAndDescription(reportType) {
     let reportTitle = '';
     let reportDescription = '';
 
+    // Get selected school year
+    const schoolYear = document.getElementById('schoolYearDropdown').value;
+
+    // Check if 'All' is selected for the school year
+    const schoolYearText = schoolYear === 'all' ? 'in All School Years' : `SY ${schoolYear}`;
+
     switch (reportType) {
         case 'all_clubs':
-            reportTitle = "All Clubs Records";
-            reportDescription = "This report provides a comprehensive overview of all registered clubs, including their names, cover photos, and dates of establishment.";
+            reportTitle = `All Clubs Record ${schoolYearText}`;
+            reportDescription = "This report provides a comprehensive overview of all registered clubs, including their names and dates of establishment.";
             break;
         case 'all_moderators':
-            reportTitle = "All Moderators Records";
+            reportTitle = "All Moderators Record";
             reportDescription = "This report lists all moderators along with their personal details such as full name, gender, contact information, department, and the date they were assigned to their respective clubs.";
             break;
         case 'student_profiles':
@@ -356,20 +390,6 @@ function generateTitleAndDescription(reportType) {
     document.getElementById('reportDescription').innerText = reportDescription;
 }
 
-function fetchReportData(reportType) {
-    const schoolYear = document.getElementById('schoolYearDropdown').value;
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '../apis/fetch-report-api.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-    xhr.onload = function () {
-        if (this.status === 200) {
-            document.getElementById('reportContent').innerHTML = this.responseText;
-        }
-    };
-
-    xhr.send(`reportType=${reportType}&schoolYear=${schoolYear}`);
-}
 
 // Print report functionality
 document.getElementById('printReport').addEventListener('click', function () {
