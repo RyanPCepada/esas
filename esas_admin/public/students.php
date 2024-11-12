@@ -268,7 +268,8 @@ try {
                                                 <tr>
                                                     <!-- <th>Application ID</th> -->
                                                     <!-- <th>Club ID</th> -->
-                                                    <th></th>
+                                                    <th>Student ID</th>
+                                                    <th>Profile</th>
                                                     <th>Full Name</th>
                                                     <th>Department</th>
                                                     <th>Course</th>
@@ -281,6 +282,7 @@ try {
                                             while ($row = $result->fetch()) {
                                                 $application_id = htmlspecialchars($row['application_id']);
                                                 $club_id = isset($row['club_id']) ? htmlspecialchars($row['club_id']) : ''; // Check if club_id is set
+                                                $student_id = isset($row['student_id']) ? htmlspecialchars($row['student_id']) : '';
                                                 $firstName = htmlspecialchars($row['firstName']);
                                                 $middleName = htmlspecialchars($row['middleName']);
                                                 $lastName = htmlspecialchars($row['lastName']);
@@ -292,6 +294,7 @@ try {
                                                 <tr class="student-row" data-club="' . htmlspecialchars($clubNames) . '">
                                                     <!-- <td>' . $application_id . '</td> -->
                                                     <!-- <td>' . $club_id . '</td> -->
+                                                    <td>' . $student_id . '</td>
                                                     <td class="text-center p-1">
                                                         <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
                                                             alt="' . $fullName . ' profile picture" 
