@@ -21,28 +21,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Fetch data based on report type for a specific club
     switch ($reportType) {
         case 'club_students_list':
-            // Fetch basic information of students in the club, filtering by dateDecided
-            $query = "SELECT s.student_id AS 'Student ID', s.firstName AS 'First Name', 
-                            s.middleName AS 'Middle Name', s.lastName AS 'Last Name', 
-                            s.instiEmail AS 'Institutional Email', s.dateAdded AS 'Date Added' 
-                      FROM tbl_students s 
+            // Fetch basic information of students in the club, including first name, middle name, last name, email, date applied, and date decided
+            $query = "SELECT s.student_id AS 'Student ID', 
+                             s.firstName AS 'First Name', 
+                             s.middleName AS 'Middle Name', 
+                             s.lastName AS 'Last Name', 
+                             s.instiEmail AS 'Institutional Email', 
+                             s.year AS 'Year', 
+                             s.department AS 'Department', 
+                             s.course AS 'Course', 
+                             DATE_FORMAT(r.dateApplied, '%m-%d-%Y') AS 'Date Applied', 
+                             DATE_FORMAT(r.dateDecided, '%m-%d-%Y') AS 'Date Approved'
+                      FROM tbl_students s
                       JOIN tbl_application r ON s.student_id = r.student_id 
                       WHERE r.status = 'active' AND r.club_id = :club_id";
-    
+            
             // Apply school year filter using dateDecided
             if (!empty($schoolYear)) {
                 $query .= " AND r.dateDecided BETWEEN :startDate AND :endDate";
             }
+            
+            $query .= " ORDER BY r.dateDecided ASC";
             break;
+        
 
         case 'pending_approvals':
             // Fetch students with pending application approvals, filtering by dateApplied
-            $query = "SELECT s.student_id AS 'Student ID', s.firstName AS 'First Name', 
-                            s.middleName AS 'Middle Name', s.lastName AS 'Last Name', 
-                            s.instiEmail AS 'Institutional Email' 
-                    FROM tbl_students s 
-                    JOIN tbl_application r ON s.student_id = r.student_id 
-                    WHERE r.status = 'pending' AND r.club_id = :club_id";
+            $query = "SELECT s.student_id AS 'Student ID', 
+                             s.firstName AS 'First Name', 
+                             s.middleName AS 'Middle Name', 
+                             s.lastName AS 'Last Name', 
+                             s.instiEmail AS 'Institutional Email', 
+                             s.year AS 'Year', 
+                             s.department AS 'Department', 
+                             s.course AS 'Course', 
+                             DATE_FORMAT(r.dateApplied, '%m-%d-%Y') AS 'Date Applied'
+                      FROM tbl_students s
+                      JOIN tbl_application r ON s.student_id = r.student_id 
+                      WHERE r.status = 'pending' AND r.club_id = :club_id";
             // Apply school year filter using dateApplied
             if (!empty($schoolYear)) {
                 $query .= " AND r.dateApplied BETWEEN :startDate AND :endDate";
@@ -51,12 +67,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'disapproved_applications':
             // Fetch disapproved applications, filtering by dateDecided
-            $query = "SELECT s.student_id AS 'Student ID', s.firstName AS 'First Name', 
-                            s.middleName AS 'Middle Name', s.lastName AS 'Last Name', 
-                            s.instiEmail AS 'Institutional Email' 
-                    FROM tbl_students s 
-                    JOIN tbl_application r ON s.student_id = r.student_id 
-                    WHERE r.status = 'disapproved' AND r.club_id = :club_id";
+            $query = "SELECT s.student_id AS 'Student ID', 
+                             s.firstName AS 'First Name', 
+                             s.middleName AS 'Middle Name', 
+                             s.lastName AS 'Last Name', 
+                             s.instiEmail AS 'Institutional Email', 
+                             s.year AS 'Year', 
+                             s.department AS 'Department', 
+                             s.course AS 'Course', 
+                             DATE_FORMAT(r.dateApplied, '%m-%d-%Y') AS 'Date Applied', 
+                             DATE_FORMAT(r.dateDecided, '%m-%d-%Y') AS 'Date Disapproved'
+                      FROM tbl_students s
+                      JOIN tbl_application r ON s.student_id = r.student_id 
+                      WHERE r.status = 'disapproved' AND r.club_id = :club_id";
             // Apply school year filter using dateDecided
             if (!empty($schoolYear)) {
                 $query .= " AND r.dateDecided BETWEEN :startDate AND :endDate";
@@ -64,18 +87,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'pending_departure_requests':
-            // Fetch pending departure requests, filtering by dateRequested
-            $query = "SELECT s.student_id AS 'Student ID', s.firstName AS 'First Name', 
-                            s.middleName AS 'Middle Name', s.lastName AS 'Last Name', 
-                            s.instiEmail AS 'Institutional Email' 
-                    FROM tbl_students s 
-                    JOIN tbl_departure_requests d ON s.student_id = d.student_id 
-                    WHERE d.status = 'pending' AND d.club_id = :club_id";
+            // Fetch pending departure requests, including year, department, course, and dateRequested, dateDecided as 'Member Since'
+            $query = "SELECT s.student_id AS 'Student ID', 
+                            s.firstName AS 'First Name', 
+                            s.middleName AS 'Middle Name', 
+                            s.lastName AS 'Last Name', 
+                            s.instiEmail AS 'Institutional Email', 
+                            s.year AS 'Year', 
+                            s.department AS 'Department', 
+                            s.course AS 'Course', 
+                            DATE_FORMAT(d.dateRequested, '%m-%d-%Y') AS 'Date Requested', 
+                            DATE_FORMAT(a.dateDecided, '%m-%d-%Y') AS 'Member Since'
+                    FROM tbl_students s
+                    JOIN tbl_departure_requests d ON s.student_id = d.student_id
+                    JOIN tbl_application a ON s.student_id = a.student_id
+                    WHERE d.status = 'pending' AND a.status = 'active' AND d.club_id = :club_id";
+            
             // Apply school year filter using dateRequested
             if (!empty($schoolYear)) {
                 $query .= " AND d.dateRequested BETWEEN :startDate AND :endDate";
             }
             break;
+
 
         case 'upcoming_events':
             // Fetch upcoming events for the current club, filtering by dateAdded
