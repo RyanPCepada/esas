@@ -90,6 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Set default profile picture
     $profilePic = PROF_PIC_DEFAULT;
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     if (empty($firstName_err) && empty($middleName_err) && empty($lastName_err) && empty($password_err)) {
         $sql = "INSERT INTO tbl_moderators (firstName, middleName, lastName, moderator_id, password, profilePic, dateAdded) 
@@ -99,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(":middleName", $middleName);
             $stmt->bindParam(":lastName", $lastName);
             $stmt->bindParam(":moderator_id", $moderator_id);
-            $stmt->bindParam(":password", $password);
+            $stmt->bindParam(":password", $hashed_password);
             $stmt->bindParam(":profilePic", $profilePic);
 
             if ($stmt->execute()) {
