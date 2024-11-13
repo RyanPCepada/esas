@@ -176,8 +176,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($clubName_err) && empty($description_err) && empty($coverPhoto_err)) {
-        $sql = "INSERT INTO tbl_clubs (clubName, description, mission, vision, history, coverPhoto, founder_id, dateAdded) 
-        VALUES (:clubName, :description, :mission, :vision, :history, :coverPhoto, :admin_id, NOW())";
+        $sql = "INSERT INTO tbl_clubs (clubName, description, mission, vision, history, coverPhoto, slots, founder_id, dateAdded) 
+        VALUES (:clubName, :description, :mission, :vision, :history, :coverPhoto, 0, :admin_id, NOW())";
 
         if ($stmt = $pdo->prepare($sql)) {
             // Bind parameters
@@ -435,46 +435,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <!-- Include Cropper.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-
-
-<script>
-    document.getElementById("moderatorSelect").addEventListener("change", function() {
-        if (this.value === "add_new_moderator") {
-            $("#addModeratorModal").modal("show");
-        }
-    });
-
-    document.getElementById("addModeratorForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-        const form = this;
-        const formData = new FormData(form);
-        formData.append('action', 'add_moderator');
-
-        fetch("<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>", {
-            method: 'POST',
-            body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const select = document.getElementById("moderatorSelect");
-                const newOption = document.createElement("option");
-                newOption.value = data.moderatorId;
-                newOption.text = data.fullName;
-                select.appendChild(newOption);
-                select.value = data.moderatorId;
-
-                $("#addModeratorModal").modal("hide");
-                document.getElementById('newModeratorId').value = data.moderatorId;
-            } else {
-                alert("Error adding moderator.");
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    });
-</script>
-
-
 
 
 
