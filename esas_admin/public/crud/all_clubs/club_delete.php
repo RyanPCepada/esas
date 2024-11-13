@@ -42,6 +42,12 @@ if (isset($_POST["club_id"]) && !empty($_POST["club_id"])) {
         $stmt2->bindParam(":club_id", $param_club_id);
         $stmt2->execute();
 
+        // // Prepare a delete statement for the clubs_and_moderators table
+        // $sql3 = "DELETE FROM tbl_club_recommendations WHERE club_id = :club_id";
+        // $stmt3 = $pdo->prepare($sql3);
+        // $stmt3->bindParam(":club_id", $param_club_id);
+        // $stmt3->execute();
+
         // Log the activity into tbl_activity_logs
         $sql_log = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, student_id) 
                     VALUES (:activity, :dateAdded, :admin_id, :student_id)";
