@@ -186,7 +186,7 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
 
                         <button type="submit" class="btn btn-primary mb-3">Update Officers</button>
                         <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal" data-club-id="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
-                            <i class="fas fa-plus"></i> Add New Officer
+                            <i class="fas fa-plus"></i> Add New Position
                         </button>
                     
                     </form>
@@ -198,7 +198,7 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                         <input type="hidden" name="officer_id" value="<?php echo htmlspecialchars($officersArray[0]['officer_id']); ?>">
                         
                         <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addOfficerModal" data-club-id="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
-                            <i class="fas fa-plus"></i> Add New Officer
+                            <i class="fas fa-plus"></i> Add New Position
                         </button>
 
                     </form>
@@ -219,7 +219,7 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addOfficerModalLabel">Add New Officer</h5>
+                <h5 class="modal-title" id="addOfficerModalLabel">Add New Position</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -230,11 +230,11 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                         <label for="officer_position">Position</label>
                         <input type="text" class="form-control" id="officer_position" name="position" placeholder="Enter Position" required>
                     </div>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label for="officer_student">Select Student</label>
                         <select class="form-control" id="officer_student" name="student_id">
                             <option value="">None</option>
-                            <?php
+                            <php
                             // Fetch students for the current club
                             $studentsSql = "
                                 SELECT DISTINCT s.student_id, CONCAT(s.firstName, ' ', s.lastName) AS fullName
@@ -248,18 +248,18 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                             $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
 
                             foreach ($students as $student): ?>
-                                <option value="<?php echo htmlspecialchars($student['student_id']); ?>">
-                                    <?php echo htmlspecialchars($student['fullName']); ?>
+                                <option value="<php echo htmlspecialchars($student['student_id']); ?>">
+                                    <php echo htmlspecialchars($student['fullName']); ?>
                                 </option>
-                            <?php endforeach; ?>
+                            <php endforeach; ?>
                         </select>
-                    </div>
+                    </div> -->
                     <!-- Use the first officer's club_id to populate the modal -->
                     <input type="hidden" id="club_id" name="club_id" value="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Officer</button>
+                    <button type="submit" class="btn btn-primary">Add Position</button>
                 </div>
             </form>
         </div>
