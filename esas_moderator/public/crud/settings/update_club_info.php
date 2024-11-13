@@ -13,7 +13,7 @@ $moderator_id = $_SESSION['moderator_id'];
 
 // Fetch clubs handled by the active moderator
 $sql = "
-    SELECT c.club_id, c.clubName, c.description, c.mission, c.vision, c.history, c.coverPhoto, c.slots 
+    SELECT c.club_id, c.clubName, c.description, c.mission, c.vision, c.history, c.founder, c.coverPhoto, c.slots 
     FROM tbl_clubs AS c
     JOIN tbl_clubs_and_moderators AS cm ON c.club_id = cm.club_id
     WHERE cm.moderator_id = ?
@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     $mission = $_POST['mission'];
     $vision = $_POST['vision'];
     $history = $_POST['history'];
+    $founder = $_POST['founder'];
     $coverPhoto = $_FILES['coverPhoto']['name'] ? $_FILES['coverPhoto']['name'] : null;
     $slots = $_POST['slots']; // Retrieve the slots value from the form
 
@@ -59,11 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
     // Update club description
     $updateSql = "
         UPDATE tbl_clubs 
-        SET clubName = ?, description = ?, mission = ?, vision = ?, history = ?, coverPhoto = COALESCE(?, coverPhoto), slots = ?, dateModified = NOW() 
+        SET clubName = ?, description = ?, mission = ?, vision = ?, history = ?, founder = ?, coverPhoto = COALESCE(?, coverPhoto), slots = ?, dateModified = NOW() 
         WHERE club_id = ?";
     
     $updateStmt = $pdo->prepare($updateSql);
-    if ($updateStmt->execute([$clubName, $description, $mission, $vision, $history, $fileName ?? null, $slots, $clubId])) {
+    if ($updateStmt->execute([$clubName, $description, $mission, $vision, $history, $founder, $fileName ?? null, $slots, $clubId])) {
         // Log the activity after a successful update
         $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
         $logStmt = $pdo->prepare($logSql);
@@ -121,6 +122,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
                         <div class="form-group">
                             <label for="history">History</label>
                             <textarea class="form-control" id="history" name="history" rows="4" required><?php echo htmlspecialchars($club['history']); ?></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="founder">Founder</label>
+                            <textarea class="form-control" id="founder" name="founder" rows="1" required><?php echo htmlspecialchars($club['founder']); ?></textarea>
                         </div>
                         <div class="form-group">
                             <label for="slots">Membership Limit</label>
