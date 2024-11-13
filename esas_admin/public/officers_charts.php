@@ -313,7 +313,7 @@ try {
                     </div>
                     <div class="col text-center d-flex flex-column align-items-center">
                         <h5>New Chart:</h5>
-                        <img id="newChartImage" src="" alt="New Chart" class="img-fluid" style="border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5); display: none; max-width: 300px; max-height: 300px;" />
+                        <img id="newChartImage" src="" alt="New Chart" class="img-fluid" style="border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5); display: none; max-width: 230px; max-height: 300px;" />
                     </div>
                 </div>
                 <form id="changeForm" action="/esas/esas_admin/public/crud/officers_charts/chart_update.php" method="POST" enctype="multipart/form-data" class="mt-3">
