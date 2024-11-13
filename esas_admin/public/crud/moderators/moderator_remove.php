@@ -16,14 +16,19 @@ if (isset($_POST['club_id']) && isset($_POST['moderator_id'])) {
     $club_id = $_POST['club_id'];
     $moderator_id = $_POST['moderator_id'];
 
-    // Fetch the moderator's full name and email
+    // Fetch the moderator's first name, middle name, last name, and email
     $stmt = $pdo->prepare("SELECT firstName, middleName, lastName, email FROM tbl_moderators WHERE moderator_id = ?");
     $stmt->execute([$moderator_id]);
     $moderator = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($moderator) {
+        // Combine first, middle, and last names into the full name
         $moderator_name = trim($moderator['firstName'] . ' ' . $moderator['middleName'] . ' ' . $moderator['lastName']);
         $moderator_email = $moderator['email']; // Get the moderator's email
+        // Store the individual names for later use
+        $firstName = $moderator['firstName'];
+        $middleName = $moderator['middleName'];
+        $lastName = $moderator['lastName'];
     } else {
         $moderator_name = "Unknown Moderator";
         $moderator_email = ''; // Default empty email if not found
@@ -68,12 +73,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm'])) {
             
             $log_stmt = $pdo->prepare("INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (?, NOW(), ?, ?, ?)");
             $log_stmt->execute([$activity, $admin_id, null, null]); // Assuming student_id is not relevant here
-// Insert into tbl_moderator_archive before removal
-$dateUnassigned = date('Y-m-d H:i:s'); // Capture the current timestamp when unassigned
+            
+            // Insert into tbl_moderator_archive before removal
+            $dateUnassigned = date('Y-m-d H:i:s'); // Capture the current timestamp when unassigned
 
-// Insert into the archive table with moderator_id
-$archive_stmt = $pdo->prepare("INSERT INTO tbl_moderator_archive (moderator_id, fullName, clubName, dateAssigned, dateUnassigned) VALUES (?, ?, ?, ?, ?)");
-$archive_stmt->execute([$moderator_id, $moderator_name, $club_name, $dateAssigned, $dateUnassigned]);
+            // Insert into the archive table with moderator_id, firstName, middleName, lastName
+            $archive_stmt = $pdo->prepare("INSERT INTO tbl_moderator_archive (moderator_id, firstName, middleName, lastName, clubName, dateAssigned, dateUnassigned) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $archive_stmt->execute([$moderator_id, $firstName, $middleName, $lastName, $club_name, $dateAssigned, $dateUnassigned]);
 
             // Send email notification to the moderator about the removal
             $mail = new PHPMailer(true);
