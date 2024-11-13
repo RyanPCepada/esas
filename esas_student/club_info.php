@@ -14,6 +14,7 @@ $description = '';
 $mission = '';
 $vision = '';
 $history = '';
+$founder = '';
 $coverPhoto = '';
 $dateAdded = '';
 $moderators = '';
@@ -55,7 +56,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
     try {
         // Prepare SQL query to fetch club description and moderators' profile pictures
         $stmt = $pdo->prepare("
-            SELECT c.clubName, c.description, c.mission, c.vision, c.history, c.coverPhoto, c.dateAdded, c.slots, 
+            SELECT c.clubName, c.description, c.mission, c.vision, c.history, c.founder, c.coverPhoto, c.dateAdded, c.slots, 
                 m.firstName, m.middleName, m.lastName, m.profilePic,
                 COUNT(DISTINCT CASE WHEN r.status = 'active' THEN r.student_id END) AS membersCount,
                 COUNT(DISTINCT m.moderator_id) AS numModerators
@@ -76,6 +77,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             $mission = htmlspecialchars_decode($club['mission']); // Decode HTML entities
             $vision = htmlspecialchars_decode($club['vision']); // Decode HTML entities
             $history = htmlspecialchars_decode($club['history']); // Decode HTML entities
+            $founder = htmlspecialchars_decode($club['founder']);
             $coverPhoto = htmlspecialchars($club['coverPhoto']);
             $dateAdded = htmlspecialchars($club['dateAdded']);
             $membersCount = htmlspecialchars($club['membersCount']);
@@ -134,6 +136,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
             $mission = 'No mission available for this club.';
             $vision = 'No vision available for this club.';
             $history = 'No history available for this club.';
+            $founder = 'No founder available for this club.';
         }
 
         // Fetch the student's application status for the current club
@@ -169,6 +172,7 @@ if (isset($_GET['club_id']) && is_numeric($_GET['club_id'])) {
     $mission = 'Please provide a valid club ID.';
     $vision = 'Please provide a valid club ID.';
     $history = 'Please provide a valid club ID.';
+    $founder = 'Please provide a valid club ID.';
 }
 
 // Encode clubName for JavaScript use
@@ -276,87 +280,67 @@ $encodedClubName = addslashes($clubName);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         .clubname-and-coverphoto {
-    margin-top: 0px;
-}
+            margin-top: 0px;
+        }
 
-.club-info-coverphoto {
-    width: 100%;
-    height: auto;
-    margin-top: 10px;
-    border-radius: 10px;
-    object-fit: cover;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+        .club-info-coverphoto {
+            width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
-.club-name {
-    font-weight: bold;
-}
+        .club-name {
+            font-weight: bold;
+        }
 
-.divider {
-    margin-top: 40px;
-    border-color: #ccc;
-}
+        .divider {
+            margin-top: 40px;
+            border-color: #ccc;
+        }
 
-.moderators-label {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #003366; /* Dark blue for the label */
-}
+        .moderators-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #003366; /* Dark blue for the label */
+        }
 
-.moderators {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0px; /* Space between moderator elements */
-}
+        .moderators {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0px; /* Space between moderator elements */
+        }
 
-.moderator-item {
-    width: 30%;
-    display: flex;
-    align-items: center;
-    margin: 5px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #f8f9fa;
-    /* background-color: white; */
-    /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); */
-}
+        .moderator-item {
+            width: 30%;
+            display: flex;
+            align-items: center;
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            /* background-color: white; */
+            /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); */
+        }
 
-.moderator-pic {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 5px;
-}
+        .moderator-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
 
-.moderator-name {
-    font-size: 16px;
-    margin: 0;
-    line-height: 1.2;
-}
-
+        .moderator-name {
+            font-size: 16px;
+            margin: 0;
+            line-height: 1.2;
+        }
 
 
 
@@ -585,6 +569,17 @@ $encodedClubName = addslashes($clubName);
                     <?php 
                         $historyLines = explode("\n", $history);
                         foreach ($historyLines as $line) {
+                            echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
+                        }
+                    ?>
+                </div>
+                
+                <div class="founder-section">
+                    <h5 class="profile-section-title"><i class="fas fa-user text-warning" style="font-size: 30px;"></i>
+                    Founder</h5>
+                    <?php 
+                        $founderLines = explode("\n", $founder);
+                        foreach ($founderLines as $line) {
                             echo '<p class="profile-section-content">' . htmlspecialchars($line) . '</p>';
                         }
                     ?>
