@@ -174,6 +174,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $coverPhoto = COVERPHOTO_DEFAULT;
     }
+    
+    $input_slots = trim($_POST["slots"]);
+    if (empty($input_slots)) {
+        $slots = 0;  // Default to 0 if no value is entered
+    } else {
+        $slots = (int) $input_slots; // Cast to integer if there is a value
+    }
+
 
     if (empty($clubName_err) && empty($description_err) && empty($coverPhoto_err)) {
         $sql = "INSERT INTO tbl_clubs (clubName, description, mission, vision, history, coverPhoto, slots, founder_id, dateAdded) 
