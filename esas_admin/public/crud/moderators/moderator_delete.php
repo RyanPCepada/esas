@@ -40,19 +40,23 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
         if ($moderatorData) {
             // Loop through the clubs and insert the data into tbl_moderator_archive
             foreach ($moderatorData as $data) {
-                $moderatorFullName = $data['firstName'] . ' ' . $data['middleName'] . ' ' . $data['lastName'];
+                $firstName = $data['firstName'];
+                $middleName = $data['middleName'];
+                $lastName = $data['lastName'];
                 $clubName = $data['clubName'] ? $data['clubName'] : "None"; // Use "None" if no club is associated
                 $dateAssigned = $data['dateAssigned'];
                 $dateUnassigned = date("Y-m-d H:i:s"); // Date when moderator is unassigned
 
                 // Insert into tbl_moderator_archive
                 $archiveSQL = "
-                    INSERT INTO tbl_moderator_archive (moderator_id, fullName, clubName, dateAssigned, dateUnassigned)
-                    VALUES (:moderator_id, :fullName, :clubName, :dateAssigned, :dateUnassigned)
+                    INSERT INTO tbl_moderator_archive (moderator_id, firstName, middleName, lastName, clubName, dateAssigned, dateUnassigned)
+                    VALUES (:moderator_id, :firstName, :middleName, :lastName, :clubName, :dateAssigned, :dateUnassigned)
                 ";
                 $archiveStmt = $pdo->prepare($archiveSQL);
                 $archiveStmt->bindParam(":moderator_id", $moderator_id); // Store moderator_id
-                $archiveStmt->bindParam(":fullName", $moderatorFullName);
+                $archiveStmt->bindParam(":firstName", $firstName);
+                $archiveStmt->bindParam(":middleName", $middleName);
+                $archiveStmt->bindParam(":lastName", $lastName);
                 $archiveStmt->bindParam(":clubName", $clubName); // Insert "None" if no club
                 $archiveStmt->bindParam(":dateAssigned", $dateAssigned);
                 $archiveStmt->bindParam(":dateUnassigned", $dateUnassigned);
