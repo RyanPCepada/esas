@@ -46,12 +46,12 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>ESAS - Student Dashboard</title>
+    <title>eSAS - Student Dashboard</title>
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../assets/js/jquery-3.6.0.js"></script>
     <link href="../assets/css/styles.css" rel="stylesheet" />
-    <link href="../assets/img/NBSC_LOGO.png" rel="icon">
+    <link href="../assets/img/nbsclogo.png" rel="icon">
     <style>
         .left-sidebar {
             font-size: 16px;
@@ -298,7 +298,7 @@ try {
         <div class="row g-0 h-100">
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
-                    <img src="../assets/img/NBSC_LOGO.png" style="height: 0.3in;">
+                    <img src="../assets/img/nbsclogo.png" style="height: 0.3in;">
                     NBSC SIS</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
@@ -458,13 +458,8 @@ try {
                                     <h4 class="text-muted mb-0">Application Status Summary</h4>
                                 </div>
 
-        <div class="col-md-6 p-1">
                                 <!-- Card for STUDENT TOTAL REGISTRATIONS -->
-
-                    <div class="row px-2">
-
-                                
-                                <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -495,7 +490,7 @@ try {
                                 </div>
                                 
                                 <!-- Card for STUDENT TOTAL ACTIVE CLUBS -->
-                                <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -525,13 +520,10 @@ try {
                                         <p>Total Active Club</p>
                                     </div>
                                 </div>
-                                
-                    </div>
-                    <div class="row px-2">
 
 
                                 <!-- Card for STUDENT TOTAL PENDING APPROVAL -->
-                                <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -561,7 +553,7 @@ try {
 
 
                                 <!-- Card for STUDENT TOTAL DISAPPROVAL -->
-                                <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
                                     <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                         <?php
                                         try {
@@ -588,162 +580,6 @@ try {
                                         <p>Total Disapproval</p>
                                     </div>
                                 </div>
-                                
-                    </div>
-        </div>
-        <div class="col-md-6">
-    <!-- Engagement Line Chart -->
-    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-        <p>Club Engagement</p>
-        <div style="height: 200px; width: 100%; overflow-x: auto;">
-            <canvas id="engagementChart"></canvas>
-        </div>
-        <p id="noDataMessageEngagement" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;"><em>No engagement.</em></p>
-
-        <?php
-        try {
-            $student_id = $_SESSION['student_id'] ?? null;
-
-            if ($student_id) {
-                // Query to get all engagement dates and counts
-                $sql = "
-                    SELECT DATE(dateAdded) as engagementDate, COUNT(*) as loginCount
-                    FROM tbl_activity_logs
-                    WHERE activity = 'You logged in to your account' AND student_id = :student_id
-                    GROUP BY DATE(dateAdded)
-                    ORDER BY engagementDate;
-                ";
-                $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-                $stmt->execute();
-                $engagementData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                // Fetch the earliest and latest engagement dates
-                $startDateQuery = "
-                    SELECT MIN(DATE(dateAdded)) AS startDate, MAX(DATE(dateAdded)) AS endDate
-                    FROM tbl_activity_logs
-                    WHERE student_id = :student_id AND activity = 'You logged in to your account';
-                ";
-                $dateStmt = $pdo->prepare($startDateQuery);
-                $dateStmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-                $dateStmt->execute();
-                $dateRange = $dateStmt->fetch(PDO::FETCH_ASSOC);
-
-                // Set start and end dates
-                $startDate = new DateTime($dateRange['startDate']);
-                $endDate = new DateTime($dateRange['endDate']);
-
-                // Initialize dates and counts with zeros
-                $engagementDates = [];
-                $loginCounts = [];
-                $currentDate = clone $startDate;
-
-                while ($currentDate <= $endDate) {
-                    $formattedDate = $currentDate->format('m-d-y'); // Change to MM-DD-YY format
-                    $engagementDates[] = $formattedDate;
-                    $loginCounts[$formattedDate] = 0;  // Default to zero if no engagement
-                    $currentDate->modify('+1 day');
-                }
-
-                // Populate counts from the engagement data
-                foreach ($engagementData as $row) {
-                    $loginCounts[date('m-d-y', strtotime($row['engagementDate']))] = (int)$row['loginCount'];
-                }
-
-                // Separate keys and values for the chart
-                $engagementDates = array_keys($loginCounts);
-                $loginCounts = array_values($loginCounts);
-
-                // Max login count for y-axis scale
-                $maxLoginCount = max($loginCounts);
-            } else {
-                $engagementDates = [];
-                $loginCounts = [];
-                $maxLoginCount = 1;
-            }
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
-        }
-        ?>
-
-        <!-- Include Chart.js and the Zoom Plugin -->
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
-
-        <script>
-            const engagementDates = <?php echo json_encode($engagementDates); ?>;
-            const loginCounts = <?php echo json_encode($loginCounts); ?>;
-            const hasDataEngagement = loginCounts.some(count => count > 0);
-            const maxLoginCount = <?php echo $maxLoginCount; ?>;
-
-            const engagementChartElement = document.getElementById('engagementChart');
-            const noDataMessageEngagement = document.getElementById('noDataMessageEngagement');
-
-            if (!hasDataEngagement) {
-                engagementChartElement.style.display = 'none';
-                noDataMessageEngagement.style.display = 'block';
-            } else {
-                // Chart.js data and configuration without tension for straight lines
-                const engagementData = {
-                    labels: engagementDates,
-                    datasets: [{
-                        label: 'Logins',
-                        data: loginCounts,
-                        fill: true,
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        tension: 0 // No tension for straight lines
-                    }]
-                };
-
-                const engagementConfig = {
-                    type: 'line',
-                    data: engagementData,
-                    options: {
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                max: 10 // Show only 10 dates initially
-                            },
-                            y: {
-                                beginAtZero: true,
-                                max: maxLoginCount
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            zoom: {
-                                pan: {
-                                    enabled: true,
-                                    mode: 'x',
-                                    onPanComplete: function() {
-                                        engagementChart.update();
-                                    }
-                                },
-                                zoom: {
-                                    wheel: {
-                                        enabled: true
-                                    },
-                                    pinch: {
-                                        enabled: true
-                                    },
-                                    mode: 'x'
-                                }
-                            }
-                        },
-                        responsive: true,
-                        maintainAspectRatio: false
-                    }
-                };
-
-                const engagementChart = new Chart(engagementChartElement, engagementConfig);
-            }
-        </script>
-    </div>
-</div>
-
 
                             </div>
                             <!-- ROW-1 CARDS END -->
