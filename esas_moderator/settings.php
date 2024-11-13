@@ -223,14 +223,6 @@ if (!$club) {
                 </div>
             </div>
         </div>
-
-        
-        <a href="../esas_moderator/public/dashboard.php" class="dashboard-button">
-            <i class="fas fa-chart-line"></i>
-        </a>
-        <a href="../esas_moderator/public/home.php" class="home-button">
-            <i class="fas fa-home"></i>
-        </a>
     </div>
 </body>
 </html>
