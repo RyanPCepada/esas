@@ -166,7 +166,7 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
         <form method="post" action="../esas_moderator/actions/history_delete.php">
             <div class="d-flex justify-content-between mb-2">
                 <p class="text-muted">All your interactions within the system</p>
-                <div>
+                <div class="d-flex align-items-center gap-1">
                     <button type="submit" name="delete" class="history-delete-button" 
                         onclick="
                             const checkboxes = document.querySelectorAll('input[type=checkbox]:checked'); 
@@ -186,6 +186,9 @@ $activities = $stmt_activities->fetchAll(PDO::FETCH_ASSOC); // Fetch all activit
                         onclick="if (<?php echo empty($activities) ? 'true' : 'false'; ?>) { alert('No activities to clear.'); return false; } return confirm('Are you sure you want to clear all activities?');">
                         Clear All
                     </button>
+                    <a href="../esas_moderator/public/dashboard.php" class="dashboard-button ml-1" title="Go to Dashboard">
+                        <h5><i class="fas fa-chart-line text-info"></i></h5>
+                    </a>
                 </div>
             </div>
             <div class="container-fluid container auto-scroll">
