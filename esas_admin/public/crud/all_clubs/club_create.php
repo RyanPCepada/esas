@@ -66,7 +66,7 @@ function getNextModeratorIncrement($pdo, $schoolYearCode) {
     return $nextIncrement;
 }
 
-$moderatorQuery = "SELECT moderator_id, CONCAT(firstName, ' ', lastName) AS moderator_name FROM tbl_moderators";
+$moderatorQuery = "SELECT moderator_id, CONCAT(firstName, ' ', lastName) AS moderator_name FROM tbl_moderators GROUP BY firstName ASC";
 if ($stmt = $pdo->prepare($moderatorQuery)) {
     if ($stmt->execute()) {
         $moderators = $stmt->fetchAll(PDO::FETCH_ASSOC);
