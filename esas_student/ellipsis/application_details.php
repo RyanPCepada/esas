@@ -195,6 +195,10 @@ function formatDate($date) {
                         <hr>
                         <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                         <p><strong>Date Disapproved:</strong> <?php echo formatDate($application['dateDecided']); ?></p>
+                        <br>
+                        <a href="/esas/esas_student/club_info.php?application_id=<?php echo $application_id; ?>&club_id=<?php echo $club_id; ?>" style="font-size: 16px;">
+                            See Club Information
+                        </a>
                     <?php elseif ($status === 'active'): ?>
                         <p class="text-danger"><strong>Approval Remarks:</strong><br><?php echo !empty($application['remark']) ? htmlspecialchars($application['remark']) : 'No remark available.'; ?></p>
                         <p class="text-primary"><strong>Approved by:</strong><br><?php echo !empty($moderatorFullName) ? htmlspecialchars($moderatorFullName) : 'No moderator available.'; ?></p>
