@@ -190,6 +190,9 @@ try {
                                     <a href="../public/crud/moderators/moderator_assign.php" class="btn btn-warning">
                                         <i class="fa fa-plus"></i> Assign A Moderator
                                     </a>
+                                    <a href="../public/crud/moderators/moderator_restore.php" class="btn btn-light" title="Restore Moderator" style="border-radius: 50%;">
+                                        <i class="fas fa-undo"></i>
+                                    </a>
                                 </div>
                             </div>
 
