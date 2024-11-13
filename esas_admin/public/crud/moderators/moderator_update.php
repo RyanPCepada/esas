@@ -252,6 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 FROM tbl_clubs c
                                 JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                                 WHERE cm.moderator_id = ?
+                                ORDER BY c.clubName ASC
                             ");
                             $stmt->execute([$moderator_id]);
                             $currentClubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -271,6 +272,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 WHERE c.club_id NOT IN (
                                     SELECT club_id FROM tbl_clubs_and_moderators WHERE moderator_id = ?
                                 )
+                                ORDER BY c.clubName ASC
                             ");
                             $stmt->execute([$moderator_id]);
                             $availableClubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
