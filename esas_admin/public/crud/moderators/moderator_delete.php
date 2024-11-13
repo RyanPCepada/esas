@@ -27,8 +27,8 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
         $fetchModeratorSQL = "
             SELECT m.firstName, m.middleName, m.lastName, c.clubName, cm.dateAdded AS dateAssigned
             FROM tbl_moderators m
-            JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
-            JOIN tbl_clubs c ON cm.club_id = c.club_id
+            LEFT JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
+            LEFT JOIN tbl_clubs c ON cm.club_id = c.club_id
             WHERE m.moderator_id = :moderator_id
         ";
         $fetchModeratorStmt = $pdo->prepare($fetchModeratorSQL);
@@ -41,7 +41,7 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
             // Loop through the clubs and insert the data into tbl_moderator_archive
             foreach ($moderatorData as $data) {
                 $moderatorFullName = $data['firstName'] . ' ' . $data['middleName'] . ' ' . $data['lastName'];
-                $clubName = $data['clubName'];
+                $clubName = $data['clubName'] ? $data['clubName'] : "None"; // Use "None" if no club is associated
                 $dateAssigned = $data['dateAssigned'];
                 $dateUnassigned = date("Y-m-d H:i:s"); // Date when moderator is unassigned
 
@@ -53,7 +53,7 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
                 $archiveStmt = $pdo->prepare($archiveSQL);
                 $archiveStmt->bindParam(":moderator_id", $moderator_id); // Store moderator_id
                 $archiveStmt->bindParam(":fullName", $moderatorFullName);
-                $archiveStmt->bindParam(":clubName", $clubName);
+                $archiveStmt->bindParam(":clubName", $clubName); // Insert "None" if no club
                 $archiveStmt->bindParam(":dateAssigned", $dateAssigned);
                 $archiveStmt->bindParam(":dateUnassigned", $dateUnassigned);
                 $archiveStmt->execute();
@@ -111,6 +111,7 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
     }
 }
 ?>
+
 
 
 
