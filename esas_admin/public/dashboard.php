@@ -615,6 +615,7 @@ try {
                                 <div class="col-md-6" style="border: 1px solid transparent; padding: 0;">
 
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
+                                        
                                         <!-- Application per SY -->
                                         <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
@@ -626,7 +627,25 @@ try {
 
                                                 <?php
                                                     try {
-                                                        // Fetch the count of members per academic year
+                                                        // Find the earliest and latest years with data in tbl_application
+                                                        $sql = "SELECT 
+                                                                    MIN(YEAR(dateDecided)) AS earliestYear, 
+                                                                    MAX(YEAR(dateDecided)) AS latestYear 
+                                                                FROM tbl_application";
+                                                        $stmt = $pdo->prepare($sql);
+                                                        $stmt->execute();
+                                                        $yearRange = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                                                        $earliestYear = $yearRange['earliestYear'];
+                                                        $latestYear = $yearRange['latestYear'];
+
+                                                        // Generate an array of all school years from earliest to latest
+                                                        $allAcademicYears = [];
+                                                        for ($year = $earliestYear; $year <= $latestYear; $year++) {
+                                                            $allAcademicYears[] = $year . '-' . ($year + 1);
+                                                        }
+
+                                                        // Fetch actual data of active applications per academic year
                                                         $sql = "
                                                             SELECT 
                                                                 CONCAT(
@@ -642,59 +661,60 @@ try {
                                                                         ELSE YEAR(r.dateDecided) 
                                                                     END
                                                                 ) AS academicYear,
-                                                                COUNT(s.student_id) AS memberCount -- Count the number of students for each academic year
+                                                                COUNT(s.student_id) AS memberCount
                                                             FROM tbl_students s
                                                             JOIN tbl_application r ON s.student_id = r.student_id
                                                             WHERE r.status = 'active'
-                                                            GROUP BY academicYear -- Group by academic year
+                                                            GROUP BY academicYear
                                                             ORDER BY academicYear ASC;
                                                         ";
-
                                                         $stmt = $pdo->prepare($sql);
                                                         $stmt->execute();
-                                                        $applicationPerSYData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                        $applicationData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                                                        // Initialize arrays for chart data
-                                                        $academicYears = [];
-                                                        $memberCountsPerSY = [];
+                                                        // Prepare data for chart by merging with all academic years
+                                                        $academicYears = $allAcademicYears;
+                                                        $memberCountsPerSY = array_fill(0, count($academicYears), 0);
 
-                                                        // Populate the arrays with data
-                                                        foreach ($applicationPerSYData as $row) {
-                                                            $academicYears[] = $row['academicYear'];  // Just the academic year
-                                                            $memberCountsPerSY[] = $row['memberCount'];  // Number of members for each academic year
+                                                        // Map actual data to academic years, filling in 0 where no data
+                                                        foreach ($applicationData as $row) {
+                                                            $index = array_search($row['academicYear'], $academicYears);
+                                                            if ($index !== false) {
+                                                                $memberCountsPerSY[$index] = $row['memberCount'];
+                                                            }
                                                         }
 
-                                                        // Fetch the total number of students for max value
+                                                        // Get total number of students for chart scaling
                                                         $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
                                                         $totalStudentsStmt->execute();
                                                         $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
                                                         $totalStudentCount = $totalStudentsData ? (int)$totalStudentsData['totalCount'] : 0;
 
-                                                        // Function to round up to the nearest even number
                                                         function roundUpToEven($number) {
                                                             return $number % 2 === 0 ? $number : $number + 1;
                                                         }
+                                                        // Fetch the maximum member count from the actual application data
+                                                        $maxMemberCountFromData = max($memberCountsPerSY);
 
-                                                        // Adjust max value to nearest even number
-                                                        $maxMemberCount = roundUpToEven($totalStudentCount);
+                                                        // Calculate buffered max member count for the chart (based on the highest actual data point)
+                                                        $buffer = 10; // buffer percentage (you can adjust this if needed)
+                                                        $maxMemberCountWithBuffer = roundUpToEven(ceil($maxMemberCountFromData * (1 + $buffer / 100)));
+
                                                     } catch (PDOException $e) {
-                                                        echo "Error: " . $e->getMessage();
+                                                        echo "Error: " . htmlspecialchars($e->getMessage());
                                                     }
                                                 ?>
+
 
                                                 <!-- Include Chart.js -->
                                                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
                                                 <script>
-                                                    // PHP arrays passed into JavaScript
                                                     const academicYears = <?php echo json_encode($academicYears); ?>;
                                                     const memberCountsPerSY = <?php echo json_encode($memberCountsPerSY); ?>;
-                                                    const maxMemberCount = <?php echo $maxMemberCount; ?>;
+                                                    const maxMemberCountWithBuffer = <?php echo $maxMemberCountWithBuffer; ?>;
 
-                                                    // Check if there is no data to display
                                                     const hasDataSY = memberCountsPerSY.some(count => count > 0);
-
-                                                    // Show or hide the "No Data" message based on data availability
                                                     const applicationPerSYChartElement = document.getElementById('applicationPerSYChart');
                                                     const noDataMessageSY = document.getElementById('noDataMessageSY');
 
@@ -702,7 +722,6 @@ try {
                                                         applicationPerSYChartElement.style.display = 'none';
                                                         noDataMessageSY.style.display = 'block';
                                                     } else {
-                                                        // Data for the chart
                                                         const applicationPerSYData = {
                                                             labels: academicYears,
                                                             datasets: [{
@@ -715,7 +734,6 @@ try {
                                                             }]
                                                         };
 
-                                                        // Configuration for the chart
                                                         const applicationPerSYConfig = {
                                                             type: 'line',
                                                             data: applicationPerSYData,
@@ -723,32 +741,34 @@ try {
                                                                 scales: {
                                                                     x: {
                                                                         ticks: {
-                                                                            maxRotation: 45, // Rotate x-axis labels for better readability
-                                                                            autoSkip: true // Automatically skip labels if too many
+                                                                            maxRotation: 45,
+                                                                            autoSkip: true
                                                                         }
                                                                     },
                                                                     y: {
                                                                         beginAtZero: true,
-                                                                        max: maxMemberCount // Adjust max count dynamically to even number
+                                                                        max: maxMemberCountWithBuffer // Dynamically set the max value based on actual data
                                                                     }
                                                                 },
                                                                 plugins: {
                                                                     legend: {
-                                                                        display: false // Disable the legend to remove label
+                                                                        display: false
                                                                     }
                                                                 },
                                                                 responsive: true,
-                                                                maintainAspectRatio: false // Allow chart to fill container width
+                                                                maintainAspectRatio: false
                                                             }
                                                         };
 
-                                                        // Render the chart
                                                         const applicationPerSYChart = new Chart(applicationPerSYChartElement, applicationPerSYConfig);
                                                     }
+
                                                 </script>
+
                                             </div>
                                         </div>
                                         <!-- Application per SY END-->
+
                                     </div>
 
                                         
