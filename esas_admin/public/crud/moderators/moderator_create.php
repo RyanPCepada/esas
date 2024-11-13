@@ -54,6 +54,27 @@ function getNextModeratorIncrement($pdo, $schoolYearCode) {
     return $nextIncrement;
 }
 
+// Function to check if the generated moderator ID already exists
+function checkModeratorIdExistence($pdo, $moderator_id) {
+    // Check in tbl_moderators
+    $sql = "SELECT COUNT(*) FROM tbl_moderators WHERE moderator_id = :moderator_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':moderator_id', $moderator_id);
+    $stmt->execute();
+    $moderatorExists = $stmt->fetchColumn() > 0;
+
+    // Check in tbl_moderator_archive
+    if (!$moderatorExists) {
+        $sql = "SELECT COUNT(*) FROM tbl_moderator_archive WHERE moderator_id = :moderator_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':moderator_id', $moderator_id);
+        $stmt->execute();
+        $moderatorExists = $stmt->fetchColumn() > 0;
+    }
+
+    return $moderatorExists;
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input_firstName = trim($_POST["firstName"]);
     if (empty($input_firstName)) {
@@ -87,6 +108,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $schoolYearCode = getSchoolYearCode();
     $nextIncrement = getNextModeratorIncrement($pdo, $schoolYearCode);
     $moderator_id = $schoolYearCode . $nextIncrement; // Example: '24250022'
+
+    // Check if the generated ID already exists
+    while (checkModeratorIdExistence($pdo, $moderator_id)) {
+        $nextIncrement = str_pad((int)substr($moderator_id, 4, 4) + 1, 4, '0', STR_PAD_LEFT); 
+        $moderator_id = $schoolYearCode . $nextIncrement; // Regenerate ID if it exists
+    }
 
     // Set default profile picture
     $profilePic = PROF_PIC_DEFAULT;
@@ -144,8 +171,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     unset($pdo);
 }
 ?>
-
-
 
 
 
