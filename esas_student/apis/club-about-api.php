@@ -21,6 +21,7 @@ if (isset($_GET['club_id'])) {
                 c.mission, 
                 c.vision, 
                 c.history, 
+                c.founder, 
                 c.coverPhoto, 
                 c.dateAdded AS clubDateAdded, 
                 c.dateModified AS clubDateModified,
