@@ -63,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['restore'])) {
 }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -75,40 +76,83 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['restore'])) {
     <script src="../../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../../assets/css/styles.css" rel="stylesheet" />
     <link href="../../../assets/img/NBSC_LOGO.png" rel="icon">
+    <style>
+        body {
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        /* h2 {
+            margin-bottom: 20px;
+        } */
+
+        .restore-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .restore-btn:hover {
+            background-color: #218838;
+        }
+
+        .moderator-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+        }
+
+        .moderator-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .row-separator {
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h2 class="mt-5">Restore Moderator</h2>
-            <p>Please select previous moderator(s) to restore.</p>
+    <div class="wrapper">
+        <h2 class="mt-5">Restore Moderator</h2>
+        <p class="text-muted">Please select previous moderator(s) to restore.</p>
 
+        <!-- Display moderators in a container with restore button -->
+        <div class="restore-table">
             <form action="moderator_restore.php" method="POST">
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Full Name</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($moderators as $moderator): ?>
-                                <tr>
-                                    <td><?= $moderator['firstName'] . ' ' . $moderator['middleName'] . ' ' . $moderator['lastName']; ?></td>
-                                    <td>
-                                        <!-- Restore button for each moderator -->
-                                        <button type="submit" class="btn btn-success" name="restore[]" value="<?= $moderator['archive_id']; ?>">Restore</button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+                <?php foreach ($moderators as $moderator): ?>
+                    <div class="moderator-card">
+                        <span class="moderator-name"><?= htmlspecialchars($moderator['firstName'] . ' ' . $moderator['middleName'] . ' ' . $moderator['lastName']); ?></span>
+                        <button type="submit" class="btn restore-btn text-light" name="restore[]" value="<?= htmlspecialchars($moderator['archive_id']); ?>">Restore</button>
+                    </div>
+                <?php endforeach; ?>
             </form>
         </div>
-    </div>
-</div>
 
+        <!-- Option to go back -->
+        <div class="text-start">
+            <a href="../../moderators.php" class="btn btn-secondary">Cancel</a>
+        </div>
+    </div>
 </body>
-</html> 
+</html>
+
