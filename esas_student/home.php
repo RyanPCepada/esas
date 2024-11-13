@@ -435,9 +435,9 @@ try {
                     <div id="dropdownMenu" class="dropdown mt-4">
                         <a href="../esas_student/ellipsis/club_profile.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo urlencode($club_id); ?>&application_id=<?php echo urlencode($application_id); ?>">Club Profile</a>
                         <a href="../esas_student/ellipsis/application_details.php?club_id=<?php echo urlencode($club_id); ?>&application_id=<?php echo urlencode($application_id); ?>">Application Details</a>
-    <?php if ($isSecretary): ?>
-        <a href="../esas_student/ellipsis/accomplishment_reports.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo urlencode($club_id); ?>&application_id=<?php echo urlencode($application_id); ?>">Accomplishment Reports</a>
-    <?php endif; ?>
+                        <?php if ($isSecretary): ?>
+                            <a href="../esas_student/ellipsis/accomplishment_reports.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo urlencode($club_id); ?>&application_id=<?php echo urlencode($application_id); ?>">Accomplishment Reports</a>
+                        <?php endif; ?>
     
                         <a href="../esas_student/ellipsis/history.php?student_id=<?php echo $student_id; ?>">History</a>
                         <?php if ($hasDepartureRequest): ?>
