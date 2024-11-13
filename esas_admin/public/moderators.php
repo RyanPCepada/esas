@@ -315,98 +315,87 @@ try {
 
                         <script>
                             document.addEventListener('DOMContentLoaded', function () {
-                                const searchInput = document.getElementById('moderatorSearch');
-                                const clubSelect = document.getElementById('clubSelect');
-                                const moderatorRows = document.querySelectorAll('.moderator-row');
-                                const rowCountDisplay = document.getElementById('rowCountDisplay');
-                                const noResultsMessage = document.getElementById('noResultsMessage');
-                                const totalRows = moderatorRows.length;
+                            const searchInput = document.getElementById('moderatorSearch');
+                            const clubSelect = document.getElementById('clubSelect');
+                            const moderatorRows = document.querySelectorAll('.moderator-row');
+                            const rowCountDisplay = document.getElementById('rowCountDisplay');
+                            const noResultsMessage = document.getElementById('noResultsMessage');
+                            const totalRows = moderatorRows.length;
 
-                                rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`;
+                            rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`;
 
-                                // Filter by club
-                                clubSelect.addEventListener('change', function () {
-                                    const selectedClub = clubSelect.value;
-                                    let visibleRowCount = 0;
+                            function applyFilters() {
+                                const selectedClub = clubSelect.value;
+                                const searchTerm = searchInput.value.trim().toLowerCase();
+                                let visibleRowCount = 0;
 
-                                    moderatorRows.forEach(function (row) {
-                                        const cells = row.querySelectorAll('td');
-                                        const clubCell = cells[3].textContent.trim(); // Adjust based on club column index
+                                moderatorRows.forEach(function (row) {
+                                    const clubCell = row.querySelectorAll('td')[3].textContent.trim().toLowerCase(); // Club data for filtering
+                                    const cells = row.querySelectorAll('td');
+                                    let rowContainsTerm = false;
 
-                                        // Check if the row matches the selected club
-                                        if (selectedClub === '' || clubCell.includes(clubSelect.options[clubSelect.selectedIndex].text)) {
-                                            row.style.display = '';
-                                            visibleRowCount++;
-                                        } else {
-                                            row.style.display = 'none';
+                                    // Reset cell content and apply highlight if it matches the search term
+                                    cells.forEach(function (cell) {
+                                        cell.innerHTML = removeHighlight(cell.innerHTML);
+                                        if (highlightText(cell, searchTerm)) {
+                                            rowContainsTerm = true;
                                         }
                                     });
 
-                                    rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
-                                    noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
-                                });
-
-                                // Search functionality
-                                searchInput.addEventListener('input', function () {
-                                    const searchTerm = searchInput.value.trim().toLowerCase();
-                                    let visibleRowCount = 0;
-
-                                    moderatorRows.forEach(function (row) {
-                                        let rowContainsTerm = false;
-                                        const cells = row.querySelectorAll('td');
-
-                                        cells.forEach(function (cell) {
-                                            // Reset cell content and apply highlight
-                                            cell.innerHTML = removeHighlight(cell.innerHTML);
-                                            if (highlightText(cell, searchTerm)) {
-                                                rowContainsTerm = true;
-                                            }
-                                        });
-
-                                        if (rowContainsTerm) {
-                                            row.style.display = '';
-                                            visibleRowCount++;
-                                        } else {
-                                            row.style.display = 'none';
-                                        }
-                                    });
-
-                                    rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
-                                    noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
-                                });
-
-                                function highlightText(cell, term) {
-                                    const textNodes = getTextNodes(cell);
-                                    let found = false;
-
-                                    textNodes.forEach(node => {
-                                        const text = node.textContent;
-                                        if (text.toLowerCase().includes(term)) {
-                                            const regex = new RegExp(`(${term})`, 'gi');
-                                            node.replaceWith(document.createElement('span').innerHTML = text.replace(regex, '<mark>$1</mark>'));
-                                            found = true;
-                                        }
-                                    });
-
-                                    return found;
-                                }
-
-                                function removeHighlight(content) {
-                                    return content.replace(/<mark>(.*?)<\/mark>/g, '$1');
-                                }
-
-                                function getTextNodes(node) {
-                                    let textNodes = [];
-                                    if (node.nodeType === Node.TEXT_NODE) {
-                                        textNodes.push(node);
+                                    // Display row only if it matches both club selection and search term
+                                    if ((selectedClub === '' || clubCell.includes(clubSelect.options[clubSelect.selectedIndex].text.toLowerCase())) && rowContainsTerm) {
+                                        row.style.display = '';
+                                        visibleRowCount++;
                                     } else {
-                                        node.childNodes.forEach(child => {
-                                            textNodes = textNodes.concat(getTextNodes(child));
-                                        });
+                                        row.style.display = 'none';
                                     }
-                                    return textNodes;
+                                });
+
+                                rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
+                                noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
+                            }
+
+                            // Attach applyFilters to both events
+                            clubSelect.addEventListener('change', applyFilters);
+                            searchInput.addEventListener('input', applyFilters);
+
+                            function highlightText(cell, term) {
+                                const textNodes = getTextNodes(cell);
+                                let found = false;
+
+                                textNodes.forEach(node => {
+                                    const text = node.textContent;
+                                    if (text.toLowerCase().includes(term)) {
+                                        const regex = new RegExp(`(${term})`, 'gi');
+                                        const highlightedText = text.replace(regex, '<span style="background-color: lightblue; color: #0033cc;">$1</span>');
+                                        const span = document.createElement('span');
+                                        span.innerHTML = highlightedText;
+                                        node.replaceWith(span);
+                                        found = true;
+                                    }
+                                });
+
+                                return found;
+                            }
+
+                            function getTextNodes(element) {
+                                let textNodes = [];
+                                function recurse(node) {
+                                    if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== '') {
+                                        textNodes.push(node);
+                                    } else if (node.nodeType === Node.ELEMENT_NODE) {
+                                        node.childNodes.forEach(recurse);
+                                    }
                                 }
-                            });
+                                recurse(element);
+                                return textNodes;
+                            }
+
+                            function removeHighlight(html) {
+                                return html.replace(/<span[^>]*style="[^"]*background-color:[^"]*"[^>]*>(.*?)<\/span>/gi, '$1');
+                            }
+                        });
+
                         </script>
                         <!-- THE MAIN PAGE END -->
 
