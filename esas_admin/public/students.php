@@ -202,7 +202,7 @@ try {
                                                                 <option value="" selected>All</option>
                                                                 <?php
                                                                 // Fetch clubs from tbl_clubs
-                                                                $clubSql = "SELECT club_id, clubName FROM tbl_clubs";
+                                                                $clubSql = "SELECT club_id, clubName FROM tbl_clubs ORDER BY clubName ASC";
                                                                 $clubs = $pdo->query($clubSql);
                                                                 while ($club = $clubs->fetch()) {
                                                                     echo '<option value="' . htmlspecialchars($club['club_id']) . '">' . htmlspecialchars($club['clubName']) . '</option>';
