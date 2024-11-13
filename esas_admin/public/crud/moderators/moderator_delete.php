@@ -23,40 +23,21 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
         // First, fetch the moderator's details from tbl_moderators
         $moderator_id = trim($_POST["moderator_id"]);
 
-        // Fetch moderator's full name and club associations
+        // Fetch moderator's full name
         $fetchModeratorSQL = "
-            SELECT m.firstName, m.middleName, m.lastName, c.clubName, cm.dateAdded AS dateAssigned
-            FROM tbl_moderators m
-            JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
-            JOIN tbl_clubs c ON cm.club_id = c.club_id
-            WHERE m.moderator_id = :moderator_id
+            SELECT firstName, middleName, lastName 
+            FROM tbl_moderators 
+            WHERE moderator_id = :moderator_id
         ";
         $fetchModeratorStmt = $pdo->prepare($fetchModeratorSQL);
         $fetchModeratorStmt->bindParam(":moderator_id", $moderator_id);
         $fetchModeratorStmt->execute();
-        $moderatorData = $fetchModeratorStmt->fetchAll(PDO::FETCH_ASSOC);
+        $moderatorData = $fetchModeratorStmt->fetch(PDO::FETCH_ASSOC);
 
         // Ensure we have the moderator details
         if ($moderatorData) {
-            // Loop through the clubs and insert the data into tbl_moderator_archive
-            foreach ($moderatorData as $data) {
-                $moderatorFullName = $data['firstName'] . ' ' . $data['middleName'] . ' ' . $data['lastName'];
-                $clubName = $data['clubName'];
-                $dateAssigned = $data['dateAssigned'];
-                $dateUnassigned = date("Y-m-d H:i:s"); // Date when moderator is unassigned
-
-                // Insert into tbl_moderator_archive
-                $archiveSQL = "
-                    INSERT INTO tbl_moderator_archive (fullName, clubName, dateAssigned, dateUnassigned, dateAdded, dateModified)
-                    VALUES (:fullName, :clubName, :dateAssigned, :dateUnassigned, NOW(), NOW())
-                ";
-                $archiveStmt = $pdo->prepare($archiveSQL);
-                $archiveStmt->bindParam(":fullName", $moderatorFullName);
-                $archiveStmt->bindParam(":clubName", $clubName);
-                $archiveStmt->bindParam(":dateAssigned", $dateAssigned);
-                $archiveStmt->bindParam(":dateUnassigned", $dateUnassigned);
-                $archiveStmt->execute();
-            }
+            // Store the moderator's full name
+            $moderatorFullName = $moderatorData['firstName'] . ' ' . $moderatorData['middleName'] . ' ' . $moderatorData['lastName'];
 
             // Prepare a delete statement for the moderators table
             $sql = "DELETE FROM tbl_moderators WHERE moderator_id = :moderator_id";
@@ -99,7 +80,6 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
     unset($stmt);
     unset($stmt2);
     unset($logStmt);
-    unset($archiveStmt);
     unset($pdo);
 } else {
     // Check existence of moderator_id parameter
@@ -110,7 +90,6 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
     }
 }
 ?>
-
 
 
 <!DOCTYPE html>

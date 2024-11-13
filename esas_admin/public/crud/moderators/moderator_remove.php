@@ -39,6 +39,11 @@ if (isset($_POST['club_id']) && isset($_POST['moderator_id'])) {
     } else {
         $club_name = "Unknown Club";
     }
+
+    // Fetch the dateAssigned (dateAdded from tbl_clubs_and_moderators)
+    $stmt = $pdo->prepare("SELECT dateAdded FROM tbl_clubs_and_moderators WHERE club_id = ? AND moderator_id = ?");
+    $stmt->execute([$club_id, $moderator_id]);
+    $dateAssigned = $stmt->fetchColumn();
 } else {
     // Missing club_id or moderator_id
     $_SESSION['error_message'] = "Invalid request. Club ID or Moderator ID is missing.";
@@ -63,6 +68,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm'])) {
             
             $log_stmt = $pdo->prepare("INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (?, NOW(), ?, ?, ?)");
             $log_stmt->execute([$activity, $admin_id, null, null]); // Assuming student_id is not relevant here
+// Insert into tbl_moderator_archive before removal
+$dateUnassigned = date('Y-m-d H:i:s'); // Capture the current timestamp when unassigned
+
+// Insert into the archive table with moderator_id
+$archive_stmt = $pdo->prepare("INSERT INTO tbl_moderator_archive (moderator_id, fullName, clubName, dateAssigned, dateUnassigned) VALUES (?, ?, ?, ?, ?)");
+$archive_stmt->execute([$moderator_id, $moderator_name, $club_name, $dateAssigned, $dateUnassigned]);
 
             // Send email notification to the moderator about the removal
             $mail = new PHPMailer(true);
