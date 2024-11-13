@@ -14,8 +14,8 @@ if (isset($_SESSION['admin_id'])) {
 date_default_timezone_set('Asia/Manila');
 
     $clubId = $_GET['club_id'] ?? null; // Get the club ID from the query string
-    $clubName = $description = $mission = $vision = $history = $coverPhoto = "";
-    $clubName_err = $description_err = $mission_err = $vision_err = $history_err = $coverPhoto_err = "";
+    $clubName = $description = $mission = $vision = $history = $founder = $coverPhoto = "";
+    $clubName_err = $description_err = $mission_err = $vision_err = $history_err = $founder_err = $coverPhoto_err = "";
     define('COVERPHOTO_DEFAULT', 'COVERPHOTO_DEFAULT.png');
 
     // Fetch moderators
@@ -59,6 +59,7 @@ date_default_timezone_set('Asia/Manila');
                     $mission = $club['mission'];
                     $vision = $club['vision'];
                     $history = $club['history'];
+                    $founder = $club['founder'];
                     $coverPhoto = $club['coverPhoto'] ?: COVERPHOTO_DEFAULT; // Set default if no cover photo exists
                     $currentModeratorId = $club['moderator_id']; // Fetch current moderator ID
                 } else {
@@ -122,14 +123,14 @@ if (!empty($_POST['recommendedDepartments'])) {
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $input_clubName = trim($_POST["clubName"]);
         if (empty($input_clubName)) {
-            $clubName_err = "Please enter a club name.";
+            // $clubName_err = "Please enter a club name.";
         } else {
             $clubName = $input_clubName;
         }
 
         $input_description = trim($_POST["description"]);
         if (empty($input_description)) {
-            $description_err = "Please enter club description.";
+            // $description_err = "Please enter club description.";
         } else {
             $description = $input_description;
         }
@@ -137,7 +138,7 @@ if (!empty($_POST['recommendedDepartments'])) {
         // Validate mission
         $input_mission = trim($_POST["mission"]);
         if (empty($input_mission)) {
-            $mission_err = "Please enter the club's mission.";
+            // $mission_err = "Please enter the club's mission.";
         } else {
             $mission = $input_mission;
         }
@@ -145,7 +146,7 @@ if (!empty($_POST['recommendedDepartments'])) {
         // Validate vision
         $input_vision = trim($_POST["vision"]);
         if (empty($input_vision)) {
-            $vision_err = "Please enter the club's vision.";
+            // $vision_err = "Please enter the club's vision.";
         } else {
             $vision = $input_vision;
         }
@@ -153,9 +154,17 @@ if (!empty($_POST['recommendedDepartments'])) {
         // Validate history
         $input_history = trim($_POST["history"]);
         if (empty($input_history)) {
-            $history_err = "Please enter the club's history.";
+            // $history_err = "Please enter the club's history.";
         } else {
             $history = $input_history;
+        }
+    
+        // Validate founder
+        $input_founder = trim($_POST["founder"]);
+        if (empty($input_founder)) {
+            // $founder_err = "Please enter the club's founder.";
+        } else {
+            $founder = $input_founder;
         }
 
         // Handle cover photo upload
@@ -196,13 +205,14 @@ if (!empty($_POST['recommendedDepartments'])) {
 
 
         // Update the club if no errors
-        if (empty($clubName_err) && empty($description_err) && empty($mission_err) && empty($vision_err) && empty($history_err) && empty($coverPhoto_err)) {
+        if (empty($clubName_err) && empty($description_err) && empty($mission_err) && empty($vision_err) && empty($history_err) && empty($founder_err) && empty($coverPhoto_err)) {
             $sql = "UPDATE tbl_clubs 
                     SET clubName = :clubName, 
                         description = :description, 
                         mission = :mission, 
                         vision = :vision, 
                         history = :history, 
+                        founder = :founder, 
                         coverPhoto = :coverPhoto 
                     WHERE club_id = :clubId";
             
@@ -213,6 +223,7 @@ if (!empty($_POST['recommendedDepartments'])) {
                 $stmt->bindParam(":mission", $mission);
                 $stmt->bindParam(":vision", $vision);
                 $stmt->bindParam(":history", $history);
+                $stmt->bindParam(":founder", $founder);
                 $stmt->bindParam(":coverPhoto", $coverPhoto);
                 $stmt->bindParam(":clubId", $clubId);
 
@@ -373,6 +384,11 @@ unset($pdo);
                             <label>History</label>
                             <textarea name="history" class="form-control <?php echo (!empty($history_err)) ? 'is-invalid' : ''; ?>" rows="5"><?php echo htmlspecialchars($history); ?></textarea>
                             <span class="invalid-feedback"><?php echo $history_err; ?></span>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label>Founder</label>
+                            <textarea name="founder" class="form-control <?php echo (!empty($founder_err)) ? 'is-invalid' : ''; ?>" rows="1"><?php echo $founder; ?></textarea>
+                            <span class="invalid-feedback"><?php echo $founder_err; ?></span>
                         </div>
                         <div class="form-group mb-2">
                             <label>Cover Photo</label>
