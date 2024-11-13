@@ -63,7 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['restore'])) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,10 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['restore'])) {
             margin: 0 auto;
             padding: 15px;
         }
-
-        /* h2 {
-            margin-bottom: 20px;
-        } */
 
         .restore-btn {
             background-color: #28a745;
@@ -130,6 +125,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['restore'])) {
             margin-bottom: 20px;
         }
     </style>
+    <script>
+        function confirmRestore() {
+            return confirm('Are you sure you want to restore this moderator?');
+        }
+    </script>
 </head>
 <body>
     <div class="wrapper">
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['restore'])) {
 
         <!-- Display moderators in a container with restore button -->
         <div class="restore-table">
-            <form action="moderator_restore.php" method="POST">
+            <form action="moderator_restore.php" method="POST" onsubmit="return confirmRestore();">
                 <?php foreach ($moderators as $moderator): ?>
                     <div class="moderator-card">
                         <span class="moderator-name"><?= htmlspecialchars($moderator['firstName'] . ' ' . $moderator['middleName'] . ' ' . $moderator['lastName']); ?></span>
@@ -155,4 +155,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['restore'])) {
     </div>
 </body>
 </html>
-
