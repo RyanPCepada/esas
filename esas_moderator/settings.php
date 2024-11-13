@@ -191,7 +191,21 @@ if (!$club) {
             <i class="fa fa-arrow-left"></i>
         </a>
         <h2 class="mt-5">Account Settings</h2>
-        <p class="text-muted">Change your profile, account, and club settings</p>
+
+        <div class="row col-md-12 m-0 p-0">
+            <div class="col-md-11 p-0">
+                <p class="text-muted">Change your profile, account, and club settings</p>
+            </div>
+            <div class="col-md-1 p-1 d-flex align-items-center justify-content-end gap-2">
+                <a href="../esas_moderator/public/my_clubs.php" class="myclubs-button" title="Go to My Clubs">
+                    <h5><i class="fas fa-university text-info"></i></h5>
+                </a>
+                <a href="../esas_moderator/public/dashboard.php" class="dashboard-button" title="Go to Dashboard">
+                    <h5><i class="fas fa-chart-line text-info"></i></h5>
+                </a>
+            </div>
+        </div>
+
 
         <div class="container-fluid container">
             <div class="row">
@@ -209,6 +223,14 @@ if (!$club) {
                 </div>
             </div>
         </div>
+
+        
+        <a href="../esas_moderator/public/dashboard.php" class="dashboard-button">
+            <i class="fas fa-chart-line"></i>
+        </a>
+        <a href="../esas_moderator/public/home.php" class="home-button">
+            <i class="fas fa-home"></i>
+        </a>
     </div>
 </body>
 </html>
