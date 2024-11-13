@@ -172,6 +172,8 @@ $(document).ready(function() {
                                 <!-- <div class="dashed-border"></div> -->
                                 <p><i class="fas fa-history text-warning" style="font-size: 30px;"></i><strong> History</strong></p>
                                 <p class="history">${club.history}</p>
+                                <p><i class="fas fa-user text-warning" style="font-size: 30px;"></i><strong> Founder</strong></p>
+                                <p class="founder">${club.founder}</p>
                                 <a href="../settings.php">Edit Information in Settings</a>
 
                                 <div class="dashed-border"></div>
