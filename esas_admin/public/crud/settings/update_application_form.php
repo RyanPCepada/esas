@@ -26,7 +26,47 @@ $clubQuestions = [];
 foreach ($questions as $question) {
     $clubQuestions[$question['clubName']][] = $question;
 }
+// Check if there are questions to update
+$clubName = !empty($questions) ? $questions[0]['clubName'] : null;
 
+// Process form submission for updating application questions
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['club_id'])) {
+    $clubId = $_POST['club_id'];
+    $updatedQuestions = $_POST['questions']; // Array of questions
+
+    // Initialize a flag to check if any questions were updated
+    $anyUpdate = false;
+
+    // Loop through each question and update it
+    foreach ($updatedQuestions as $questionId => $questionText) {
+        // Update application question
+        $updateSql = "
+            UPDATE tbl_application_questions 
+            SET question = ?, dateModified = NOW() 
+            WHERE question_id = ?";
+
+        $updateStmt = $pdo->prepare($updateSql);
+        if ($updateStmt->execute([$questionText, $questionId])) {
+            // Set flag to true if at least one question was updated
+            $anyUpdate = true;
+        }
+    }
+
+    // Log the activity only if at least one question was updated
+    if ($anyUpdate) {
+        $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id) VALUES (:activity, :dateAdded, :admin_id)";
+        $logStmt = $pdo->prepare($logSql);
+        $logStmt->execute([
+            'activity' => "You updated the questions in " . htmlspecialchars($clubName) . "'s application form",
+            'dateAdded' => date('Y-m-d H:i:s'),
+            'admin_id' => $admin_id
+        ]);
+    }
+
+    echo "Questions updated successfully!";
+    header("location: ../../../settings.php");
+    exit();
+}
 ?>
 
 

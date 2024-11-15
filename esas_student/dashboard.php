@@ -34,7 +34,7 @@ try {
     // Handle database connection or query error
     die("Database error: " . $e->getMessage());
 }
-
+// echo "<script>alert('Hi!');</script>;"
 ?>
 
 
@@ -386,7 +386,7 @@ try {
                 <div class="row g-0 h-100">
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
                         
-
+                        <!-- <php echo "Club ID: $student_id"; ?> -->
 
                         <!-- THE MAIN PAGE START -->
                         <div class="card p-2">

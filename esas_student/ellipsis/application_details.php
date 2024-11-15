@@ -53,10 +53,10 @@ if ($application) {
     $moderatorFullName = trim("{$application['firstName']} {$application['middleName']} {$application['lastName']}");
 }
 
-if (!$application) {
-    echo "Application not found.";
-    exit;
-}
+// if (!$application) {
+//     echo "Application not found.";
+//     exit;
+// }
 
 // Fetch club name
 $sql_club = "SELECT clubName FROM tbl_clubs WHERE club_id = ?";
