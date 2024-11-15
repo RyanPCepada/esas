@@ -40,7 +40,7 @@ $sql_application = "SELECT
                         a.remark, a.status, a.dateApplied, a.dateDecided, a.dateModified, 
                         m.firstName, m.middleName, m.lastName 
                     FROM tbl_application a
-                    JOIN tbl_moderators m ON a.moderator_id = m.moderator_id
+                    LEFT JOIN tbl_moderators m ON a.moderator_id = m.moderator_id
                     WHERE a.student_id = ? AND a.club_id = ? AND a.application_id = ?
                     AND a.status IN ('pending', 'active', 'disapproved')";
 
@@ -48,15 +48,16 @@ $stmt_application = $pdo->prepare($sql_application);
 $stmt_application->execute([$student_id, $club_id, $application_id]);
 $application = $stmt_application->fetch(PDO::FETCH_ASSOC);
 
-if ($application) {
-    // Combine firstName, middleName, and lastName into a single full name
-    $moderatorFullName = trim("{$application['firstName']} {$application['middleName']} {$application['lastName']}");
-}
+// Combine firstName, middleName, and lastName into a single full name (if moderator exists)
+$moderatorFullName = $application && $application['firstName'] 
+    ? trim("{$application['firstName']} {$application['middleName']} {$application['lastName']}") 
+    : 'N/A';
 
-// if (!$application) {
-//     echo "Application not found.";
-//     exit;
-// }
+
+if (!$application) {
+    echo "Application not found.";
+    exit;
+}
 
 // Fetch club name
 $sql_club = "SELECT clubName FROM tbl_clubs WHERE club_id = ?";

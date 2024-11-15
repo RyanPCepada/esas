@@ -639,7 +639,7 @@ $encodedClubName = addslashes($clubName);
                 <?php elseif ($status === 'pending'): ?>
                     <div class="alert alert-warning custom-alert" role="alert">
                         <p class="lead mb-0">You have already applied to this club. Please wait for the Moderator's approval.
-                            <!-- <br><a href="/esas/esas_student/ellipsis/application_details.php?application_id=<?php echo $application_id; ?>&club_id=<?php echo $club_id; ?>"> See Application Details</a> -->
+                            <br><a href="/esas/esas_student/ellipsis/application_details.php?application_id=<?php echo $application_id; ?>&club_id=<?php echo $club_id; ?>"> See Application Details</a>
                         </p>
                     </div>
                 <?php elseif ($disapprovedCount >= 3): ?>
