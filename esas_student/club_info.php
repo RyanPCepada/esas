@@ -614,7 +614,8 @@ $encodedClubName = addslashes($clubName);
                             <a href="/esas/esas_student/home.php?club_id=<?php echo $club_id; ?>"> Go to Home</a>
                         </p>
                     </div>
-                <?php elseif ($membersCount === $slots && ($slots !== 0 || $slots !== NULL)): ?>
+                <!-- <php elseif ($membersCount === $slots && ($slots !== 0 || $slots !== NULL)): ?> -->
+                <?php elseif ($membersCount === $slots && $slots > 0): ?>
                     <div class="alert alert-danger custom-alert" role="alert">
                         <p class="lead mb-0">This club is full.</p>
                     </div>
