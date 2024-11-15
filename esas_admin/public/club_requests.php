@@ -234,13 +234,14 @@ try {
                                             s.department,
                                             s.course,  -- Added Course field
                                             s.profilePic,
+                                            r.dateRequested,
                                             GROUP_CONCAT(DISTINCT r.clubName ORDER BY r.clubName ASC SEPARATOR ', ') AS clubNames
                                         FROM tbl_club_requests r
                                         JOIN tbl_students s ON r.student_id = s.student_id
                                         LEFT JOIN tbl_application reg ON s.student_id = reg.student_id
                                         WHERE reg.status = 'active' -- Filter for active students
                                         GROUP BY r.request_id
-                                        ORDER BY r.dateRequested DESC";
+                                        ORDER BY r.dateRequested ASC";
 
                                 if ($result = $pdo->query($sql)) {
                                     $totalRows = $result->rowCount();
@@ -257,6 +258,7 @@ try {
                                                         <th>Department</th>
                                                         <th>Course</th>
                                                         <th>Status</th>
+                                                        <th>Date Requested</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
@@ -268,10 +270,12 @@ try {
                                             $course = htmlspecialchars($row['course']);
                                             $clubName = htmlspecialchars($row['clubName']);
                                             $status = htmlspecialchars($row['status']);
+                                            $dateRequested = htmlspecialchars($row['dateRequested']);
                                             $requestId = htmlspecialchars($row['request_id']);
                                             $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
                                             $coverPhoto = htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-club.jpg'); // Use a default if no cover photo
 
+                                            $dateRequestedFormatted = (new DateTime($dateRequested))->format('F j, Y');
                                             echo '
                                             <tr class="request-row">
                                                 <td class="text-center p-1">
@@ -289,6 +293,7 @@ try {
                                                 <td>' . $department . '</td>
                                                 <td>' . $course . '</td>  <!-- Course data -->
                                                 <td>' . $status . '</td>
+                                                <td>' . $dateRequestedFormatted . '</td>
                                                 <td class="text-center">
                                                     <a href="../public/crud/club_requests/club_request_read.php?request_id=' . $requestId . '" class="mr-2" title="View Request" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                                     <!--<a href="../public/crud/club_requests/club_request_update.php?request_id=' . $requestId . '" class="mr-2" title="Update Request" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>-->
