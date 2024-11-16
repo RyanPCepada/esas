@@ -93,8 +93,9 @@ try {
             }
         }
 
-        .card {
-            /* Ensure your card styles are here */
+        .main-page {
+            background-color: white;
+            padding: 0px !important;
         }
 
         
@@ -102,7 +103,7 @@ try {
         .icon-style {
             position: absolute;
             font-size: 18px;
-            width: 8%;
+            width: 11%;
             background-color: #4682B4; /*steel blue*/
             background-color: #89CFF0; /* baby blue */
             background-color: #70B9E6; /*darker baby blue*/
@@ -125,6 +126,20 @@ try {
             width: 90% !important;
             height: auto !important;
         }
+        .auto-scroll {
+            overflow-y: none; /* Enable vertical scrolling */
+        }
+
+        .auto-scroll::-webkit-scrollbar {
+            width: 8px; /* Width of the scrollbar */
+        }
+
+        .auto-scroll::-webkit-scrollbar-thumb {
+            background-color: rgba(211, 211, 211, 0.5); /* Light grey with 50% opacity */
+            border-radius: 10px; /* Rounded edges */
+        }
+
+
     </style>
 </head>
 <body>
@@ -212,7 +227,10 @@ try {
             <!-- MAINPAGE BAR -->
             <div class="col-12 col-md-10 bg-lgrey auto-scroll">
                 <div class="row g-0">
-                    <div class="row g-0 p-4 px-2 pt-2">
+                    
+                    <div class="row g-0 p-2 justify-content-center">
+
+                        <!-- DROPDOWN START -->
                         <div class="row align-items-center mb-2">
                             <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
                             <div class="col-auto">
@@ -265,736 +283,609 @@ try {
                             </script>
 
                         </div>
+                        <!-- DROPDOWN END -->
 
                         <!-- THE MAIN PAGE START -->
-                        <div class="card p-2">
-                            <!-- UPPER CARDS START -->
-                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
-                                <!-- Card for TOTAL CLUBS -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <?php
-                                        try {
-                                            // Get the selected school year from the URL or default to the latest
-                                            $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
-
-                                            // Base SQL query to count total clubs up to the end of the selected school year
-                                            $sql = "SELECT COUNT(*) AS total_clubs FROM tbl_clubs";
-
-                                            // If a school year is selected, adjust the SQL to count clubs cumulatively up to July of the end year
-                                            if ($selectedSchoolYear) {
-                                                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
-
-                                                // Define the end date for the school year (July 31 of the end year)
-                                                $endDate = "$endYear-07-31";
-
-                                                // Add the WHERE condition to count clubs added up to the end of the school year
-                                                $sql .= " WHERE dateAdded <= :endDate";
-                                            }
-
-                                            // Prepare and execute the query
-                                            $stmt_clubs = $pdo->prepare($sql);
-
-                                            // Bind the end date parameter if filtering by school year
-                                            if ($selectedSchoolYear) {
-                                                $stmt_clubs->bindParam(':endDate', $endDate);
-                                            }
-
-                                            $stmt_clubs->execute();
-
-                                            // Fetch and display the total number of clubs
-                                            $total_clubs = $stmt_clubs->fetchColumn();
-                                            echo "<h3>" . htmlspecialchars($total_clubs) . "</h3>";
-                                        } catch (PDOException $e) {
-                                            echo "Error: " . htmlspecialchars($e->getMessage());
-                                        }
-                                        ?>
-
-                                        <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Clubs</p>
-                                    </div>
-                                </div>
-
-
-                                <!-- Card for TOTAL MODERATORS -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <?php
-                                        try {
-                                            // Get the selected school year from the URL
-                                            $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : null;
-
-                                            // Base SQL query to count total moderators
-                                            $sql = "SELECT COUNT(*) AS total_moderators FROM tbl_moderators";
-
-                                            // If a school year is selected, count moderators up to the end of that school year (July 31 of the end year)
-                                            if ($selectedSchoolYear) {
-                                                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
-
-                                                // Define end date as July 31 of the end year
-                                                $endDate = "$endYear-07-31";
-
-                                                // Add the WHERE condition for dateAdded up to the end of the school year
-                                                $sql .= " WHERE dateAdded <= :endDate";
-                                            }
-
-                                            // Prepare and execute the query
-                                            $stmt_moderators = $pdo->prepare($sql);
-
-                                            // Bind the endDate parameter if filtering by school year
-                                            if ($selectedSchoolYear) {
-                                                $stmt_moderators->bindParam(':endDate', $endDate);
-                                            }
-
-                                            $stmt_moderators->execute();
-
-                                            // Fetch the total number of moderators
-                                            $total_moderators = $stmt_moderators->fetchColumn();
-                                            echo "<h3>" . htmlspecialchars($total_moderators) . "</h3>";
-                                        } catch (PDOException $e) {
-                                            echo "Error: " . htmlspecialchars($e->getMessage());
-                                        }
-                                        ?>
-                                        <i class="fas fa-user-shield mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Moderators</p>
-                                    </div>
-                                </div>
-
-
-                                <!-- Card for TOTAL STUDENTS -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <?php
-                                        try {
-                                            // Get the selected school year from the URL
-                                            $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : null;
-
-                                            // Base SQL query to count total active students
-                                            $sql = "SELECT COUNT(DISTINCT student_id) AS total_students 
-                                                    FROM tbl_application 
-                                                    WHERE status = 'active'";
-
-                                            // If a school year is selected, count students up to the end of that school year (July 31 of the end year)
-                                            if ($selectedSchoolYear) {
-                                                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
-
-                                                // Define end date as July 31 of the end year
-                                                $endDate = "$endYear-07-31";
-
-                                                // Add the WHERE condition for students active up to the end of the selected school year
-                                                $sql .= " AND dateDecided <= :endDate";
-                                            }
-
-                                            // Prepare and execute the query
-                                            $stmt_students = $pdo->prepare($sql);
-
-                                            // Bind the endDate parameter if filtering by school year
-                                            if ($selectedSchoolYear) {
-                                                $stmt_students->bindParam(':endDate', $endDate);
-                                            }
-
-                                            $stmt_students->execute();
-
-                                            // Fetch the total number of students
-                                            $total_students = $stmt_students->fetchColumn();
-                                            echo "<h3>" . htmlspecialchars($total_students) . "</h3>";
-                                        } catch (PDOException $e) {
-                                            echo "Error: " . htmlspecialchars($e->getMessage());
-                                        }
-                                        ?>
-                                        <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Students</p>
-                                    </div>
-                                </div>
-
-
-                                <!-- Card for CLUB REQUESTS -->
-                                <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
-                                    <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <?php
-                                        try {
-                                            // Get the selected school year from the URL
-                                            $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : null;
-
-                                            // Base SQL query to count total club requests
-                                            $sql = "SELECT COUNT(request_id) AS total_requests 
-                                                    FROM tbl_club_requests";
-
-                                            // If a school year is selected, count requests up to the end of that school year (July 31 of the end year)
-                                            if ($selectedSchoolYear) {
-                                                list($startYear, $endYear) = explode('-', $selectedSchoolYear);
-
-                                                // Define end date as July 31 of the end year
-                                                $endDate = "$endYear-07-31";
-
-                                                // Add the WHERE condition for requests made up to the end of the selected school year
-                                                $sql .= " WHERE dateRequested <= :endDate";
-                                            }
-
-                                            // Prepare and execute the query
-                                            $stmt_requests = $pdo->prepare($sql);
-
-                                            // Bind the endDate parameter if filtering by school year
-                                            if ($selectedSchoolYear) {
-                                                $stmt_requests->bindParam(':endDate', $endDate);
-                                            }
-
-                                            $stmt_requests->execute();
-
-                                            // Fetch the total number of requests
-                                            $total_requests = $stmt_requests->fetchColumn();
-                                            echo "<h3>" . htmlspecialchars($total_requests) . "</h3>";
-                                        } catch (PDOException $e) {
-                                            echo "Error: " . htmlspecialchars($e->getMessage());
-                                        }
-                                        ?>
-                                        <i class="fas fa-envelope mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Club Requests</p>
-                                    </div>
-                                </div>
-
-
-                            </div>
-                            <!-- UPPER CARDS END -->
-
-                            <!-- CHARTS AND DIAGRAMS START -->
-                            <div class="row card-row2 col-12" style="border: 1px solid transparent; margin: 0;">
-
-                                <!-- PIE CHART -->
-                                <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
-                                    <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <p>Total Students per Club</p>
-                                        <div style="height: auto; background-color: transparent;">
+                        <div class="row main-page p-0">
+                            
+                            <!-- DASHBOARD COL-MD-9 START -->
+                            <div class="row cards-charts-graphs col-md-9 m-0 p-0 pt-2">
+                                <!-- UPPER CARDS START -->
+                                <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+                                    <!-- Card for TOTAL CLUBS -->
+                                    <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                             <?php
                                             try {
-                                                // Your original PHP code for fetching the club data...
-                                                $selectedYear = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
-                                                $selectedMonth = isset($_GET['month']) ? intval($_GET['month']) : null;
+                                                // Get the selected school year from the URL or default to the latest
+                                                $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
 
-                                                $sql = "
-                                                    SELECT tc.clubName, COUNT(tr.student_id) AS member_count
-                                                    FROM tbl_application tr
-                                                    JOIN tbl_clubs tc ON tr.club_id = tc.club_id
-                                                    WHERE tr.status = 'active'
-                                                ";
+                                                // Base SQL query to count total clubs up to the end of the selected school year
+                                                $sql = "SELECT COUNT(*) AS total_clubs FROM tbl_clubs";
 
-                                                if ($selectedYear) {
-                                                    $endDate = ($selectedYear + 1) . "-05-31";
-                                                    $sql .= " AND tr.dateDecided <= :endDate";
+                                                // If a school year is selected, adjust the SQL to count clubs cumulatively up to July of the end year
+                                                if ($selectedSchoolYear) {
+                                                    list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+
+                                                    // Define the end date for the school year (July 31 of the end year)
+                                                    $endDate = "$endYear-07-31";
+
+                                                    // Add the WHERE condition to count clubs added up to the end of the school year
+                                                    $sql .= " WHERE dateAdded <= :endDate";
                                                 }
 
-                                                if ($selectedMonth) {
-                                                    $sql .= " AND MONTH(tr.dateDecided) <= :month";
+                                                // Prepare and execute the query
+                                                $stmt_clubs = $pdo->prepare($sql);
+
+                                                // Bind the end date parameter if filtering by school year
+                                                if ($selectedSchoolYear) {
+                                                    $stmt_clubs->bindParam(':endDate', $endDate);
                                                 }
 
-                                                $sql .= " GROUP BY tc.club_id ORDER BY member_count DESC";
+                                                $stmt_clubs->execute();
 
-                                                $stmt = $pdo->prepare($sql);
-
-                                                if ($selectedYear) {
-                                                    $stmt->bindParam(':endDate', $endDate);
-                                                }
-
-                                                if ($selectedMonth) {
-                                                    $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
-                                                }
-
-                                                $stmt->execute();
-                                                $club_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                // Fetch and display the total number of clubs
+                                                $total_clubs = $stmt_clubs->fetchColumn();
+                                                echo "<h3>" . htmlspecialchars($total_clubs) . "</h3>";
                                             } catch (PDOException $e) {
                                                 echo "Error: " . htmlspecialchars($e->getMessage());
                                             }
+                                            ?>
 
-                                            $clubs = [];
-                                            $counts = [];
-                                            $total_students = 0;
+                                            <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
+                                            <p>Total Clubs</p>
+                                        </div>
+                                    </div>
 
-                                            foreach ($club_data as $row) {
-                                                $clubs[] = $row['clubName'];
-                                                $counts[] = $row['member_count'];
-                                                $total_students += $row['member_count'];
-                                            }
 
-                                            $percentages = [];
-                                            foreach ($counts as $count) {
-                                                $percentages[] = $total_students > 0 ? round(($count / $total_students) * 100) : 0;
-                                            }
+                                    <!-- Card for TOTAL MODERATORS -->
+                                    <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                            <?php
+                                            try {
+                                                // Get the selected school year from the URL
+                                                $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : null;
 
-                                            $labels_with_percentages = [];
-                                            foreach ($clubs as $index => $club) {
-                                                $labels_with_percentages[] = $percentages[$index] . '% ' . $club;
+                                                // Base SQL query to count total moderators
+                                                $sql = "SELECT COUNT(*) AS total_moderators FROM tbl_moderators";
+
+                                                // If a school year is selected, count moderators up to the end of that school year (July 31 of the end year)
+                                                if ($selectedSchoolYear) {
+                                                    list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+
+                                                    // Define end date as July 31 of the end year
+                                                    $endDate = "$endYear-07-31";
+
+                                                    // Add the WHERE condition for dateAdded up to the end of the school year
+                                                    $sql .= " WHERE dateAdded <= :endDate";
+                                                }
+
+                                                // Prepare and execute the query
+                                                $stmt_moderators = $pdo->prepare($sql);
+
+                                                // Bind the endDate parameter if filtering by school year
+                                                if ($selectedSchoolYear) {
+                                                    $stmt_moderators->bindParam(':endDate', $endDate);
+                                                }
+
+                                                $stmt_moderators->execute();
+
+                                                // Fetch the total number of moderators
+                                                $total_moderators = $stmt_moderators->fetchColumn();
+                                                echo "<h3>" . htmlspecialchars($total_moderators) . "</h3>";
+                                            } catch (PDOException $e) {
+                                                echo "Error: " . htmlspecialchars($e->getMessage());
                                             }
                                             ?>
-                                            <!-- Canvas for the pie chart -->
-                                            <div style="display: flex; justify-content: center;">
-                                                <canvas id="pieChart"></canvas>
-                                            </div>
-                                            <p id="noDataMessage" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 35%;"><em>No students.</em></p>
-                                            <!-- Custom Legends -->
-                                            <div id="customLegend" style="margin-top: 15px; text-align: center;"></div>
+                                            <i class="fas fa-user-shield mt-2 me-2 p-2 icon-style"></i>
+                                            <p>Total Moderators</p>
+                                        </div>
+                                    </div>
 
-                                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                                            <script>
-                                                const labelsWithPercentages = <?php echo json_encode($labels_with_percentages); ?>;
-                                                const counts = <?php echo json_encode($counts); ?>;
-                                                const ctx = document.getElementById('pieChart').getContext('2d');
-                                                const noDataMessage = document.getElementById('noDataMessage');
-                                                const customLegend = document.getElementById('customLegend');
 
-                                                // Generate 50 distinct colors for clubs
-                                                const backgroundColors = [
-                                                    'rgba(65, 105, 225, 0.8)', 'rgba(255, 105, 180, 0.8)', 'rgba(255, 215, 0, 0.8)', 'rgba(0, 255, 255, 0.8)',
-                                                    'rgba(255, 165, 0, 0.8)', 'rgba(0, 255, 0, 0.8)', 'rgba(138, 43, 226, 0.8)', 'rgba(255, 69, 0, 0.8)',
-                                                    'rgba(139, 0, 0, 0.8)', 'rgba(0, 0, 139, 0.8)', 'rgba(144, 238, 144, 0.8)', 'rgba(32, 178, 170, 0.8)',
-                                                    'rgba(218, 112, 214, 0.8)', 'rgba(255, 20, 147, 0.8)', 'rgba(255, 182, 193, 0.8)', 'rgba(210, 105, 30, 0.8)',
-                                                    'rgba(255, 160, 122, 0.8)', 'rgba(70, 130, 180, 0.8)', 'rgba(189, 183, 107, 0.8)', 'rgba(0, 191, 255, 0.8)',
-                                                    'rgba(255, 228, 181, 0.8)', 'rgba(152, 251, 152, 0.8)', 'rgba(100, 149, 237, 0.8)', 'rgba(233, 150, 122, 0.8)',
-                                                    'rgba(255, 215, 0, 0.8)', 'rgba(186, 85, 211, 0.8)', 'rgba(128, 0, 128, 0.8)', 'rgba(255, 99, 71, 0.8)',
-                                                    'rgba(250, 128, 114, 0.8)', 'rgba(95, 158, 160, 0.8)', 'rgba(123, 104, 238, 0.8)', 'rgba(255, 250, 205, 0.8)',
-                                                    'rgba(72, 209, 204, 0.8)', 'rgba(175, 238, 238, 0.8)', 'rgba(173, 255, 47, 0.8)', 'rgba(124, 252, 0, 0.8)',
-                                                    'rgba(240, 128, 128, 0.8)', 'rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)',
-                                                    'rgba(75, 192, 192, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 159, 64, 0.8)', 'rgba(199, 21, 133, 0.8)',
-                                                    'rgba(255, 140, 0, 0.8)', 'rgba(255, 69, 0, 0.8)', 'rgba(34, 139, 34, 0.8)', 'rgba(106, 90, 205, 0.8)',
-                                                    'rgba(127, 255, 212, 0.8)', 'rgba(240, 230, 140, 0.8)', 'rgba(189, 183, 107, 0.8)', 'rgba(255, 228, 225, 0.8)'
-                                                ];
+                                    <!-- Card for TOTAL STUDENTS -->
+                                    <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                            <?php
+                                            try {
+                                                // Get the selected school year from the URL
+                                                $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : null;
 
-                                                // If there's no data, display the "No students" message
-                                                if (counts.length === 0 || labelsWithPercentages.length === 0) {
-                                                    document.getElementById('pieChart').style.display = 'none';
-                                                    noDataMessage.style.display = 'block';
-                                                } else {
-                                                    // Initialize the pie chart
-                                                    const pieChart = new Chart(ctx, {
-                                                        type: 'pie',
-                                                        data: {
-                                                            labels: labelsWithPercentages,
-                                                            datasets: [{
-                                                                data: counts,
-                                                                backgroundColor: backgroundColors.slice(0, counts.length),
-                                                                borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
-                                                                borderWidth: 1
-                                                            }]
-                                                        },
-                                                        options: {
-                                                            responsive: true,
-                                                            plugins: {
-                                                                legend: {
-                                                                    display: false // Disable the default legend
-                                                                },
-                                                                tooltip: {
-                                                                    callbacks: {
-                                                                        label: function(tooltipItem) {
-                                                                            return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
+                                                // Base SQL query to count total active students
+                                                $sql = "SELECT COUNT(DISTINCT student_id) AS total_students 
+                                                        FROM tbl_application 
+                                                        WHERE status = 'active'";
+
+                                                // If a school year is selected, count students up to the end of that school year (July 31 of the end year)
+                                                if ($selectedSchoolYear) {
+                                                    list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+
+                                                    // Define end date as July 31 of the end year
+                                                    $endDate = "$endYear-07-31";
+
+                                                    // Add the WHERE condition for students active up to the end of the selected school year
+                                                    $sql .= " AND dateDecided <= :endDate";
+                                                }
+
+                                                // Prepare and execute the query
+                                                $stmt_students = $pdo->prepare($sql);
+
+                                                // Bind the endDate parameter if filtering by school year
+                                                if ($selectedSchoolYear) {
+                                                    $stmt_students->bindParam(':endDate', $endDate);
+                                                }
+
+                                                $stmt_students->execute();
+
+                                                // Fetch the total number of students
+                                                $total_students = $stmt_students->fetchColumn();
+                                                echo "<h3>" . htmlspecialchars($total_students) . "</h3>";
+                                            } catch (PDOException $e) {
+                                                echo "Error: " . htmlspecialchars($e->getMessage());
+                                            }
+                                            ?>
+                                            <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
+                                            <p>Total Students</p>
+                                        </div>
+                                    </div>
+
+
+                                    <!-- Card for CLUB REQUESTS -->
+                                    <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
+                                        <div class="card p-2" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                            <?php
+                                            try {
+                                                // Get the selected school year from the URL
+                                                $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : null;
+
+                                                // Base SQL query to count total club requests
+                                                $sql = "SELECT COUNT(request_id) AS total_requests 
+                                                        FROM tbl_club_requests";
+
+                                                // If a school year is selected, count requests up to the end of that school year (July 31 of the end year)
+                                                if ($selectedSchoolYear) {
+                                                    list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+
+                                                    // Define end date as July 31 of the end year
+                                                    $endDate = "$endYear-07-31";
+
+                                                    // Add the WHERE condition for requests made up to the end of the selected school year
+                                                    $sql .= " WHERE dateRequested <= :endDate";
+                                                }
+
+                                                // Prepare and execute the query
+                                                $stmt_requests = $pdo->prepare($sql);
+
+                                                // Bind the endDate parameter if filtering by school year
+                                                if ($selectedSchoolYear) {
+                                                    $stmt_requests->bindParam(':endDate', $endDate);
+                                                }
+
+                                                $stmt_requests->execute();
+
+                                                // Fetch the total number of requests
+                                                $total_requests = $stmt_requests->fetchColumn();
+                                                echo "<h3>" . htmlspecialchars($total_requests) . "</h3>";
+                                            } catch (PDOException $e) {
+                                                echo "Error: " . htmlspecialchars($e->getMessage());
+                                            }
+                                            ?>
+                                            <i class="fas fa-envelope mt-2 me-2 p-2 icon-style"></i>
+                                            <p>Total Club Requests</p>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <!-- UPPER CARDS END -->
+
+                                <!-- CHARTS AND DIAGRAMS START -->
+                                <div class="row card-row2 col-md-12" style="border: 1px solid transparent; margin: 0;">
+
+                                    <!-- PIE CHART -->
+                                    <div class="col-md-6 p-1" style="border: 1px solid transparent; padding: 0;">
+                                        <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                            <p>Total Students per Club</p>
+                                            <div style="height: auto; background-color: transparent;">
+                                                <?php
+                                                try {
+                                                    // Your original PHP code for fetching the club data...
+                                                    $selectedYear = isset($_GET['school_year']) ? intval($_GET['school_year']) : null;
+                                                    $selectedMonth = isset($_GET['month']) ? intval($_GET['month']) : null;
+
+                                                    $sql = "
+                                                        SELECT tc.clubName, COUNT(tr.student_id) AS member_count
+                                                        FROM tbl_application tr
+                                                        JOIN tbl_clubs tc ON tr.club_id = tc.club_id
+                                                        WHERE tr.status = 'active'
+                                                    ";
+
+                                                    if ($selectedYear) {
+                                                        $endDate = ($selectedYear + 1) . "-05-31";
+                                                        $sql .= " AND tr.dateDecided <= :endDate";
+                                                    }
+
+                                                    if ($selectedMonth) {
+                                                        $sql .= " AND MONTH(tr.dateDecided) <= :month";
+                                                    }
+
+                                                    $sql .= " GROUP BY tc.club_id ORDER BY member_count DESC";
+
+                                                    $stmt = $pdo->prepare($sql);
+
+                                                    if ($selectedYear) {
+                                                        $stmt->bindParam(':endDate', $endDate);
+                                                    }
+
+                                                    if ($selectedMonth) {
+                                                        $stmt->bindParam(':month', $selectedMonth, PDO::PARAM_INT);
+                                                    }
+
+                                                    $stmt->execute();
+                                                    $club_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                } catch (PDOException $e) {
+                                                    echo "Error: " . htmlspecialchars($e->getMessage());
+                                                }
+
+                                                $clubs = [];
+                                                $counts = [];
+                                                $total_students = 0;
+
+                                                foreach ($club_data as $row) {
+                                                    $clubs[] = $row['clubName'];
+                                                    $counts[] = $row['member_count'];
+                                                    $total_students += $row['member_count'];
+                                                }
+
+                                                $percentages = [];
+                                                foreach ($counts as $count) {
+                                                    $percentages[] = $total_students > 0 ? round(($count / $total_students) * 100) : 0;
+                                                }
+
+                                                $labels_with_percentages = [];
+                                                foreach ($clubs as $index => $club) {
+                                                    $labels_with_percentages[] = $percentages[$index] . '% ' . $club;
+                                                }
+                                                ?>
+                                                <!-- Canvas for the pie chart -->
+                                                <div style="display: flex; justify-content: center;">
+                                                    <canvas id="pieChart"></canvas>
+                                                </div>
+                                                <p id="noDataMessage" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 35%;"><em>No students.</em></p>
+                                                <!-- Custom Legends -->
+                                                <div class="auto-scroll" id="customLegend" style="height: 245px; margin-top: 15px; text-align: center;"></div>
+
+                                                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                                                <script>
+                                                    const labelsWithPercentages = <?php echo json_encode($labels_with_percentages); ?>;
+                                                    const counts = <?php echo json_encode($counts); ?>;
+                                                    const ctx = document.getElementById('pieChart').getContext('2d');
+                                                    const noDataMessage = document.getElementById('noDataMessage');
+                                                    const customLegend = document.getElementById('customLegend');
+
+                                                    // Generate 50 distinct colors for clubs
+                                                    const backgroundColors = [
+                                                        'rgba(65, 105, 225, 0.8)', 'rgba(255, 105, 180, 0.8)', 'rgba(255, 215, 0, 0.8)', 'rgba(0, 255, 255, 0.8)',
+                                                        'rgba(255, 165, 0, 0.8)', 'rgba(0, 255, 0, 0.8)', 'rgba(138, 43, 226, 0.8)', 'rgba(255, 69, 0, 0.8)',
+                                                        'rgba(139, 0, 0, 0.8)', 'rgba(0, 0, 139, 0.8)', 'rgba(144, 238, 144, 0.8)', 'rgba(32, 178, 170, 0.8)',
+                                                        'rgba(218, 112, 214, 0.8)', 'rgba(255, 20, 147, 0.8)', 'rgba(255, 182, 193, 0.8)', 'rgba(210, 105, 30, 0.8)',
+                                                        'rgba(255, 160, 122, 0.8)', 'rgba(70, 130, 180, 0.8)', 'rgba(189, 183, 107, 0.8)', 'rgba(0, 191, 255, 0.8)',
+                                                        'rgba(255, 228, 181, 0.8)', 'rgba(152, 251, 152, 0.8)', 'rgba(100, 149, 237, 0.8)', 'rgba(233, 150, 122, 0.8)',
+                                                        'rgba(255, 215, 0, 0.8)', 'rgba(186, 85, 211, 0.8)', 'rgba(128, 0, 128, 0.8)', 'rgba(255, 99, 71, 0.8)',
+                                                        'rgba(250, 128, 114, 0.8)', 'rgba(95, 158, 160, 0.8)', 'rgba(123, 104, 238, 0.8)', 'rgba(255, 250, 205, 0.8)',
+                                                        'rgba(72, 209, 204, 0.8)', 'rgba(175, 238, 238, 0.8)', 'rgba(173, 255, 47, 0.8)', 'rgba(124, 252, 0, 0.8)',
+                                                        'rgba(240, 128, 128, 0.8)', 'rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)',
+                                                        'rgba(75, 192, 192, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 159, 64, 0.8)', 'rgba(199, 21, 133, 0.8)',
+                                                        'rgba(255, 140, 0, 0.8)', 'rgba(255, 69, 0, 0.8)', 'rgba(34, 139, 34, 0.8)', 'rgba(106, 90, 205, 0.8)',
+                                                        'rgba(127, 255, 212, 0.8)', 'rgba(240, 230, 140, 0.8)', 'rgba(189, 183, 107, 0.8)', 'rgba(255, 228, 225, 0.8)'
+                                                    ];
+
+                                                    // If there's no data, display the "No students" message
+                                                    if (counts.length === 0 || labelsWithPercentages.length === 0) {
+                                                        document.getElementById('pieChart').style.display = 'none';
+                                                        noDataMessage.style.display = 'block';
+                                                    } else {
+                                                        // Initialize the pie chart
+                                                        const pieChart = new Chart(ctx, {
+                                                            type: 'pie',
+                                                            data: {
+                                                                labels: labelsWithPercentages,
+                                                                datasets: [{
+                                                                    data: counts,
+                                                                    backgroundColor: backgroundColors.slice(0, counts.length),
+                                                                    borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
+                                                                    borderWidth: 1
+                                                                }]
+                                                            },
+                                                            options: {
+                                                                responsive: true,
+                                                                plugins: {
+                                                                    legend: {
+                                                                        display: false // Disable the default legend
+                                                                    },
+                                                                    tooltip: {
+                                                                        callbacks: {
+                                                                            label: function(tooltipItem) {
+                                                                                return labelsWithPercentages[tooltipItem.dataIndex] + ': ' + counts[tooltipItem.dataIndex];
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
                                                             }
-                                                        }
-                                                    });
+                                                        });
 
-                                                    // Generate custom legends manually
-                                                    let legendHtml = '';
-                                                    labelsWithPercentages.forEach((label, index) => {
-                                                        legendHtml += `
-                                                            <span style="display: inline-block; margin-right: 10px;">
-                                                                <span style="display: inline-block; width: 12px; height: 12px; background-color: ${backgroundColors[index]}; margin-right: 5px;"></span>
-                                                                ${label}
-                                                            </span>`;
-                                                    });
+                                                        // Generate custom legends manually
+                                                        let legendHtml = '';
+                                                        labelsWithPercentages.forEach((label, index) => {
+                                                            legendHtml += `
+                                                                <span style="display: inline-block; margin-right: 10px;">
+                                                                    <span style="display: inline-block; width: 12px; height: 12px; background-color: ${backgroundColors[index]}; margin-right: 5px;"></span>
+                                                                    ${label}
+                                                                </span>`;
+                                                        });
 
-                                                    customLegend.innerHTML = legendHtml;
-                                                }
-                                            </script>
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- PIE CHART END -->
-
-                                <!-- OTHER CHARTS -->
-                                <div class="col-md-6" style="border: 1px solid transparent; padding: 0;">
-
-                                    <div class="row" style="border: 1px solid transparent; margin: 0;">
-                                        
-                                        <!-- Application per SY -->
-                                        <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
-                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Total Application per SY</p>
-                                                <div style="height: 100%; width: 100%; background-color: transparent;">
-                                                    <canvas id="applicationPerSYChart"></canvas>
-                                                </div>
-                                                <p id="noDataMessageSY" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;"><em>No students.</em></p>
-
-                                                <?php
-                                                    try {
-                                                        // Find the earliest and latest years with data in tbl_application
-                                                        $sql = "SELECT 
-                                                                    MIN(YEAR(dateDecided)) AS earliestYear, 
-                                                                    MAX(YEAR(dateDecided)) AS latestYear 
-                                                                FROM tbl_application";
-                                                        $stmt = $pdo->prepare($sql);
-                                                        $stmt->execute();
-                                                        $yearRange = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                                                        $earliestYear = $yearRange['earliestYear'];
-                                                        $latestYear = $yearRange['latestYear'];
-
-                                                        // Generate an array of all school years from earliest to latest
-                                                        $allAcademicYears = [];
-                                                        for ($year = $earliestYear; $year <= $latestYear; $year++) {
-                                                            $allAcademicYears[] = $year . '-' . ($year + 1);
-                                                        }
-
-                                                        // Fetch actual data of active applications per academic year
-                                                        $sql = "
-                                                            SELECT 
-                                                                CONCAT(
-                                                                    CASE 
-                                                                        WHEN MONTH(r.dateDecided) >= 8 
-                                                                        THEN YEAR(r.dateDecided) 
-                                                                        ELSE YEAR(r.dateDecided) - 1 
-                                                                    END, 
-                                                                    '-', 
-                                                                    CASE 
-                                                                        WHEN MONTH(r.dateDecided) >= 8 
-                                                                        THEN YEAR(r.dateDecided) + 1 
-                                                                        ELSE YEAR(r.dateDecided) 
-                                                                    END
-                                                                ) AS academicYear,
-                                                                COUNT(s.student_id) AS memberCount
-                                                            FROM tbl_students s
-                                                            JOIN tbl_application r ON s.student_id = r.student_id
-                                                            WHERE r.status = 'active'
-                                                            GROUP BY academicYear
-                                                            ORDER BY academicYear ASC;
-                                                        ";
-                                                        $stmt = $pdo->prepare($sql);
-                                                        $stmt->execute();
-                                                        $applicationData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                                                        // Prepare data for chart by merging with all academic years
-                                                        $academicYears = $allAcademicYears;
-                                                        $memberCountsPerSY = array_fill(0, count($academicYears), 0);
-
-                                                        // Map actual data to academic years, filling in 0 where no data
-                                                        foreach ($applicationData as $row) {
-                                                            $index = array_search($row['academicYear'], $academicYears);
-                                                            if ($index !== false) {
-                                                                $memberCountsPerSY[$index] = $row['memberCount'];
-                                                            }
-                                                        }
-
-                                                        // Get total number of students for chart scaling
-                                                        $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
-                                                        $totalStudentsStmt->execute();
-                                                        $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
-                                                        $totalStudentCount = $totalStudentsData ? (int)$totalStudentsData['totalCount'] : 0;
-
-                                                        function roundUpToEven($number) {
-                                                            return $number % 2 === 0 ? $number : $number + 1;
-                                                        }
-                                                        // Fetch the maximum member count from the actual application data
-                                                        $maxMemberCountFromData = max($memberCountsPerSY);
-
-                                                        // Calculate buffered max member count for the chart (based on the highest actual data point)
-                                                        $buffer = 10; // buffer percentage (you can adjust this if needed)
-                                                        $maxMemberCountWithBuffer = roundUpToEven(ceil($maxMemberCountFromData * (1 + $buffer / 100)));
-
-                                                    } catch (PDOException $e) {
-                                                        echo "Error: " . htmlspecialchars($e->getMessage());
+                                                        customLegend.innerHTML = legendHtml;
                                                     }
-                                                ?>
-
-
-                                                <!-- Include Chart.js -->
-                                                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-                                                <script>
-                                                    const academicYears = <?php echo json_encode($academicYears); ?>;
-                                                    const memberCountsPerSY = <?php echo json_encode($memberCountsPerSY); ?>;
-                                                    const maxMemberCountWithBuffer = <?php echo $maxMemberCountWithBuffer; ?>;
-
-                                                    const hasDataSY = memberCountsPerSY.some(count => count > 0);
-                                                    const applicationPerSYChartElement = document.getElementById('applicationPerSYChart');
-                                                    const noDataMessageSY = document.getElementById('noDataMessageSY');
-
-                                                    if (!hasDataSY) {
-                                                        applicationPerSYChartElement.style.display = 'none';
-                                                        noDataMessageSY.style.display = 'block';
-                                                    } else {
-                                                        const applicationPerSYData = {
-                                                            labels: academicYears,
-                                                            datasets: [{
-                                                                label: 'Application per SY',
-                                                                data: memberCountsPerSY,
-                                                                fill: true,
-                                                                borderColor: 'rgba(75, 192, 192, 1)',
-                                                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                                                tension: 0.1
-                                                            }]
-                                                        };
-
-                                                        const applicationPerSYConfig = {
-                                                            type: 'line',
-                                                            data: applicationPerSYData,
-                                                            options: {
-                                                                scales: {
-                                                                    x: {
-                                                                        ticks: {
-                                                                            maxRotation: 45,
-                                                                            autoSkip: true
-                                                                        }
-                                                                    },
-                                                                    y: {
-                                                                        beginAtZero: true,
-                                                                        max: maxMemberCountWithBuffer // Dynamically set the max value based on actual data
-                                                                    }
-                                                                },
-                                                                plugins: {
-                                                                    legend: {
-                                                                        display: false
-                                                                    }
-                                                                },
-                                                                responsive: true,
-                                                                maintainAspectRatio: false
-                                                            }
-                                                        };
-
-                                                        const applicationPerSYChart = new Chart(applicationPerSYChartElement, applicationPerSYConfig);
-                                                    }
-
                                                 </script>
 
                                             </div>
                                         </div>
-                                        <!-- Application per SY END-->
-
                                     </div>
+                                    <!-- PIE CHART END -->
 
-                                        
-                                    <div class="row" style="border: 1px solid transparent; margin: 0;">
-                                        <!-- Year Level Count -->
-                                        <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
-                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Total Year Level Count</p>
-                                                <div style="height: auto; background-color: transparent;">
+                                    <!-- OTHER CHARTS -->
+                                    <div class="col-md-6" style="border: 1px solid transparent; padding: 0;">
+
+                                        <div class="row" style="border: 1px solid transparent; margin: 0;">
+                                            
+                                            <!-- Application per SY -->
+                                            <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
+                                                <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                                    <p>Total Application per SY</p>
+                                                    <div style="height: 100%; width: 100%; background-color: transparent;">
+                                                        <canvas id="applicationPerSYChart"></canvas>
+                                                    </div>
+                                                    <p id="noDataMessageSY" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;"><em>No students.</em></p>
+
                                                     <?php
-                                                    try {
-                                                        // Get the selected school year from the URL parameter or default to the current school year
-                                                        $currentYear = date('Y');
-                                                        $selectedSchoolYear = isset($_GET['school_year']) ? intval($_GET['school_year']) : $currentYear;
-                                                        $nextSchoolYear = $selectedSchoolYear + 1;
+                                                        try {
+                                                            // Find the earliest and latest years with data in tbl_application
+                                                            $sql = "SELECT 
+                                                                        MIN(YEAR(dateDecided)) AS earliestYear, 
+                                                                        MAX(YEAR(dateDecided)) AS latestYear 
+                                                                    FROM tbl_application";
+                                                            $stmt = $pdo->prepare($sql);
+                                                            $stmt->execute();
+                                                            $yearRange = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                                                        // Define end date as July 31 of the next school year
-                                                        $endDate = "$nextSchoolYear-07-31";
+                                                            $earliestYear = $yearRange['earliestYear'];
+                                                            $latestYear = $yearRange['latestYear'];
 
-                                                        // SQL Query to fetch year level counts by school year
-                                                        $sql = "
-                                                            SELECT s.year, COUNT(DISTINCT s.student_id) AS count
-                                                            FROM tbl_students s
-                                                            JOIN tbl_application r ON s.student_id = r.student_id
-                                                            WHERE r.status = 'active'
-                                                            AND r.dateDecided <= :endDate
-                                                            GROUP BY s.year
-                                                        ";
-
-                                                        $stmt = $pdo->prepare($sql);
-                                                        $stmt->bindParam(':endDate', $endDate);
-                                                        $stmt->execute();
-                                                        
-                                                        // Fetch the results into an associative array
-                                                        $yearData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                                                        // Initialize arrays for years and counts
-                                                        $years = ['1', '2', '3', '4']; // Ensure all years are included
-                                                        $counts = [0, 0, 0, 0]; // Initialize with zeros
-
-                                                        // Populate the counts array based on fetched data
-                                                        foreach ($yearData as $row) {
-                                                            $year = (int)$row['year']; // Ensure $year is an integer
-                                                            $count = (int)$row['count']; // Ensure $count is an integer
-
-                                                            // Check if $year is within the valid range
-                                                            if ($year >= 1 && $year <= 4) {
-                                                                $counts[$year - 1] += $count; // Sum counts for each year
+                                                            // Generate an array of all school years from earliest to latest
+                                                            $allAcademicYears = [];
+                                                            for ($year = $earliestYear; $year <= $latestYear; $year++) {
+                                                                $allAcademicYears[] = $year . '-' . ($year + 1);
                                                             }
+
+                                                            // Fetch actual data of active applications per academic year
+                                                            $sql = "
+                                                                SELECT 
+                                                                    CONCAT(
+                                                                        CASE 
+                                                                            WHEN MONTH(r.dateDecided) >= 8 
+                                                                            THEN YEAR(r.dateDecided) 
+                                                                            ELSE YEAR(r.dateDecided) - 1 
+                                                                        END, 
+                                                                        '-', 
+                                                                        CASE 
+                                                                            WHEN MONTH(r.dateDecided) >= 8 
+                                                                            THEN YEAR(r.dateDecided) + 1 
+                                                                            ELSE YEAR(r.dateDecided) 
+                                                                        END
+                                                                    ) AS academicYear,
+                                                                    COUNT(s.student_id) AS memberCount
+                                                                FROM tbl_students s
+                                                                JOIN tbl_application r ON s.student_id = r.student_id
+                                                                WHERE r.status = 'active'
+                                                                GROUP BY academicYear
+                                                                ORDER BY academicYear ASC;
+                                                            ";
+                                                            $stmt = $pdo->prepare($sql);
+                                                            $stmt->execute();
+                                                            $applicationData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                                            // Prepare data for chart by merging with all academic years
+                                                            $academicYears = $allAcademicYears;
+                                                            $memberCountsPerSY = array_fill(0, count($academicYears), 0);
+
+                                                            // Map actual data to academic years, filling in 0 where no data
+                                                            foreach ($applicationData as $row) {
+                                                                $index = array_search($row['academicYear'], $academicYears);
+                                                                if ($index !== false) {
+                                                                    $memberCountsPerSY[$index] = $row['memberCount'];
+                                                                }
+                                                            }
+
+                                                            // Get total number of students for chart scaling
+                                                            $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
+                                                            $totalStudentsStmt->execute();
+                                                            $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
+                                                            $totalStudentCount = $totalStudentsData ? (int)$totalStudentsData['totalCount'] : 0;
+
+                                                            function roundUpToEven($number) {
+                                                                return $number % 2 === 0 ? $number : $number + 1;
+                                                            }
+                                                            // Fetch the maximum member count from the actual application data
+                                                            $maxMemberCountFromData = max($memberCountsPerSY);
+
+                                                            // Calculate buffered max member count for the chart (based on the highest actual data point)
+                                                            $buffer = 10; // buffer percentage (you can adjust this if needed)
+                                                            $maxMemberCountWithBuffer = roundUpToEven(ceil($maxMemberCountFromData * (1 + $buffer / 100)));
+
+                                                        } catch (PDOException $e) {
+                                                            echo "Error: " . htmlspecialchars($e->getMessage());
                                                         }
-
-                                                        // SQL Query to get the total number of students
-                                                        $sqlTotalStudents = "SELECT COUNT(DISTINCT student_id) AS total_student_count FROM tbl_students";
-                                                        $stmtTotalStudents = $pdo->prepare($sqlTotalStudents);
-                                                        $stmtTotalStudents->execute();
-                                                        $totalStudentCount = (int)$stmtTotalStudents->fetchColumn();
-
-                                                    } catch (PDOException $e) {
-                                                        echo "Error: " . $e->getMessage();
-                                                    }
                                                     ?>
+
 
                                                     <!-- Include Chart.js -->
                                                     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-                                                    <!-- Canvas for the bar chart -->
-                                                    <div style="max-width: 100%; overflow: hidden;">
-                                                        <canvas id="studentBarChart" style="max-width: 100%; height: 150px;"></canvas>
-                                                    </div>
-                                                    
-                                                    <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
-
                                                     <script>
-                                                        // PHP arrays passed into JavaScript
-                                                        const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
-                                                        const dataCounts = <?php echo json_encode($counts); ?>;
-                                                        const totalStudentCount = <?php echo $totalStudentCount; ?>; // Get the total student count
+                                                        const academicYears = <?php echo json_encode($academicYears); ?>;
+                                                        const memberCountsPerSY = <?php echo json_encode($memberCountsPerSY); ?>;
+                                                        const maxMemberCountWithBuffer = <?php echo $maxMemberCountWithBuffer; ?>;
 
-                                                        // Check if there is no data to display
-                                                        const hasDataYearLevels = dataCounts.some(count => count > 0);
+                                                        const hasDataSY = memberCountsPerSY.some(count => count > 0);
+                                                        const applicationPerSYChartElement = document.getElementById('applicationPerSYChart');
+                                                        const noDataMessageSY = document.getElementById('noDataMessageSY');
 
-                                                        // Show or hide the "No Data" message based on data availability
-                                                        const studentBarChartElement = document.getElementById('studentBarChart');
-                                                        const noDataMessageYearLevels = document.getElementById('noDataMessageYearLevels');
-
-                                                        if (!hasDataYearLevels) {
-                                                            studentBarChartElement.style.display = 'none';
-                                                            noDataMessageYearLevels.style.display = 'block';
+                                                        if (!hasDataSY) {
+                                                            applicationPerSYChartElement.style.display = 'none';
+                                                            noDataMessageSY.style.display = 'block';
                                                         } else {
-                                                            // Data for the chart
-                                                            const data = {
-                                                                labels: labels,
+                                                            const applicationPerSYData = {
+                                                                labels: academicYears,
                                                                 datasets: [{
-                                                                    data: dataCounts, // Dynamic data from PHP
-                                                                    backgroundColor: ['blue', 'orange', 'green', 'red'], // Colors for bars
+                                                                    label: 'Application per SY',
+                                                                    data: memberCountsPerSY,
+                                                                    fill: true,
+                                                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                                    tension: 0.1
                                                                 }]
                                                             };
 
-                                                            const maxDataCount = Math.max(...dataCounts); // Get the highest count from dataCounts
-                                                            const buffer = Math.ceil(maxDataCount * 0.1); // Calculate 10% buffer space
-
-                                                            const config = {
-                                                                type: 'bar',
-                                                                data: data,
+                                                            const applicationPerSYConfig = {
+                                                                type: 'line',
+                                                                data: applicationPerSYData,
                                                                 options: {
-                                                                    responsive: true,
-                                                                    maintainAspectRatio: false,
                                                                     scales: {
+                                                                        x: {
+                                                                            ticks: {
+                                                                                maxRotation: 45,
+                                                                                autoSkip: true
+                                                                            }
+                                                                        },
                                                                         y: {
                                                                             beginAtZero: true,
-                                                                            suggestedMax: maxDataCount + buffer, // Set max to highest data value plus buffer
-                                                                            ticks: {
-                                                                                callback: function(value) {
-                                                                                    return Number.isInteger(value) ? value : Math.floor(value); // Ensure no decimal points
-                                                                                },
-                                                                                stepSize: 1 // Force y-axis steps of 1 to avoid decimals
-                                                                            }
+                                                                            max: maxMemberCountWithBuffer // Dynamically set the max value based on actual data
                                                                         }
                                                                     },
                                                                     plugins: {
                                                                         legend: {
-                                                                            display: false // Remove the legend
+                                                                            display: false
                                                                         }
-                                                                    }
+                                                                    },
+                                                                    responsive: true,
+                                                                    maintainAspectRatio: false
                                                                 }
                                                             };
 
-                                                            // Render the chart
-                                                            new Chart(studentBarChartElement, config);
+                                                            const applicationPerSYChart = new Chart(applicationPerSYChartElement, applicationPerSYConfig);
                                                         }
+
                                                     </script>
+
                                                 </div>
                                             </div>
+                                            <!-- Application per SY END-->
+
                                         </div>
-                                        <!-- YEAR LEVEL COUNT END -->
-                                    </div>
 
+                                            
+                                        <div class="row" style="border: 1px solid transparent; margin: 0;">
+                                            <!-- Year Level Count -->
+                                            <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
+                                                <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                                    <p>Total Year Level Count</p>
+                                                    <div style="height: auto; background-color: transparent;">
+                                                        <?php
+                                                        try {
+                                                            // Get the selected school year from the URL parameter or default to the current school year
+                                                            $currentYear = date('Y');
+                                                            $selectedSchoolYear = isset($_GET['school_year']) ? intval($_GET['school_year']) : $currentYear;
+                                                            $nextSchoolYear = $selectedSchoolYear + 1;
 
+                                                            // Define end date as July 31 of the next school year
+                                                            $endDate = "$nextSchoolYear-07-31";
 
+                                                            // SQL Query to fetch year level counts by school year
+                                                            $sql = "
+                                                                SELECT s.year, COUNT(DISTINCT s.student_id) AS count
+                                                                FROM tbl_students s
+                                                                JOIN tbl_application r ON s.student_id = r.student_id
+                                                                WHERE r.status = 'active'
+                                                                AND r.dateDecided <= :endDate
+                                                                GROUP BY s.year
+                                                            ";
 
-                                    <div class="row" style="border: 1px solid transparent; margin: 0;">
-                                        <!-- Student Gender -->
-                                        <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
-                                            <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Total Student Gender</p>
-                                                <div style="height: 150px; position: relative;">
-                                                    <?php
-                                                    try {
-                                                        // Get the selected school year from the URL or default to the latest year
-                                                        $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
+                                                            $stmt = $pdo->prepare($sql);
+                                                            $stmt->bindParam(':endDate', $endDate);
+                                                            $stmt->execute();
+                                                            
+                                                            // Fetch the results into an associative array
+                                                            $yearData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                                                        // Parse the selected school year to get the end year
-                                                        list($startYear, $endYear) = explode('-', $selectedSchoolYear);
-                                                        $endDate = "$endYear-07-31"; // End date is July 31 of the end year
+                                                            // Initialize arrays for years and counts
+                                                            $years = ['1', '2', '3', '4']; // Ensure all years are included
+                                                            $counts = [0, 0, 0, 0]; // Initialize with zeros
 
-                                                        // SQL Query to fetch cumulative gender counts, filtered by the selected school year
-                                                        $sqlCounts = "
-                                                            SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
-                                                            FROM tbl_students s
-                                                            JOIN tbl_application r ON s.student_id = r.student_id
-                                                            WHERE r.status = 'active' 
-                                                            AND r.dateDecided <= :endDate
-                                                            GROUP BY s.gender
-                                                        ";
+                                                            // Populate the counts array based on fetched data
+                                                            foreach ($yearData as $row) {
+                                                                $year = (int)$row['year']; // Ensure $year is an integer
+                                                                $count = (int)$row['count']; // Ensure $count is an integer
 
-                                                        $stmtCounts = $pdo->prepare($sqlCounts);
-                                                        $stmtCounts->bindParam(':endDate', $endDate);
-                                                        $stmtCounts->execute();
-                                                        $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
-
-                                                        // Initialize arrays for gender counts
-                                                        $genderCounts = [
-                                                            'Male' => 0,
-                                                            'Female' => 0
-                                                        ];
-
-                                                        // Populate the counts array based on fetched data
-                                                        foreach ($counts as $row) {
-                                                            if (array_key_exists($row['gender'], $genderCounts)) {
-                                                                $genderCounts[$row['gender']] = $row['count'];
+                                                                // Check if $year is within the valid range
+                                                                if ($year >= 1 && $year <= 4) {
+                                                                    $counts[$year - 1] += $count; // Sum counts for each year
+                                                                }
                                                             }
+
+                                                            // SQL Query to get the total number of students
+                                                            $sqlTotalStudents = "SELECT COUNT(DISTINCT student_id) AS total_student_count FROM tbl_students";
+                                                            $stmtTotalStudents = $pdo->prepare($sqlTotalStudents);
+                                                            $stmtTotalStudents->execute();
+                                                            $totalStudentCount = (int)$stmtTotalStudents->fetchColumn();
+
+                                                        } catch (PDOException $e) {
+                                                            echo "Error: " . $e->getMessage();
                                                         }
+                                                        ?>
 
-                                                        // Prepare the SQL statement to get the total number of students
-                                                        $sqlTotal = "SELECT COUNT(DISTINCT student_id) AS total_count FROM tbl_students";
-                                                        $stmtTotal = $pdo->prepare($sqlTotal);
-                                                        $stmtTotal->execute();
-                                                        $totalCount = $stmtTotal->fetchColumn();
+                                                        <!-- Include Chart.js -->
+                                                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-                                                        // Prepare the data for JavaScript
-                                                        $labels = array_keys($genderCounts);
-                                                        $data = array_values($genderCounts);
+                                                        <!-- Canvas for the bar chart -->
+                                                        <div style="max-width: 100%; overflow: hidden;">
+                                                            <canvas id="studentBarChart" style="max-width: 100%; height: 150px;"></canvas>
+                                                        </div>
+                                                        
+                                                        <p id="noDataMessageYearLevels" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
 
-                                                    } catch (PDOException $e) {
-                                                        // Handle query error
-                                                        echo 'Error: ' . htmlspecialchars($e->getMessage());
-                                                    }
-                                                    ?>
-                                                    <canvas id="studentGenderChart" style="width: 100%; height: 100%;"></canvas>
-                                                    <p id="noDataMessageGender" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
-                                                    <script>
-                                                        document.addEventListener('DOMContentLoaded', function() {
-                                                            const ctx = document.getElementById('studentGenderChart').getContext('2d');
-                                                            const noDataMessageGender = document.getElementById('noDataMessageGender');
-
-                                                            // Data from PHP
-                                                            const labels = <?php echo json_encode($labels); ?>;
-                                                            const dataCounts = <?php echo json_encode($data); ?>;
-                                                            const totalCount = <?php echo $totalCount; ?>;
+                                                        <script>
+                                                            // PHP arrays passed into JavaScript
+                                                            const labels = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+                                                            const dataCounts = <?php echo json_encode($counts); ?>;
+                                                            const totalStudentCount = <?php echo $totalStudentCount; ?>; // Get the total student count
 
                                                             // Check if there is no data to display
-                                                            const hasDataGender = dataCounts.some(count => count > 0);
+                                                            const hasDataYearLevels = dataCounts.some(count => count > 0);
 
-                                                            if (!hasDataGender) {
-                                                                // Hide the chart and show the "No Data" message
-                                                                ctx.canvas.style.display = 'none';
-                                                                noDataMessageGender.style.display = 'block';
+                                                            // Show or hide the "No Data" message based on data availability
+                                                            const studentBarChartElement = document.getElementById('studentBarChart');
+                                                            const noDataMessageYearLevels = document.getElementById('noDataMessageYearLevels');
+
+                                                            if (!hasDataYearLevels) {
+                                                                studentBarChartElement.style.display = 'none';
+                                                                noDataMessageYearLevels.style.display = 'block';
                                                             } else {
                                                                 // Data for the chart
                                                                 const data = {
                                                                     labels: labels,
                                                                     datasets: [{
-                                                                        data: dataCounts,
-                                                                        backgroundColor: ['#3498db', '#e74c3c'], // Male: blue, Female: red
-                                                                        borderColor: ['#2980b9', '#c0392b'],
-                                                                        borderWidth: 1
+                                                                        data: dataCounts, // Dynamic data from PHP
+                                                                        backgroundColor: ['blue', 'orange', 'green', 'red'], // Colors for bars
                                                                     }]
                                                                 };
 
@@ -1028,32 +919,172 @@ try {
                                                                 };
 
                                                                 // Render the chart
-                                                                new Chart(ctx, config);
+                                                                new Chart(studentBarChartElement, config);
                                                             }
-                                                        });
-                                                    </script>
+                                                        </script>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <!-- YEAR LEVEL COUNT END -->
                                         </div>
-                                        <!-- Student Gender END -->
 
 
+
+
+                                        <div class="row" style="border: 1px solid transparent; margin: 0;">
+                                            <!-- Student Gender -->
+                                            <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
+                                                <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                                    <p>Total Student Gender</p>
+                                                    <div style="height: 150px; position: relative;">
+                                                        <?php
+                                                        try {
+                                                            // Get the selected school year from the URL or default to the latest year
+                                                            $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
+
+                                                            // Parse the selected school year to get the end year
+                                                            list($startYear, $endYear) = explode('-', $selectedSchoolYear);
+                                                            $endDate = "$endYear-07-31"; // End date is July 31 of the end year
+
+                                                            // SQL Query to fetch cumulative gender counts, filtered by the selected school year
+                                                            $sqlCounts = "
+                                                                SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
+                                                                FROM tbl_students s
+                                                                JOIN tbl_application r ON s.student_id = r.student_id
+                                                                WHERE r.status = 'active' 
+                                                                AND r.dateDecided <= :endDate
+                                                                GROUP BY s.gender
+                                                            ";
+
+                                                            $stmtCounts = $pdo->prepare($sqlCounts);
+                                                            $stmtCounts->bindParam(':endDate', $endDate);
+                                                            $stmtCounts->execute();
+                                                            $counts = $stmtCounts->fetchAll(PDO::FETCH_ASSOC);
+
+                                                            // Initialize arrays for gender counts
+                                                            $genderCounts = [
+                                                                'Male' => 0,
+                                                                'Female' => 0
+                                                            ];
+
+                                                            // Populate the counts array based on fetched data
+                                                            foreach ($counts as $row) {
+                                                                if (array_key_exists($row['gender'], $genderCounts)) {
+                                                                    $genderCounts[$row['gender']] = $row['count'];
+                                                                }
+                                                            }
+
+                                                            // Prepare the SQL statement to get the total number of students
+                                                            $sqlTotal = "SELECT COUNT(DISTINCT student_id) AS total_count FROM tbl_students";
+                                                            $stmtTotal = $pdo->prepare($sqlTotal);
+                                                            $stmtTotal->execute();
+                                                            $totalCount = $stmtTotal->fetchColumn();
+
+                                                            // Prepare the data for JavaScript
+                                                            $labels = array_keys($genderCounts);
+                                                            $data = array_values($genderCounts);
+
+                                                        } catch (PDOException $e) {
+                                                            // Handle query error
+                                                            echo 'Error: ' . htmlspecialchars($e->getMessage());
+                                                        }
+                                                        ?>
+                                                        <canvas id="studentGenderChart" style="width: 100%; height: 100%;"></canvas>
+                                                        <p id="noDataMessageGender" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 14%; margin-bottom: 7%;"><em>No students.</em></p>
+                                                        <script>
+                                                            document.addEventListener('DOMContentLoaded', function() {
+                                                                const ctx = document.getElementById('studentGenderChart').getContext('2d');
+                                                                const noDataMessageGender = document.getElementById('noDataMessageGender');
+
+                                                                // Data from PHP
+                                                                const labels = <?php echo json_encode($labels); ?>;
+                                                                const dataCounts = <?php echo json_encode($data); ?>;
+                                                                const totalCount = <?php echo $totalCount; ?>;
+
+                                                                // Check if there is no data to display
+                                                                const hasDataGender = dataCounts.some(count => count > 0);
+
+                                                                if (!hasDataGender) {
+                                                                    // Hide the chart and show the "No Data" message
+                                                                    ctx.canvas.style.display = 'none';
+                                                                    noDataMessageGender.style.display = 'block';
+                                                                } else {
+                                                                    // Data for the chart
+                                                                    const data = {
+                                                                        labels: labels,
+                                                                        datasets: [{
+                                                                            data: dataCounts,
+                                                                            backgroundColor: ['#3498db', '#e74c3c'], // Male: blue, Female: red
+                                                                            borderColor: ['#2980b9', '#c0392b'],
+                                                                            borderWidth: 1
+                                                                        }]
+                                                                    };
+
+                                                                    const maxDataCount = Math.max(...dataCounts); // Get the highest count from dataCounts
+                                                                    const buffer = Math.ceil(maxDataCount * 0.1); // Calculate 10% buffer space
+
+                                                                    const config = {
+                                                                        type: 'bar',
+                                                                        data: data,
+                                                                        options: {
+                                                                            responsive: true,
+                                                                            maintainAspectRatio: false,
+                                                                            scales: {
+                                                                                y: {
+                                                                                    beginAtZero: true,
+                                                                                    suggestedMax: maxDataCount + buffer, // Set max to highest data value plus buffer
+                                                                                    ticks: {
+                                                                                        callback: function(value) {
+                                                                                            return Number.isInteger(value) ? value : Math.floor(value); // Ensure no decimal points
+                                                                                        },
+                                                                                        stepSize: 1 // Force y-axis steps of 1 to avoid decimals
+                                                                                    }
+                                                                                }
+                                                                            },
+                                                                            plugins: {
+                                                                                legend: {
+                                                                                    display: false // Remove the legend
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    };
+
+                                                                    // Render the chart
+                                                                    new Chart(ctx, config);
+                                                                }
+                                                            });
+                                                        </script>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Student Gender END -->
+
+
+                                        </div>
+
+
+
+
+                                        <!-- Vertically divided Year Level Count and Members per School Year -->
+                                        <div class="row" style="border: 1px solid transparent; margin: 0;">
+
+                                            <!-- (OLD ROW FOR THE YEAR LEVEL COUNT AND STUDENT GENDER) -->
+                                        
+                                        </div>
                                     </div>
 
-
-
-
-                                    <!-- Vertically divided Year Level Count and Members per School Year -->
-                                    <div class="row" style="border: 1px solid transparent; margin: 0;">
-
-                                        <!-- (OLD ROW FOR THE YEAR LEVEL COUNT AND STUDENT GENDER) -->
-                                    
-                                    </div>
                                 </div>
-
+                                <!-- CHARTS AND DIAGRAMS END -->
 
                             </div>
-                            <!-- CHARTS AND DIAGRAMS END -->
+                            <!-- DASHBOARD COL-MD-9 END -->
+                             
+                            <!-- DASHBOARD COL-MD-3 START -->
+                            <div class="row trends col-md-3 m-0 p-0">
+                                <h1>TRENDS</h1>
+                            </div>
+
+
                         </div>
                         <!-- THE MAIN PAGE END -->
                     </div>
