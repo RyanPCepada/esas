@@ -1080,8 +1080,8 @@ try {
                             <!-- DASHBOARD COL-MD-9 END -->
                              
                             <!-- DASHBOARD COL-MD-4 START --> 
-<div class="row trends-section col-md-3 m-0 p-0 auto-scroll" style="height: 750px;">
-    <!-- <h1>TRENDS</h1> -->
+<div class="row trends-section col-md-3 m-0 p-0 pt-2 auto-scroll" style="height: 750px;">
+    <h4 class="text-muted">Club Trends</h4>
     <div id="clubTrendsList" class="row d-flex flex-wrap justify-content-start"></div>
 </div>
 <!-- DASHBOARD COL-MD-4 END -->
@@ -1243,7 +1243,7 @@ function fetchClubTrends() {
                                     </div> 
                                 </div>
                                 <div class="col-md-9">
-                                    <p class="card-title">${club.clubName}</p>
+                                    <p class="card-title club-name">${club.clubName}</p>
                                 </div>
                             </div>
                         </div>
@@ -1303,6 +1303,16 @@ function fetchClubTrends() {
         stroke-dasharray: 0 100;
     }
 }
+
+
+.club-name {
+    white-space: nowrap;     /* Prevents text from wrapping to the next line */
+    overflow: hidden;        /* Hides any text that overflows the container */
+    text-overflow: ellipsis; /* Adds ellipsis (...) for overflow text */
+    display: block;          /* Ensures the element is treated as a block-level element */
+    width: 100%;             /* Ensures it respects the width of the column */
+}
+
 </style>
 </body>
 </html>
