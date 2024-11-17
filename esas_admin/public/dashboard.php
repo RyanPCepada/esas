@@ -1221,50 +1221,57 @@ function fetchClubTrends() {
                 let html = '';
                 data.forEach(club => {
                     html += `
+                        <!-- <div class="card trends-card mb-2 p-2" style="background-image: url('/esas/esas_admin/images/${club.coverPhoto.replace(/'/g, "\\'")}'); background-size: cover; background-position: center;"> -->
                         <div class="card trends-card mb-2 p-2">
-                            <div class="row trends-card-body">
-                                <div class="col-md-3 d-flex justify-content-center align-items-start p-0 ps-2">
-                                    <div class="circle-bar" title="Slot Occupancy"> 
-                                        <svg viewBox="0 0 36 36" class="circular-chart">
-                                            <path class="circle-bg"
-                                                d="M18 2.0845
-                                                   a 15.9155 15.9155 0 0 1 0 31.831
-                                                   a 15.9155 15.9155 0 0 1 0 -31.831" 
-                                                fill="none" 
-                                                stroke="#eee" 
-                                                stroke-width="3"></path>
-                                            <path class="circle"
-                                                d="M18 2.0845
-                                                   a 15.9155 15.9155 0 0 1 0 31.831
-                                                   a 15.9155 15.9155 0 0 1 0 -31.831" 
-                                                fill="none" 
-                                                stroke="#007bff" 
-                                                stroke-width="3"
-                                                stroke-dasharray="${club.percentage}, 100"></path>
-                                        </svg>
-                                        <div class="circle-label">
-                                            ${club.percentage}%
-                                        </div>
-                                    </div> 
-                                </div>
-                                <div class="col-md-9">
-                                    <div class="row ml-1">
-                                        <span class="card-title club-name mb-0" title="${club.clubName}">${club.clubName}</span>
-                                    </div>
-                                    <div class="row mt-1 px-2">
-                                        <div class="card col-md-4">
-                                            <i class="fas fa-user text-info"></i>
-                                        </div>
-                                        <div class="card col-md-4">
-                                            <i class="fas fa-bullhorn text-info"></i>
-                                        </div>
-                                        <div class="card col-md-4">
-                                            <i class="fas fa-calendar text-info"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <div class="row trends-card-body">
+        <div class="col-md-3 d-flex justify-content-center align-items-start p-0 ps-2">
+            <div class="circle-bar" title="Slot Occupancy"> 
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <!-- Background circle, always rendered -->
+                    <path class="circle-bg"
+                        d="M18 2.0845
+                           a 15.9155 15.9155 0 0 1 0 31.831
+                           a 15.9155 15.9155 0 0 1 0 -31.831" 
+                        fill="none" 
+                        stroke="#FFFFFF" 
+                        stroke-width="4"></path>
+
+                    <!-- Only render the progress circle if percentage > 0 -->
+                    ${club.percentage > 0 ? `
+                        <path class="circle"
+                            d="M18 2.0845
+                               a 15.9155 15.9155 0 0 1 0 31.831
+                               a 15.9155 15.9155 0 0 1 0 -31.831" 
+                            fill="none" 
+                            stroke="#007bff" 
+                            stroke-width="4"
+                            stroke-dasharray="${club.percentage}, 100"></path>
+                    ` : ''}
+                </svg>
+                <div class="circle-label">
+                    ${club.percentage}%
+                </div>
+            </div> 
+        </div>
+        <div class="col-md-9">
+            <div class="row ml-1">
+                <span class="card-title club-name mb-0" title="${club.clubName}">${club.clubName}</span>
+            </div>
+            <div class="row mt-1 px-2">
+                <div class="card col-md-4">
+                    <i class="fas fa-user text-info"></i>
+                </div>
+                <div class="card col-md-4">
+                    <i class="fas fa-bullhorn text-info"></i>
+                </div>
+                <div class="card col-md-4">
+                    <i class="fas fa-calendar text-info"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
                     `;
                 });
                 clubTrendsList.innerHTML = html;
@@ -1283,6 +1290,21 @@ function fetchClubTrends() {
 
 
 <style>
+    /* .trends-card {
+        border-radius: 8px;
+        overflow: hidden;
+        color: white;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+    } */
+
+    .trends-card {
+        background-color: #F1F3F5;
+        background-color: #E9ECEF;
+        background-color: #DEE2E6;
+        border: none;
+        border-radius: 10px;
+    }
+
     .circle-bar {
     position: relative;
     width: 100%; /* Fixed width */
@@ -1309,12 +1331,12 @@ function fetchClubTrends() {
 }
 
 .circle-bg {
-    stroke: #eee;
-    stroke-width: 3;
+    stroke: #FFFFFF;
+    stroke-width: 4;
 }
 .circle {
     stroke: #007bff;
-    stroke-width: 3;
+    stroke-width: 4;
     stroke-linecap: round;
     animation: progress 1s ease-out forwards;
 }

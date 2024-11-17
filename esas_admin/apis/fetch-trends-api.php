@@ -15,6 +15,7 @@ $query = "
         c.clubName,
         c.slots,
         c.club_id,
+        c.coverPhoto,
         a.dateDecided,
         COUNT(a.student_id) AS activeMembers
     FROM 
@@ -59,6 +60,7 @@ try {
     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Add percentage progress to each club
+    // Add `coverPhoto` to the array map
     $clubTrends = array_map(function ($club) {
         $club['percentage'] = ($club['slots'] > 0) ? round(($club['activeMembers'] / $club['slots']) * 100, 2) : 0;
         return $club;
