@@ -1219,7 +1219,7 @@ function fetchClubTrends() {
                         <div class="card trends-card mb-2 p-2">
                             <div class="row trends-card-body">
                                 <div class="col-md-3 d-flex justify-content-center align-items-start p-0 ps-2">
-                                    <div class="circle-bar"> 
+                                    <div class="circle-bar" title="Slot Occupancy"> 
                                         <svg viewBox="0 0 36 36" class="circular-chart">
                                             <path class="circle-bg"
                                                 d="M18 2.0845
