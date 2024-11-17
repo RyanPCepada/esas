@@ -271,15 +271,19 @@ try {
 
                             <script>
                                 function filterDashboard() {
-                                    var school_year = document.getElementById('schoolYearDropdown').value;
-                                    var queryParams = new URLSearchParams(window.location.search);
+    var school_year = document.getElementById('schoolYearDropdown').value;
+    var queryParams = new URLSearchParams(window.location.search);
 
-                                    // Update the school_year parameter in the URL
-                                    queryParams.set('school_year', school_year);
+    // Update the school_year parameter in the URL
+    queryParams.set('school_year', school_year);
 
-                                    // Navigate to the updated URL
-                                    window.location.search = queryParams.toString();
-                                }
+    // Navigate to the updated URL to refresh the page with new school year
+    window.location.search = queryParams.toString();
+    
+    // Make sure the API call is also updated to include the school year
+    fetchClubTrends(school_year);
+}
+
                             </script>
 
                         </div>
@@ -1207,7 +1211,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function fetchClubTrends() {
-    fetch('/esas/esas_admin/apis/fetch-trends-api.php')
+    const schoolYear = document.getElementById('schoolYearDropdown').value; // Get the selected school year
+    fetch(`/esas/esas_admin/apis/fetch-trends-api.php?school_year=${encodeURIComponent(schoolYear)}`)
         .then(response => response.json())
         .then(data => {
             const clubTrendsList = document.getElementById('clubTrendsList');
@@ -1272,6 +1277,7 @@ function fetchClubTrends() {
             document.getElementById('clubTrendsList').innerHTML = 'Failed to load clubs.';
         });
 }
+
 </script>
 
 
