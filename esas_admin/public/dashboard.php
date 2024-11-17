@@ -1079,10 +1079,12 @@ try {
                             </div>
                             <!-- DASHBOARD COL-MD-9 END -->
                              
-                            <!-- DASHBOARD COL-MD-3 START -->
-                            <div class="row trends col-md-3 m-0 p-0">
-                                <h1>TRENDS</h1>
-                            </div>
+                            <!-- DASHBOARD COL-MD-4 START --> 
+<div class="row trends-section col-md-3 m-0 p-0 auto-scroll" style="height: 750px;">
+    <!-- <h1>TRENDS</h1> -->
+    <div id="clubTrendsList" class="row d-flex flex-wrap justify-content-start"></div>
+</div>
+<!-- DASHBOARD COL-MD-4 END -->
 
 
                         </div>
@@ -1112,49 +1114,49 @@ try {
             document.getElementById("tabLabel").innerText = label;
         }
 
-        // Fetch clubs data from API
-        fetch('/esas/esas_moderator/apis/clubs-api.php')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // $('#post-26').html(data)
-                const allClubsContainer = document.getElementById('allClubsContainer');
-                if (data && data.length > 0) {
-                    data.forEach(club => {
-                        const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
-                        const cardHTML = `
-                            <div class="col-md-4 card-container">
-                                <div class="card card-img-only-all">
-                                    <small data-toggle="tooltip" title="${memberText}">
-                                        <i class="fa fa-user mr-1"></i>${club.membersCount}
-                                    </small>
-                                    <a href="/esas/esas_moderator/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
-                                        <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
-                                        <div class="overlay-text">
-                                            <h4>${club.clubName}</h4>
-                                            <!--<div class="moderators-container">
-                                                ${club.formattedModerators}
-                                            </div>-->
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                        `;
-                        allClubsContainer.innerHTML += cardHTML;
-                    });
-                } else {
-                    allClubsContainer.innerHTML = '<p>No clubs found.</p>';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching clubs:', error);
-                const allClubsContainer = document.getElementById('allClubsContainer');
-                allClubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
-            });
+        // // Fetch clubs data from API
+        // fetch('/esas/esas_moderator/apis/clubs-api.php')
+        //     .then(response => {
+        //         if (!response.ok) {
+        //             throw new Error('Network response was not ok');
+        //         }
+        //         return response.json();
+        //     })
+        //     .then(data => {
+        //         // $('#post-26').html(data)
+        //         const allClubsContainer = document.getElementById('allClubsContainer');
+        //         if (data && data.length > 0) {
+        //             data.forEach(club => {
+        //                 const memberText = club.membersCount === 1 ? '1 member' : `${club.membersCount} members`;
+        //                 const cardHTML = `
+        //                     <div class="col-md-4 card-container">
+        //                         <div class="card card-img-only-all">
+        //                             <small data-toggle="tooltip" title="${memberText}">
+        //                                 <i class="fa fa-user mr-1"></i>${club.membersCount}
+        //                             </small>
+        //                             <a href="/esas/esas_moderator/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}">
+        //                                 <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
+        //                                 <div class="overlay-text">
+        //                                     <h4>${club.clubName}</h4>
+        //                                     <!--<div class="moderators-container">
+        //                                         ${club.formattedModerators}
+        //                                     </div>-->
+        //                                 </div>
+        //                             </a>
+        //                         </div>
+        //                     </div>
+        //                 `;
+        //                 allClubsContainer.innerHTML += cardHTML;
+        //             });
+        //         } else {
+        //             allClubsContainer.innerHTML = '<p>No clubs found.</p>';
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error('Error fetching clubs:', error);
+        //         const allClubsContainer = document.getElementById('allClubsContainer');
+        //         allClubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
+        //     });
 
 
     </script>
@@ -1196,6 +1198,48 @@ try {
             // let value= $("classname").val()
         });
     </script>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    fetchClubTrends();
+});
+
+function fetchClubTrends() {
+    fetch('/esas/esas_admin/apis/fetch-trends-api.php')
+        .then(response => response.json()) // Assuming the response is in JSON format
+        .then(data => {
+            const clubTrendsList = document.getElementById('clubTrendsList');
+            
+            // Check if there are any clubs in the response
+            if (data.length > 0) {
+                let html = ''; // Initialize an empty string to build the HTML
+                data.forEach(club => {
+                    // Create a card for each club
+                    html += `
+                        <div class="card trends-card mb-2 p-2">
+                            <div class="trends-card-body">
+                                <div class="col-md-10">
+                                    <p class="card-title">${club.clubName}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                clubTrendsList.innerHTML = html; // Display the cards inside the div
+            } else {
+                clubTrendsList.innerHTML = 'No clubs found.'; // Handle case if no clubs are returned
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching club names:', error);
+            document.getElementById('clubTrendsList').innerHTML = 'Failed to load clubs.';
+        });
+}
+
+
+</script>
 
 </body>
 </html>
