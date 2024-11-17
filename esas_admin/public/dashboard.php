@@ -1243,7 +1243,7 @@ function fetchClubTrends() {
                                     </div> 
                                 </div>
                                 <div class="col-md-9">
-                                    <p class="card-title club-name">${club.clubName}</p>
+                                    <p class="card-title club-name" title="${club.clubName}">${club.clubName}</p>
                                 </div>
                             </div>
                         </div>
@@ -1271,6 +1271,7 @@ function fetchClubTrends() {
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 .circular-chart {
@@ -1311,6 +1312,7 @@ function fetchClubTrends() {
     text-overflow: ellipsis; /* Adds ellipsis (...) for overflow text */
     display: block;          /* Ensures the element is treated as a block-level element */
     width: 100%;             /* Ensures it respects the width of the column */
+    cursor: pointer;
 }
 
 </style>
