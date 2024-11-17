@@ -1288,7 +1288,21 @@ function fetchClubTrends() {
     text-align: center;
 }
 
-
+.circle-bg {
+    stroke: #eee;
+    stroke-width: 3;
+}
+.circle {
+    stroke: #007bff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    animation: progress 1s ease-out forwards;
+}
+@keyframes progress {
+    from {
+        stroke-dasharray: 0 100;
+    }
+}
 </style>
 </body>
 </html>
