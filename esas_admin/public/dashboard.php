@@ -1243,7 +1243,20 @@ function fetchClubTrends() {
                                     </div> 
                                 </div>
                                 <div class="col-md-9">
-                                    <p class="card-title club-name" title="${club.clubName}">${club.clubName}</p>
+                                    <div class="row ml-1">
+                                        <span class="card-title club-name mb-0" title="${club.clubName}">${club.clubName}</span>
+                                    </div>
+                                    <div class="row mt-1 px-2">
+                                        <div class="card col-md-4">
+                                            <i class="fas fa-user text-info"></i>
+                                        </div>
+                                        <div class="card col-md-4">
+                                            <i class="fas fa-bullhorn text-info"></i>
+                                        </div>
+                                        <div class="card col-md-4">
+                                            <i class="fas fa-calendar text-info"></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
