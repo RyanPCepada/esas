@@ -9,23 +9,25 @@ date_default_timezone_set('Asia/Manila');
 // Get the selected school year from the query parameter
 $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : null;
 
-// Prepare the query to fetch club data with member percentage based on the selected school year
+// Prepare the query to fetch club data with member counts based on status
 $query = "
     SELECT 
         c.clubName,
         c.slots,
         c.club_id,
         c.coverPhoto,
-        a.dateDecided,
-        COUNT(a.student_id) AS activeMembers
+        c.dateAdded,  -- Assuming this is when the club was established
+        COUNT(CASE WHEN a.status = 'active' THEN 1 END) AS activeMembers,
+        COUNT(CASE WHEN a.status = 'departed' THEN 1 END) AS departedMembers
     FROM 
         tbl_clubs c
     LEFT JOIN 
         tbl_application a 
     ON 
-        c.club_id = a.club_id AND a.status = 'active'";
+        c.club_id = a.club_id
+";
 
-// If a school year is selected, add the date filter
+// If a school year is selected, add the date filter for club establishment date (dateAdded)
 if ($selectedSchoolYear) {
     $yearRange = explode('-', $selectedSchoolYear);
     $startYear = $yearRange[0];
@@ -35,10 +37,11 @@ if ($selectedSchoolYear) {
     $startDate = $startYear . '-08-01'; // August 1st of the start year
     $endDate = $endYear . '-07-31'; // July 31st of the end year
 
-    // Modify the query to fetch only records within the school year's date range
-    $query .= " AND (a.dateDecided BETWEEN :startDate AND :endDate OR a.student_id IS NULL)";
+    // Add the filter for clubs established during this school year
+    $query .= " WHERE c.dateAdded BETWEEN :startDate AND :endDate"; 
 }
 
+// Continue with the rest of the query as usual
 $query .= "
     GROUP BY 
         c.club_id
@@ -59,15 +62,26 @@ try {
     // Fetch all results as an associative array
     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Add percentage progress to each club
-    // Add `coverPhoto` to the array map
+    // Process the fetched clubs data
     $clubTrends = array_map(function ($club) {
-        $club['percentage'] = ($club['slots'] > 0) ? round(($club['activeMembers'] / $club['slots']) * 100, 2) : 0;
+        if ($club['slots'] == 0) {
+            $club['percentage'] = -1;
+            $club['percentageText'] = '<span class="text-danger">Unli</span>';
+        } else {
+            $club['percentage'] = round(($club['activeMembers'] / $club['slots']) * 100, 2);
+            $club['percentageText'] = $club['percentage'] . '%';
+        }
+        
+        $club['newlyActive'] = $club['activeMembers'];
+        $club['newlyDeparted'] = $club['departedMembers'];
+    
         return $club;
     }, $clubs);
 
-    // Sort the clubs by percentage in descending order
+    // Sort clubs based on percentage
     usort($clubTrends, function ($a, $b) {
+        if ($a['percentage'] == -1) return 1;
+        if ($b['percentage'] == -1) return -1;
         return $b['percentage'] <=> $a['percentage'];
     });
 
@@ -80,4 +94,5 @@ try {
     header('Content-Type: application/json');
     echo json_encode(["error" => "Database query failed: " . $e->getMessage()]);
 }
+
 ?>

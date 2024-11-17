@@ -1082,12 +1082,13 @@ try {
                             </div>
                             <!-- DASHBOARD COL-MD-9 END -->
                              
-                            <!-- DASHBOARD COL-MD-4 START --> 
-<div class="row trends-section col-md-3 m-0 p-0 pt-2 auto-scroll justify-content-start" style="height: 750px; z-index: 2;">
-    <h4 class="text-muted">Club Trends</h4>
-    <div id="clubTrendsList" class="row justify-content-center"></div>
+                           <!-- DASHBOARD COL-MD-4 START --> 
+<div class="row trends-section col-md-3 m-0 p-0 pt-2 auto-scroll align-items-start justify-content-start" style="height: 750px; z-index: 2; position: relative;">
+    <!-- <h5 class="text-muted mt-1">Club Trends & Metrics</h5> -->
+    <div id="clubTrendsList" class="row align-items-start justify-content-start p-2" style="position: absolute; margin-top: 0px; left: 0; width: 100%;"></div>
 </div>
 <!-- DASHBOARD COL-MD-4 END -->
+
 
 
                         </div>
@@ -1221,50 +1222,45 @@ function fetchClubTrends() {
                 let html = '';
                 data.forEach(club => {
                     html += `
-                        <!-- <div class="card trends-card mb-2 p-2" style="background-image: url('/esas/esas_admin/images/${club.coverPhoto.replace(/'/g, "\\'")}'); background-size: cover; background-position: center;"> -->
-                        <div class="card trends-card mb-2 p-2">
+                        <div class="card trends-card">
                             <div class="row trends-card-body">
                                 <div class="col-md-3 d-flex justify-content-center align-items-start p-0 ps-2">
-                                    <div class="circle-bar" title="Slot Occupancy"> 
+                                    <div class="circle-bar" title="Slot occupancy"> 
                                         <svg viewBox="0 0 36 36" class="circular-chart">
-                                            <!-- Background circle, always rendered -->
+                                            <!-- Background circle -->
                                             <path class="circle-bg"
-                                                d="M18 2.0845
-                                                a 15.9155 15.9155 0 0 1 0 31.831
-                                                a 15.9155 15.9155 0 0 1 0 -31.831" 
-                                                fill="none" 
-                                                stroke="#FFFFFF" 
-                                                stroke-width="4"></path>
+                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                                fill="none" stroke="#FFFFFF" stroke-width="4"></path>
 
-                                            <!-- Only render the progress circle if percentage > 0 -->
-                                            ${club.percentage > 0 ? `
+                                            <!-- Progress circle based on percentage -->
+                                            ${club.percentage !== -1 ? `
                                                 <path class="circle"
-                                                    d="M18 2.0845
-                                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                                    a 15.9155 15.9155 0 0 1 0 -31.831" 
-                                                    fill="none" 
-                                                    stroke="#007bff" 
-                                                    stroke-width="4"
+                                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                                    fill="none" stroke="#007bff" stroke-width="4"
                                                     stroke-dasharray="${club.percentage}, 100"></path>
                                             ` : ''}
                                         </svg>
                                         <div class="circle-label">
-                                            ${club.percentage}%
+                                            ${club.percentage !== -1 ? club.percentageText : club.percentageText}
                                         </div>
                                     </div> 
                                 </div>
                                 <div class="col-md-9">
                                     <div class="row ml-1">
-                                        <span class="card-title club-name mb-0" title="${club.clubName}">${club.clubName}</span>
+                                        <strong><span class="card-title club-name mb-0 text-muted" title="${club.clubName}">${club.clubName}</span></strong>
                                     </div>
                                     <div class="row mt-1 px-2">
                                         <div class="card card-members col-md-4 p-0">
                                             <div class="col-5 div-user-icon text-center">
                                                 <i class="fas fa-user text-primary"></i>
                                             </div>
-                                            <div class="col-7 div-user-data text-center">
-                                                <p class="m-0" style="font-size: 10px; color: blue;">+100</p>
-                                                <p class="" style="font-size: 10px; color: red; margin: -5px;">-100</p>
+                                            <div class="col-7 div-user-data text-center" title="Active and departed members">
+                                                <strong><p class="m-0" style="font-size: 10px; color: blue;">
+                                                    ${club.newlyActive !== 0 ? `+${club.newlyActive}` : club.newlyActive}
+                                                </p></strong>
+                                                <strong><p class="" style="font-size: 10px; color: red; margin: -5px;">
+                                                    ${club.newlyDeparted !== 0 ? `-${club.newlyDeparted}` : club.newlyDeparted}
+                                                </p></strong>
                                             </div>
                                         </div>
                                         <div class="card card-posts col-md-4 p-1">
@@ -1303,6 +1299,8 @@ function fetchClubTrends() {
 
     .trends-card {
         margin-left: 10px;
+        margin-bottom: 10px;
+        padding: 8px;
         background-color: #E9ECEF;
         background-color: #DEE2E6;
         background-color: white;
@@ -1377,6 +1375,7 @@ function fetchClubTrends() {
     .div-user-data {
         position: absolute;
         right: 2px;
+        cursor: pointer;
     }
 </style>
 
