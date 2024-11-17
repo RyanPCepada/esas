@@ -1,38 +1,48 @@
 <?php
 // Include the database connection configuration file
-require_once "../../config.php";  // Ensure the path is correct based on your folder structure
+require_once "../../config.php"; 
 session_start();
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-// Prepare the query to fetch all club names from the tbl_clubs table
-$query = "SELECT clubName FROM tbl_clubs";
+// Prepare the query to fetch club data with member percentage
+$query = "
+    SELECT 
+        c.clubName,
+        c.slots,
+        c.club_id,
+        COUNT(a.student_id) AS activeMembers
+    FROM 
+        tbl_clubs c
+    LEFT JOIN 
+        tbl_application a 
+    ON 
+        c.club_id = a.club_id AND a.status = 'active'
+    GROUP BY 
+        c.club_id
+";
 
 try {
     // Create a PDO instance and prepare the query
     $stmt = $pdo->prepare($query);
-    $stmt->execute(); // Execute the query
+    $stmt->execute();
 
     // Fetch all results as an associative array
-    $clubNames = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Check if any clubs were fetched
-    if ($clubNames) {
-        // Set the content type to JSON and output the result
-        header('Content-Type: application/json');
-        echo json_encode($clubNames);
-    } else {
-        // No clubs found, output an empty array
-        header('Content-Type: application/json');
-        echo json_encode([]);
-    }
+    // Add percentage progress to each club
+    $clubTrends = array_map(function ($club) {
+        $club['percentage'] = ($club['slots'] > 0) ? round(($club['activeMembers'] / $club['slots']) * 100, 2) : 0;
+        return $club;
+    }, $clubs);
+
+    // Return the data as JSON
+    header('Content-Type: application/json');
+    echo json_encode($clubTrends);
 
 } catch (PDOException $e) {
-    // Handle any errors that occur during the execution of the query
+    // Handle errors
     header('Content-Type: application/json');
     echo json_encode(["error" => "Database query failed: " . $e->getMessage()]);
 }
-
-// No need to manually close the PDO connection, as it will automatically close when the script ends.
-?>

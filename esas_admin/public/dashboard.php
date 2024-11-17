@@ -1202,44 +1202,93 @@ try {
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     fetchClubTrends();
 });
 
 function fetchClubTrends() {
     fetch('/esas/esas_admin/apis/fetch-trends-api.php')
-        .then(response => response.json()) // Assuming the response is in JSON format
+        .then(response => response.json())
         .then(data => {
             const clubTrendsList = document.getElementById('clubTrendsList');
-            
-            // Check if there are any clubs in the response
+
             if (data.length > 0) {
-                let html = ''; // Initialize an empty string to build the HTML
+                let html = '';
                 data.forEach(club => {
-                    // Create a card for each club
                     html += `
                         <div class="card trends-card mb-2 p-2">
-                            <div class="trends-card-body">
-                                <div class="col-md-10">
+                            <div class="row trends-card-body">
+                                <div class="col-md-3 d-flex justify-content-center align-items-start p-0 ps-2">
+                                    <div class="circle-bar"> 
+                                        <svg viewBox="0 0 36 36" class="circular-chart">
+                                            <path class="circle-bg"
+                                                d="M18 2.0845
+                                                   a 15.9155 15.9155 0 0 1 0 31.831
+                                                   a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                                fill="none" 
+                                                stroke="#eee" 
+                                                stroke-width="3"></path>
+                                            <path class="circle"
+                                                d="M18 2.0845
+                                                   a 15.9155 15.9155 0 0 1 0 31.831
+                                                   a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                                fill="none" 
+                                                stroke="#007bff" 
+                                                stroke-width="3"
+                                                stroke-dasharray="${club.percentage}, 100"></path>
+                                        </svg>
+                                        <div class="circle-label">
+                                            ${club.percentage}%
+                                        </div>
+                                    </div> 
+                                </div>
+                                <div class="col-md-9">
                                     <p class="card-title">${club.clubName}</p>
                                 </div>
                             </div>
                         </div>
                     `;
                 });
-                clubTrendsList.innerHTML = html; // Display the cards inside the div
+                clubTrendsList.innerHTML = html;
             } else {
-                clubTrendsList.innerHTML = 'No clubs found.'; // Handle case if no clubs are returned
+                clubTrendsList.innerHTML = 'No clubs found.';
             }
         })
         .catch(error => {
-            console.error('Error fetching club names:', error);
+            console.error('Error fetching club trends:', error);
             document.getElementById('clubTrendsList').innerHTML = 'Failed to load clubs.';
         });
 }
-
-
 </script>
 
+
+
+<style>
+    .circle-bar {
+    position: relative;
+    width: 100%; /* Fixed width */
+    height: 100%; /* Fixed height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circular-chart {
+    width: 100%;
+    height: 100%;
+}
+
+.circle-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+
+</style>
 </body>
 </html>
