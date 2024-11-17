@@ -271,19 +271,18 @@ try {
 
                             <script>
                                 function filterDashboard() {
-    var school_year = document.getElementById('schoolYearDropdown').value;
-    var queryParams = new URLSearchParams(window.location.search);
+                                    var school_year = document.getElementById('schoolYearDropdown').value;
+                                    var queryParams = new URLSearchParams(window.location.search);
 
-    // Update the school_year parameter in the URL
-    queryParams.set('school_year', school_year);
+                                    // Update the school_year parameter in the URL
+                                    queryParams.set('school_year', school_year);
 
-    // Navigate to the updated URL to refresh the page with new school year
-    window.location.search = queryParams.toString();
-    
-    // Make sure the API call is also updated to include the school year
-    fetchClubTrends(school_year);
-}
-
+                                    // Navigate to the updated URL to refresh the page with new school year
+                                    window.location.search = queryParams.toString();
+                                    
+                                    // Make sure the API call is also updated to include the school year
+                                    fetchClubTrends(school_year);
+                                }
                             </script>
 
                         </div>
@@ -293,7 +292,7 @@ try {
                         <div class="row main-page p-0">
                             
                             <!-- DASHBOARD COL-MD-9 START -->
-                            <div class="row cards-charts-graphs col-md-9 m-0 p-0 pt-2">
+                            <div class="row cards-charts-graphs col-md-9 m-0 p-0 pt-2" style="position: relative; z-index: 1;">
                                 <!-- UPPER CARDS START -->
                                 <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                     <!-- Card for TOTAL CLUBS -->
@@ -1084,9 +1083,9 @@ try {
                             <!-- DASHBOARD COL-MD-9 END -->
                              
                             <!-- DASHBOARD COL-MD-4 START --> 
-<div class="row trends-section col-md-3 m-0 p-0 pt-2 auto-scroll" style="height: 750px;">
+<div class="row trends-section col-md-3 m-0 p-0 pt-2 auto-scroll justify-content-start" style="height: 750px; z-index: 2;">
     <h4 class="text-muted">Club Trends</h4>
-    <div id="clubTrendsList" class="row d-flex flex-wrap justify-content-start"></div>
+    <div id="clubTrendsList" class="row justify-content-center"></div>
 </div>
 <!-- DASHBOARD COL-MD-4 END -->
 
@@ -1166,42 +1165,43 @@ try {
     </script>
 
 
-    <script>
 
 
-        // JavaScript to Animate Cards
-        document.addEventListener('DOMContentLoaded', function() {
-            function animateCards(cards) { 
-                cards.forEach((card, index) => {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(5px) scale(0.95)'; // Adjusted Y translation
-                    card.style.transition = 'none'; // Disable transition for reset
+<script>
 
-                    void card.offsetWidth; // Trigger reflow
 
-                    card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-                    
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0) scale(1)';
-                        card.style.animation = `waveIn 0.6s ease-out forwards`;
-                    }, index * 100); // Staggered delay
-                });
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    function animateCards(cards) { 
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(5px) scale(0.95)'; // Adjusted Y translation
+            card.style.transition = 'none'; // Disable transition for reset
 
-            // Select only the upper cards
-            const upperCards = document.querySelectorAll('.card-row1 .card');
-            animateCards(upperCards);
+            void card.offsetWidth; // Trigger reflow
+
+            card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0) scale(1)';
+                card.style.animation = `waveIn 0.6s ease-out forwards`;
+            }, index * 100); // Staggered delay
         });
+    }
 
+    // Select only the upper cards
+    const upperCards = document.querySelectorAll('.card-row1 .card');
+    animateCards(upperCards);
 
-        $(document).ready(function() {
-            $('.delprreq').click(function(e) {
-                e.stopPropagation();
-            });
-            // let value= $("classname").val()
-        });
-    </script>
+    // Wait until the club trends are fetched and rendered, then animate those cards
+    const clubTrendsList = document.getElementById('clubTrendsList');
+    
+    // Ensure animateCards runs on .trends-card after data is added
+    const trendsCards = clubTrendsList.querySelectorAll('.trends-card');
+    animateCards(trendsCards);
+});
+</script>
+
 
 
 
@@ -1223,55 +1223,60 @@ function fetchClubTrends() {
                     html += `
                         <!-- <div class="card trends-card mb-2 p-2" style="background-image: url('/esas/esas_admin/images/${club.coverPhoto.replace(/'/g, "\\'")}'); background-size: cover; background-position: center;"> -->
                         <div class="card trends-card mb-2 p-2">
-    <div class="row trends-card-body">
-        <div class="col-md-3 d-flex justify-content-center align-items-start p-0 ps-2">
-            <div class="circle-bar" title="Slot Occupancy"> 
-                <svg viewBox="0 0 36 36" class="circular-chart">
-                    <!-- Background circle, always rendered -->
-                    <path class="circle-bg"
-                        d="M18 2.0845
-                           a 15.9155 15.9155 0 0 1 0 31.831
-                           a 15.9155 15.9155 0 0 1 0 -31.831" 
-                        fill="none" 
-                        stroke="#FFFFFF" 
-                        stroke-width="4"></path>
+                            <div class="row trends-card-body">
+                                <div class="col-md-3 d-flex justify-content-center align-items-start p-0 ps-2">
+                                    <div class="circle-bar" title="Slot Occupancy"> 
+                                        <svg viewBox="0 0 36 36" class="circular-chart">
+                                            <!-- Background circle, always rendered -->
+                                            <path class="circle-bg"
+                                                d="M18 2.0845
+                                                a 15.9155 15.9155 0 0 1 0 31.831
+                                                a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                                fill="none" 
+                                                stroke="#FFFFFF" 
+                                                stroke-width="4"></path>
 
-                    <!-- Only render the progress circle if percentage > 0 -->
-                    ${club.percentage > 0 ? `
-                        <path class="circle"
-                            d="M18 2.0845
-                               a 15.9155 15.9155 0 0 1 0 31.831
-                               a 15.9155 15.9155 0 0 1 0 -31.831" 
-                            fill="none" 
-                            stroke="#007bff" 
-                            stroke-width="4"
-                            stroke-dasharray="${club.percentage}, 100"></path>
-                    ` : ''}
-                </svg>
-                <div class="circle-label">
-                    ${club.percentage}%
-                </div>
-            </div> 
-        </div>
-        <div class="col-md-9">
-            <div class="row ml-1">
-                <span class="card-title club-name mb-0" title="${club.clubName}">${club.clubName}</span>
-            </div>
-            <div class="row mt-1 px-2">
-                <div class="card col-md-4">
-                    <i class="fas fa-user text-info"></i>
-                </div>
-                <div class="card col-md-4">
-                    <i class="fas fa-bullhorn text-info"></i>
-                </div>
-                <div class="card col-md-4">
-                    <i class="fas fa-calendar text-info"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+                                            <!-- Only render the progress circle if percentage > 0 -->
+                                            ${club.percentage > 0 ? `
+                                                <path class="circle"
+                                                    d="M18 2.0845
+                                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                                    a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                                    fill="none" 
+                                                    stroke="#007bff" 
+                                                    stroke-width="4"
+                                                    stroke-dasharray="${club.percentage}, 100"></path>
+                                            ` : ''}
+                                        </svg>
+                                        <div class="circle-label">
+                                            ${club.percentage}%
+                                        </div>
+                                    </div> 
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="row ml-1">
+                                        <span class="card-title club-name mb-0" title="${club.clubName}">${club.clubName}</span>
+                                    </div>
+                                    <div class="row mt-1 px-2">
+                                        <div class="card card-members col-md-4 p-0">
+                                            <div class="col-5 div-user-icon text-center">
+                                                <i class="fas fa-user text-primary"></i>
+                                            </div>
+                                            <div class="col-7 div-user-data text-center">
+                                                <p class="m-0" style="font-size: 10px; color: blue;">+100</p>
+                                                <p class="" style="font-size: 10px; color: red; margin: -5px;">-100</p>
+                                            </div>
+                                        </div>
+                                        <div class="card card-posts col-md-4 p-1">
+                                            <i class="fas fa-bullhorn text-info"></i>
+                                        </div>
+                                        <div class="card card-events col-md-4 p-1">
+                                            <i class="fas fa-calendar text-info"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     `;
                 });
                 clubTrendsList.innerHTML = html;
@@ -1288,7 +1293,6 @@ function fetchClubTrends() {
 </script>
 
 
-
 <style>
     /* .trends-card {
         border-radius: 8px;
@@ -1298,64 +1302,87 @@ function fetchClubTrends() {
     } */
 
     .trends-card {
-        background-color: #F1F3F5;
+        margin-left: 10px;
         background-color: #E9ECEF;
         background-color: #DEE2E6;
+        background-color: white;
+        background-color: #F1F3F5;
         border: none;
         border-radius: 10px;
+        /* box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); */
+        z-index: 2000 !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.1);
     }
 
     .circle-bar {
-    position: relative;
-    width: 100%; /* Fixed width */
-    height: 100%; /* Fixed height */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
-
-.circular-chart {
-    width: 100%;
-    height: 100%;
-}
-
-.circle-label {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 12px;
-    font-weight: bold;
-    text-align: center;
-}
-
-.circle-bg {
-    stroke: #FFFFFF;
-    stroke-width: 4;
-}
-.circle {
-    stroke: #007bff;
-    stroke-width: 4;
-    stroke-linecap: round;
-    animation: progress 1s ease-out forwards;
-}
-@keyframes progress {
-    from {
-        stroke-dasharray: 0 100;
+        position: relative;
+        width: 100%; /* Fixed width */
+        height: 100%; /* Fixed height */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border-radius: 50%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.1);
     }
-}
+
+    .circular-chart {
+        width: 100%;
+        height: 100%;
+    }
+
+    .circle-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 12px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .circle-bg {
+        stroke: #FFFFFF;
+        stroke-width: 4;
+    }
+    .circle {
+        stroke: #007bff;
+        stroke-width: 4;
+        stroke-linecap: round;
+        animation: progress 1s ease-out forwards;
+    }
+    @keyframes progress {
+        from {
+            stroke-dasharray: 0 100;
+        }
+    }
 
 
-.club-name {
-    white-space: nowrap;     /* Prevents text from wrapping to the next line */
-    overflow: hidden;        /* Hides any text that overflows the container */
-    text-overflow: ellipsis; /* Adds ellipsis (...) for overflow text */
-    display: block;          /* Ensures the element is treated as a block-level element */
-    width: 100%;             /* Ensures it respects the width of the column */
-    cursor: pointer;
-}
+    .club-name {
+        white-space: nowrap;     /* Prevents text from wrapping to the next line */
+        overflow: hidden;        /* Hides any text that overflows the container */
+        text-overflow: ellipsis; /* Adds ellipsis (...) for overflow text */
+        display: block;          /* Ensures the element is treated as a block-level element */
+        width: 100%;             /* Ensures it respects the width of the column */
+        cursor: pointer;
+    }
 
+    .card-members, .card-posts, .card-events {
+        background-color: rgba(0, 0, 0, 0.8);
+        background-color: white;
+        margin: 0px 2px;
+        width: 30%;
+    }
+
+    .div-user-data {
+        position: absolute;
+        right: 2px;
+    }
 </style>
+
+
+
+
+
 </body>
 </html>
