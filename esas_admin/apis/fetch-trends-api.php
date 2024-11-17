@@ -37,6 +37,11 @@ try {
         return $club;
     }, $clubs);
 
+    // Sort the clubs by percentage in descending order
+    usort($clubTrends, function ($a, $b) {
+        return $b['percentage'] <=> $a['percentage'];
+    });
+
     // Return the data as JSON
     header('Content-Type: application/json');
     echo json_encode($clubTrends);
