@@ -1304,12 +1304,12 @@ function fetchClubTrends() {
                                         </div>
                                     </div>
                                     <div class="row ml-1">
-                                        <div class="club-rating col-6" data-rating="${club.rating}" title="${club.rating}">
+                                        <div class="club-rating col-6" data-rating="${club.rating}" title="Club Rating">
                                             ${generateStars(club.rating)}
                                             <!-- ${club.rating} -->
                                         </div>
-                                        <div class="club-status col-6" data-status="${club.status}" title="${club.status}">
-                                            ${club.status}
+                                        <div class="club-status col-6" data-status="${club.status}" title="Active Status">
+                                            <span class="status-dot" style="position: absolute; top: -10px; left: 0; color: red; font-size: 2em;">&#8226;</span> ${club.status}
                                         </div>
                                     </div>
                                 </div>
@@ -1462,11 +1462,14 @@ function generateStars(rating) {
         padding-top: 2px;
         padding-right: 0px;
         padding-bottom: 2px;
+        cursor: pointer;
     }
     .club-status {
+        position: relative;
         padding-top: 2px;
-        padding-left: 0px;
+        padding-left: 15px;
         padding-right: 0px;
+        cursor: pointer;
     }
     .star-rating {
         font-size: 14px;
