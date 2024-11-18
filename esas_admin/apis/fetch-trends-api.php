@@ -61,7 +61,31 @@ try {
     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Process the fetched clubs data
-    $clubTrends = array_map(function ($club) {
+    $clubTrends = array_map(function ($club) use ($pdo, $startDate, $endDate) {
+        // Calculate posts per week
+        $postQuery = "
+            SELECT COUNT(*) AS postCount
+            FROM tbl_posts
+            WHERE club_id = :club_id
+            AND dateAdded BETWEEN :startDate AND :endDate
+        ";
+
+        $postStmt = $pdo->prepare($postQuery);
+        $postStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
+        $postStmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+        $postStmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+        $postStmt->execute();
+        $postCount = $postStmt->fetch(PDO::FETCH_ASSOC)['postCount'];
+
+        // Calculate the number of weeks in the school year
+        $start = new DateTime($startDate);
+        $end = new DateTime($endDate);
+        $interval = $start->diff($end);
+        $weeks = ceil($interval->days / 7);  // Round up to ensure a full week is counted
+
+        // Calculate posts per week
+        $club['postPerWeek'] = $weeks > 0 ? round($postCount / $weeks, 2) : 0;
+
         if ($club['slots'] == 0) {
             $club['percentage'] = -1;
             $club['percentageText'] = '<span class="text-danger">Unli</span>';
@@ -93,4 +117,5 @@ try {
     header('Content-Type: application/json');
     echo json_encode(["error" => "Database query failed: " . $e->getMessage()]);
 }
+
 ?>
