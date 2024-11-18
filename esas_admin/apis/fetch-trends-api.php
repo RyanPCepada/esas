@@ -158,6 +158,7 @@ try {
             ? '+' . number_format($eventDifference, 2)  // Add "+" if positive
             : number_format($eventDifference, 2);       // Otherwise, just show the number
     
+        // Calculate club membership percentage
         if ($club['slots'] == 0) {
             $club['percentage'] = -1;
             $club['percentageText'] = '<span class="text-danger">Unli</span>';
@@ -167,11 +168,44 @@ try {
             $club['percentageText'] = $club['percentage'] . '%';
         }
     
+        // Add newly active and departed members
         $club['newlyActive'] = $club['activeMembers'];
         $club['newlyDeparted'] = $club['departedMembers'];
-        
+    
+        // Rating calculation based on club metrics
+        $appQuery = "SELECT COUNT(*) AS appCount FROM tbl_application WHERE club_id = :club_id";
+        $appStmt = $pdo->prepare($appQuery);
+        $appStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
+        $appStmt->execute();
+        $appCount = $appStmt->fetch(PDO::FETCH_ASSOC)['appCount'];
+    
+        $accReportQuery = "SELECT COUNT(*) AS accReportCount FROM tbl_accomplishment_reports WHERE club_id = :club_id";
+        $accReportStmt = $pdo->prepare($accReportQuery);
+        $accReportStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
+        $accReportStmt->execute();
+        $accReportCount = $accReportStmt->fetch(PDO::FETCH_ASSOC)['accReportCount'];
+    
+        $recQuery = "SELECT COUNT(*) AS recCount FROM tbl_club_recommendations WHERE club_id = :club_id";
+        $recStmt = $pdo->prepare($recQuery);
+        $recStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
+        $recStmt->execute();
+        $recCount = $recStmt->fetch(PDO::FETCH_ASSOC)['recCount'];
+    
+        // Calculate the total rating based on the weighted formula
+        $rating = (
+            ($appCount * 0.20) + // Number of Applications
+            ($club['activeMembers'] * 0.20) + // Number of Active Members
+            ($club['postPerWeek'] * 0.20) + // Posts (adjusted per week)
+            ($club['eventPerMonth'] * 0.20) + // Events (adjusted per month)
+            ($accReportCount * 0.10) + // Accomplishment Reports
+            ($recCount * 0.10) // Club Recommendations
+        );
+    
+        // Round the rating to 2 decimal places
+        $club['rating'] = number_format($rating, 2);
+    
         return $club;
-    }, $clubs);
+    }, $clubs);    
     
     // Sort clubs based on percentage (descending order)
     usort($clubTrends, function ($a, $b) {

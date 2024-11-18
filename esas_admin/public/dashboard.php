@@ -135,7 +135,8 @@ try {
         }
 
         .auto-scroll::-webkit-scrollbar-thumb {
-            background-color: rgba(211, 211, 211, 0.5); /* Light grey with 50% opacity */
+            /* background-color: rgba(211, 211, 211, 0.5); */
+            background-color: rgba(211, 211, 211, 0.0);
             border-radius: 10px; /* Rounded edges */
         }
 
@@ -1082,12 +1083,12 @@ try {
                             </div>
                             <!-- DASHBOARD COL-MD-9 END -->
                              
-                           <!-- DASHBOARD COL-MD-4 START --> 
-<div class="row trends-section col-md-3 m-0 p-0 pt-2 auto-scroll align-items-start justify-content-start" style="height: 750px; z-index: 2; position: relative;">
-    <!-- <h5 class="text-muted mt-1">Club Trends & Metrics</h5> -->
-    <div id="clubTrendsList" class="row align-items-start justify-content-start p-2" style="position: absolute; margin-top: 0px; left: 0; width: 100%;"></div>
-</div>
-<!-- DASHBOARD COL-MD-4 END -->
+                            <!-- DASHBOARD COL-MD-4 START --> 
+                            <div class="row trends-section col-md-3 m-0 p-0 pt-2 auto-scroll align-items-start justify-content-start" style="height: 785px; z-index: 2; position: relative;">
+                                <!-- <h5 class="text-muted mt-1">Club Trends & Metrics</h5> -->
+                                <div id="clubTrendsList" class="row align-items-start justify-content-start p-1" style="position: absolute; margin-top: 0px; left: 0; width: 100%;"></div>
+                            </div>
+                            <!-- DASHBOARD COL-MD-4 END -->
 
 
 
@@ -1302,6 +1303,10 @@ function fetchClubTrends() {
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row ml-1">
+    <strong><span class="card-title club-rating mb-0 text-muted" title="${club.rating}">${club.rating}</span></strong>
+</div>
+
                                 </div>
                             </div>
                         </div>
@@ -1348,7 +1353,7 @@ function fetchClubTrends() {
     .circle-bar {
         position: relative;
         width: 100%; /* Fixed width */
-        height: 100%; /* Fixed height */
+        /* height: 100%; */
         display: flex;
         justify-content: center;
         align-items: center;
