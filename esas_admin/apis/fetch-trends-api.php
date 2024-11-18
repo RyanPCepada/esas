@@ -60,8 +60,81 @@ try {
     // Fetch all results as an associative array
     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Function to convert timestamp to human-readable format
+    function timeAgo($timestamp) {
+        $timeDifference = time() - strtotime($timestamp);
+        $seconds = $timeDifference;
+        $minutes      = round($seconds / 60);           // value 60 is seconds
+        $hours        = round($seconds / 3600);         // value 3600 is 60 minutes * 60 sec
+        $days         = round($seconds / 86400);        // value 86400 is 24 hours * 60 minutes * 60 sec
+        $weeks        = round($seconds / 604800);       // value 604800 is 7 days * 24 hours * 60 minutes * 60 sec
+        $months       = round($seconds / 2629440);      // value 2629440 is ((365+365+365+365)/4/12) * 24 * 60 * 60
+        $years        = round($seconds / 31553280);     // value 31553280 is (365+365+365+365)/4 * 24 * 60 * 60
+
+        if ($seconds <= 60) {
+            return "Just Now";
+        } else if ($minutes <= 60) {
+            if ($minutes == 1) {
+                return "1 min ago";
+            } else {
+                return "$minutes mins ago";
+            }
+        } else if ($hours <= 24) {
+            if ($hours == 1) {
+                return "1 hr ago";
+            } else {
+                return "$hours hrs ago";
+            }
+        } else if ($days <= 7) {
+            if ($days == 1) {
+                return "yesterday";
+            } else {
+                return "$days days ago";
+            }
+        } else if ($weeks <= 4.3) { // 4.3 == 30/7
+            if ($weeks == 1) {
+                return "1 week ago";
+            } else {
+                return "$weeks weeks ago";
+            }
+        } else if ($months <= 12) {
+            if ($months == 1) {
+                return "1 month ago";
+            } else {
+                return "$months months ago";
+            }
+        } else {
+            if ($years == 1) {
+                return "1 year ago";
+            } else {
+                return "$years years ago";
+            }
+        }
+    }
+
     // Process the fetched clubs data
     $clubTrends = array_map(function ($club) use ($pdo, $startDate, $endDate, $startYear) {
+        // Get latest activity date for the club
+        $activityQuery = "
+            SELECT dateAdded
+            FROM tbl_activity_logs
+            WHERE club_id = :club_id
+            ORDER BY dateAdded DESC
+            LIMIT 1
+        ";
+
+        $activityStmt = $pdo->prepare($activityQuery);
+        $activityStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
+        $activityStmt->execute();
+        $activityResult = $activityStmt->fetch(PDO::FETCH_ASSOC);
+
+        // If there's an activity, calculate the time ago
+        if ($activityResult) {
+            $club['status'] = timeAgo($activityResult['dateAdded']);
+        } else {
+            $club['status'] = 'Not active';
+        }
+
         // Calculate posts per week for this school year
         $postQuery = "
             SELECT COUNT(*) AS postCount
@@ -194,11 +267,11 @@ try {
         // Calculate the total rating based on the weighted formula
         $rating = (
             ($appCount * 0.20) + // Number of Applications
-            ($club['activeMembers'] * 0.30) + // Number of Active Members
+            ($club['activeMembers'] * 0.20) + // Number of Active Members
             ($club['postPerWeek'] * 0.20) + // Posts (adjusted per week)
             ($club['eventPerMonth'] * 0.20) + // Events (adjusted per month)
-            ($accReportCount * 0.5) + // Accomplishment Reports
-            ($recCount * 0.5) // Club Recommendations
+            ($accReportCount * 0.10) + // Accomplishment Reports
+            ($recCount * 0.10) // Club Recommendations
         );
     
         // Round the rating to 2 decimal places

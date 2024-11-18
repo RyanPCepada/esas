@@ -1304,9 +1304,12 @@ function fetchClubTrends() {
                                         </div>
                                     </div>
                                     <div class="row ml-1">
-                                        <div class="club-rating" data-rating="${club.rating}" title="${club.rating}">
+                                        <div class="club-rating col-6" data-rating="${club.rating}" title="${club.rating}">
                                             ${generateStars(club.rating)}
                                             <!-- ${club.rating} -->
+                                        </div>
+                                        <div class="club-status col-6" data-status="${club.status}" title="${club.status}">
+                                            ${club.status}
                                         </div>
                                     </div>
                                 </div>
@@ -1340,17 +1343,17 @@ function generateStars(rating) {
 
     // Add full stars
     for (let i = 0; i < fullStars; i++) {
-        starsHTML += '<i class="fas fa-star text-warning"></i>'; // Full star
+        starsHTML += '<i class="fas fa-star star-rating text-warning"></i>'; // Full star
     }
 
     // Add half star (if any)
     if (halfStar) {
-        starsHTML += '<i class="fas fa-star-half-alt text-warning"></i>'; // Half star
+        starsHTML += '<i class="fas fa-star-half-alt star-rating text-warning"></i>'; // Half star
     }
 
     // Display one empty star if the rating is 0, else do not display empty stars
     if (numRating === 0) {
-        starsHTML += '<i class="far fa-star text-warning"></i>'; // Empty star
+        starsHTML += '<i class="far fa-star star-rating text-warning"></i>'; // Empty star
     }
 
     return starsHTML;
@@ -1455,8 +1458,18 @@ function generateStars(rating) {
         cursor: pointer;
     }
     .club-rating {
+        margin-right: 0px;
         padding-top: 2px;
+        padding-right: 0px;
         padding-bottom: 2px;
+    }
+    .club-status {
+        padding-top: 2px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    .star-rating {
+        font-size: 14px;
     }
 </style>
 
