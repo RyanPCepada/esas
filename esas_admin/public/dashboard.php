@@ -1225,7 +1225,7 @@ function fetchClubTrends() {
                     html += `
                         <div class="card trends-card">
                             <div class="row trends-card-body">
-                                <div class="col-md-3 d-flex justify-content-center align-items-start p-0 ps-2">
+                                <div class="col-3 d-flex justify-content-center align-items-start p-0 ps-2">
                                     <div class="circle-bar" title="Slot occupancy"> 
                                         <svg viewBox="0 0 36 36" class="circular-chart">
                                             <!-- Background circle -->
@@ -1246,7 +1246,7 @@ function fetchClubTrends() {
                                         </div>
                                     </div> 
                                 </div>
-                                <div class="col-md-9">
+                                <div class="col-9">
                                     <div class="row ml-1">
                                         <strong><span class="card-title club-name mb-0 text-muted" title="${club.clubName}">${club.clubName}</span></strong>
                                     </div>
