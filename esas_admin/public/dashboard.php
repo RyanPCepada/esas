@@ -1250,12 +1250,12 @@ function fetchClubTrends() {
                                         <strong><span class="card-title club-name mb-0 text-muted" title="${club.clubName}">${club.clubName}</span></strong>
                                     </div>
                                     <div class="row mt-1 px-2">
-                                        <div class="card card-members col-md-4 p-0">
+                                        <div class="card card-members col-md-4 p-0" title="Active/Departed Members">
                                             <div class="col-5 div-user-icon text-center">
                                                 <i class="fas fa-user text-primary"></i>
                                             </div>
-                                            <div class="col-7 div-user-data text-center" title="Active and departed members">
-                                                <strong><p class="m-0" style="font-size: 10px; color: blue;">
+                                            <div class="col-7 div-user-data text-center">
+                                                <strong><p class="m-0" style="font-size: 10px; color: black;">
                                                     ${club.newlyActive !== 0 ? `+${club.newlyActive}` : club.newlyActive}
                                                 </p></strong>
                                                 <strong><p class="" style="font-size: 10px; color: red; margin: -5px;">
@@ -1263,8 +1263,18 @@ function fetchClubTrends() {
                                                 </p></strong>
                                             </div>
                                         </div>
-                                        <div class="card card-posts col-md-4 p-1">
-                                            <i class="fas fa-bullhorn text-info"></i>
+                                        <div class="card card-posts col-md-4 p-0" title="Posts per Week">
+                                            <div class="col-5 div-user-icon text-center">
+                                                <i class="fas fa-bullhorn text-info"></i>
+                                            </div>
+                                            <div class="col-7 div-user-data text-center">
+                                                <strong><p class="m-0" style="font-size: 10px; color: black;">
+                                                    ${club.postPerWeek !== 0 ? `${club.postPerWeek}` : club.postPerWeek}
+                                                </p></strong>
+                                                <strong><p class="" style="font-size: 10px; color: red; margin: -5px;">
+                                                    ${club.postPercentage !== 0 ? `${club.postPercentage}` : club.postPercentage}
+                                                </p></strong>
+                                            </div>
                                         </div>
                                         <div class="card card-events col-md-4 p-1">
                                             <i class="fas fa-calendar text-info"></i>
@@ -1341,6 +1351,7 @@ function fetchClubTrends() {
 
     .circle-bg {
         stroke: #FFFFFF;
+        /* stroke: lightblue; */
         stroke-width: 4;
     }
     .circle {
