@@ -1306,6 +1306,7 @@ function fetchClubTrends() {
                                     <div class="row ml-1">
                                         <div class="club-rating" data-rating="${club.rating}" title="${club.rating}">
                                             ${generateStars(club.rating)}
+                                            <!-- ${club.rating} -->
                                         </div>
                                     </div>
                                 </div>
@@ -1347,10 +1348,10 @@ function generateStars(rating) {
         starsHTML += '<i class="fas fa-star-half-alt text-warning"></i>'; // Half star
     }
 
-    // Add empty stars
-    // for (let i = 0; i < emptyStars; i++) {
-    //     starsHTML += '<i class="far fa-star text-muted"></i>'; // Empty star
-    // }
+    // Display one empty star if the rating is 0, else do not display empty stars
+    if (numRating === 0) {
+        starsHTML += '<i class="far fa-star text-warning"></i>'; // Empty star
+    }
 
     return starsHTML;
 }

@@ -194,15 +194,15 @@ try {
         // Calculate the total rating based on the weighted formula
         $rating = (
             ($appCount * 0.20) + // Number of Applications
-            ($club['activeMembers'] * 0.20) + // Number of Active Members
+            ($club['activeMembers'] * 0.30) + // Number of Active Members
             ($club['postPerWeek'] * 0.20) + // Posts (adjusted per week)
             ($club['eventPerMonth'] * 0.20) + // Events (adjusted per month)
-            ($accReportCount * 0.10) + // Accomplishment Reports
-            ($recCount * 0.10) // Club Recommendations
+            ($accReportCount * 0.5) + // Accomplishment Reports
+            ($recCount * 0.5) // Club Recommendations
         );
     
         // Round the rating to 2 decimal places
-        $club['rating'] = number_format($rating, 2);
+        $club['rating'] = number_format($rating/6, 2);
     
         return $club;
     }, $clubs);    
