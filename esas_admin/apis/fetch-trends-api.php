@@ -61,8 +61,8 @@ try {
     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Process the fetched clubs data
-    $clubTrends = array_map(function ($club) use ($pdo, $startDate, $endDate) {
-        // Calculate posts per week
+    $clubTrends = array_map(function ($club) use ($pdo, $startDate, $endDate, $startYear) {
+        // Calculate posts per week for this school year
         $postQuery = "
             SELECT COUNT(*) AS postCount
             FROM tbl_posts
@@ -83,18 +83,45 @@ try {
         $interval = $start->diff($end);
         $weeks = ceil($interval->days / 7);  // Round up to ensure a full week is counted
 
-        // Calculate posts per week
-        $club['postPerWeek'] = $weeks > 0 ? round($postCount / $weeks, 2) : 0;
+        // Calculate posts per week for this year
+        $club['postPerWeek'] = $weeks > 0 ? number_format($postCount / $weeks, 2) : 0;
+
+        // Get last school year's data for comparison (same range, previous year)
+        $lastYearStartDate = ($startYear - 1) . "-08-01"; // Last year starts on August 1st
+        $lastYearEndDate = ($startYear) . "-07-31"; // Last year ends on July 31st
+
+        $lastYearPostStmt = $pdo->prepare($postQuery);
+        $lastYearPostStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
+        $lastYearPostStmt->bindParam(':startDate', $lastYearStartDate, PDO::PARAM_STR);
+        $lastYearPostStmt->bindParam(':endDate', $lastYearEndDate, PDO::PARAM_STR);
+        $lastYearPostStmt->execute();
+        $lastYearPostCount = $lastYearPostStmt->fetch(PDO::FETCH_ASSOC)['postCount'];
+
+        // Calculate posts per week for last year
+        $lastYearStart = new DateTime($lastYearStartDate);
+        $lastYearEnd = new DateTime($lastYearEndDate);
+        $lastYearInterval = $lastYearStart->diff($lastYearEnd);
+        $lastYearWeeks = ceil($lastYearInterval->days / 7);  // Round up weeks
+
+        $lastYearPostsPerWeek = $lastYearWeeks > 0 ? $lastYearPostCount / $lastYearWeeks : 0;
+
+        // Calculate the difference in posts per week (this year - last year)
+        $postDifference = $club['postPerWeek'] - $lastYearPostsPerWeek;
+
+        // Add the "+" sign if the difference is positive
+        $club['postChanges'] = $postDifference > 0 
+            ? '+' . number_format($postDifference, 2)  // Add "+" if positive
+            : number_format($postDifference, 2);       // Otherwise, just show the number
 
         if ($club['slots'] == 0) {
             $club['percentage'] = -1;
             $club['percentageText'] = '<span class="text-danger">Unli</span>';
         } else {
-            // Calculate the club percentage based on active members
-            $club['percentage'] = round(($club['activeMembers'] / $club['slots']) * 100, 2);
+            // Calculate the club percentage based on active members and limit to 2 decimal places
+            $club['percentage'] = number_format(($club['activeMembers'] / $club['slots']) * 100, 2);
             $club['percentageText'] = $club['percentage'] . '%';
         }
-        
+
         $club['newlyActive'] = $club['activeMembers'];
         $club['newlyDeparted'] = $club['departedMembers'];
     
@@ -117,5 +144,4 @@ try {
     header('Content-Type: application/json');
     echo json_encode(["error" => "Database query failed: " . $e->getMessage()]);
 }
-
 ?>
