@@ -1250,7 +1250,7 @@ function fetchClubTrends() {
                                         <strong><span class="card-title club-name mb-0 text-muted" title="${club.clubName}">${club.clubName}</span></strong>
                                     </div>
                                     <div class="row mt-1 px-2">
-                                        <div class="card card-members col-md-4 p-0" title="Active and Departed Members This School Year">
+                                        <div class="card card-members col-md-4" title="Active and Departed Members This School Year">
                                             <div class="col-5 div-user-icon text-center">
                                                 <i class="fas fa-user text-primary"></i>
                                             </div>
@@ -1263,7 +1263,7 @@ function fetchClubTrends() {
                                                 </p></strong>
                                             </div>
                                         </div>
-                                        <div class="card card-posts col-md-4 p-0" title="Posts per Week Compared to Previous School Year">
+                                        <div class="card card-posts col-md-4" title="Posts per Week Compared to Previous School Year">
                                             <div class="col-5 div-user-icon text-center">
                                                 <i class="fas fa-bullhorn text-info"></i>
                                             </div>
@@ -1282,8 +1282,24 @@ function fetchClubTrends() {
                                                 </strong>
                                             </div>
                                         </div>
-                                        <div class="card card-events col-md-4 p-1">
-                                            <i class="fas fa-calendar text-info"></i>
+                                        <div class="card card-events col-md-4" title="Events per Month Compared to Previous School Year">
+                                            <div class="col-5 div-user-icon text-center">
+                                                <i class="fas fa-calendar text-info"></i>
+                                            </div>
+                                            <div class="col-7 div-user-data text-center">
+                                                <strong>
+                                                    <p class="m-0" style="font-size: 10px; color: black;">
+                                                        ${club.eventPerMonth !== 0 ? `${club.eventPerMonth}` : club.eventPerMonth}
+                                                    </p>
+                                                </strong>
+                                                <strong>
+                                                    <p class="" style="font-size: 10px; 
+                                                        color: ${club.eventChanges === 0 ? 'black' : (club.eventChanges > 0 ? 'blue' : 'red')}; 
+                                                        margin: -5px;">
+                                                        ${club.eventChanges !== 0 ? `${club.eventChanges}` : club.eventChanges}
+                                                    </p>
+                                                </strong>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1387,6 +1403,8 @@ function fetchClubTrends() {
         background-color: rgba(0, 0, 0, 0.8);
         background-color: white;
         margin: 0px 2px;
+        padding: 0px;
+        padding-bottom: 2px;
         width: 30%;
     }
 

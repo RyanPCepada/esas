@@ -69,50 +69,95 @@ try {
             WHERE club_id = :club_id
             AND dateAdded BETWEEN :startDate AND :endDate
         ";
-
+    
         $postStmt = $pdo->prepare($postQuery);
         $postStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
         $postStmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
         $postStmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
         $postStmt->execute();
         $postCount = $postStmt->fetch(PDO::FETCH_ASSOC)['postCount'];
-
+    
         // Calculate the number of weeks in the school year
         $start = new DateTime($startDate);
         $end = new DateTime($endDate);
         $interval = $start->diff($end);
         $weeks = ceil($interval->days / 7);  // Round up to ensure a full week is counted
-
+    
         // Calculate posts per week for this year
         $club['postPerWeek'] = $weeks > 0 ? number_format($postCount / $weeks, 2) : 0;
-
+    
         // Get last school year's data for comparison (same range, previous year)
         $lastYearStartDate = ($startYear - 1) . "-08-01"; // Last year starts on August 1st
         $lastYearEndDate = ($startYear) . "-07-31"; // Last year ends on July 31st
-
+    
         $lastYearPostStmt = $pdo->prepare($postQuery);
         $lastYearPostStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
         $lastYearPostStmt->bindParam(':startDate', $lastYearStartDate, PDO::PARAM_STR);
         $lastYearPostStmt->bindParam(':endDate', $lastYearEndDate, PDO::PARAM_STR);
         $lastYearPostStmt->execute();
         $lastYearPostCount = $lastYearPostStmt->fetch(PDO::FETCH_ASSOC)['postCount'];
-
+    
         // Calculate posts per week for last year
         $lastYearStart = new DateTime($lastYearStartDate);
         $lastYearEnd = new DateTime($lastYearEndDate);
         $lastYearInterval = $lastYearStart->diff($lastYearEnd);
         $lastYearWeeks = ceil($lastYearInterval->days / 7);  // Round up weeks
-
+    
         $lastYearPostsPerWeek = $lastYearWeeks > 0 ? $lastYearPostCount / $lastYearWeeks : 0;
-
+    
         // Calculate the difference in posts per week (this year - last year)
         $postDifference = $club['postPerWeek'] - $lastYearPostsPerWeek;
-
+    
         // Add the "+" sign if the difference is positive
         $club['postChanges'] = $postDifference > 0 
             ? '+' . number_format($postDifference, 2)  // Add "+" if positive
             : number_format($postDifference, 2);       // Otherwise, just show the number
-
+    
+        // Calculate events per month for this school year
+        $eventQuery = "
+            SELECT COUNT(*) AS eventCount
+            FROM tbl_events
+            WHERE club_id = :club_id
+            AND dateAdded BETWEEN :startDate AND :endDate
+        ";
+    
+        $eventStmt = $pdo->prepare($eventQuery);
+        $eventStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
+        $eventStmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+        $eventStmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+        $eventStmt->execute();
+        $eventCount = $eventStmt->fetch(PDO::FETCH_ASSOC)['eventCount'];
+    
+        // Calculate the number of months in the school year
+        $months = ceil($interval->days / 30); // Approximate month count
+    
+        // Calculate events per month for this year
+        $club['eventPerMonth'] = $months > 0 ? number_format($eventCount / $months, 2) : 0;
+    
+        // Get last school year's data for comparison (same range, previous year)
+        $lastYearEventStmt = $pdo->prepare($eventQuery);
+        $lastYearEventStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
+        $lastYearEventStmt->bindParam(':startDate', $lastYearStartDate, PDO::PARAM_STR);
+        $lastYearEventStmt->bindParam(':endDate', $lastYearEndDate, PDO::PARAM_STR);
+        $lastYearEventStmt->execute();
+        $lastYearEventCount = $lastYearEventStmt->fetch(PDO::FETCH_ASSOC)['eventCount'];
+    
+        // Calculate events per month for last year
+        $lastYearStart = new DateTime($lastYearStartDate);
+        $lastYearEnd = new DateTime($lastYearEndDate);
+        $lastYearInterval = $lastYearStart->diff($lastYearEnd);
+        $lastYearMonths = ceil($lastYearInterval->days / 30);  // Approximate month count
+    
+        $lastYearEventsPerMonth = $lastYearMonths > 0 ? $lastYearEventCount / $lastYearMonths : 0;
+    
+        // Calculate the difference in events per month (this year - last year)
+        $eventDifference = $club['eventPerMonth'] - $lastYearEventsPerMonth;
+    
+        // Add the "+" sign if the difference is positive
+        $club['eventChanges'] = $eventDifference > 0 
+            ? '+' . number_format($eventDifference, 2)  // Add "+" if positive
+            : number_format($eventDifference, 2);       // Otherwise, just show the number
+    
         if ($club['slots'] == 0) {
             $club['percentage'] = -1;
             $club['percentageText'] = '<span class="text-danger">Unli</span>';
@@ -121,13 +166,13 @@ try {
             $club['percentage'] = number_format(($club['activeMembers'] / $club['slots']) * 100, 2);
             $club['percentageText'] = $club['percentage'] . '%';
         }
-
+    
         $club['newlyActive'] = $club['activeMembers'];
         $club['newlyDeparted'] = $club['departedMembers'];
-    
+        
         return $club;
     }, $clubs);
-
+    
     // Sort clubs based on percentage (descending order)
     usort($clubTrends, function ($a, $b) {
         if ($a['percentage'] == -1) return 1;
