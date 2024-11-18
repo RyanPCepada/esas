@@ -178,7 +178,7 @@ try {
                     </li>
                     <li class="nav-item">
                         <a href="../../esas_admin/public/moderators.php" class="nav-link left-sidebar text-dark" id="my-clubs">
-                            <i class="fa fa-user-shield"></i> Moderators
+                            <i class="fas fa-user-shield"></i> Moderators
                         </a>
                     </li>
                     <li class="nav-item">
@@ -1253,7 +1253,7 @@ function fetchClubTrends() {
                                     <div class="row mt-1 px-2">
                                         <div class="card card-members col-md-4" title="Active and Departed Members This School Year">
                                             <div class="col-5 div-user-icon text-center">
-                                                <i class="fas fa-user text-primary"></i>
+                                                <i class="fas fa-user text-info"></i>
                                             </div>
                                             <div class="col-7 div-user-data text-center">
                                                 <strong><p class="m-0" style="font-size: 10px; color: black;">
@@ -1304,9 +1304,10 @@ function fetchClubTrends() {
                                         </div>
                                     </div>
                                     <div class="row ml-1">
-    <strong><span class="card-title club-rating mb-0 text-muted" title="${club.rating}">${club.rating}</span></strong>
-</div>
-
+                                        <div class="club-rating" data-rating="${club.rating}" title="${club.rating}">
+                                            ${generateStars(club.rating)}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1323,6 +1324,39 @@ function fetchClubTrends() {
         });
 }
 
+
+
+function generateStars(rating) {
+    // Convert rating to a number (ensure no string issues)
+    const numRating = parseFloat(rating);
+    
+    // Create full stars, half stars, and empty stars
+    let fullStars = Math.floor(numRating); // Full stars
+    let halfStar = numRating % 1 >= 0.5 ? 1 : 0; // Half star if rating has decimal >= 0.5
+    let emptyStars = 5 - (fullStars + halfStar); // Remaining are empty stars
+
+    let starsHTML = '';
+
+    // Add full stars
+    for (let i = 0; i < fullStars; i++) {
+        starsHTML += '<i class="fas fa-star text-warning"></i>'; // Full star
+    }
+
+    // Add half star (if any)
+    if (halfStar) {
+        starsHTML += '<i class="fas fa-star-half-alt text-warning"></i>'; // Half star
+    }
+
+    // Add empty stars
+    // for (let i = 0; i < emptyStars; i++) {
+    //     starsHTML += '<i class="far fa-star text-muted"></i>'; // Empty star
+    // }
+
+    return starsHTML;
+}
+
+
+
 </script>
 
 
@@ -1338,6 +1372,7 @@ function fetchClubTrends() {
         margin-left: 10px;
         margin-bottom: 10px;
         padding: 8px;
+        padding-bottom: 0px;
         background-color: #E9ECEF;
         background-color: #DEE2E6;
         background-color: white;
@@ -1417,6 +1452,10 @@ function fetchClubTrends() {
         position: absolute;
         right: 2px;
         cursor: pointer;
+    }
+    .club-rating {
+        padding-top: 2px;
+        padding-bottom: 2px;
     }
 </style>
 
