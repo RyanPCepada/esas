@@ -182,7 +182,7 @@ try {
         $postDifference = $club['postPerWeek'] - $lastYearPostsPerWeek;
     
         // Add the "+" sign if the difference is positive
-        $club['postChanges'] = $postDifference > 0 
+        $club['postsChanges'] = $postDifference > 0 
             ? '+' . number_format($postDifference, 2)  // Add "+" if positive
             : number_format($postDifference, 2);       // Otherwise, just show the number
     
@@ -227,7 +227,7 @@ try {
         $eventDifference = $club['eventPerMonth'] - $lastYearEventsPerMonth;
     
         // Add the "+" sign if the difference is positive
-        $club['eventChanges'] = $eventDifference > 0 
+        $club['eventsChanges'] = $eventDifference > 0 
             ? '+' . number_format($eventDifference, 2)  // Add "+" if positive
             : number_format($eventDifference, 2);       // Otherwise, just show the number
     

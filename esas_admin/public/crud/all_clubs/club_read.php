@@ -128,8 +128,153 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
     exit();
 }
 
+
+// Get the current year and next year
+$currentYear = date('Y');
+$nextYear = $currentYear + 1;
+$previousYear = $currentYear - 1;
+
+// Define the start and end dates of the current school year (Aug to July)
+$startDate = "$currentYear-08-01";
+$endDate = "$nextYear-07-31";
+
+// Define the start and end dates of the previous school year (Aug to July)
+$prevStartDate = "$previousYear-08-01";
+$prevEndDate = "$currentYear-07-31";
+
+// SQL for new members this year
+$newMembersSql = "SELECT COUNT(*) AS newMembers FROM tbl_application 
+                  WHERE club_id = :club_id AND status = 'active' 
+                  AND dateDecided BETWEEN :startDate AND :endDate";
+$newMembersStmt = $pdo->prepare($newMembersSql);
+$newMembersStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$newMembersStmt->bindParam(":startDate", $startDate, PDO::PARAM_STR);
+$newMembersStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
+$newMembersStmt->execute();
+$newMembersRow = $newMembersStmt->fetch(PDO::FETCH_ASSOC);
+$newMembersCount = $newMembersRow['newMembers'];
+
+// SQL for departed members this year
+$departedMembersSql = "SELECT COUNT(*) AS departedMembers FROM tbl_application 
+                       WHERE club_id = :club_id AND status = 'departed' 
+                       AND dateDecided BETWEEN :startDate AND :endDate";
+$departedMembersStmt = $pdo->prepare($departedMembersSql);
+$departedMembersStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$departedMembersStmt->bindParam(":startDate", $startDate, PDO::PARAM_STR);
+$departedMembersStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
+$departedMembersStmt->execute();
+$departedMembersRow = $departedMembersStmt->fetch(PDO::FETCH_ASSOC);
+$departedMembersCount = $departedMembersRow['departedMembers'];
+
+// SQL for total active members this year
+$totalMembersThisYearSql = "SELECT COUNT(*) AS totalMembers FROM tbl_application 
+                            WHERE club_id = :club_id AND status = 'active' 
+                            AND dateDecided BETWEEN :startDate AND :endDate";
+$totalMembersThisYearStmt = $pdo->prepare($totalMembersThisYearSql);
+$totalMembersThisYearStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$totalMembersThisYearStmt->bindParam(":startDate", $startDate, PDO::PARAM_STR);
+$totalMembersThisYearStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
+$totalMembersThisYearStmt->execute();
+$totalMembersThisYearRow = $totalMembersThisYearStmt->fetch(PDO::FETCH_ASSOC);
+$totalMembersThisYear = $totalMembersThisYearRow['totalMembers'];
+
+// SQL for total active members last year
+$totalMembersLastYearSql = "SELECT COUNT(*) AS totalMembers FROM tbl_application 
+                            WHERE club_id = :club_id AND status = 'active' 
+                            AND dateDecided BETWEEN :prevStartDate AND :prevEndDate";
+$totalMembersLastYearStmt = $pdo->prepare($totalMembersLastYearSql);
+$totalMembersLastYearStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$totalMembersLastYearStmt->bindParam(":prevStartDate", $prevStartDate, PDO::PARAM_STR);
+$totalMembersLastYearStmt->bindParam(":prevEndDate", $prevEndDate, PDO::PARAM_STR);
+$totalMembersLastYearStmt->execute();
+$totalMembersLastYearRow = $totalMembersLastYearStmt->fetch(PDO::FETCH_ASSOC);
+$totalMembersLastYear = $totalMembersLastYearRow['totalMembers'];
+
+// Calculate the difference in total members
+$membersChanges = $totalMembersThisYear - $totalMembersLastYear - $departedMembersCount;
+
+// Close statements
+unset($newMembersStmt, $departedMembersStmt, $totalMembersThisYearStmt, $totalMembersLastYearStmt);
+
+
+// Define the start and end dates for the current school year
+$startDate = "$currentYear-08-01";
+$endDate = "$nextYear-07-31";
+$prevStartDate = "$previousYear-08-01";
+$prevEndDate = "$currentYear-07-31";
+
+// SQL for posts created this week
+$thisWeekStartDate = date('Y-m-d', strtotime('monday this week'));
+$thisWeekEndDate = date('Y-m-d', strtotime('sunday this week'));
+$newPostsSql = "SELECT COUNT(*) AS newPosts FROM tbl_posts 
+                WHERE club_id = :club_id 
+                AND dateAdded BETWEEN :thisWeekStartDate AND :thisWeekEndDate";
+$newPostsStmt = $pdo->prepare($newPostsSql);
+$newPostsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$newPostsStmt->bindParam(":thisWeekStartDate", $thisWeekStartDate, PDO::PARAM_STR);
+$newPostsStmt->bindParam(":thisWeekEndDate", $thisWeekEndDate, PDO::PARAM_STR);
+$newPostsStmt->execute();
+$newPostsRow = $newPostsStmt->fetch(PDO::FETCH_ASSOC);
+$newPostsCount = $newPostsRow['newPosts'];
+
+// SQL for average posts per week for this school year
+$averagePostsSql = "SELECT COUNT(*) / TIMESTAMPDIFF(WEEK, :startDate, :endDate) AS averagePosts 
+                    FROM tbl_posts 
+                    WHERE club_id = :club_id 
+                    AND dateAdded BETWEEN :startDate AND :endDate";
+$averagePostsStmt = $pdo->prepare($averagePostsSql);
+$averagePostsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$averagePostsStmt->bindParam(":startDate", $startDate, PDO::PARAM_STR);
+$averagePostsStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
+$averagePostsStmt->execute();
+$averagePostsRow = $averagePostsStmt->fetch(PDO::FETCH_ASSOC);
+$postAveragePerWeek = round($averagePostsRow['averagePosts'], 2);
+$averagePostsLastYearSql = "SELECT COUNT(*) / TIMESTAMPDIFF(WEEK, :prevStartDate, :prevEndDate) AS averagePosts 
+                            FROM tbl_posts 
+                            WHERE club_id = :club_id 
+                            AND dateAdded BETWEEN :prevStartDate AND :prevEndDate";
+$averagePostsLastYearStmt = $pdo->prepare($averagePostsLastYearSql);
+$averagePostsLastYearStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$averagePostsLastYearStmt->bindParam(":prevStartDate", $prevStartDate, PDO::PARAM_STR);
+$averagePostsLastYearStmt->bindParam(":prevEndDate", $prevEndDate, PDO::PARAM_STR);
+$averagePostsLastYearStmt->execute();
+$averagePostsLastYearRow = $averagePostsLastYearStmt->fetch(PDO::FETCH_ASSOC);
+$averagePostsLastYear = round($averagePostsLastYearRow['averagePosts'], 2);
+
+// SQL for total posts last year
+$totalPostsLastYearSql = "SELECT COUNT(*) AS totalPosts FROM tbl_posts 
+                          WHERE club_id = :club_id 
+                          AND dateAdded BETWEEN :prevStartDate AND :prevEndDate";
+$totalPostsLastYearStmt = $pdo->prepare($totalPostsLastYearSql);
+$totalPostsLastYearStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$totalPostsLastYearStmt->bindParam(":prevStartDate", $prevStartDate, PDO::PARAM_STR);
+$totalPostsLastYearStmt->bindParam(":prevEndDate", $prevEndDate, PDO::PARAM_STR);
+$totalPostsLastYearStmt->execute();
+$totalPostsLastYearRow = $totalPostsLastYearStmt->fetch(PDO::FETCH_ASSOC);
+$totalPostsLastYear = $totalPostsLastYearRow['totalPosts'];
+
+// SQL for total posts this year
+$totalPostsThisYearSql = "SELECT COUNT(*) AS totalPosts FROM tbl_posts 
+                          WHERE club_id = :club_id 
+                          AND dateAdded BETWEEN :startDate AND :endDate";
+$totalPostsThisYearStmt = $pdo->prepare($totalPostsThisYearSql);
+$totalPostsThisYearStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$totalPostsThisYearStmt->bindParam(":startDate", $startDate, PDO::PARAM_STR);
+$totalPostsThisYearStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
+$totalPostsThisYearStmt->execute();
+$totalPostsThisYearRow = $totalPostsThisYearStmt->fetch(PDO::FETCH_ASSOC);
+$totalPostsThisYear = $totalPostsThisYearRow['totalPosts'];
+
+// Calculate the change in posts compared to last school year
+$postsChanges = $postAveragePerWeek - $averagePostsLastYear;
+
+// Close statements
+unset($newPostsStmt, $averagePostsStmt, $totalPostsLastYearStmt, $totalPostsThisYearStmt);
+
+
 // Close connection
 unset($pdo);
+
 ?>
 
 
@@ -142,6 +287,7 @@ unset($pdo);
     <title>ESAS - Club Details</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../../assets/js/jquery-3.6.0.js"></script>
@@ -172,14 +318,78 @@ unset($pdo);
                                      <!-- class="img-fluid" style="width: 300px; height: 171px; border-radius: 5px; object-fit: cover;"> -->
                             </div>
                             <div class="row col-md-8">
-                                <div class="col-8">
+                                <div class="col-9">
                                     <h3 class="text-muted mb-0"><?php echo $clubName; ?></h3>
                                     <span class="status-dot" style="position: absolute; top: 18px; left: 16px; color: red; font-size: 2em;">&#8226;</span><small class="ml-3"> Active <?php echo $clubStatus; ?></small>
-                                    <hr>
-                                    <p><strong>Date Created: </strong><?php echo date("F j, Y", strtotime($dateAdded)); ?></p>
-                                    <p><strong><?php echo $moderatorLabel; ?> </strong><?php echo $moderatorNames; ?></p>
+                                    <!-- <hr> -->
+                                    <div class="row col-12 m-0 mt-2 p-0">
+                                        <!-- MEMBERS CARD START -->
+                                        <div class="col-4 p-1">
+                                            <div class="card card-members p-2">
+                                                <p class="m-0 p-0"><i class="fas fa-user text-info"></i><strong> Members</strong></p>
+                                                <h3 class="text-muted m-0 p-0"><strong><?php echo $newMembersCount; ?><small> new</small></strong></h3>
+                                                <p class="text-muted m-0 p-0"><strong><?php echo $departedMembersCount; ?> <?php echo $departedMembersCount == 1 ? 'Departure' : 'Departures'; ?></strong></p>
+                                                
+                                                <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
+                                                    <?php if ($membersChanges > 0): ?>
+                                                        <i class="fas fa-arrow-up text-light"></i>
+                                                    <?php elseif ($membersChanges < 0): ?>
+                                                        <i class="fas fa-arrow-down text-light"></i>
+                                                    <?php else: ?>
+                                                        <small>0</small>
+                                                    <?php endif; ?>
+                                                </div>
+
+                                                <?php if ($membersChanges > 0): ?>
+                                                    <small class="text-muted m-0 p-0"><small>+</small><?php echo $membersChanges; ?> Compared to previous SY</small>
+                                                <?php elseif ($membersChanges < 0): ?>
+                                                    <small class="text-muted m-0 p-0"><?php echo $membersChanges; ?> Compared to previous SY</small>
+                                                <?php else: ?>
+                                                    <small class="text-muted m-0 p-0">+-0 Compared to previous SY</small>
+                                                <?php endif; ?>
+                                            </div> 
+                                        </div>
+                                        <!-- MEMBERS CARD END -->
+                                        <!-- POSTS CARD START -->
+                                        <div class="col-4 p-1">
+                                            <div class="card card-posts p-2">
+                                                <p class="m-0 p-0"><i class="fas fa-bullhorn text-info"></i><strong> Posts</strong></p>
+                                                <h3 class="text-muted m-0 p-0"><strong><?php echo $newPostsCount; ?><small> this week</small></strong></h3>
+                                                <p class="text-muted m-0 p-0"><strong><?php echo $postAveragePerWeek; ?> posts/week</strong></p>
+                                                
+                                                <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
+                                                    <?php if ($postsChanges > 0): ?>
+                                                        <i class="fas fa-arrow-up text-light"></i>
+                                                    <?php elseif ($postsChanges < 0): ?>
+                                                        <i class="fas fa-arrow-down text-light"></i>
+                                                    <?php else: ?>
+                                                        <h4>0</h4>
+                                                    <?php endif; ?>
+                                                </div>
+
+                                                <?php if ($postsChanges > 0): ?>
+                                                    <small class="text-muted m-0 p-0"><small>+</small><?php echo $postsChanges; ?> Compared to previous SY</small>
+                                                <?php elseif ($postsChanges < 0): ?>
+                                                    <small class="text-muted m-0 p-0"><?php echo $postsChanges; ?> Compared to previous SY</small>
+                                                <?php else: ?>
+                                                    <small class="text-muted m-0 p-0">+-0 Compared to previous SY</small>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+
+                                        <!-- POSTS CARD END -->
+                                        <!-- EVENTS CARD START -->
+                                        <div class="col-4 p-1">
+                                            <div class="card card-events p-2">
+                                                <p><i class="fas fa-calendar text-info"></i><strong> Events</strong></p>
+                                            </div>
+                                        </div>
+                                        <!-- EVENTS CARD END -->
+                                    </div>
+                                    <p class="m-0 mt-3 p-0"><strong>Date Created: </strong><?php echo date("F j, Y", strtotime($dateAdded)); ?></p>
+                                    <p class="m-0 p-0"><strong><?php echo $moderatorLabel; ?> </strong><?php echo $moderatorNames; ?></p>
                                 </div>
-                                <div class="col-4"> 
+                                <div class="col-3"> 
                                     <div class="circle-bar" title="Slot occupancy"> 
                                         <svg viewBox="0 0 36 36" class="circular-chart">
                                             <!-- Background circle -->
@@ -193,29 +403,42 @@ unset($pdo);
                                                 fill="none" stroke="#007bff" stroke-width="4"
                                                 stroke-dasharray="<?= $slotsPercentage ?>, 100"></path>
                                         </svg>
-                                        <div class="circle-label">
+                                        <div class="circle-label" style="text-align: center; line-height: 1.2;">
                                             <?= $slotsPercentage ?>%
+                                            <br>
+                                            <small style="line-height: 15px; display: block;">Slot<br>Occupancy</small>
                                         </div>
+
                                     </div> 
                                 </div>
 
-                                <div class="row col-12 m-0 p-0">
+                                <!-- <div class="row col-12 m-0 mt-2 p-0">
                                     <div class="col-4 p-1">
-                                        <div class="card card-members">
-                                            MEMBERS
+                                        <div class="card card-members p-2">
+                                            <p class="m-0 p-0"><strong>Members</strong></p>
+                                            <h3 class="m-0 p-0"><strong><?php echo $newMembersCount; ?><small> new</small></strong></h3>
+                                            <p><strong><?php echo $departedMembersCount; ?> Departures</strong></p>
+
+                                            <?php if ($membersChanges > 0): ?>
+                                                <p><strong>+<?php echo $membersChanges; ?> compared to the previous school year</strong></p>
+                                            <?php elseif ($membersChanges < 0): ?>
+                                                <p><strong><?php echo $membersChanges; ?> compared to the previous school year</strong></p>
+                                            <?php else: ?>
+                                                <p><strong>No change</strong> compared to the previous school year</p>
+                                            <?php endif; ?>
+                                        </div> 
+                                    </div>
+                                    <div class="col-4 p-1">
+                                        <div class="card card-posts p-2">
+                                            <p><strong>Posts</strong></p>
                                         </div>
                                     </div>
                                     <div class="col-4 p-1">
-                                        <div class="card card-posts">
-                                            POSTS
+                                        <div class="card card-events p-2">
+                                            <p><strong>Events</strong></p>
                                         </div>
                                     </div>
-                                    <div class="col-4 p-1">
-                                        <div class="card card-events">
-                                            EVENTS
-                                        </div>
-                                    </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                         <hr>
@@ -256,7 +479,7 @@ unset($pdo);
     <style>
         .circle-bar {
         position: relative;
-        width: 80%; /* Fixed width */
+        width: 100%; /* Fixed width */
         /* height: 100%; */
         display: flex;
         justify-content: center;
@@ -299,7 +522,14 @@ unset($pdo);
         }
     }
 
-    
+    .card-members, .card-posts, .card-events {
+        position: relative;
+        background-color: #F1F3F5;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 3px 3px rgba(0, 0, 0, 0.1);
+    }
+
     </style>
 
 

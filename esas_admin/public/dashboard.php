@@ -1276,9 +1276,9 @@ function fetchClubTrends() {
                                                 </strong>
                                                 <strong>
                                                     <p class="" style="font-size: 10px; 
-                                                        color: ${club.postChanges === 0 ? 'black' : (club.postChanges > 0 ? 'blue' : 'red')}; 
+                                                        color: ${club.postsChanges === 0 ? 'black' : (club.postsChanges > 0 ? 'blue' : 'red')}; 
                                                         margin: -5px;">
-                                                        ${club.postChanges !== 0 ? `${club.postChanges}` : club.postChanges}
+                                                        ${club.postsChanges !== 0 ? `${club.postsChanges}` : club.postsChanges}
                                                     </p>
                                                 </strong>
                                             </div>
@@ -1295,9 +1295,9 @@ function fetchClubTrends() {
                                                 </strong>
                                                 <strong>
                                                     <p class="" style="font-size: 10px; 
-                                                        color: ${club.eventChanges === 0 ? 'black' : (club.eventChanges > 0 ? 'blue' : 'red')}; 
+                                                        color: ${club.eventsChanges === 0 ? 'black' : (club.eventsChanges > 0 ? 'blue' : 'red')}; 
                                                         margin: -5px;">
-                                                        ${club.eventChanges !== 0 ? `${club.eventChanges}` : club.eventChanges}
+                                                        ${club.eventsChanges !== 0 ? `${club.eventsChanges}` : club.eventsChanges}
                                                     </p>
                                                 </strong>
                                             </div>
