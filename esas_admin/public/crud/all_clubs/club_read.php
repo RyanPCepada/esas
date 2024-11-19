@@ -454,7 +454,7 @@ unset($pdo);
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $newPostsCount; ?></strong></h5>
                                                 <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this week</p>
 
-                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $postAveragePerWeek; ?></strong></h5>
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo number_format($postAveragePerWeek, 2) ?></strong></h5>
                                                 <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts per week</p>
                                                 
                                                 <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" 
@@ -529,7 +529,7 @@ unset($pdo);
                                                 stroke-dasharray="<?= $slotsPercentage ?>, 100"></path>
                                         </svg>
                                         <div class="circle-label" style="text-align: center; line-height: 1.5; font-size: 24px;">
-                                            <?= $slotsPercentage ?>%
+                                            <?= number_format($slotsPercentage, 2) ?>%
                                             <br>
                                             <small style="line-height: 15px; display: block; font-size: 14px;">Slots<br>Occupancy</small>
                                             <small style="line-height: 15px; display: block; font-size: 11px;">(<?php echo $activeCount ?>/<?php echo $slots ?>)</small>
