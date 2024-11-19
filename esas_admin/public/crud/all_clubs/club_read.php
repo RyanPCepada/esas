@@ -17,19 +17,19 @@ function timeAgo($timestamp) {
     $years = round($seconds / 31553280);       // value 31553280 is (365+365+365+365)/4 * 24 * 60 * 60
 
     if ($seconds <= 60) {
-        return "few seconds ago";
+        return "Active few seconds ago";
     } elseif ($minutes <= 60) {
-        return ($minutes == 1) ? "1 min ago" : "$minutes mins ago";
+        return ($minutes == 1) ? "Active 1 min ago" : "Active $minutes mins ago";
     } elseif ($hours <= 24) {
-        return ($hours == 1) ? "1 hr ago" : "$hours hrs ago";
+        return ($hours == 1) ? "Active 1 hr ago" : "Active $hours hrs ago";
     } elseif ($days <= 7) {
-        return ($days == 1) ? "yesterday" : "$days days ago";
+        return ($days == 1) ? "Active yesterday" : "Active $days days ago";
     } elseif ($weeks <= 4.3) {
-        return ($weeks == 1) ? "1 week ago" : "$weeks weeks ago";
+        return ($weeks == 1) ? "Active 1 week ago" : "Active $weeks weeks ago";
     } elseif ($months <= 12) {
-        return ($months == 1) ? "1 month ago" : "$months months ago";
+        return ($months == 1) ? "Active 1 month ago" : "Active $months months ago";
     } else {
-        return ($years == 1) ? "1 year ago" : "$years years ago";
+        return ($years == 1) ? "Active 1 year ago" : "Active $years years ago";
     }
 }
 
@@ -95,21 +95,39 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
                     unset($activeStmt);
                 }
 
-                // Determine the last activity
-                $logSql = "SELECT MAX(dateAdded) AS lastActivity FROM tbl_activity_logs WHERE club_id = :club_id";
+                // Determine the club status based on the last activity
+                $logSql = "SELECT activity, dateAdded 
+                           FROM tbl_activity_logs 
+                           WHERE club_id = :club_id 
+                           ORDER BY dateAdded DESC LIMIT 1";
+
                 if ($logStmt = $pdo->prepare($logSql)) {
                     $logStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
                     if ($logStmt->execute()) {
                         $logRow = $logStmt->fetch(PDO::FETCH_ASSOC);
-                        $lastActivity = !empty($logRow["lastActivity"]) ? $logRow["lastActivity"] : $dateAdded; // Use club dateAdded if no activity found
-                        $clubStatus = timeAgo($lastActivity);
+
+                        if (!empty($logRow)) {
+                            $lastActivity = $logRow["activity"];
+                            $lastActivityDate = $logRow["dateAdded"];
+
+                            if ($lastActivity == "You logged in to your account") {
+                                $clubStatus = "Active now";
+                            } elseif ($lastActivity == "You logged out of your account") {
+                                $clubStatus = timeAgo($lastActivityDate);
+                            } else {
+                                $clubStatus = timeAgo($lastActivityDate); // Default fallback for other activities
+                            }
+                        } else {
+                            // No activity found; fallback to club dateAdded
+                            $clubStatus = timeAgo($dateAdded);
+                        }
                     }
                     unset($logStmt);
                 }
-
                 // Determine if the label should be "Moderator" or "Moderators"
                 $moderatorCount = substr_count($moderatorNames, ',') + 1; // Count commas and add 1 for total moderators
                 $moderatorLabel = ($moderatorCount > 1) ? "Moderators:" : "Moderator:";
+
             } else {
                 // Redirect if no record is found
                 header("location: error.php");
@@ -127,6 +145,7 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
     header("location: error.php");
     exit();
 }
+
 
 // MEMBERS
 
@@ -405,7 +424,7 @@ unset($pdo);
                             <div class="row col-md-8">
                                 <div class="col-9">
                                     <h3 class="text-muted mb-0"><?php echo $clubName; ?></h3>
-                                    <span class="status-dot" style="position: absolute; top: 18px; left: 16px; color: red; font-size: 2em;">&#8226;</span><small class="ml-3"> Active <?php echo $clubStatus; ?></small>
+                                    <span class="status-dot" style="position: absolute; top: 18px; left: 16px; color: red; font-size: 2em;">&#8226;</span><small class="ml-3"> <?php echo $clubStatus; ?></small>
                                     <!-- <hr> -->
                                     <div class="row col-12 m-0 mt-2 p-0">
                                         <!-- MEMBERS CARD START -->
