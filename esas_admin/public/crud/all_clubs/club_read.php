@@ -49,6 +49,7 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
                 c.founder,
                 c.dateAdded,
                 c.coverPhoto,
+                c.slots,
                 GROUP_CONCAT(DISTINCT m.firstName, ' ', m.middleName, ' ', m.lastName ORDER BY m.lastName ASC SEPARATOR ', ') AS moderatorNames
             FROM tbl_clubs c
             LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
@@ -78,6 +79,21 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
                 $dateAdded = !empty($row["dateAdded"]) ? htmlspecialchars($row["dateAdded"]) : 'None';
                 $moderatorNames = !empty($row["moderatorNames"]) ? htmlspecialchars($row["moderatorNames"]) : 'None';
                 $coverPhoto = !empty($row["coverPhoto"]) ? htmlspecialchars($row["coverPhoto"]) : "default-cover.jpg";
+                $slots = !empty($row["slots"]) ? $row["slots"] : 0; // Default to 0 if no slots available
+
+                // Fetch the count of active students for this club
+                $activeSql = "SELECT COUNT(*) AS activeCount FROM tbl_application WHERE club_id = :club_id AND status = 'active'";
+                if ($activeStmt = $pdo->prepare($activeSql)) {
+                    $activeStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+                    if ($activeStmt->execute()) {
+                        $activeRow = $activeStmt->fetch(PDO::FETCH_ASSOC);
+                        $activeCount = $activeRow['activeCount'];
+
+                        // Calculate the percentage of slots occupied
+                        $slotsPercentage = ($slots > 0) ? round(($activeCount / $slots) * 100, 2) : 0;
+                    }
+                    unset($activeStmt);
+                }
 
                 // Determine the last activity
                 $logSql = "SELECT MAX(dateAdded) AS lastActivity FROM tbl_activity_logs WHERE club_id = :club_id";
@@ -117,6 +133,7 @@ unset($pdo);
 ?>
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -154,15 +171,51 @@ unset($pdo);
                                      class="img-fluid" style="width: 300px; height: auto; border-radius: 5px; object-fit: cover;">
                                      <!-- class="img-fluid" style="width: 300px; height: 171px; border-radius: 5px; object-fit: cover;"> -->
                             </div>
-                            <div class="col-md-8">
-                                <h3 class="text-muted mb-0"><?php echo $clubName; ?></h3>
-                                <span class="status-dot" style="position: absolute; top: 18px; left: 16px; color: red; font-size: 2em;">&#8226;</span><small class="ml-3"> Active <?php echo $clubStatus; ?></small>
-                                <hr>
-                                <p><strong>Date Created: </strong><?php echo date("F j, Y", strtotime($dateAdded)); ?></p>
-                                <p><strong><?php echo $moderatorLabel; ?> </strong><?php echo $moderatorNames; ?></p>
+                            <div class="row col-md-8">
+                                <div class="col-8">
+                                    <h3 class="text-muted mb-0"><?php echo $clubName; ?></h3>
+                                    <span class="status-dot" style="position: absolute; top: 18px; left: 16px; color: red; font-size: 2em;">&#8226;</span><small class="ml-3"> Active <?php echo $clubStatus; ?></small>
+                                    <hr>
+                                    <p><strong>Date Created: </strong><?php echo date("F j, Y", strtotime($dateAdded)); ?></p>
+                                    <p><strong><?php echo $moderatorLabel; ?> </strong><?php echo $moderatorNames; ?></p>
+                                </div>
+                                <div class="col-4"> 
+                                    <div class="circle-bar" title="Slot occupancy"> 
+                                        <svg viewBox="0 0 36 36" class="circular-chart">
+                                            <!-- Background circle -->
+                                            <path class="circle-bg"
+                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                                fill="none" stroke="#FFFFFF" stroke-width="4"></path>
 
+                                            <!-- Progress circle based on percentage -->
+                                            <path class="circle"
+                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                                fill="none" stroke="#007bff" stroke-width="4"
+                                                stroke-dasharray="<?= $slotsPercentage ?>, 100"></path>
+                                        </svg>
+                                        <div class="circle-label">
+                                            <?= $slotsPercentage ?>%
+                                        </div>
+                                    </div> 
+                                </div>
 
-                                
+                                <div class="row col-12 m-0 p-0">
+                                    <div class="col-4 p-1">
+                                        <div class="card card-members">
+                                            MEMBERS
+                                        </div>
+                                    </div>
+                                    <div class="col-4 p-1">
+                                        <div class="card card-posts">
+                                            POSTS
+                                        </div>
+                                    </div>
+                                    <div class="col-4 p-1">
+                                        <div class="card card-events">
+                                            EVENTS
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <hr>
@@ -198,6 +251,57 @@ unset($pdo);
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+    <style>
+        .circle-bar {
+        position: relative;
+        width: 80%; /* Fixed width */
+        /* height: 100%; */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border-radius: 50%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .circular-chart {
+        width: 100%;
+        height: 100%;
+    }
+
+    .circle-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .circle-bg {
+        stroke: #FFFFFF;
+        stroke: lightblue;
+        stroke: #eee;
+        stroke-width: 4;
+    }
+    .circle {
+        stroke: #007bff;
+        stroke-width: 4;
+        stroke-linecap: round;
+        animation: progress 1s ease-out forwards;
+    }
+    @keyframes progress {
+        from {
+            stroke-dasharray: 0 100;
+        }
+    }
+
+    
+    </style>
+
 
     <script>
 document.addEventListener('DOMContentLoaded', function () {
