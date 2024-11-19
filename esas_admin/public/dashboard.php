@@ -1303,13 +1303,14 @@ function fetchClubTrends() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row ml-1">
+                                    <div class="row ml-1 mb-1">
                                         <div class="club-rating col-6" data-rating="${club.rating}" title="Club Rating">
                                             ${generateStars(club.rating)}
                                             <!-- ${club.rating} -->
                                         </div>
                                         <div class="club-status col-6" data-status="${club.status}" title="Active Status">
-                                            <span class="status-dot" style="position: absolute; top: -10px; left: 0; color: red; font-size: 2em;">&#8226;</span> ${club.status}
+                                            <span class="status-dot" style="position: absolute; top: -10px; left: 0; color: red; font-size: 2em;">&#8226;</span>
+                                            <span style="font-size: .9em;">${club.status}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1329,7 +1330,6 @@ function fetchClubTrends() {
 }
 
 
-
 function generateStars(rating) {
     // Convert rating to a number (ensure no string issues)
     const numRating = parseFloat(rating);
@@ -1341,25 +1341,28 @@ function generateStars(rating) {
 
     let starsHTML = '';
 
-    // Add full stars
-    for (let i = 0; i < fullStars; i++) {
-        starsHTML += '<i class="fas fa-star star-rating text-warning"></i>'; // Full star
-    }
-
-    // Add half star (if any)
-    if (halfStar) {
-        starsHTML += '<i class="fas fa-star-half-alt star-rating text-warning"></i>'; // Half star
-    }
-
-    // Display one empty star if the rating is 0, else do not display empty stars
+    // Check if the rating is 0, and if so, only display one empty star
     if (numRating === 0) {
-        starsHTML += '<i class="far fa-star star-rating text-warning"></i>'; // Empty star
+        starsHTML += '<i class="far fa-star star-rating text-warning"></i>'; // One empty star
+    } else {
+        // Add full stars
+        for (let i = 0; i < fullStars; i++) {
+            starsHTML += '<i class="fas fa-star star-rating text-warning"></i>'; // Full star
+        }
+
+        // Add half star (if any)
+        if (halfStar) {
+            starsHTML += '<i class="fas fa-star-half-alt star-rating text-warning"></i>'; // Half star
+        }
+
+        // Add empty stars
+        for (let i = 0; i < emptyStars; i++) {
+            starsHTML += '<i class="far fa-star star-rating text-warning"></i>'; // Empty star
+        }
     }
 
     return starsHTML;
 }
-
-
 
 </script>
 
