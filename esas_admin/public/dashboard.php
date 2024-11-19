@@ -1214,7 +1214,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function fetchClubTrends() {
     const schoolYear = document.getElementById('schoolYearDropdown').value; // Get the selected school year
-    fetch(`/esas/esas_admin/apis/fetch-trends-api.php?school_year=${encodeURIComponent(schoolYear)}`)
+    fetch(`/esas/esas_admin/apis/fetch-all-trends-api.php?school_year=${encodeURIComponent(schoolYear)}`)
         .then(response => response.json())
         .then(data => {
             const clubTrendsList = document.getElementById('clubTrendsList');
