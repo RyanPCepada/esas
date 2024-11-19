@@ -454,7 +454,7 @@ unset($pdo);
 
             <hr>
             <div class="text-center">
-                <a href="../../all_clubs.php" class="btn text-align-end btn-secondary">Go Back</a>
+                <a href="javascript:history.back()" class="btn text-align-end btn-secondary">Go Back</a>
             </div>
 
         </div>
