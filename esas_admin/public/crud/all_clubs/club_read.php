@@ -168,16 +168,16 @@ $departedMembersRow = $departedMembersStmt->fetch(PDO::FETCH_ASSOC);
 $departedMembersCount = $departedMembersRow['departedMembers'];
 
 // SQL for total active members this year
-$totalMembersThisYearSql = "SELECT COUNT(*) AS totalMembers FROM tbl_application 
+$totalMembersThisYearCountSql = "SELECT COUNT(*) AS totalMembers FROM tbl_application 
                             WHERE club_id = :club_id AND status = 'active' 
                             AND dateDecided BETWEEN :startDate AND :endDate";
-$totalMembersThisYearStmt = $pdo->prepare($totalMembersThisYearSql);
-$totalMembersThisYearStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-$totalMembersThisYearStmt->bindParam(":startDate", $startDate, PDO::PARAM_STR);
-$totalMembersThisYearStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
-$totalMembersThisYearStmt->execute();
-$totalMembersThisYearRow = $totalMembersThisYearStmt->fetch(PDO::FETCH_ASSOC);
-$totalMembersThisYear = $totalMembersThisYearRow['totalMembers'];
+$totalMembersThisYearCountStmt = $pdo->prepare($totalMembersThisYearCountSql);
+$totalMembersThisYearCountStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$totalMembersThisYearCountStmt->bindParam(":startDate", $startDate, PDO::PARAM_STR);
+$totalMembersThisYearCountStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
+$totalMembersThisYearCountStmt->execute();
+$totalMembersThisYearCountRow = $totalMembersThisYearCountStmt->fetch(PDO::FETCH_ASSOC);
+$totalMembersThisYearCount = $totalMembersThisYearCountRow['totalMembers'];
 
 // SQL for total active members last year
 $totalMembersLastYearSql = "SELECT COUNT(*) AS totalMembers FROM tbl_application 
@@ -192,10 +192,10 @@ $totalMembersLastYearRow = $totalMembersLastYearStmt->fetch(PDO::FETCH_ASSOC);
 $totalMembersLastYear = $totalMembersLastYearRow['totalMembers'];
 
 // Calculate the difference in total members
-$membersChanges = $totalMembersThisYear - $totalMembersLastYear - $departedMembersCount;
+$membersChanges = $totalMembersThisYearCount - $totalMembersLastYear - $departedMembersCount;
 
 // Close statements
-unset($newMembersStmt, $departedMembersStmt, $totalMembersThisYearStmt, $totalMembersLastYearStmt);
+unset($newMembersStmt, $departedMembersStmt, $totalMembersThisYearCountStmt, $totalMembersLastYearStmt);
 
 //POSTS
 
@@ -256,26 +256,55 @@ $totalPostsLastYearRow = $totalPostsLastYearStmt->fetch(PDO::FETCH_ASSOC);
 $totalPostsLastYear = $totalPostsLastYearRow['totalPosts'];
 
 // SQL for total posts this year
-$totalPostsThisYearSql = "SELECT COUNT(*) AS totalPosts FROM tbl_posts 
+$totalPostsThisYearCountSql = "SELECT COUNT(*) AS totalPosts FROM tbl_posts 
                           WHERE club_id = :club_id 
                           AND dateAdded BETWEEN :startDate AND :endDate";
-$totalPostsThisYearStmt = $pdo->prepare($totalPostsThisYearSql);
-$totalPostsThisYearStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-$totalPostsThisYearStmt->bindParam(":startDate", $startDate, PDO::PARAM_STR);
-$totalPostsThisYearStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
-$totalPostsThisYearStmt->execute();
-$totalPostsThisYearRow = $totalPostsThisYearStmt->fetch(PDO::FETCH_ASSOC);
-$totalPostsThisYear = $totalPostsThisYearRow['totalPosts'];
+$totalPostsThisYearCountStmt = $pdo->prepare($totalPostsThisYearCountSql);
+$totalPostsThisYearCountStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$totalPostsThisYearCountStmt->bindParam(":startDate", $startDate, PDO::PARAM_STR);
+$totalPostsThisYearCountStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
+$totalPostsThisYearCountStmt->execute();
+$totalPostsThisYearCountRow = $totalPostsThisYearCountStmt->fetch(PDO::FETCH_ASSOC);
+$totalPostsThisYearCount = $totalPostsThisYearCountRow['totalPosts'];
 
 // Calculate the change in posts compared to last school year
 $postsChanges = $postAveragePerWeek - $averagePostsLastYear;
 
 // Close statements
-unset($newPostsStmt, $averagePostsStmt, $totalPostsLastYearStmt, $totalPostsThisYearStmt);
+unset($newPostsStmt, $averagePostsStmt, $totalPostsLastYearStmt, $totalPostsThisYearCountStmt);
 
 // EVENTS
 
-// SQL for events created this month
+// Determine current school year range
+$currentMonth = date('n'); // Numeric representation of the current month (1 to 12)
+$currentYear = date('Y'); // Current year
+
+if ($currentMonth >= 8) {
+    // School year starts in August of this year and ends in July of the next year
+    $schoolYearStartDate = "$currentYear-08-01";
+    $schoolYearEndDate = ($currentYear + 1) . "-07-31";
+} else {
+    // School year starts in August of the previous year and ends in July of this year
+    $schoolYearStartDate = ($currentYear - 1) . "-08-01";
+    $schoolYearEndDate = "$currentYear-07-31";
+}
+
+// SQL for total events this school year
+$totalEventsSql = "SELECT COUNT(*) AS totalEventsThisYear 
+                   FROM tbl_events 
+                   WHERE club_id = :club_id 
+                   AND dateAdded BETWEEN :schoolYearStartDate AND :schoolYearEndDate";
+$totalEventsStmt = $pdo->prepare($totalEventsSql);
+$totalEventsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$totalEventsStmt->bindParam(":schoolYearStartDate", $schoolYearStartDate, PDO::PARAM_STR);
+$totalEventsStmt->bindParam(":schoolYearEndDate", $schoolYearEndDate, PDO::PARAM_STR);
+$totalEventsStmt->execute();
+$totalEventsRow = $totalEventsStmt->fetch(PDO::FETCH_ASSOC);
+$totalEventsThisYearCount = $totalEventsRow['totalEventsThisYear'];
+
+// Close statement
+unset($totalEventsStmt);
+
 // SQL for events created this month
 $thisMonthStartDate = date('Y-m-01'); // First day of the current month
 $thisMonthEndDate = date('Y-m-t');   // Last day of the current month
@@ -363,11 +392,15 @@ unset($pdo);
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-4 text-center">
+                            <div class="col-md-4 text-start">
                                 <img src="/esas/esas_admin/images/<?php echo $coverPhoto; ?>" 
                                      alt="<?php echo $clubName; ?> Cover Photo" 
                                      class="img-fluid" style="width: 300px; height: auto; border-radius: 5px; object-fit: cover;">
                                      <!-- class="img-fluid" style="width: 300px; height: 171px; border-radius: 5px; object-fit: cover;"> -->
+                                <div>
+                                    <p class="m-0 mt-3 p-0"><strong>Date Created:<br></strong><?php echo date("F j, Y", strtotime($dateAdded)); ?></p>
+                                    <p class="m-0 p-0"><strong><?php echo $moderatorLabel; ?><br></strong><?php echo $moderatorNames; ?></p>
+                                </div>
                             </div>
                             <div class="row col-md-8">
                                 <div class="col-9">
@@ -379,16 +412,24 @@ unset($pdo);
                                         <div class="col-4 p-1">
                                             <div class="card card-members p-2">
                                                 <p class="m-0 p-0"><i class="fas fa-user text-info"></i><strong> Members</strong></p>
-                                                <h3 class="text-muted m-0 p-0"><strong><?php echo $newMembersCount; ?><small> new</small></strong></h3>
-                                                <p class="text-muted m-0 p-0"><strong><?php echo $departedMembersCount; ?> <?php echo $departedMembersCount == 1 ? 'Departure' : 'Departures'; ?></strong></p>
-                                                
-                                                <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
+
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $totalMembersThisYearCount; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">members this year</p>
+
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $newMembersCount; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">new members</p>
+
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $departedMembersCount; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;"><?php echo $departedMembersCount == 1 ? 'departure' : 'departures'; ?></p>
+
+                                                <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" 
+                                                    style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
                                                     <?php if ($membersChanges > 0): ?>
                                                         <i class="fas fa-arrow-up text-light" title="Performance Increasing"></i>
                                                     <?php elseif ($membersChanges < 0): ?>
                                                         <i class="fas fa-arrow-down text-light" title="Performance Decreasing"></i>
                                                     <?php else: ?>
-                                                        <small>0</small>
+                                                        <h4>0</h4>
                                                     <?php endif; ?>
                                                 </div>
 
@@ -399,17 +440,25 @@ unset($pdo);
                                                 <?php else: ?>
                                                     <small class="text-muted m-0 p-0">+-0 Compared to previous S.Y.</small>
                                                 <?php endif; ?>
-                                            </div> 
+                                            </div>
                                         </div>
                                         <!-- MEMBERS CARD END -->
                                         <!-- POSTS CARD START -->
                                         <div class="col-4 p-1">
                                             <div class="card card-posts p-2">
                                                 <p class="m-0 p-0"><i class="fas fa-bullhorn text-info"></i><strong> Posts</strong></p>
-                                                <h3 class="text-muted m-0 p-0"><strong><?php echo $newPostsCount; ?><small> this week</small></strong></h3>
-                                                <p class="text-muted m-0 p-0"><strong><?php echo $postAveragePerWeek; ?> posts/week</strong></p>
+
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $totalPostsThisYearCount; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this year</p>
+
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $newPostsCount; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this week</p>
+
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $postAveragePerWeek; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts per week</p>
                                                 
-                                                <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
+                                                <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" 
+                                                    style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
                                                     <?php if ($postsChanges > 0): ?>
                                                         <i class="fas fa-arrow-up text-light" title="Performance Increasing"></i>
                                                     <?php elseif ($postsChanges < 0): ?>
@@ -430,39 +479,43 @@ unset($pdo);
                                         </div>
                                         <!-- POSTS CARD END -->
                                         <!-- EVENTS CARD START -->
-<div class="col-4 p-1">
-    <div class="card card-events p-2">
-        <p class="m-0 p-0"><i class="fas fa-calendar text-info"></i><strong> Events</strong></p>
-        <h3 class="text-muted m-0 p-0"><strong><?php echo $newEventsCount; ?><small> this month</small></strong></h3>
-        <p class="text-muted m-0 p-0"><strong><?php echo $eventsAveragePerMonth; ?> events/month</strong></p>
-        
-        <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
-            <?php if ($eventsChanges > 0): ?>
-                <i class="fas fa-arrow-up text-light" title="Performance Increasing"></i>
-            <?php elseif ($eventsChanges < 0): ?>
-                <i class="fas fa-arrow-down text-light" title="Performance Decreasing"></i>
-            <?php else: ?>
-                <h4>0</h4>
-            <?php endif; ?>
-        </div>
+                                        <div class="col-4 p-1">
+                                            <div class="card card-events p-2">
+                                                <p class="m-0 p-0"><i class="fas fa-calendar text-info"></i><strong> Events</strong></p>
 
-        <?php if ($eventsChanges > 0): ?>
-            <small class="text-muted m-0 p-0"><small>+</small><?php echo round($eventsChanges, 2); ?> Compared to previous S.Y.</small>
-        <?php elseif ($eventsChanges < 0): ?>
-            <small class="text-muted m-0 p-0"><?php echo round($eventsChanges, 2); ?> Compared to previous S.Y.</small>
-        <?php else: ?>
-            <small class="text-muted m-0 p-0">+-0 Compared to previous S.Y.</small>
-        <?php endif; ?>
-    </div>
-</div>
-<!-- EVENTS CARD END -->
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $totalEventsThisYearCount; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events this year</p>
 
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $newEventsCount; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events this month</p>
+
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $eventsAveragePerMonth; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events per month</p>
+                                                
+                                                <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
+                                                    <?php if ($eventsChanges > 0): ?>
+                                                        <i class="fas fa-arrow-up text-light" title="Performance Increasing"></i>
+                                                    <?php elseif ($eventsChanges < 0): ?>
+                                                        <i class="fas fa-arrow-down text-light" title="Performance Decreasing"></i>
+                                                    <?php else: ?>
+                                                        <h4>0</h4>
+                                                    <?php endif; ?>
+                                                </div>
+
+                                                <?php if ($eventsChanges > 0): ?>
+                                                    <small class="text-muted m-0 p-0"><small>+</small><?php echo round($eventsChanges, 2); ?> Compared to previous S.Y.</small>
+                                                <?php elseif ($eventsChanges < 0): ?>
+                                                    <small class="text-muted m-0 p-0"><?php echo round($eventsChanges, 2); ?> Compared to previous S.Y.</small>
+                                                <?php else: ?>
+                                                    <small class="text-muted m-0 p-0">+-0 Compared to previous S.Y.</small>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                        <!-- EVENTS CARD END -->
                                     </div>
-                                    <p class="m-0 mt-3 p-0"><strong>Date Created: </strong><?php echo date("F j, Y", strtotime($dateAdded)); ?></p>
-                                    <p class="m-0 p-0"><strong><?php echo $moderatorLabel; ?> </strong><?php echo $moderatorNames; ?></p>
                                 </div>
                                 <div class="col-3 d-flex align-items-center justify-content-center m-0 p-0"> 
-                                    <div class="circle-bar" title="Slot occupancy"> 
+                                    <div class="circle-bar" title="Slot occupancy - <?php echo $activeCount ?> students, <?php echo $slots ?> slots"> 
                                         <svg viewBox="0 0 36 36" class="circular-chart">
                                             <!-- Background circle -->
                                             <path class="circle-bg"
@@ -478,7 +531,8 @@ unset($pdo);
                                         <div class="circle-label" style="text-align: center; line-height: 1.5; font-size: 24px;">
                                             <?= $slotsPercentage ?>%
                                             <br>
-                                            <small style="line-height: 15px; display: block; font-size: 14px;">Slot<br>Occupancy</small>
+                                            <small style="line-height: 15px; display: block; font-size: 14px;">Slots<br>Occupancy</small>
+                                            <small style="line-height: 15px; display: block; font-size: 11px;">(<?php echo $activeCount ?>/<?php echo $slots ?>)</small>
                                         </div>
 
                                     </div> 
@@ -513,9 +567,9 @@ unset($pdo);
                                 </div> -->
                             </div>
                         </div>
-                        <hr>
+                        <!-- <hr> -->
                         <div class="row p-2 mt-4">
-                            <div class="col-md-12">
+                            <div class="card col-md-12 p-3 bg-light">
                                 <h5>Description:</h5>
                                 <p style="text-align: justify; text-indent: 30px;"><?php echo $description; ?></p>
                                 <h5>Mission:</h5>
@@ -596,139 +650,14 @@ unset($pdo);
 
     .card-members, .card-posts, .card-events {
         position: relative;
-        background-color: #F1F3F5;
+        /* background-color: #F1F3F5; */
         border: none;
+        border: solid 1px lightblue;
         border-radius: 10px;
         box-shadow: 0 3px 3px rgba(0, 0, 0, 0.1);
     }
 
     </style>
 
-
-    <script>
-document.addEventListener('DOMContentLoaded', function () {
-    fetchClubTrends();
-});
-
-function fetchClubTrends() {
-    const schoolYear = document.getElementById('schoolYearDropdown').value; // Get the selected school year
-    const clubId = document.getElementById('clubId').value; // Assuming club_id is in a hidden input with ID `clubId`
-
-    // Fetch the trends with school_year and club_id as query parameters
-    fetch(`/esas/esas_admin/apis/fetch-club-trends-api.php?school_year=${encodeURIComponent(schoolYear)}&club_id=${encodeURIComponent(clubId)}`)
-        .then(response => response.json())
-        .then(data => {
-            const clubTrendsList = document.getElementById('clubTrendsList');
-
-            if (data.length > 0) {
-                let html = '';
-                data.forEach(club => {
-                    html += `
-                        <div class="card trends-card">
-                            <div class="row trends-card-body">
-                                <div class="col-3 d-flex justify-content-center align-items-start p-0 ps-2">
-                                    <div class="circle-bar" title="Slot occupancy"> 
-                                        <svg viewBox="0 0 36 36" class="circular-chart">
-                                            <!-- Background circle -->
-                                            <path class="circle-bg"
-                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
-                                                fill="none" stroke="#FFFFFF" stroke-width="4"></path>
-
-                                            <!-- Progress circle based on percentage -->
-                                            ${club.percentage !== -1 ? `
-                                                <path class="circle"
-                                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
-                                                    fill="none" stroke="#007bff" stroke-width="4"
-                                                    stroke-dasharray="${club.percentage}, 100"></path>
-                                            ` : ''}
-                                        </svg>
-                                        <div class="circle-label">
-                                            ${club.percentage !== -1 ? club.percentageText : club.percentageText}
-                                        </div>
-                                    </div> 
-                                </div>
-                                <div class="col-9">
-                                    <div class="row ml-1">
-                                        <strong><span class="card-title club-name mb-0 text-muted" title="${club.clubName}">${club.clubName}</span></strong>
-                                    </div>
-                                    <div class="row mt-1 px-2">
-                                        <div class="card card-members col-md-4" title="Active and Departed Members This School Year">
-                                            <div class="col-5 div-user-icon text-center">
-                                                <i class="fas fa-user text-info"></i>
-                                            </div>
-                                            <div class="col-7 div-user-data text-center">
-                                                <strong><p class="m-0" style="font-size: 10px; color: black;">
-                                                    ${club.newlyActive !== 0 ? `+${club.newlyActive}` : club.newlyActive}
-                                                </p></strong>
-                                                <strong><p class="" style="font-size: 10px; color: red; margin: -5px;">
-                                                    ${club.newlyDeparted !== 0 ? `-${club.newlyDeparted}` : club.newlyDeparted}
-                                                </p></strong>
-                                            </div>
-                                        </div>
-                                        <div class="card card-posts col-md-4" title="Posts per Week Compared to Previous School Year">
-                                            <div class="col-5 div-user-icon text-center">
-                                                <i class="fas fa-bullhorn text-info"></i>
-                                            </div>
-                                            <div class="col-7 div-user-data text-center">
-                                                <strong>
-                                                    <p class="m-0" style="font-size: 10px; color: black;">
-                                                        ${club.postPerWeek !== 0 ? `${club.postPerWeek}` : club.postPerWeek}
-                                                    </p>
-                                                </strong>
-                                                <strong>
-                                                    <p class="" style="font-size: 10px; 
-                                                        color: ${club.postChanges === 0 ? 'black' : (club.postChanges > 0 ? 'blue' : 'red')}; 
-                                                        margin: -5px;">
-                                                        ${club.postChanges !== 0 ? `${club.postChanges}` : club.postChanges}
-                                                    </p>
-                                                </strong>
-                                            </div>
-                                        </div>
-                                        <div class="card card-events col-md-4" title="Events per Month Compared to Previous School Year">
-                                            <div class="col-5 div-user-icon text-center">
-                                                <i class="fas fa-calendar text-info"></i>
-                                            </div>
-                                            <div class="col-7 div-user-data text-center">
-                                                <strong>
-                                                    <p class="m-0" style="font-size: 10px; color: black;">
-                                                        ${club.eventPerMonth !== 0 ? `${club.eventPerMonth}` : club.eventPerMonth}
-                                                    </p>
-                                                </strong>
-                                                <strong>
-                                                    <p class="" style="font-size: 10px; 
-                                                        color: ${club.eventChanges === 0 ? 'black' : (club.eventChanges > 0 ? 'blue' : 'red')}; 
-                                                        margin: -5px;">
-                                                        ${club.eventChanges !== 0 ? `${club.eventChanges}` : club.eventChanges}
-                                                    </p>
-                                                </strong>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row ml-1 mb-1">
-                                        <div class="club-rating col-6" data-rating="${club.rating}" title="Club Rating">
-                                            ${generateStars(club.rating)}
-                                            <!-- ${club.rating} -->
-                                        </div>
-                                        <div class="club-status col-6" data-status="${club.status}" title="Active Status">
-                                            <span class="status-dot" style="position: absolute; top: -10px; left: 0; color: red; font-size: 2em;">&#8226;</span>
-                                            <span style="font-size: .9em;">${club.status}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-                clubTrendsList.innerHTML = html;
-            } else {
-                clubTrendsList.innerHTML = 'No clubs found.';
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching club trends:', error);
-            document.getElementById('clubTrendsList').innerHTML = 'Failed to load clubs.';
-        });
-}
-</script>
 </body>
 </html>
