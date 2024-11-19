@@ -425,11 +425,11 @@ unset($pdo);
                                                 <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" 
                                                     style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
                                                     <?php if ($membersChanges > 0): ?>
-                                                        <i class="fas fa-arrow-up text-light" title="Performance Increasing"></i>
+                                                        <i class="fas fa-arrow-up text-light" title="Performance Increasing" style="cursor: pointer;"></i>
                                                     <?php elseif ($membersChanges < 0): ?>
-                                                        <i class="fas fa-arrow-down text-light" title="Performance Decreasing"></i>
+                                                        <i class="fas fa-arrow-down text-light" title="Performance Decreasing" style="cursor: pointer;"></i>
                                                     <?php else: ?>
-                                                        <h4>0</h4>
+                                                        <h4 style="cursor: pointer;" title="Performance Unchanging">-</h4>
                                                     <?php endif; ?>
                                                 </div>
 
@@ -460,11 +460,11 @@ unset($pdo);
                                                 <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" 
                                                     style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
                                                     <?php if ($postsChanges > 0): ?>
-                                                        <i class="fas fa-arrow-up text-light" title="Performance Increasing"></i>
+                                                        <i class="fas fa-arrow-up text-light" title="Performance Increasing" style="cursor: pointer;"></i>
                                                     <?php elseif ($postsChanges < 0): ?>
-                                                        <i class="fas fa-arrow-down text-light" title="Performance Decreasing"></i>
+                                                        <i class="fas fa-arrow-down text-light" title="Performance Decreasing" style="cursor: pointer;"></i>
                                                     <?php else: ?>
-                                                        <h4>0</h4>
+                                                        <h4 style="cursor: pointer;" title="Performance Unchanging">-</h4>
                                                     <?php endif; ?>
                                                 </div>
 
@@ -494,11 +494,11 @@ unset($pdo);
                                                 
                                                 <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
                                                     <?php if ($eventsChanges > 0): ?>
-                                                        <i class="fas fa-arrow-up text-light" title="Performance Increasing"></i>
+                                                        <i class="fas fa-arrow-up text-light" title="Performance Increasing" style="cursor: pointer;"></i>
                                                     <?php elseif ($eventsChanges < 0): ?>
-                                                        <i class="fas fa-arrow-down text-light" title="Performance Decreasing"></i>
+                                                        <i class="fas fa-arrow-down text-light" title="Performance Decreasing" style="cursor: pointer;"></i>
                                                     <?php else: ?>
-                                                        <h4>0</h4>
+                                                        <h4 style="cursor: pointer;" title="Performance Unchanging">-</h4>
                                                     <?php endif; ?>
                                                 </div>
 
