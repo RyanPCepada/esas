@@ -26,14 +26,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         return false; // Moderator not found
     }
 
+    // Function to get the club_id associated with the moderator
+    function getClubIdByModerator($pdo, $moderator_id) {
+        $query = "SELECT club_id FROM tbl_clubs_and_moderators WHERE moderator_id = :moderator_id LIMIT 1";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute(['moderator_id' => $moderator_id]);
+        $club = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $club ? $club['club_id'] : null;
+    }
+
     // Function to insert activity log
-    function insertActivityLog($pdo, $moderator_id) {
-        $query = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id) VALUES (:activity, :dateAdded, :moderator_id)";
+    function insertActivityLog($pdo, $moderator_id, $club_id) {
+        $query = "INSERT INTO tbl_activity_logs (activity, dateAdded, moderator_id, club_id) VALUES (:activity, :dateAdded, :moderator_id, :club_id)";
         $stmt = $pdo->prepare($query);
         $stmt->execute([
             'activity' => 'You logged in to your account',
             'dateAdded' => date('Y-m-d H:i:s'), // current timestamp
-            'moderator_id' => $moderator_id
+            'moderator_id' => $moderator_id,
+            'club_id' => $club_id
         ]);
     }
     
@@ -43,8 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($moderator_result) {
         $_SESSION['moderator_id'] = $moderator_result['moderator_id'];
         
+        // Get the club_id associated with the moderator
+        $club_id = getClubIdByModerator($pdo, $moderator_result['moderator_id']);
+        
         // Insert the activity log after successful login
-        insertActivityLog($pdo, $moderator_result['moderator_id']);
+        insertActivityLog($pdo, $moderator_result['moderator_id'], $club_id);
 
         // Redirect to clubs.php upon successful login
         echo "<script>alert('Logged in successfully!');</script>";
@@ -55,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "<script>alert('Invalid Moderator ID or password.');</script>";
     }
 }
+
 ?>
 
 
