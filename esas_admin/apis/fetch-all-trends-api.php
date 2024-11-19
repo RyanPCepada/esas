@@ -132,7 +132,7 @@ try {
         if ($activityResult) {
             $club['status'] = timeAgo($activityResult['dateAdded']);
         } else {
-            $club['status'] = 'Not active';
+            $club['status'] = 'Inactive';
         }
 
         // Calculate posts per week for this school year
@@ -187,49 +187,38 @@ try {
             : number_format($postDifference, 2);       // Otherwise, just show the number
     
         // Calculate events per month for this school year
-        $eventQuery = "
-            SELECT COUNT(*) AS eventCount
-            FROM tbl_events
-            WHERE club_id = :club_id
-            AND dateAdded BETWEEN :startDate AND :endDate
+        $averageEventsSql = "
+        SELECT COUNT(*) / TIMESTAMPDIFF(MONTH, :startDate, :endDate) AS averageEvents 
+        FROM tbl_events 
+        WHERE club_id = :club_id 
+        AND dateAdded BETWEEN :startDate AND :endDate
         ";
-    
-        $eventStmt = $pdo->prepare($eventQuery);
-        $eventStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
-        $eventStmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
-        $eventStmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
-        $eventStmt->execute();
-        $eventCount = $eventStmt->fetch(PDO::FETCH_ASSOC)['eventCount'];
-    
-        // Calculate the number of months in the school year
-        $months = ceil($interval->days / 30); // Approximate month count
-    
-        // Calculate events per month for this year
-        $club['eventPerMonth'] = $months > 0 ? number_format($eventCount / $months, 2) : 0;
-    
-        // Get last school year's data for comparison (same range, previous year)
-        $lastYearEventStmt = $pdo->prepare($eventQuery);
-        $lastYearEventStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
-        $lastYearEventStmt->bindParam(':startDate', $lastYearStartDate, PDO::PARAM_STR);
-        $lastYearEventStmt->bindParam(':endDate', $lastYearEndDate, PDO::PARAM_STR);
-        $lastYearEventStmt->execute();
-        $lastYearEventCount = $lastYearEventStmt->fetch(PDO::FETCH_ASSOC)['eventCount'];
-    
-        // Calculate events per month for last year
-        $lastYearStart = new DateTime($lastYearStartDate);
-        $lastYearEnd = new DateTime($lastYearEndDate);
-        $lastYearInterval = $lastYearStart->diff($lastYearEnd);
-        $lastYearMonths = ceil($lastYearInterval->days / 30);  // Approximate month count
-    
-        $lastYearEventsPerMonth = $lastYearMonths > 0 ? $lastYearEventCount / $lastYearMonths : 0;
-    
-        // Calculate the difference in events per month (this year - last year)
+
+        // Calculate events per month for this school year
+        $averageEventsStmt = $pdo->prepare($averageEventsSql);
+        $averageEventsStmt->bindParam(":club_id", $club['club_id'], PDO::PARAM_INT);
+        $averageEventsStmt->bindParam(":startDate", $startDate, PDO::PARAM_STR);
+        $averageEventsStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
+        $averageEventsStmt->execute();
+        $eventsAverageRow = $averageEventsStmt->fetch(PDO::FETCH_ASSOC);
+        $club['eventPerMonth'] = round($eventsAverageRow['averageEvents'], 2);
+
+        // Calculate events per month for last school year (same range, previous year)
+        $averageEventsLastYearStmt = $pdo->prepare($averageEventsSql);
+        $averageEventsLastYearStmt->bindParam(":club_id", $club['club_id'], PDO::PARAM_INT);
+        $averageEventsLastYearStmt->bindParam(":startDate", $lastYearStartDate, PDO::PARAM_STR);
+        $averageEventsLastYearStmt->bindParam(":endDate", $lastYearEndDate, PDO::PARAM_STR);
+        $averageEventsLastYearStmt->execute();
+        $averageEventsLastYearRow = $averageEventsLastYearStmt->fetch(PDO::FETCH_ASSOC);
+        $lastYearEventsPerMonth = round($averageEventsLastYearRow['averageEvents'], 2);
+
+        // Calculate the difference in events per month
         $eventDifference = $club['eventPerMonth'] - $lastYearEventsPerMonth;
-    
-        // Add the "+" sign if the difference is positive
-        $club['eventsChanges'] = $eventDifference > 0 
-            ? '+' . number_format($eventDifference, 2)  // Add "+" if positive
-            : number_format($eventDifference, 2);       // Otherwise, just show the number
+
+        // Add "+" sign for positive differences and format the result
+        $club['eventsChanges'] = $eventDifference > 0
+        ? '+' . number_format($eventDifference, 2)
+        : number_format($eventDifference, 2);
     
         // Calculate club membership percentage
         if ($club['slots'] == 0) {
