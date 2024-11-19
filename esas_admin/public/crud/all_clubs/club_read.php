@@ -128,6 +128,7 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
     exit();
 }
 
+// MEMBERS
 
 // Get the current year and next year
 $currentYear = date('Y');
@@ -196,6 +197,7 @@ $membersChanges = $totalMembersThisYear - $totalMembersLastYear - $departedMembe
 // Close statements
 unset($newMembersStmt, $departedMembersStmt, $totalMembersThisYearStmt, $totalMembersLastYearStmt);
 
+//POSTS
 
 // Define the start and end dates for the current school year
 $startDate = "$currentYear-08-01";
@@ -271,6 +273,56 @@ $postsChanges = $postAveragePerWeek - $averagePostsLastYear;
 // Close statements
 unset($newPostsStmt, $averagePostsStmt, $totalPostsLastYearStmt, $totalPostsThisYearStmt);
 
+// EVENTS
+
+// SQL for events created this month
+// SQL for events created this month
+$thisMonthStartDate = date('Y-m-01'); // First day of the current month
+$thisMonthEndDate = date('Y-m-t');   // Last day of the current month
+$newEventsSql = "SELECT COUNT(*) AS newEvents FROM tbl_events 
+                 WHERE club_id = :club_id 
+                 AND dateAdded BETWEEN :thisMonthStartDate AND :thisMonthEndDate";
+$newEventsStmt = $pdo->prepare($newEventsSql);
+$newEventsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$newEventsStmt->bindParam(":thisMonthStartDate", $thisMonthStartDate, PDO::PARAM_STR);
+$newEventsStmt->bindParam(":thisMonthEndDate", $thisMonthEndDate, PDO::PARAM_STR);
+$newEventsStmt->execute();
+$newEventsRow = $newEventsStmt->fetch(PDO::FETCH_ASSOC);
+$newEventsCount = $newEventsRow['newEvents'];
+
+// SQL for average events per month for this school year
+$averageEventsSql = "SELECT COUNT(*) / TIMESTAMPDIFF(MONTH, :startDate, :endDate) AS averageEvents 
+                     FROM tbl_events 
+                     WHERE club_id = :club_id 
+                     AND dateAdded BETWEEN :startDate AND :endDate";
+$averageEventsStmt = $pdo->prepare($averageEventsSql);
+$averageEventsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$averageEventsStmt->bindParam(":startDate", $startDate, PDO::PARAM_STR);
+$averageEventsStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
+$averageEventsStmt->execute();
+$averageEventsRow = $averageEventsStmt->fetch(PDO::FETCH_ASSOC);
+$eventsAveragePerMonth = round($averageEventsRow['averageEvents'], 2);
+
+// SQL for average events per month for the previous school year
+$averageEventsLastYearSql = "SELECT COUNT(*) / TIMESTAMPDIFF(MONTH, :prevStartDate, :prevEndDate) AS averageEvents 
+                             FROM tbl_events 
+                             WHERE club_id = :club_id 
+                             AND dateAdded BETWEEN :prevStartDate AND :prevEndDate";
+$averageEventsLastYearStmt = $pdo->prepare($averageEventsLastYearSql);
+$averageEventsLastYearStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$averageEventsLastYearStmt->bindParam(":prevStartDate", $prevStartDate, PDO::PARAM_STR);
+$averageEventsLastYearStmt->bindParam(":prevEndDate", $prevEndDate, PDO::PARAM_STR);
+$averageEventsLastYearStmt->execute();
+$averageEventsLastYearRow = $averageEventsLastYearStmt->fetch(PDO::FETCH_ASSOC);
+$eventsAverageLastYear = round($averageEventsLastYearRow['averageEvents'], 2);
+
+// Calculate the change in events compared to last school year
+$eventsChanges = $eventsAveragePerMonth - $eventsAverageLastYear;
+
+// Close statements
+unset($newEventsStmt, $averageEventsStmt, $averageEventsLastYearStmt);
+
+
 
 // Close connection
 unset($pdo);
@@ -332,20 +384,20 @@ unset($pdo);
                                                 
                                                 <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
                                                     <?php if ($membersChanges > 0): ?>
-                                                        <i class="fas fa-arrow-up text-light"></i>
+                                                        <i class="fas fa-arrow-up text-light" title="Performance Increasing"></i>
                                                     <?php elseif ($membersChanges < 0): ?>
-                                                        <i class="fas fa-arrow-down text-light"></i>
+                                                        <i class="fas fa-arrow-down text-light" title="Performance Decreasing"></i>
                                                     <?php else: ?>
                                                         <small>0</small>
                                                     <?php endif; ?>
                                                 </div>
 
                                                 <?php if ($membersChanges > 0): ?>
-                                                    <small class="text-muted m-0 p-0"><small>+</small><?php echo $membersChanges; ?> Compared to previous SY</small>
+                                                    <small class="text-muted m-0 p-0"><small>+</small><?php echo $membersChanges; ?> Compared to previous S.Y.</small>
                                                 <?php elseif ($membersChanges < 0): ?>
-                                                    <small class="text-muted m-0 p-0"><?php echo $membersChanges; ?> Compared to previous SY</small>
+                                                    <small class="text-muted m-0 p-0"><?php echo $membersChanges; ?> Compared to previous S.Y.</small>
                                                 <?php else: ?>
-                                                    <small class="text-muted m-0 p-0">+-0 Compared to previous SY</small>
+                                                    <small class="text-muted m-0 p-0">+-0 Compared to previous S.Y.</small>
                                                 <?php endif; ?>
                                             </div> 
                                         </div>
@@ -359,37 +411,57 @@ unset($pdo);
                                                 
                                                 <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
                                                     <?php if ($postsChanges > 0): ?>
-                                                        <i class="fas fa-arrow-up text-light"></i>
+                                                        <i class="fas fa-arrow-up text-light" title="Performance Increasing"></i>
                                                     <?php elseif ($postsChanges < 0): ?>
-                                                        <i class="fas fa-arrow-down text-light"></i>
+                                                        <i class="fas fa-arrow-down text-light" title="Performance Decreasing"></i>
                                                     <?php else: ?>
                                                         <h4>0</h4>
                                                     <?php endif; ?>
                                                 </div>
 
                                                 <?php if ($postsChanges > 0): ?>
-                                                    <small class="text-muted m-0 p-0"><small>+</small><?php echo $postsChanges; ?> Compared to previous SY</small>
+                                                    <small class="text-muted m-0 p-0"><small>+</small><?php echo $postsChanges; ?> Compared to previous S.Y.</small>
                                                 <?php elseif ($postsChanges < 0): ?>
-                                                    <small class="text-muted m-0 p-0"><?php echo $postsChanges; ?> Compared to previous SY</small>
+                                                    <small class="text-muted m-0 p-0"><?php echo $postsChanges; ?> Compared to previous S.Y.</small>
                                                 <?php else: ?>
-                                                    <small class="text-muted m-0 p-0">+-0 Compared to previous SY</small>
+                                                    <small class="text-muted m-0 p-0">+-0 Compared to previous S.Y.</small>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
-
                                         <!-- POSTS CARD END -->
                                         <!-- EVENTS CARD START -->
-                                        <div class="col-4 p-1">
-                                            <div class="card card-events p-2">
-                                                <p><i class="fas fa-calendar text-info"></i><strong> Events</strong></p>
-                                            </div>
-                                        </div>
-                                        <!-- EVENTS CARD END -->
+<div class="col-4 p-1">
+    <div class="card card-events p-2">
+        <p class="m-0 p-0"><i class="fas fa-calendar text-info"></i><strong> Events</strong></p>
+        <h3 class="text-muted m-0 p-0"><strong><?php echo $newEventsCount; ?><small> this month</small></strong></h3>
+        <p class="text-muted m-0 p-0"><strong><?php echo $eventsAveragePerMonth; ?> events/month</strong></p>
+        
+        <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
+            <?php if ($eventsChanges > 0): ?>
+                <i class="fas fa-arrow-up text-light" title="Performance Increasing"></i>
+            <?php elseif ($eventsChanges < 0): ?>
+                <i class="fas fa-arrow-down text-light" title="Performance Decreasing"></i>
+            <?php else: ?>
+                <h4>0</h4>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($eventsChanges > 0): ?>
+            <small class="text-muted m-0 p-0"><small>+</small><?php echo round($eventsChanges, 2); ?> Compared to previous S.Y.</small>
+        <?php elseif ($eventsChanges < 0): ?>
+            <small class="text-muted m-0 p-0"><?php echo round($eventsChanges, 2); ?> Compared to previous S.Y.</small>
+        <?php else: ?>
+            <small class="text-muted m-0 p-0">+-0 Compared to previous S.Y.</small>
+        <?php endif; ?>
+    </div>
+</div>
+<!-- EVENTS CARD END -->
+
                                     </div>
                                     <p class="m-0 mt-3 p-0"><strong>Date Created: </strong><?php echo date("F j, Y", strtotime($dateAdded)); ?></p>
                                     <p class="m-0 p-0"><strong><?php echo $moderatorLabel; ?> </strong><?php echo $moderatorNames; ?></p>
                                 </div>
-                                <div class="col-3"> 
+                                <div class="col-3 d-flex align-items-center justify-content-center m-0 p-0"> 
                                     <div class="circle-bar" title="Slot occupancy"> 
                                         <svg viewBox="0 0 36 36" class="circular-chart">
                                             <!-- Background circle -->
@@ -403,10 +475,10 @@ unset($pdo);
                                                 fill="none" stroke="#007bff" stroke-width="4"
                                                 stroke-dasharray="<?= $slotsPercentage ?>, 100"></path>
                                         </svg>
-                                        <div class="circle-label" style="text-align: center; line-height: 1.2;">
+                                        <div class="circle-label" style="text-align: center; line-height: 1.5; font-size: 24px;">
                                             <?= $slotsPercentage ?>%
                                             <br>
-                                            <small style="line-height: 15px; display: block;">Slot<br>Occupancy</small>
+                                            <small style="line-height: 15px; display: block; font-size: 14px;">Slot<br>Occupancy</small>
                                         </div>
 
                                     </div> 
