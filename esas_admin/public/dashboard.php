@@ -1249,8 +1249,14 @@ try {
                                             $stmt = $pdo->query($query);
                                             $rank = 1;
 
+                                            // Define vibrant shades of success
+                                            $lightSuccess = "#e9f4e9"; // Light Success
+                                            $lighterSuccess = "#f4f9f4"; // Lighter Success
+
                                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                echo "<tr>
+                                                // Alternate background colors
+                                                $bgColor = ($rank % 2 == 0) ? $lightSuccess : $lighterSuccess;
+                                                echo "<tr style='background-color: $bgColor;'>
                                                         <td>{$rank}</td>
                                                         <td>{$row['clubName']}</td>
                                                     </tr>";
@@ -1262,6 +1268,7 @@ try {
                                 </div>
                             </div>
                             <!-- COL-MD-3 FASTEST GROWING CLUB END -->
+
 
                         </div>
                         <!-- THE MAIN PAGE 2 END -->
