@@ -1132,8 +1132,14 @@ try {
                                             $stmt = $pdo->query($query);
                                             $rank = 1;
 
+                                            // Define light and lighter shades of primary
+                                            $lightPrimary = "#cce5ff"; // Light Primary
+                                            $lighterPrimary = "#f2f9ff"; // Lighter Primary
+
                                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                echo "<tr>
+                                                // Alternate background colors
+                                                $bgColor = ($rank % 2 == 0) ? $lightPrimary : $lighterPrimary;
+                                                echo "<tr style='background-color: $bgColor;'>
                                                         <td>{$rank}</td>
                                                         <td>{$row['clubName']}</td>
                                                     </tr>";
@@ -1145,6 +1151,7 @@ try {
                                 </div>
                             </div>
                             <!-- COL-MD-3 MOST ACTIVE CLUB END -->
+
 
                             <!-- COL-MD-3 MOST APPLIED CLUB START -->
                             <div class="most-applied-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
