@@ -196,6 +196,15 @@ $departedMembersStmt->execute();
 $departedMembersRow = $departedMembersStmt->fetch(PDO::FETCH_ASSOC);
 $departedMembersCount = $departedMembersRow['departedMembers'];
 
+// SQL for total active members overall
+$totalMembersOverallCountSql = "SELECT COUNT(*) AS totalMembers FROM tbl_application 
+                            WHERE club_id = :club_id AND status = 'active'";
+$totalMembersOverallCountStmt = $pdo->prepare($totalMembersOverallCountSql);
+$totalMembersOverallCountStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$totalMembersOverallCountStmt->execute();
+$totalMembersOverallCountRow = $totalMembersOverallCountStmt->fetch(PDO::FETCH_ASSOC);
+$totalMembersOverallCount = $totalMembersOverallCountRow['totalMembers'];
+
 // SQL for total active members this year
 $totalMembersThisYearCountSql = "SELECT COUNT(*) AS totalMembers FROM tbl_application 
                             WHERE club_id = :club_id AND status = 'active' 
@@ -224,7 +233,7 @@ $totalMembersLastYear = $totalMembersLastYearRow['totalMembers'];
 $membersChanges = $totalMembersThisYearCount - $totalMembersLastYear - $departedMembersCount;
 
 // Close statements
-unset($newMembersStmt, $departedMembersStmt, $totalMembersThisYearCountStmt, $totalMembersLastYearStmt);
+unset($newMembersStmt, $departedMembersStmt, $totalMembersOverallCountStmt, $totalMembersThisYearCountStmt, $totalMembersLastYearStmt);
 
 //POSTS
 
@@ -587,7 +596,8 @@ unset($pdo);
                                             <div class="card card-members p-2">
                                                 <p class="m-0 p-0"><i class="fas fa-user text-info"></i><strong> Members</strong></p>
 
-                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $totalMembersThisYearCount; ?></strong></h5>
+                                                <!-- <h5 class="text-dark m-0 p-0"><strong><?php echo $totalMembersThisYearCount; ?></strong></h5> -->
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $totalMembersOverallCount; ?></strong></h5>
                                                 <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">members this year</p>
 
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $newMembersCount; ?></strong></h5>
@@ -724,7 +734,7 @@ unset($pdo);
 
                                     <!-- Ratings Section -->
                                     <div class="w-100 text-center p-3">
-                                    <p class="m-0 p-0"><i class="fas fa-star text-warning"></i><strong> Rating</strong></p>
+                                        <p class="m-0 mt-2 p-0"><i class="fas fa-star text-warning"></i><strong> Rating</strong></p>
                                         <div class="club-rating" data-rating="<?php echo $ratingAllYears; ?>" title="Club Rating">
                                             <p class="text-dark mb-0 p-0">Overall: <strong class="text-info"><?php echo $ratingAllYears; ?>/10</strong></p>
                                         </div>
@@ -765,8 +775,64 @@ unset($pdo);
                             </div>
                         </div>
                         <!-- <hr> -->
-                        <div class="row p-2 mt-4">
-                            <div class="card col-md-12 p-3 bg-light">
+                        <div class="row p-3 mt-4">
+                            <!-- Left Column -->
+                            <div class="col-md-4 p-0 pr-3">
+                                <!-- Most Applied Club -->
+                                <div class="card text-center mb-3 p-5 bg-light" style="border-radius: 15px;">
+                                    <div class="row">
+                                        <div class="col-5 m-0 p-0">
+                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
+                                        </div>
+                                        <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                            <h1 class="m-0 p-0"><strong class="text-info">1st</strong></h1>
+                                            <p class="m-0 p-0"><strong class="text-info">Most applied club</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Highest Number of Members -->
+                                <div class="card text-center mb-3 p-5 bg-light" style="border-radius: 15px;">
+                                    <div class="row">
+                                        <div class="col-5 m-0 p-0">
+                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
+                                        </div>
+                                        <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                            <h1 class="m-0 p-0"><strong class="text-info">1st</strong></h1>
+                                            <p class="m-0 p-0"><strong class="text-info">Highest in members</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Most Active Club -->
+                                <div class="card text-center mb-3 p-5 bg-light" style="border-radius: 15px;">
+                                    <div class="row">
+                                        <div class="col-5 m-0 p-0">
+                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
+                                        </div>
+                                        <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                            <h1 class="m-0 p-0"><strong class="text-info">1st</strong></h1>
+                                            <p class="m-0 p-0"><strong class="text-info">Most active club</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Fastest Growing Club -->
+                                <div class="card text-center mb-3 p-5 bg-light" style="border-radius: 15px;">
+                                    <div class="row">
+                                        <div class="col-5 m-0 p-0">
+                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
+                                        </div>
+                                        <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                            <h1 class="m-0 p-0"><strong class="text-info">1st</strong></h1>
+                                            <p class="m-0 p-0"><strong class="text-info">Fastest growing club</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="card col-md-8 p-3 bg-light">
                                 <h5>Description:</h5>
                                 <p style="text-align: justify; text-indent: 30px;"><?php echo $description; ?></p>
                                 <h5>Mission:</h5>
@@ -779,6 +845,7 @@ unset($pdo);
                                 <p style="text-align: justify; text-indent: 30px;"><?php echo $founder; ?></p>
                             </div>
                         </div>
+
 
                     </div>
                     <div class="card-footer text-center">
