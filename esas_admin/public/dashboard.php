@@ -1203,8 +1203,14 @@ try {
                                             $stmt = $pdo->query($query);
                                             $rank = 1;
 
+                                            // Define vibrant shades of danger
+                                            $lightDanger = "#f8d7da"; // Light Danger
+                                            $lighterDanger = "#fdeef0"; // Lighter Danger
+
                                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                echo "<tr>
+                                                // Alternate background colors
+                                                $bgColor = ($rank % 2 == 0) ? $lightDanger : $lighterDanger;
+                                                echo "<tr style='background-color: $bgColor;'>
                                                         <td>{$rank}</td>
                                                         <td>{$row['clubName']}</td>
                                                     </tr>";
