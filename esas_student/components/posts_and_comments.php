@@ -118,9 +118,9 @@
                                             <button class="dropdown-item" data-comment-id="${comment.comment_id}" data-comment-text="${comment.comment}" onclick="openEditCommentModal(this)">
                                                 <i class="fa fa-pencil"></i> Edit
                                             </button>
-                                            <button class="dropdown-item text-danger" data-comment-id="${comment.comment_id}" onclick="deleteComment(this)">
+                                            <!-- <button class="dropdown-item text-danger" data-comment-id="${comment.comment_id}" onclick="deleteComment(this)">
                                                 <i class="fa fa-trash"></i> Delete
-                                            </button>
+                                            </button> -->
                                         </div>
                                     </div>` : '';
                                 return `
