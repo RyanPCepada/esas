@@ -1133,7 +1133,7 @@ try {
                                             $rank = 1;
 
                                             // Define light and lighter shades of primary
-                                            $lightPrimary = "#cce5ff"; // Light Primary
+                                            $lightPrimary = "#e0f0ff"; // Light Primary
                                             $lighterPrimary = "#f2f9ff"; // Lighter Primary
 
                                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -1168,8 +1168,8 @@ try {
                                             $rank = 1;
 
                                             // Define light and lighter shades of warning
-                                            $lightWarning = "#ffeb99"; // Light Warning
-                                            $lighterWarning = "#fff6cc"; // Lighter Warning
+                                            $lightWarning = "#fff1b3"; // Light Warning
+                                            $lighterWarning = "#fff7cc"; // Lighter Warning
 
                                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                                 // Alternate background colors
@@ -1204,8 +1204,8 @@ try {
                                             $rank = 1;
 
                                             // Define vibrant shades of danger
-                                            $lightDanger = "#f8d7da"; // Light Danger
-                                            $lighterDanger = "#fdeef0"; // Lighter Danger
+                                            $lightDanger = "#fce7ed"; // Light Danger
+                                            $lighterDanger = "#fef3f5"; // Lighter Danger
 
                                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                                 // Alternate background colors
