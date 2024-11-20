@@ -337,10 +337,9 @@ try {
                                             ?>
 
                                             <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
-                                            <p>Total Clubs</p>
+                                            <p class="mb-2 p-0">Total Clubs</p>
                                         </div>
                                     </div>
-
 
                                     <!-- Card for TOTAL MODERATORS -->
                                     <div class="col-md-3 p-1" style="border: 1px solid transparent; padding: 0;">
@@ -382,7 +381,7 @@ try {
                                             }
                                             ?>
                                             <i class="fas fa-user-shield mt-2 me-2 p-2 icon-style"></i>
-                                            <p>Total Moderators</p>
+                                            <p class="mb-2 p-0">Total Moderators</p>
                                         </div>
                                     </div>
 
@@ -429,7 +428,7 @@ try {
                                             }
                                             ?>
                                             <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
-                                            <p>Total Students</p>
+                                            <p class="mb-2 p-0">Total Students</p>
                                         </div>
                                     </div>
 
@@ -475,7 +474,7 @@ try {
                                             }
                                             ?>
                                             <i class="fas fa-envelope mt-2 me-2 p-2 icon-style"></i>
-                                            <p>Total Club Requests</p>
+                                            <p class="mb-2 p-0">Total Club Requests</p>
                                         </div>
                                     </div>
 
