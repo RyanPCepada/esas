@@ -16,17 +16,17 @@ function timeAgo($timestamp) {
     $months = round($seconds / 2629440);       // value 2629440 is ((365+365+365+365)/4/12) * 24 * 60 * 60
     $years = round($seconds / 31553280);       // value 31553280 is (365+365+365+365)/4 * 24 * 60 * 60
 
-    if ($seconds <= 60) {
+    if ($seconds < 60) {
         return "Active few seconds ago";
-    } elseif ($minutes <= 60) {
+    } elseif ($minutes < 60) {
         return ($minutes == 1) ? "Active 1 min ago" : "Active $minutes mins ago";
-    } elseif ($hours <= 24) {
+    } elseif ($hours < 24) {
         return ($hours == 1) ? "Active 1 hr ago" : "Active $hours hrs ago";
-    } elseif ($days <= 7) {
+    } elseif ($days < 7) {
         return ($days == 1) ? "Active yesterday" : "Active $days days ago";
-    } elseif ($weeks <= 4.3) {
+    } elseif ($weeks < 4.3) {
         return ($weeks == 1) ? "Active 1 week ago" : "Active $weeks weeks ago";
-    } elseif ($months <= 12) {
+    } elseif ($months < 12) {
         return ($months == 1) ? "Active 1 month ago" : "Active $months months ago";
     } else {
         return ($years == 1) ? "Active 1 year ago" : "Active $years years ago";
@@ -97,9 +97,9 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
 
                 // Determine the club status based on the last activity
                 $logSql = "SELECT activity, dateAdded 
-                           FROM tbl_activity_logs 
-                           WHERE club_id = :club_id 
-                           ORDER BY dateAdded DESC LIMIT 1";
+                        FROM tbl_activity_logs 
+                        WHERE club_id = :club_id 
+                        ORDER BY dateAdded DESC LIMIT 1";
 
                 if ($logStmt = $pdo->prepare($logSql)) {
                     $logStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
@@ -110,20 +110,30 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
                             $lastActivity = $logRow["activity"];
                             $lastActivityDate = $logRow["dateAdded"];
 
-                            if ($lastActivity == "You logged in to your account") {
-                                $clubStatus = "Active now";
-                            } elseif ($lastActivity == "You logged out of your account") {
+                            if ($lastActivity === "You logged out of your account") {
+                                // Use timeAgo for logout activity
                                 $clubStatus = timeAgo($lastActivityDate);
-                            } else {
-                                $clubStatus = timeAgo($lastActivityDate); // Default fallback for other activities
+                            } elseif (!empty($lastActivity) && $lastActivity !== "You logged out of your account") {
+                                // If there's an activity and it's not logout, show "Active now"
+                                $clubStatus = "Active now";
+                            } elseif (empty($lastActivity)) {
+                                // If no activity is found, set as inactive
+                                $clubStatus = "Inactive";
                             }
                         } else {
-                            // No activity found; fallback to club dateAdded
-                            $clubStatus = timeAgo($dateAdded);
+                            // No activity found in the logs
+                            $clubStatus = "Inactive";
                         }
+                    } else {
+                        // Handle execution failure
+                        $clubStatus = "Error fetching activity logs";
                     }
                     unset($logStmt);
+                } else {
+                    // Handle statement preparation failure
+                    $clubStatus = "Error preparing statement";
                 }
+
                 // Determine if the label should be "Moderator" or "Moderators"
                 $moderatorCount = substr_count($moderatorNames, ',') + 1; // Count commas and add 1 for total moderators
                 $moderatorLabel = ($moderatorCount > 1) ? "Moderators:" : "Moderator:";
