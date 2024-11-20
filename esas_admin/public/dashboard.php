@@ -126,15 +126,15 @@ try {
             width: 90% !important;
             height: auto !important;
         }
-        .auto-scroll {
+        .card .auto-scroll {
             overflow-y: none; /* Enable vertical scrolling */
         }
 
-        .auto-scroll::-webkit-scrollbar {
+        .card .auto-scroll::-webkit-scrollbar {
             width: 8px; /* Width of the scrollbar */
         }
 
-        .auto-scroll::-webkit-scrollbar-thumb {
+        .card .auto-scroll::-webkit-scrollbar-thumb {
             /* background-color: rgba(211, 211, 211, 0.5); */
             background-color: rgba(211, 211, 211, 0.0);
             border-radius: 10px; /* Rounded edges */
@@ -1093,6 +1093,10 @@ try {
 
                         </div>
                         <!-- THE MAIN PAGE END -->
+
+
+
+
                     </div>
                 </div>
             </div>
@@ -1249,16 +1253,17 @@ function fetchClubTrends() {
                                     <div class="row ml-1">
                                         <strong><span class="card-title club-name mb-0 text-muted" title="${club.clubName}">${club.clubName}</span></strong>
                                     </div>
-                                    <div class="row mt-1 px-2">
+                                    <!-- <div class="row mt-1 px-2">
                                         <div class="card card-members col-md-4" title="Active and Departed Members This School Year">
                                             <div class="col-5 div-user-icon text-center">
                                                 <i class="fas fa-user text-info"></i>
                                             </div>
                                             <div class="col-7 div-user-data text-center">
-                                                <strong><p class="m-0" style="font-size: 10px; color: black;">
+                                                <!-- <strong><p class="m-0" style="font-size: 10px; color: black;">
                                                     ${club.newlyActive !== 0 ? `+${club.newlyActive}` : club.newlyActive}
-                                                </p></strong>
+                                                </p></strong> -- >
                                                 <strong><p class="" style="font-size: 10px; color: red; margin: -5px;">
+                                                    <!-- ${club.newlyDeparted !== 0 ? `-${club.newlyDeparted}` : club.newlyDeparted} -- >
                                                     ${club.newlyDeparted !== 0 ? `-${club.newlyDeparted}` : club.newlyDeparted}
                                                 </p></strong>
                                             </div>
@@ -1301,7 +1306,7 @@ function fetchClubTrends() {
                                                 </strong>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="row ml-1 mb-1">
                                         <div class="club-rating col-6" data-rating="${club.rating}" title="Club Rating">
                                             ${generateStars(club.rating)}
@@ -1398,6 +1403,7 @@ function generateStars(rating) {
         display: flex;
         justify-content: center;
         align-items: center;
+        margin-bottom: 8px;
         cursor: pointer;
         border-radius: 50%;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.1);
