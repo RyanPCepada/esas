@@ -126,6 +126,8 @@ try {
             width: 90% !important;
             height: auto !important;
         }
+
+        
         .card .auto-scroll {
             overflow-y: none; /* Enable vertical scrolling */
         }
@@ -135,6 +137,21 @@ try {
         }
 
         .card .auto-scroll::-webkit-scrollbar-thumb {
+            /* background-color: rgba(211, 211, 211, 0.5); */
+            background-color: rgba(211, 211, 211, 0.0);
+            border-radius: 10px; /* Rounded edges */
+        }
+
+        
+        .auto-scroll {
+            overflow-y: none; /* Enable vertical scrolling */
+        }
+
+        .auto-scroll::-webkit-scrollbar {
+            width: 8px; /* Width of the scrollbar */
+        }
+
+        .auto-scroll::-webkit-scrollbar-thumb {
             /* background-color: rgba(211, 211, 211, 0.5); */
             background-color: rgba(211, 211, 211, 0.0);
             border-radius: 10px; /* Rounded edges */
