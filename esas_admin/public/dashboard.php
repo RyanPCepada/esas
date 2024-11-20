@@ -1152,7 +1152,6 @@ try {
                             </div>
                             <!-- COL-MD-3 MOST ACTIVE CLUB END -->
 
-
                             <!-- COL-MD-3 MOST APPLIED CLUB START -->
                             <div class="most-applied-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
                                 <p class="text-muted"><strong>Most Applied</strong> <i class="fas fa-file-text text-secondary"></i></p>
@@ -1168,8 +1167,14 @@ try {
                                             $stmt = $pdo->query($query);
                                             $rank = 1;
 
+                                            // Define light and lighter shades of warning
+                                            $lightWarning = "#ffeb99"; // Light Warning
+                                            $lighterWarning = "#fff6cc"; // Lighter Warning
+
                                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                echo "<tr>
+                                                // Alternate background colors
+                                                $bgColor = ($rank % 2 == 0) ? $lightWarning : $lighterWarning;
+                                                echo "<tr style='background-color: $bgColor;'>
                                                         <td>{$rank}</td>
                                                         <td>{$row['clubName']}</td>
                                                     </tr>";
