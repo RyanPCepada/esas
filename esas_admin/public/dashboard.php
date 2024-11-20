@@ -1129,6 +1129,35 @@ try {
                             </div>
                             <!-- COL-MD-3 MOST ACTIVE CLUB END -->
 
+                            <!-- COL-MD-3 MOST APPLIED CLUB START -->
+                            <div class="most-applied-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
+                                <p class="text-muted"><strong>Most Applied</strong></p>
+                                <div class="auto-scroll" style="max-height: 500px;">
+                                    <table class="table table-sm">
+                                        <tbody>
+                                            <?php
+                                            $query = "SELECT c.clubName, COUNT(a.application_id) AS application_count
+                                                    FROM tbl_application a
+                                                    INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+                                                    GROUP BY c.clubName
+                                                    ORDER BY application_count DESC";
+                                            $stmt = $pdo->query($query);
+                                            $rank = 1;
+
+                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                echo "<tr>
+                                                        <td>{$rank}</td>
+                                                        <td>{$row['clubName']}</td>
+                                                    </tr>";
+                                                $rank++;
+                                            }
+                                            ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- COL-MD-3 MOST APPLIED CLUB END -->
+
                             
 
                         </div>
