@@ -561,7 +561,16 @@ unset($pdo);
                                             <?= number_format($slotsPercentage, 2) ?>%
                                             <br>
                                             <small style="line-height: 15px; display: block; font-size: 14px;">Slots<br>Occupancy</small>
-                                            <small style="line-height: 15px; display: block; font-size: 11px;">(<?php echo $activeCount ?>/<?php echo $slots ?>)</small>
+                                            
+                                            <?php if ($slots > 0): ?>
+                                                <small style="line-height: 15px; display: block; font-size: 11px;">
+                                                    (<?php echo $activeCount ?>/<?php echo $slots ?>)
+                                                </small>
+                                            <?php else: ?>
+                                                <small style="line-height: 15px; display: block; font-size: 11px;">
+                                                    (Unlimited)
+                                                </small>
+                                            <?php endif; ?>
                                         </div>
 
                                     </div> 
