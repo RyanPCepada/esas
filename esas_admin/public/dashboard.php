@@ -1188,7 +1188,45 @@ try {
                             </div>
                             <!-- COL-MD-3 HIGHEST IN MEMBERS END -->
 
-                            
+                            <!-- COL-MD-3 FASTEST GROWING CLUB START -->
+                            <div class="fastest-growing-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
+                                <p class="text-muted"><strong>Fastest Growing</strong></p>
+                                <div class="auto-scroll" style="max-height: 500px;">
+                                    <table class="table table-sm">
+                                        <tbody>
+                                            <?php
+                                            $query = "SELECT c.clubName,
+                                                            (SELECT COUNT(a.application_id)
+                                                            FROM tbl_application a
+                                                            WHERE a.club_id = c.club_id AND a.status = 'active' AND YEAR(a.dateApplied) = YEAR(CURDATE())) AS current_year_members,
+                                                            (SELECT COUNT(a.application_id)
+                                                            FROM tbl_application a
+                                                            WHERE a.club_id = c.club_id AND a.status = 'active' AND YEAR(a.dateApplied) = YEAR(CURDATE()) - 1) AS previous_year_members,
+                                                            (SELECT COUNT(p.post_id)
+                                                            FROM tbl_posts p
+                                                            WHERE p.club_id = c.club_id AND YEAR(p.dateAdded) = YEAR(CURDATE())) AS current_year_posts,
+                                                            (SELECT COUNT(p.post_id)
+                                                            FROM tbl_posts p
+                                                            WHERE p.club_id = c.club_id AND YEAR(p.dateAdded) = YEAR(CURDATE()) - 1) AS previous_year_posts
+                                                    FROM tbl_clubs c
+                                                    ORDER BY (current_year_members - previous_year_members) + 
+                                                            (current_year_posts - previous_year_posts) DESC";
+                                            $stmt = $pdo->query($query);
+                                            $rank = 1;
+
+                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                echo "<tr>
+                                                        <td>{$rank}</td>
+                                                        <td>{$row['clubName']}</td>
+                                                    </tr>";
+                                                $rank++;
+                                            }
+                                            ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- COL-MD-3 FASTEST GROWING CLUB END -->
 
                         </div>
                         <!-- THE MAIN PAGE 2 END -->
