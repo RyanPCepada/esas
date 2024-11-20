@@ -1132,14 +1132,8 @@ try {
                                             $stmt = $pdo->query($query);
                                             $rank = 1;
 
-                                            // Define light and lighter shades of primary
-                                            $lightPrimary = "#e0f0ff"; // Light Primary
-                                            $lighterPrimary = "#f2f9ff"; // Lighter Primary
-
                                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                // Alternate background colors
-                                                $bgColor = ($rank % 2 == 0) ? $lightPrimary : $lighterPrimary;
-                                                echo "<tr style='background-color: $bgColor;'>
+                                                echo "<tr>
                                                         <td>{$rank}</td>
                                                         <td>{$row['clubName']}</td>
                                                     </tr>";
@@ -1167,14 +1161,8 @@ try {
                                             $stmt = $pdo->query($query);
                                             $rank = 1;
 
-                                            // Define light and lighter shades of warning
-                                            $lightWarning = "#fff1b3"; // Light Warning
-                                            $lighterWarning = "#fff7cc"; // Lighter Warning
-
                                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                // Alternate background colors
-                                                $bgColor = ($rank % 2 == 0) ? $lightWarning : $lighterWarning;
-                                                echo "<tr style='background-color: $bgColor;'>
+                                                echo "<tr>
                                                         <td>{$rank}</td>
                                                         <td>{$row['clubName']}</td>
                                                     </tr>";
@@ -1203,14 +1191,8 @@ try {
                                             $stmt = $pdo->query($query);
                                             $rank = 1;
 
-                                            // Define vibrant shades of danger
-                                            $lightDanger = "#fce7ed"; // Light Danger
-                                            $lighterDanger = "#fef3f5"; // Lighter Danger
-
                                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                // Alternate background colors
-                                                $bgColor = ($rank % 2 == 0) ? $lightDanger : $lighterDanger;
-                                                echo "<tr style='background-color: $bgColor;'>
+                                                echo "<tr>
                                                         <td>{$rank}</td>
                                                         <td>{$row['clubName']}</td>
                                                     </tr>";
@@ -1249,14 +1231,8 @@ try {
                                             $stmt = $pdo->query($query);
                                             $rank = 1;
 
-                                            // Define vibrant shades of success
-                                            $lightSuccess = "#e9f4e9"; // Light Success
-                                            $lighterSuccess = "#f4f9f4"; // Lighter Success
-
                                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                // Alternate background colors
-                                                $bgColor = ($rank % 2 == 0) ? $lightSuccess : $lighterSuccess;
-                                                echo "<tr style='background-color: $bgColor;'>
+                                                echo "<tr>
                                                         <td>{$rank}</td>
                                                         <td>{$row['clubName']}</td>
                                                     </tr>";
@@ -1268,7 +1244,6 @@ try {
                                 </div>
                             </div>
                             <!-- COL-MD-3 FASTEST GROWING CLUB END -->
-
 
                         </div>
                         <!-- THE MAIN PAGE 2 END -->
