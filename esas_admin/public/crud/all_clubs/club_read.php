@@ -535,6 +535,137 @@ $ratingAllYears = min(10, round($ratingAllYears / 6, 2)); // Divide by 6 to norm
 // echo "Rating: " . $ratingAllYears . " (All School Years) <br>";
 // echo "Rating This Year: " . $ratingThisYear . " (This Year)";
 
+
+
+
+// AWARDS RANKS
+
+// Helper function to determine the correct suffix for a rank
+function getRankWithSuffix($rank) {
+    if (!in_array(($rank % 100), [11, 12, 13])) { // Handle special cases for 11th, 12th, 13th
+        switch ($rank % 10) {
+            case 1: return $rank . "st";
+            case 2: return $rank . "nd";
+            case 3: return $rank . "rd";
+        }
+    }
+    return $rank . "th";
+}
+
+// Get the club_id from the query string
+$club_id = trim($_GET["club_id"]);
+
+// Initialize rank variables
+$mostAppliedClubRank = "";
+$highestInMembersRank = "";
+$mostActiveClubRank = "";
+$fastestGrowingClubRank = "";
+
+// Rank for Most Active Club
+try {
+    $stmt = $pdo->prepare("
+        SELECT club_id, COUNT(activity_id) AS activity_count 
+        FROM tbl_activity_logs 
+        WHERE club_id IS NOT NULL
+        GROUP BY club_id 
+        ORDER BY activity_count DESC
+    ");
+    $stmt->execute();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $rank = 1;
+    foreach ($clubs as $club) {
+        if ($club['club_id'] == $club_id) {
+            $mostActiveClubRank = getRankWithSuffix($rank);
+            break;
+        }
+        $rank++;
+    }
+} catch (PDOException $e) {
+    echo "Error fetching most active club rank: " . $e->getMessage();
+}
+// Default rank value if no rank is fetched
+$mostActiveClubRank = $mostActiveClubRank ?: "<small>Unqualified</small>";
+
+// Rank for Most Applied Club
+try {
+    $stmt = $pdo->prepare("
+        SELECT club_id, COUNT(application_id) AS application_count 
+        FROM tbl_application 
+        GROUP BY club_id 
+        ORDER BY application_count DESC
+    ");
+    $stmt->execute();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $rank = 1;
+    foreach ($clubs as $club) {
+        if ($club['club_id'] == $club_id) {
+            $mostAppliedClubRank = getRankWithSuffix($rank);
+            break;
+        }
+        $rank++;
+    }
+} catch (PDOException $e) {
+    echo "Error fetching most applied club rank: " . $e->getMessage();
+}
+// Default rank value if no rank is fetched
+$mostAppliedClubRank = $mostAppliedClubRank ?: "<small>Unqualified</small>";
+
+// Rank for Highest in Members
+try {
+    $stmt = $pdo->prepare("
+        SELECT club_id, COUNT(application_id) AS active_member_count 
+        FROM tbl_application 
+        WHERE status = 'active' 
+        GROUP BY club_id 
+        ORDER BY active_member_count DESC
+    ");
+    $stmt->execute();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $rank = 1;
+    foreach ($clubs as $club) {
+        if ($club['club_id'] == $club_id) {
+            $highestInMembersRank = getRankWithSuffix($rank);
+            break;
+        }
+        $rank++;
+    }
+} catch (PDOException $e) {
+    echo "Error fetching highest members rank: " . $e->getMessage();
+}
+// Default rank value if no rank is fetched
+$highestInMembersRank = $highestInMembersRank ?: "<small>Unqualified</small>";
+
+// Rank for Fastest Growing Club
+try {
+    $stmt = $pdo->prepare("
+        SELECT club_id, 
+            (SELECT COUNT(application_id) FROM tbl_application WHERE club_id = tbl_clubs.club_id AND YEAR(dateApplied) = YEAR(CURDATE())) AS current_year_members,
+            (SELECT COUNT(application_id) FROM tbl_application WHERE club_id = tbl_clubs.club_id AND YEAR(dateApplied) = YEAR(CURDATE()) - 1) AS previous_year_members
+        FROM tbl_clubs
+        ORDER BY current_year_members - previous_year_members DESC
+    ");
+    $stmt->execute();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $rank = 1;
+    foreach ($clubs as $club) {
+        if ($club['club_id'] == $club_id) {
+            $fastestGrowingClubRank = getRankWithSuffix($rank);
+            break;
+        }
+        $rank++;
+    }
+} catch (PDOException $e) {
+    echo "Error fetching fastest growing club rank: " . $e->getMessage();
+}
+// Default rank value if no rank is fetched
+$fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>";
+
+
+
 // Close connection
 unset($pdo);
 
@@ -778,59 +909,59 @@ unset($pdo);
                         <div class="row p-3 mt-4">
                             <!-- Left Column -->
                             <div class="col-md-4 p-0 pr-3">
-                                <!-- Most Applied Club -->
-                                <div class="card text-center mb-3 p-5 bg-light" style="border-radius: 15px;">
+
+                                <!-- Most Active Club -->
+                                <div class="card text-center mb-3 p-5 bg-dark" style="border-radius: 15px;">
                                     <div class="row">
                                         <div class="col-5 m-0 p-0">
                                             <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
                                         </div>
                                         <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
-                                            <h1 class="m-0 p-0"><strong class="text-info">1st</strong></h1>
+                                            <h1 class="m-0 p-0"><strong class="text-info"><?php echo $mostActiveClubRank; ?></strong></h1>
+                                            <p class="m-0 p-0"><strong class="text-info">Most active club</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Most Applied Club -->
+                                <div class="card text-center mb-3 p-5 bg-dark" style="border-radius: 15px;">
+                                    <div class="row">
+                                        <div class="col-5 m-0 p-0">
+                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
+                                        </div>
+                                        <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                            <h1 class="m-0 p-0"><strong class="text-info"><?php echo $mostAppliedClubRank; ?></strong></h1>
                                             <p class="m-0 p-0"><strong class="text-info">Most applied club</strong></p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Highest Number of Members -->
-                                <div class="card text-center mb-3 p-5 bg-light" style="border-radius: 15px;">
+                                <div class="card text-center mb-3 p-5 bg-dark" style="border-radius: 15px;">
                                     <div class="row">
                                         <div class="col-5 m-0 p-0">
                                             <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
                                         </div>
                                         <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
-                                            <h1 class="m-0 p-0"><strong class="text-info">1st</strong></h1>
+                                            <h1 class="m-0 p-0"><strong class="text-info"><?php echo $highestInMembersRank; ?></strong></h1>
                                             <p class="m-0 p-0"><strong class="text-info">Highest in members</strong></p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Most Active Club -->
-                                <div class="card text-center mb-3 p-5 bg-light" style="border-radius: 15px;">
-                                    <div class="row">
-                                        <div class="col-5 m-0 p-0">
-                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
-                                        </div>
-                                        <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
-                                            <h1 class="m-0 p-0"><strong class="text-info">1st</strong></h1>
-                                            <p class="m-0 p-0"><strong class="text-info">Most active club</strong></p>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <!-- Fastest Growing Club -->
-                                <div class="card text-center mb-3 p-5 bg-light" style="border-radius: 15px;">
+                                <div class="card text-center mb-3 p-5 bg-dark" style="border-radius: 15px;">
                                     <div class="row">
                                         <div class="col-5 m-0 p-0">
                                             <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
                                         </div>
                                         <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
-                                            <h1 class="m-0 p-0"><strong class="text-info">1st</strong></h1>
+                                            <h1 class="m-0 p-0"><strong class="text-info"><?php echo $fastestGrowingClubRank; ?></strong></h1>
                                             <p class="m-0 p-0"><strong class="text-info">Fastest growing club</strong></p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                             <!-- Right Column -->
                             <div class="card col-md-8 p-3 bg-light">
                                 <h5>Description:</h5>
@@ -858,13 +989,53 @@ unset($pdo);
         </div>
     </div>
 
-    <div id="clubTrendsList" class="row align-items-start justify-content-start p-1"></div>
 
     
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    fetchAwards();
+});
+
+function fetchAwards() {
+    const schoolYear = document.getElementById('schoolYearDropdown').value; // Get the selected school year
+    fetch(`/esas/esas_admin/apis/fetch-all-awards-api.php?school_year=${encodeURIComponent(schoolYear)}`)
+        .then(response => response.json())
+        .then(data => {
+            // Handle the awards data
+            const awardsSection = document.getElementById('awardsSection'); // Replace with your awards section container ID
+
+            if (data.length > 0) {
+                let html = '';
+                data.forEach(award => {
+                    html += `
+                        <div class="card text-center mb-3 p-5 bg-light" style="border-radius: 15px;">
+                            <div class="row">
+                                <div class="col-5 m-0 p-0">
+                                    <img src="/esas/esas_admin/icons/${award.icon}" style="width: 100px; height: 100px;">
+                                </div>
+                                <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                    <h1 class="m-0 p-0"><strong class="text-info">${award.rank}</strong></h1>
+                                    <p class="m-0 p-0"><strong class="text-info">${award.title}</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                awardsSection.innerHTML = html;
+            } else {
+                awardsSection.innerHTML = 'No awards found.';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching awards:', error);
+            document.getElementById('awardsSection').innerHTML = 'Failed to load awards.';
+        });
+}
+</script>
 
     <style>
         .circle-bar {
