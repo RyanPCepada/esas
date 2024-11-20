@@ -639,17 +639,56 @@ try {
 $highestInMembersRank = $highestInMembersRank ?: "<small>Unqualified</small>";
 
 // Rank for Fastest Growing Club
+// Rank for Fastest Growing Club considering members, posts, and events growth
 try {
     $stmt = $pdo->prepare("
-        SELECT club_id, 
-            (SELECT COUNT(application_id) FROM tbl_application WHERE club_id = tbl_clubs.club_id AND YEAR(dateApplied) = YEAR(CURDATE())) AS current_year_members,
-            (SELECT COUNT(application_id) FROM tbl_application WHERE club_id = tbl_clubs.club_id AND YEAR(dateApplied) = YEAR(CURDATE()) - 1) AS previous_year_members
+        SELECT 
+            club_id, 
+            -- Current year's active members
+            (SELECT COUNT(application_id) 
+                FROM tbl_application 
+                WHERE club_id = tbl_clubs.club_id 
+                AND status = 'active' 
+                AND YEAR(dateApplied) = YEAR(CURDATE())) AS current_year_members,
+            
+            -- Previous year's active members
+            (SELECT COUNT(application_id) 
+                FROM tbl_application 
+                WHERE club_id = tbl_clubs.club_id 
+                AND status = 'active' 
+                AND YEAR(dateApplied) = YEAR(CURDATE()) - 1) AS previous_year_members,
+
+            -- Current year's posts
+            (SELECT COUNT(post_id) 
+                FROM tbl_posts 
+                WHERE club_id = tbl_clubs.club_id 
+                AND YEAR(dateAdded) = YEAR(CURDATE())) AS current_year_posts,
+
+            -- Previous year's posts
+            (SELECT COUNT(post_id) 
+                FROM tbl_posts 
+                WHERE club_id = tbl_clubs.club_id 
+                AND YEAR(dateAdded) = YEAR(CURDATE()) - 1) AS previous_year_posts,
+
+            -- Current year's events
+            (SELECT COUNT(event_id) 
+                FROM tbl_events 
+                WHERE club_id = tbl_clubs.club_id 
+                AND YEAR(dateAdded) = YEAR(CURDATE())) AS current_year_events,
+
+            -- Previous year's events
+            (SELECT COUNT(event_id) 
+                FROM tbl_events 
+                WHERE club_id = tbl_clubs.club_id 
+                AND YEAR(dateAdded) = YEAR(CURDATE()) - 1) AS previous_year_events
         FROM tbl_clubs
-        ORDER BY current_year_members - previous_year_members DESC
+        ORDER BY 
+            -- Prioritize based on the overall growth (in any category)
+            GREATEST(current_year_members - previous_year_members, current_year_posts - previous_year_posts, current_year_events - previous_year_events) DESC
     ");
     $stmt->execute();
     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     $rank = 1;
     foreach ($clubs as $club) {
         if ($club['club_id'] == $club_id) {
@@ -663,6 +702,7 @@ try {
 }
 // Default rank value if no rank is fetched
 $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>";
+
 
 
 
