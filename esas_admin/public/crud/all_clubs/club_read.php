@@ -381,6 +381,150 @@ $eventsChanges = $eventsAveragePerMonth - $eventsAverageLastYear;
 unset($newEventsStmt, $averageEventsStmt, $averageEventsLastYearStmt);
 
 
+// RATING
+
+// Fetch active members count for this year
+$activeMembersSql = "SELECT COUNT(*) AS activeMembers FROM tbl_application 
+                     WHERE club_id = :club_id AND status = 'active' 
+                     AND YEAR(dateDecided) = YEAR(CURRENT_DATE)";
+$activeMembersStmt = $pdo->prepare($activeMembersSql);
+$activeMembersStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$activeMembersStmt->execute();
+$activeMembersRow = $activeMembersStmt->fetch(PDO::FETCH_ASSOC);
+$activeMembersCount = $activeMembersRow['activeMembers'];
+
+// Fetch number of applications for this year
+$appCountSql = "SELECT COUNT(*) AS appCount FROM tbl_application 
+                WHERE club_id = :club_id AND YEAR(dateDecided) = YEAR(CURRENT_DATE)";
+$appCountStmt = $pdo->prepare($appCountSql);
+$appCountStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$appCountStmt->execute();
+$appCountRow = $appCountStmt->fetch(PDO::FETCH_ASSOC);
+$appCount = $appCountRow['appCount'];
+
+// Fetch accomplishment reports count for this year
+$accReportsSql = "SELECT COUNT(*) AS accReportCount FROM tbl_accomplishment_reports 
+                  WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+$accReportsStmt = $pdo->prepare($accReportsSql);
+$accReportsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$accReportsStmt->execute();
+$accReportsRow = $accReportsStmt->fetch(PDO::FETCH_ASSOC);
+$accReportCount = $accReportsRow['accReportCount'];
+
+// Fetch recommendations count for this year
+$recSql = "SELECT COUNT(*) AS recCount FROM tbl_club_recommendations 
+           WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+$recStmt = $pdo->prepare($recSql);
+$recStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$recStmt->execute();
+$recRow = $recStmt->fetch(PDO::FETCH_ASSOC);
+$recCount = $recRow['recCount'];
+
+// Fetch posts per week for this year
+$postsSql = "SELECT COUNT(*) AS totalPosts FROM tbl_posts 
+             WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+$postsStmt = $pdo->prepare($postsSql);
+$postsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$postsStmt->execute();
+$postsRow = $postsStmt->fetch(PDO::FETCH_ASSOC);
+$totalPosts = $postsRow['totalPosts'];
+$postsPerWeek = $totalPosts / 4; // Assuming 4 weeks per month
+
+// Fetch events per month for this year
+$eventsSql = "SELECT COUNT(*) AS totalEvents FROM tbl_events 
+              WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+$eventsStmt = $pdo->prepare($eventsSql);
+$eventsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$eventsStmt->execute();
+$eventsRow = $eventsStmt->fetch(PDO::FETCH_ASSOC);
+$totalEvents = $eventsRow['totalEvents'];
+$eventsPerMonth = $totalEvents / 12; // Assuming 12 months per year
+
+// Calculate the rating for this year
+$ratingThisYear = (
+    ($appCount * 0.20) +        // Number of Applications
+    ($activeMembersCount * 0.20) + // Active Members
+    ($postsPerWeek * 0.20) +       // Posts per Week
+    ($eventsPerMonth * 0.20) +     // Events per Month
+    ($accReportCount * 0.10) +     // Accomplishment Reports
+    ($recCount * 0.10)            // Club Recommendations
+);
+
+// Ensure rating is within 10
+$ratingThisYear = min(10, round($ratingThisYear / 6, 2)); // Divide by 6 to normalize the formula
+
+// Calculate the rating for all years (total accumulated values)
+$activeMembersSqlAllYears = "SELECT COUNT(*) AS activeMembers FROM tbl_application 
+                             WHERE club_id = :club_id AND status = 'active'";
+$activeMembersStmtAllYears = $pdo->prepare($activeMembersSqlAllYears);
+$activeMembersStmtAllYears->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$activeMembersStmtAllYears->execute();
+$activeMembersRowAllYears = $activeMembersStmtAllYears->fetch(PDO::FETCH_ASSOC);
+$activeMembersCountAllYears = $activeMembersRowAllYears['activeMembers'];
+
+// Fetch number of applications for all years
+$appCountSqlAllYears = "SELECT COUNT(*) AS appCount FROM tbl_application 
+                        WHERE club_id = :club_id";
+$appCountStmtAllYears = $pdo->prepare($appCountSqlAllYears);
+$appCountStmtAllYears->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$appCountStmtAllYears->execute();
+$appCountRowAllYears = $appCountStmtAllYears->fetch(PDO::FETCH_ASSOC);
+$appCountAllYears = $appCountRowAllYears['appCount'];
+
+// Fetch accomplishment reports count for all years
+$accReportsSqlAllYears = "SELECT COUNT(*) AS accReportCount FROM tbl_accomplishment_reports 
+                           WHERE club_id = :club_id";
+$accReportsStmtAllYears = $pdo->prepare($accReportsSqlAllYears);
+$accReportsStmtAllYears->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$accReportsStmtAllYears->execute();
+$accReportsRowAllYears = $accReportsStmtAllYears->fetch(PDO::FETCH_ASSOC);
+$accReportCountAllYears = $accReportsRowAllYears['accReportCount'];
+
+// Fetch recommendations count for all years
+$recSqlAllYears = "SELECT COUNT(*) AS recCount FROM tbl_club_recommendations 
+                   WHERE club_id = :club_id";
+$recStmtAllYears = $pdo->prepare($recSqlAllYears);
+$recStmtAllYears->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$recStmtAllYears->execute();
+$recRowAllYears = $recStmtAllYears->fetch(PDO::FETCH_ASSOC);
+$recCountAllYears = $recRowAllYears['recCount'];
+
+// Fetch total posts for all years
+$postsSqlAllYears = "SELECT COUNT(*) AS totalPosts FROM tbl_posts 
+                     WHERE club_id = :club_id";
+$postsStmtAllYears = $pdo->prepare($postsSqlAllYears);
+$postsStmtAllYears->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$postsStmtAllYears->execute();
+$postsRowAllYears = $postsStmtAllYears->fetch(PDO::FETCH_ASSOC);
+$totalPostsAllYears = $postsRowAllYears['totalPosts'];
+$postsPerWeekAllYears = $totalPostsAllYears / 4; // Assuming 4 weeks per month
+
+// Fetch total events for all years
+$eventsSqlAllYears = "SELECT COUNT(*) AS totalEvents FROM tbl_events 
+                      WHERE club_id = :club_id";
+$eventsStmtAllYears = $pdo->prepare($eventsSqlAllYears);
+$eventsStmtAllYears->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$eventsStmtAllYears->execute();
+$eventsRowAllYears = $eventsStmtAllYears->fetch(PDO::FETCH_ASSOC);
+$totalEventsAllYears = $eventsRowAllYears['totalEvents'];
+$eventsPerMonthAllYears = $totalEventsAllYears / 12; // Assuming 12 months per year
+
+// Calculate the rating for all school years
+$ratingAllYears = (
+    ($appCountAllYears * 0.20) +        // Number of Applications
+    ($activeMembersCountAllYears * 0.20) + // Active Members
+    ($postsPerWeekAllYears * 0.20) +       // Posts per Week
+    ($eventsPerMonthAllYears * 0.20) +     // Events per Month
+    ($accReportCountAllYears * 0.10) +     // Accomplishment Reports
+    ($recCountAllYears * 0.10)            // Club Recommendations
+);
+
+// Ensure rating is within 10
+$ratingAllYears = min(10, round($ratingAllYears / 6, 2)); // Divide by 6 to normalize the formula
+
+// Output or use the ratings
+// echo "Rating: " . $ratingAllYears . " (All School Years) <br>";
+// echo "Rating This Year: " . $ratingThisYear . " (This Year)";
 
 // Close connection
 unset($pdo);
@@ -435,6 +579,7 @@ unset($pdo);
                                 <div class="col-9">
                                     <h3 class="text-muted mb-0"><?php echo $clubName; ?></h3>
                                     <span class="status-dot" style="position: absolute; top: 18px; left: 16px; color: red; font-size: 2em;">&#8226;</span><small class="ml-3"> <?php echo $clubStatus; ?></small>
+
                                     <!-- <hr> -->
                                     <div class="row col-12 m-0 mt-2 p-0">
                                         <!-- MEMBERS CARD START -->
@@ -543,38 +688,52 @@ unset($pdo);
                                         <!-- EVENTS CARD END -->
                                     </div>
                                 </div>
-                                <div class="col-3 d-flex align-items-center justify-content-center m-0 p-0"> 
-                                    <div class="circle-bar" title="Slot occupancy - <?php echo $activeCount ?> students, <?php echo $slots ?> slots"> 
-                                        <svg viewBox="0 0 36 36" class="circular-chart">
-                                            <!-- Background circle -->
-                                            <path class="circle-bg"
-                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
-                                                fill="none" stroke="#FFFFFF" stroke-width="4"></path>
+                                <div class="col-3 d-flex flex-column align-items-center justify-content-start m-0 p-0">
+                                    <!-- Circle Bar Section -->
+                                    <div class="w-100 d-flex justify-content-center align-items-center">
+                                        <div class="circle-bar" title="Slot occupancy - <?php echo $activeCount ?> students, <?php echo $slots ?> slots">
+                                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                                <!-- Background circle -->
+                                                <path class="circle-bg"
+                                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                                    fill="none" stroke="#FFFFFF" stroke-width="4"></path>
 
-                                            <!-- Progress circle based on percentage -->
-                                            <path class="circle"
-                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
-                                                fill="none" stroke="#007bff" stroke-width="4"
-                                                stroke-dasharray="<?= $slotsPercentage ?>, 100"></path>
-                                        </svg>
-                                        <div class="circle-label" style="text-align: center; line-height: 1.5; font-size: 24px;">
-                                            <?= number_format($slotsPercentage, 2) ?>%
-                                            <br>
-                                            <small style="line-height: 15px; display: block; font-size: 14px;">Slots<br>Occupancy</small>
-                                            
-                                            <?php if ($slots > 0): ?>
-                                                <small style="line-height: 15px; display: block; font-size: 11px;">
-                                                    (<?php echo $activeCount ?>/<?php echo $slots ?>)
-                                                </small>
-                                            <?php else: ?>
-                                                <small style="line-height: 15px; display: block; font-size: 11px;">
-                                                    (Unlimited)
-                                                </small>
-                                            <?php endif; ?>
+                                                <!-- Progress circle based on percentage -->
+                                                <path class="circle"
+                                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                                    fill="none" stroke="#007bff" stroke-width="4"
+                                                    stroke-dasharray="<?= $slotsPercentage ?>, 100"></path>
+                                            </svg>
+                                            <div class="circle-label" style="text-align: center; line-height: 1.5; font-size: 24px;">
+                                                <?= number_format($slotsPercentage, 2) ?>%
+                                                <br>
+                                                <small style="line-height: 15px; display: block; font-size: 14px;">Slots<br>Occupancy</small>
+                                                
+                                                <?php if ($slots > 0): ?>
+                                                    <small style="line-height: 15px; display: block; font-size: 11px;">
+                                                        (<?php echo $activeCount ?>/<?php echo $slots ?>)
+                                                    </small>
+                                                <?php else: ?>
+                                                    <small style="line-height: 15px; display: block; font-size: 11px;">
+                                                        (Unlimited)
+                                                    </small>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
+                                    </div>
 
-                                    </div> 
+                                    <!-- Ratings Section -->
+                                    <div class="w-100 text-center p-3">
+                                    <p class="m-0 p-0"><i class="fas fa-star text-warning"></i><strong> Rating</strong></p>
+                                        <div class="club-rating" data-rating="<?php echo $ratingAllYears; ?>" title="Club Rating">
+                                            <p class="text-dark mb-0 p-0">Overall: <strong class="text-info"><?php echo $ratingAllYears; ?>/10</strong></p>
+                                        </div>
+                                        <div class="club-rating" data-rating="<?php echo $ratingThisYear; ?>" title="Club Rating This Year">
+                                            <p class="text-dark mb-0 p-0">This Year: <strong class="text-info"><?php echo $ratingThisYear; ?>/10</strong></p>
+                                        </div>
+                                    </div>
                                 </div>
+
 
                                 <!-- <div class="row col-12 m-0 mt-2 p-0">
                                     <div class="col-4 p-1">
