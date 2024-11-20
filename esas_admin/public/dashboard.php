@@ -1175,9 +1175,9 @@ try {
                             </div>
                             <!-- COL-MD-3 MOST APPLIED CLUB END -->
 
-                            <!-- COL-MD-3 HIGHEST IN MEMBERS START -->
+                            <!-- COL-MD-3 HIGHEST MEMBERS START -->
                             <div class="highest-in-members-section col-md-3 m-0 p-3 auto-scroll" style="position: relative; z-index: 1;">
-                                <p class="text-muted"><strong>Highest in Members</strong> <i class="fas fa-users text-primary"></i></p>
+                                <p class="text-muted"><strong>Highest Members</strong> <i class="fas fa-users text-primary"></i></p>
                                 <div class="auto-scroll" style="max-height: 500px;">
                                     <table class="table table-sm">
                                         <tbody>
@@ -1203,7 +1203,7 @@ try {
                                     </table>
                                 </div>
                             </div>
-                            <!-- COL-MD-3 HIGHEST IN MEMBERS END -->
+                            <!-- COL-MD-3 HIGHEST MEMBERS END -->
 
                             <!-- COL-MD-3 FASTEST GROWING CLUB START -->
                             <div class="fastest-growing-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
