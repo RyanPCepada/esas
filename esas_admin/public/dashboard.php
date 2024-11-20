@@ -1158,6 +1158,36 @@ try {
                             </div>
                             <!-- COL-MD-3 MOST APPLIED CLUB END -->
 
+                            <!-- COL-MD-3 HIGHEST IN MEMBERS START -->
+                            <div class="highest-in-members-section col-md-3 m-0 p-3 auto-scroll" style="position: relative; z-index: 1;">
+                                <p class="text-muted"><strong>Highest in Members</strong></p>
+                                <div class="auto-scroll" style="max-height: 500px;">
+                                    <table class="table table-sm">
+                                        <tbody>
+                                            <?php
+                                            $query = "SELECT c.clubName, COUNT(a.application_id) AS active_member_count
+                                                    FROM tbl_application a
+                                                    INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+                                                    WHERE a.status = 'active'
+                                                    GROUP BY c.clubName
+                                                    ORDER BY active_member_count DESC";
+                                            $stmt = $pdo->query($query);
+                                            $rank = 1;
+
+                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                echo "<tr>
+                                                        <td>{$rank}</td>
+                                                        <td>{$row['clubName']}</td>
+                                                    </tr>";
+                                                $rank++;
+                                            }
+                                            ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- COL-MD-3 HIGHEST IN MEMBERS END -->
+
                             
 
                         </div>
