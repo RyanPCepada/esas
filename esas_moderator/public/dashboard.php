@@ -380,7 +380,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Club</p>
+                                        <p class="mb-2 p-0">Total Club</p>
                                     </div>
                                 </div>
 
@@ -441,7 +441,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Student</p>
+                                        <p class="mb-2 p-0">Total Student</p>
                                     </div>
                                 </div>
 
@@ -503,7 +503,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-hourglass-half mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Pending Approval</p>
+                                        <p class="mb-2 p-0">Total Pending Approval</p>
                                     </div>
                                 </div>
 
@@ -564,7 +564,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-door-open mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Departure Request</p>
+                                        <p class="mb-2 p-0">Total Departure Request</p>
                                     </div>
                                 </div>
 
