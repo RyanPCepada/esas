@@ -1114,139 +1114,185 @@ try {
 
                         
                         <!-- THE MAIN PAGE 2 START -->
-                        <div class="row main-page mt-3 p-0">
+<div class="row main-page mt-3 p-0">
 
-                            <!-- COL-MD-3 MOST ACTIVE CLUB START -->
-                            <div class="most-active-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
-                                <p class="text-muted"><strong>Most Active</strong> <i class="fas fa-fire text-warning"></i></p>
-                                <div class="auto-scroll" style="max-height: 555px;">
-                                    <table class="table table-sm">
-                                        <tbody>
-                                            <?php
-                                            $query = "SELECT c.clubName, COUNT(a.activity_id) AS activity_count
-                                                    FROM tbl_activity_logs a
-                                                    INNER JOIN tbl_clubs c ON a.club_id = c.club_id
-                                                    WHERE a.club_id IS NOT NULL
-                                                    GROUP BY c.clubName
-                                                    ORDER BY activity_count DESC";
-                                            $stmt = $pdo->query($query);
-                                            $rank = 1;
+<!-- COL-MD-3 MOST ACTIVE CLUB START -->
+<div class="most-active-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
+    <p class="text-muted"><strong>Most Active</strong> <i class="fas fa-fire text-warning"></i></p>
+    <div class="auto-scroll" style="max-height: 555px;">
+        <table class="table table-sm">
+            <tbody>
+                <?php
+                try {
+                    $stmt = $pdo->prepare("
+                        SELECT tbl_clubs.clubName, COUNT(tbl_activity_logs.activity_id) AS activity_count 
+                        FROM tbl_activity_logs 
+                        INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_activity_logs.club_id
+                        GROUP BY tbl_clubs.club_id 
+                        ORDER BY activity_count DESC
+                    ");
+                    $stmt->execute();
+                    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $rank = 1;
 
-                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                echo "<tr>
-                                                        <td>{$rank}</td>
-                                                        <td>{$row['clubName']}</td>
-                                                    </tr>";
-                                                $rank++;
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <!-- COL-MD-3 MOST ACTIVE CLUB END -->
+                    foreach ($clubs as $club) {
+                        echo "<tr>
+                                <td>{$rank}</td>
+                                <td>" . htmlspecialchars($club['clubName']) . "</td>
+                              </tr>";
+                        $rank++;
+                    }
+                } catch (PDOException $e) {
+                    echo "Error fetching most active clubs: " . $e->getMessage();
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- COL-MD-3 MOST ACTIVE CLUB END -->
 
-                            <!-- COL-MD-3 MOST APPLIED CLUB START -->
-                            <div class="most-applied-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
-                                <p class="text-muted"><strong>Most Applied</strong> <i class="fas fa-file-text text-secondary"></i></p>
-                                <div class="auto-scroll" style="max-height: 555px;">
-                                    <table class="table table-sm">
-                                        <tbody>
-                                            <?php
-                                            $query = "SELECT c.clubName, COUNT(a.application_id) AS application_count
-                                                    FROM tbl_application a
-                                                    INNER JOIN tbl_clubs c ON a.club_id = c.club_id
-                                                    GROUP BY c.clubName
-                                                    ORDER BY application_count DESC";
-                                            $stmt = $pdo->query($query);
-                                            $rank = 1;
+<!-- COL-MD-3 MOST APPLIED CLUB START -->
+<div class="most-applied-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
+    <p class="text-muted"><strong>Most Applied</strong> <i class="fas fa-file-text text-secondary"></i></p>
+    <div class="auto-scroll" style="max-height: 555px;">
+        <table class="table table-sm">
+            <tbody>
+                <?php
+                try {
+                    $stmt = $pdo->prepare("
+                        SELECT tbl_clubs.clubName, COUNT(tbl_application.application_id) AS application_count 
+                        FROM tbl_application 
+                        INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_application.club_id
+                        GROUP BY tbl_clubs.club_id 
+                        ORDER BY application_count DESC
+                    ");
+                    $stmt->execute();
+                    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $rank = 1;
 
-                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                echo "<tr>
-                                                        <td>{$rank}</td>
-                                                        <td>{$row['clubName']}</td>
-                                                    </tr>";
-                                                $rank++;
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <!-- COL-MD-3 MOST APPLIED CLUB END -->
+                    foreach ($clubs as $club) {
+                        echo "<tr>
+                                <td>{$rank}</td>
+                                <td>" . htmlspecialchars($club['clubName']) . "</td>
+                              </tr>";
+                        $rank++;
+                    }
+                } catch (PDOException $e) {
+                    echo "Error fetching most applied clubs: " . $e->getMessage();
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- COL-MD-3 MOST APPLIED CLUB END -->
 
-                            <!-- COL-MD-3 HIGHEST MEMBERS START -->
-                            <div class="highest-in-members-section col-md-3 m-0 p-3 auto-scroll" style="position: relative; z-index: 1;">
-                                <p class="text-muted"><strong>Highest Members</strong> <i class="fas fa-users text-primary"></i></p>
-                                <div class="auto-scroll" style="max-height: 555px;">
-                                    <table class="table table-sm">
-                                        <tbody>
-                                            <?php
-                                            $query = "SELECT c.clubName, COUNT(a.application_id) AS active_member_count
-                                                    FROM tbl_application a
-                                                    INNER JOIN tbl_clubs c ON a.club_id = c.club_id
-                                                    WHERE a.status = 'active'
-                                                    GROUP BY c.clubName
-                                                    ORDER BY active_member_count DESC";
-                                            $stmt = $pdo->query($query);
-                                            $rank = 1;
+<!-- COL-MD-3 HIGHEST MEMBERS START -->
+<div class="highest-in-members-section col-md-3 m-0 p-3 auto-scroll" style="position: relative; z-index: 1;">
+    <p class="text-muted"><strong>Highest Members</strong> <i class="fas fa-users text-primary"></i></p>
+    <div class="auto-scroll" style="max-height: 555px;">
+        <table class="table table-sm">
+            <tbody>
+                <?php
+                try {
+                    $stmt = $pdo->prepare("
+                        SELECT tbl_clubs.clubName, COUNT(tbl_application.application_id) AS active_member_count 
+                        FROM tbl_application 
+                        INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_application.club_id
+                        WHERE tbl_application.status = 'active' 
+                        GROUP BY tbl_clubs.club_id 
+                        ORDER BY active_member_count DESC
+                    ");
+                    $stmt->execute();
+                    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $rank = 1;
 
-                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                echo "<tr>
-                                                        <td>{$rank}</td>
-                                                        <td>{$row['clubName']}</td>
-                                                    </tr>";
-                                                $rank++;
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <!-- COL-MD-3 HIGHEST MEMBERS END -->
+                    foreach ($clubs as $club) {
+                        echo "<tr>
+                                <td>{$rank}</td>
+                                <td>" . htmlspecialchars($club['clubName']) . "</td>
+                              </tr>";
+                        $rank++;
+                    }
+                } catch (PDOException $e) {
+                    echo "Error fetching highest member clubs: " . $e->getMessage();
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- COL-MD-3 HIGHEST MEMBERS END -->
 
-                            <!-- COL-MD-3 FASTEST GROWING CLUB START -->
-                            <div class="fastest-growing-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
-                                <p class="text-muted"><strong>Fastest Growing</strong> <i class="fas fa-bolt text-warning"></i></p>
-                                <div class="auto-scroll" style="max-height: 555px;">
-                                    <table class="table table-sm">
-                                        <tbody>
-                                            <?php
-                                            $query = "SELECT c.clubName,
-                                                            (SELECT COUNT(a.application_id)
-                                                            FROM tbl_application a
-                                                            WHERE a.club_id = c.club_id AND a.status = 'active' AND YEAR(a.dateApplied) = YEAR(CURDATE())) AS current_year_members,
-                                                            (SELECT COUNT(a.application_id)
-                                                            FROM tbl_application a
-                                                            WHERE a.club_id = c.club_id AND a.status = 'active' AND YEAR(a.dateApplied) = YEAR(CURDATE()) - 1) AS previous_year_members,
-                                                            (SELECT COUNT(p.post_id)
-                                                            FROM tbl_posts p
-                                                            WHERE p.club_id = c.club_id AND YEAR(p.dateAdded) = YEAR(CURDATE())) AS current_year_posts,
-                                                            (SELECT COUNT(p.post_id)
-                                                            FROM tbl_posts p
-                                                            WHERE p.club_id = c.club_id AND YEAR(p.dateAdded) = YEAR(CURDATE()) - 1) AS previous_year_posts
-                                                    FROM tbl_clubs c
-                                                    ORDER BY (current_year_members - previous_year_members) + 
-                                                            (current_year_posts - previous_year_posts) DESC";
-                                            $stmt = $pdo->query($query);
-                                            $rank = 1;
+<!-- COL-MD-3 FASTEST GROWING CLUB START -->
+<div class="fastest-growing-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
+    <p class="text-muted"><strong>Fastest Growing</strong> <i class="fas fa-bolt text-warning"></i></p>
+    <div class="auto-scroll" style="max-height: 555px;">
+        <table class="table table-sm">
+            <tbody>
+                <?php
+                try {
+                    $stmt = $pdo->prepare("
+                        SELECT tbl_clubs.clubName,
+                            (SELECT COUNT(application_id) 
+                                FROM tbl_application 
+                                WHERE club_id = tbl_clubs.club_id 
+                                AND status = 'active' 
+                                AND YEAR(dateApplied) = YEAR(CURDATE())) AS current_year_members,
 
-                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                                echo "<tr>
-                                                        <td>{$rank}</td>
-                                                        <td>{$row['clubName']}</td>
-                                                    </tr>";
-                                                $rank++;
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <!-- COL-MD-3 FASTEST GROWING CLUB END -->
+                            (SELECT COUNT(application_id) 
+                                FROM tbl_application 
+                                WHERE club_id = tbl_clubs.club_id 
+                                AND status = 'active' 
+                                AND YEAR(dateApplied) = YEAR(CURDATE()) - 1) AS previous_year_members,
 
-                        </div>
-                        <!-- THE MAIN PAGE 2 END -->
+                            (SELECT COUNT(post_id) 
+                                FROM tbl_posts 
+                                WHERE club_id = tbl_clubs.club_id 
+                                AND YEAR(dateAdded) = YEAR(CURDATE())) AS current_year_posts,
+
+                            (SELECT COUNT(post_id) 
+                                FROM tbl_posts 
+                                WHERE club_id = tbl_clubs.club_id 
+                                AND YEAR(dateAdded) = YEAR(CURDATE()) - 1) AS previous_year_posts,
+
+                            (SELECT COUNT(event_id) 
+                                FROM tbl_events 
+                                WHERE club_id = tbl_clubs.club_id 
+                                AND YEAR(dateAdded) = YEAR(CURDATE())) AS current_year_events,
+
+                            (SELECT COUNT(event_id) 
+                                FROM tbl_events 
+                                WHERE club_id = tbl_clubs.club_id 
+                                AND YEAR(dateAdded) = YEAR(CURDATE()) - 1) AS previous_year_events
+                        FROM tbl_clubs
+                        ORDER BY 
+                            GREATEST(current_year_members - previous_year_members, current_year_posts - previous_year_posts, current_year_events - previous_year_events) DESC
+                    ");
+                    $stmt->execute();
+                    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $rank = 1;
+
+                    foreach ($clubs as $club) {
+                        echo "<tr>
+                                <td>{$rank}</td>
+                                <td>" . htmlspecialchars($club['clubName']) . "</td>
+                              </tr>";
+                        $rank++;
+                    }
+                } catch (PDOException $e) {
+                    echo "Error fetching fastest growing clubs: " . $e->getMessage();
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- COL-MD-3 FASTEST GROWING CLUB END -->
+
+</div>
+<!-- THE MAIN PAGE 2 END -->
 
 
 
