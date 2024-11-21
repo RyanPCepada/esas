@@ -1123,12 +1123,12 @@ try {
                                     <table class="table table-sm">
                                         <tbody>
                                             <?php
-                                            $query = "SELECT c.club_id, c.clubName, COUNT(a.activity_id) AS activity_count
-                                                FROM tbl_activity_logs a
-                                                INNER JOIN tbl_clubs c ON a.club_id = c.club_id
-                                                WHERE a.club_id IS NOT NULL
-                                                GROUP BY c.club_id
-                                                ORDER BY activity_count DESC";                                  
+                                            $query = "SELECT c.clubName, COUNT(a.activity_id) AS activity_count
+                                                    FROM tbl_activity_logs a
+                                                    INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+                                                    WHERE a.club_id IS NOT NULL
+                                                    GROUP BY c.clubName
+                                                    ORDER BY activity_count DESC";
                                             $stmt = $pdo->query($query);
                                             $rank = 1;
 
@@ -1208,7 +1208,7 @@ try {
                             <!-- COL-MD-3 FASTEST GROWING CLUB START -->
                             <div class="fastest-growing-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
                                 <p class="text-muted"><strong>Fastest Growing</strong> <i class="fas fa-bolt text-warning"></i></p>
-                                <div class="auto-scroll" style="max-height: 555px;">
+                                <div class="auto-scroll" style="max-height: 500px;">
                                     <table class="table table-sm">
                                         <tbody>
                                             <?php
