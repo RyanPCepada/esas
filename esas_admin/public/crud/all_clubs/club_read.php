@@ -590,9 +590,10 @@ $mostActiveClubRank = $mostActiveClubRank ?: "<small>Unqualified</small>";
 // Rank for Most Applied Club
 try {
     $stmt = $pdo->prepare("
-        SELECT club_id, COUNT(application_id) AS application_count 
+        SELECT tbl_clubs.club_id, tbl_clubs.clubName, COUNT(tbl_application.application_id) AS application_count 
         FROM tbl_application 
-        GROUP BY club_id 
+        INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_application.club_id
+        GROUP BY tbl_clubs.club_id 
         ORDER BY application_count DESC
     ");
     $stmt->execute();
@@ -609,8 +610,8 @@ try {
 } catch (PDOException $e) {
     echo "Error fetching most applied club rank: " . $e->getMessage();
 }
-// Default rank value if no rank is fetched
 $mostAppliedClubRank = $mostAppliedClubRank ?: "<small>Unqualified</small>";
+
 
 // Rank for Highest in Members
 try {
