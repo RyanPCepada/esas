@@ -1125,12 +1125,14 @@ try {
                 <?php
                 try {
                     $stmt = $pdo->prepare("
-                        SELECT tbl_clubs.clubName, COUNT(tbl_activity_logs.activity_id) AS activity_count 
-                        FROM tbl_activity_logs 
-                        INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_activity_logs.club_id
-                        GROUP BY tbl_clubs.club_id 
-                        ORDER BY activity_count DESC
-                    ");
+    SELECT c.clubName, a.club_id, COUNT(a.activity_id) AS activity_count 
+    FROM tbl_activity_logs AS a
+    INNER JOIN tbl_clubs AS c ON c.club_id = a.club_id
+        WHERE a.club_id IS NOT NULL
+    GROUP BY a.club_id 
+    ORDER BY activity_count DESC
+");
+
                     $stmt->execute();
                     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     $rank = 1;

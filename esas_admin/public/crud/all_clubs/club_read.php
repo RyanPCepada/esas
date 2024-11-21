@@ -615,11 +615,12 @@ $mostAppliedClubRank = $mostAppliedClubRank ?: "<small>Unqualified</small>";
 // Rank for Highest in Members
 try {
     $stmt = $pdo->prepare("
-        SELECT club_id, COUNT(application_id) AS active_member_count 
-        FROM tbl_application 
-        WHERE status = 'active' 
-        GROUP BY club_id 
-        ORDER BY active_member_count DESC
+        SELECT tbl_clubs.clubName, tbl_clubs.club_id, COUNT(tbl_application.application_id) AS active_member_count 
+            FROM tbl_application 
+            INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_application.club_id
+            WHERE tbl_application.status = 'active' 
+            GROUP BY tbl_clubs.club_id 
+            ORDER BY active_member_count DESC
     ");
     $stmt->execute();
     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -638,7 +639,7 @@ try {
 // Default rank value if no rank is fetched
 $highestInMembersRank = $highestInMembersRank ?: "<small>Unqualified</small>";
 
-// Rank for Fastest Growing Club
+
 // Rank for Fastest Growing Club considering members, posts, and events growth
 try {
     $stmt = $pdo->prepare("
