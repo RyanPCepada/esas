@@ -564,15 +564,16 @@ $fastestGrowingClubRank = "";
 // Rank for Most Active Club
 try {
     $stmt = $pdo->prepare("
-        SELECT club_id, COUNT(activity_id) AS activity_count 
-        FROM tbl_activity_logs 
-        WHERE club_id IS NOT NULL
-        GROUP BY club_id 
+        SELECT c.club_id, c.clubName, COUNT(a.activity_id) AS activity_count
+        FROM tbl_activity_logs a
+        INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+        WHERE a.club_id IS NOT NULL
+        GROUP BY c.club_id, c.clubName
         ORDER BY activity_count DESC
     ");
     $stmt->execute();
     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     $rank = 1;
     foreach ($clubs as $club) {
         if ($club['club_id'] == $club_id) {
@@ -586,6 +587,7 @@ try {
 }
 // Default rank value if no rank is fetched
 $mostActiveClubRank = $mostActiveClubRank ?: "<small>Unqualified</small>";
+
 
 // Rank for Most Applied Club
 try {

@@ -1118,41 +1118,33 @@ try {
 
 <!-- COL-MD-3 MOST ACTIVE CLUB START -->
 <div class="most-active-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
-    <p class="text-muted"><strong>Most Active</strong> <i class="fas fa-fire text-warning"></i></p>
-    <div class="auto-scroll" style="max-height: 555px;">
-        <table class="table table-sm">
-            <tbody>
-                <?php
-                try {
-                    $stmt = $pdo->prepare("
-    SELECT c.clubName, a.club_id, COUNT(a.activity_id) AS activity_count 
-    FROM tbl_activity_logs AS a
-    INNER JOIN tbl_clubs AS c ON c.club_id = a.club_id
-        WHERE a.club_id IS NOT NULL
-    GROUP BY a.club_id 
-    ORDER BY activity_count DESC
-");
+                                <p class="text-muted"><strong>Most Active</strong> <i class="fas fa-fire text-warning"></i></p>
+                                <div class="auto-scroll" style="max-height: 555px;">
+                                    <table class="table table-sm">
+                                        <tbody>
+                                            <?php
+                                            $query = "SELECT c.clubName, COUNT(a.activity_id) AS activity_count
+                                                    FROM tbl_activity_logs a
+                                                    INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+                                                    WHERE a.club_id IS NOT NULL
+                                                    GROUP BY c.clubName
+                                                    ORDER BY activity_count DESC";
+                                            $stmt = $pdo->query($query);
+                                            $rank = 1;
 
-                    $stmt->execute();
-                    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    $rank = 1;
-
-                    foreach ($clubs as $club) {
-                        echo "<tr>
-                                <td>{$rank}</td>
-                                <td>" . htmlspecialchars($club['clubName']) . "</td>
-                              </tr>";
-                        $rank++;
-                    }
-                } catch (PDOException $e) {
-                    echo "Error fetching most active clubs: " . $e->getMessage();
-                }
-                ?>
-            </tbody>
-        </table>
-    </div>
-</div>
-<!-- COL-MD-3 MOST ACTIVE CLUB END -->
+                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                echo "<tr>
+                                                        <td>{$rank}</td>
+                                                        <td>{$row['clubName']}</td>
+                                                    </tr>";
+                                                $rank++;
+                                            }
+                                            ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- COL-MD-3 MOST ACTIVE CLUB END -->
 
 <!-- COL-MD-3 MOST APPLIED CLUB START -->
 <div class="most-applied-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
