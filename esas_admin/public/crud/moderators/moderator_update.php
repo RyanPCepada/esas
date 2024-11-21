@@ -289,7 +289,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="text-center d-flex justify-content-between mt-2">
                     <button type="submit" class="btn assign-btn text-light">Assign to Club</button>
-                    <a href="../../moderators.php" class="btn btn-secondary">Go Back</a>
+                    <!-- <a href="../../moderators.php" class="btn btn-secondary">Go Back</a> -->
+                    <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
                 </div>
             </form>
         </div>
