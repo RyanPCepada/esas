@@ -373,93 +373,93 @@ unset($pdo);
                                     </div>
 
                                     <div class="row col-md-7 moderator-trends-section m-0 p-0">
-                                    <select id="club-dropdown" class="form-control" onchange="filterClubData()">
-    <option value="all">All Clubs</option>
-    <?php
-    // Assuming $row contains the moderator's associated clubs
-    if (!empty($row)) {
-        foreach ($row as $club) {
-            $clubId = $club["club_id"];
-            $clubName = htmlspecialchars($club["clubName"]);
-            echo '<option value="' . $clubId . '"' . (isset($_GET['club_id']) && $_GET['club_id'] == $clubId ? ' selected' : '') . '>' . $clubName . '</option>';
-        }
-    } else {
-        echo '<option value="none">No clubs associated</option>';
-    }
-    ?>
-</select>
+                                        <select id="club-dropdown" class="form-control" onchange="filterClubData()">
+                                            <option value="all">All Clubs</option>
+                                            <?php
+                                            // Assuming $row contains the moderator's associated clubs
+                                            if (!empty($row)) {
+                                                foreach ($row as $club) {
+                                                    $clubId = $club["club_id"];
+                                                    $clubName = htmlspecialchars($club["clubName"]);
+                                                    echo '<option value="' . $clubId . '"' . (isset($_GET['club_id']) && $_GET['club_id'] == $clubId ? ' selected' : '') . '>' . $clubName . '</option>';
+                                                }
+                                            } else {
+                                                echo '<option value="none">No clubs associated</option>';
+                                            }
+                                            ?>
+                                        </select>
 
-<script>
-function filterClubData() {
-    var clubId = document.getElementById("club-dropdown").value;
-    // Reload the page with the selected club_id
-    window.location.href = "moderator_read.php?moderator_id=<?php echo $moderator_id; ?>&club_id=" + clubId;
-}
-</script>
+                                        <script>
+                                            function filterClubData() {
+                                                var clubId = document.getElementById("club-dropdown").value;
+                                                // Reload the page with the selected club_id
+                                                window.location.href = "moderator_read.php?moderator_id=<?php echo $moderator_id; ?>&club_id=" + clubId;
+                                            }
+                                        </script>
 
 
-    <!-- POSTS CARD START -->
-    <div class="col-md-6 p-1">
-        <div class="card card-posts p-2">
-            <p class="m-0 p-0"><i class="fas fa-bullhorn text-info"></i><strong> Posts</strong></p>
-            <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorPostsThisYearCount; ?></strong></h5>
-            <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this year</p>
-            <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorNewPostsCount; ?></strong></h5>
-            <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this week</p>
-            <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorPostAveragePerWeek; ?></strong></h5>
-            <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts per week</p>
-            <!-- Performance arrow icon and changes -->
-            <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
-                <?php if ($moderatorPostsChanges > 0): ?>
-                    <i class="fas fa-arrow-up text-light" title="Performance Increasing" style="cursor: pointer;"></i>
-                <?php elseif ($moderatorPostsChanges < 0): ?>
-                    <i class="fas fa-arrow-down text-light" title="Performance Decreasing" style="cursor: pointer;"></i>
-                <?php else: ?>
-                    <h4 style="cursor: pointer;" title="Performance Unchanging">-</h4>
-                <?php endif; ?>
-            </div>
-            <?php if ($moderatorPostsChanges > 0): ?>
-                <small class="text-muted m-0 p-0"><small>+</small><?php echo $moderatorPostsChanges; ?> Compared to previous S.Y.</small>
-            <?php elseif ($moderatorPostsChanges < 0): ?>
-                <small class="text-muted m-0 p-0"><?php echo $moderatorPostsChanges; ?> Compared to previous S.Y.</small>
-            <?php else: ?>
-                <small class="text-muted m-0 p-0"><?php echo $moderatorPostsChanges; ?> Compared to previous S.Y.</small>
-            <?php endif; ?>
-        </div>
-    </div>
-    <!-- POSTS CARD END -->
+                                        <!-- POSTS CARD START -->
+                                        <div class="col-md-6 p-1">
+                                            <div class="card card-posts p-2">
+                                                <p class="m-0 p-0"><i class="fas fa-bullhorn text-info"></i><strong> Posts</strong></p>
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorPostsThisYearCount; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this year</p>
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorNewPostsCount; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this week</p>
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorPostAveragePerWeek; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts per week</p>
+                                                <!-- Performance arrow icon and changes -->
+                                                <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-info" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
+                                                    <?php if ($moderatorPostsChanges > 0): ?>
+                                                        <i class="fas fa-arrow-up text-light" title="Performance Increasing" style="cursor: pointer;"></i>
+                                                    <?php elseif ($moderatorPostsChanges < 0): ?>
+                                                        <i class="fas fa-arrow-down text-light" title="Performance Decreasing" style="cursor: pointer;"></i>
+                                                    <?php else: ?>
+                                                        <h4 style="cursor: pointer;" title="Performance Unchanging">-</h4>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <?php if ($moderatorPostsChanges > 0): ?>
+                                                    <small class="text-muted m-0 p-0"><small>+</small><?php echo $moderatorPostsChanges; ?> Compared to previous S.Y.</small>
+                                                <?php elseif ($moderatorPostsChanges < 0): ?>
+                                                    <small class="text-muted m-0 p-0"><?php echo $moderatorPostsChanges; ?> Compared to previous S.Y.</small>
+                                                <?php else: ?>
+                                                    <small class="text-muted m-0 p-0"><?php echo $moderatorPostsChanges; ?> Compared to previous S.Y.</small>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                        <!-- POSTS CARD END -->
 
-    <!-- EVENTS CARD START -->
-    <div class="col-md-6 p-1">
-        <div class="card card-events p-2">
-            <p class="m-0 p-0"><i class="fas fa-calendar-day text-warning"></i><strong> Events</strong></p>
-            <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorEventsThisYearCount; ?></strong></h5>
-            <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events this year</p>
-            <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorNewEventsCount; ?></strong></h5>
-            <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events this month</p>
-            <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorEventsAveragePerMonth; ?></strong></h5>
-            <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events per month</p>
-            <!-- Performance arrow icon and changes -->
-            <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-warning" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
-                <?php if ($moderatorEventsChanges > 0): ?>
-                    <i class="fas fa-arrow-up text-light" title="Performance Increasing" style="cursor: pointer;"></i>
-                <?php elseif ($moderatorEventsChanges < 0): ?>
-                    <i class="fas fa-arrow-down text-light" title="Performance Decreasing" style="cursor: pointer;"></i>
-                <?php else: ?>
-                    <h4 style="cursor: pointer;" title="Performance Unchanging">-</h4>
-                <?php endif; ?>
-            </div>
-            <?php if ($moderatorEventsChanges > 0): ?>
-                <small class="text-muted m-0 p-0"><small>+</small><?php echo $moderatorEventsChanges; ?> Compared to previous S.Y.</small>
-            <?php elseif ($moderatorEventsChanges < 0): ?>
-                <small class="text-muted m-0 p-0"><?php echo $moderatorEventsChanges; ?> Compared to previous S.Y.</small>
-            <?php else: ?>
-                <small class="text-muted m-0 p-0"><?php echo $moderatorEventsChanges; ?> Compared to previous S.Y.</small>
-            <?php endif; ?>
-        </div>
-    </div>
-    <!-- EVENTS CARD END -->
-</div>
+                                        <!-- EVENTS CARD START -->
+                                        <div class="col-md-6 p-1">
+                                            <div class="card card-events p-2">
+                                                <p class="m-0 p-0"><i class="fas fa-calendar-day text-warning"></i><strong> Events</strong></p>
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorEventsThisYearCount; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events this year</p>
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorNewEventsCount; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events this month</p>
+                                                <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorEventsAveragePerMonth; ?></strong></h5>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events per month</p>
+                                                <!-- Performance arrow icon and changes -->
+                                                <div class="member-changes text-light text-center d-flex align-items-center justify-content-center bg-warning" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; right: 5px;">
+                                                    <?php if ($moderatorEventsChanges > 0): ?>
+                                                        <i class="fas fa-arrow-up text-light" title="Performance Increasing" style="cursor: pointer;"></i>
+                                                    <?php elseif ($moderatorEventsChanges < 0): ?>
+                                                        <i class="fas fa-arrow-down text-light" title="Performance Decreasing" style="cursor: pointer;"></i>
+                                                    <?php else: ?>
+                                                        <h4 style="cursor: pointer;" title="Performance Unchanging">-</h4>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <?php if ($moderatorEventsChanges > 0): ?>
+                                                    <small class="text-muted m-0 p-0"><small>+</small><?php echo $moderatorEventsChanges; ?> Compared to previous S.Y.</small>
+                                                <?php elseif ($moderatorEventsChanges < 0): ?>
+                                                    <small class="text-muted m-0 p-0"><?php echo $moderatorEventsChanges; ?> Compared to previous S.Y.</small>
+                                                <?php else: ?>
+                                                    <small class="text-muted m-0 p-0"><?php echo $moderatorEventsChanges; ?> Compared to previous S.Y.</small>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                        <!-- EVENTS CARD END -->
+                                    </div>
 
 
 
