@@ -50,7 +50,7 @@ if (isset($_GET["club_id"]) && !empty(trim($_GET["club_id"]))) {
                 c.dateAdded,
                 c.coverPhoto,
                 c.slots,
-                GROUP_CONCAT(DISTINCT m.firstName, ' ', m.middleName, ' ', m.lastName ORDER BY m.lastName ASC SEPARATOR ', ') AS moderatorNames
+                GROUP_CONCAT(DISTINCT m.moderator_id, ':', m.firstName, ' ', m.middleName, ' ', m.lastName ORDER BY m.lastName ASC SEPARATOR ', ') AS moderatorNames
             FROM tbl_clubs c
             LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
             LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
@@ -755,8 +755,29 @@ unset($pdo);
                                      class="img-fluid" style="width: 300px; height: auto; border-radius: 5px; object-fit: cover;">
                                      <!-- class="img-fluid" style="width: 300px; height: 171px; border-radius: 5px; object-fit: cover;"> -->
                                 <div>
-                                    <p class="m-0 mt-3 p-0"><strong>Date Created:<br></strong><?php echo date("F j, Y", strtotime($dateAdded)); ?></p>
-                                    <p class="m-0 p-0"><strong><?php echo $moderatorLabel; ?><br></strong><?php echo $moderatorNames; ?></p>
+                                    <p class="m-0 mt-2 p-0"><strong>Date Created:<br></strong><?php echo date("F j, Y", strtotime($dateAdded)); ?></p>
+                                    <p class="m-0 p-0"><strong><?php echo $moderatorLabel; ?><br></strong>
+                                        <?php
+                                            if (!empty($moderatorNames)) {
+                                                // Split the moderator details into an array (moderator_id:name)
+                                                $moderatorArray = explode(', ', $moderatorNames);
+
+                                                // Loop through each moderator's details
+                                                foreach ($moderatorArray as $moderatorDetail) {
+                                                    // Split the moderator_id and name
+                                                    list($moderator_id, $moderator) = explode(':', $moderatorDetail);
+
+                                                    // Create a link for each moderator using the moderator_id, and wrap the moderator name in <strong> tag to make it bold
+                                                    echo '<a href="/esas/esas_admin/public/crud/moderators/moderator_read.php?moderator_id=' . urlencode($moderator_id) . '" class="text-decoration-underline"><strong>';
+                                                    echo $moderator . '</strong></a><br>';
+                                                }
+                                            } else {
+                                                echo "None";
+                                            }
+                                        ?>
+                                    </p>
+
+
                                 </div>
                             </div>
                             <div class="row col-md-8">
