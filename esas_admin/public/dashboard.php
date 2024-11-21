@@ -1123,12 +1123,12 @@ try {
                                     <table class="table table-sm">
                                         <tbody>
                                             <?php
-                                            $query = "SELECT c.clubName, COUNT(a.activity_id) AS activity_count
-                                                    FROM tbl_activity_logs a
-                                                    INNER JOIN tbl_clubs c ON a.club_id = c.club_id
-                                                    WHERE a.club_id IS NOT NULL
-                                                    GROUP BY c.clubName
-                                                    ORDER BY activity_count DESC";
+                                            $query = "SELECT c.club_id, c.clubName, COUNT(a.activity_id) AS activity_count
+                                                FROM tbl_activity_logs a
+                                                INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+                                                WHERE a.club_id IS NOT NULL
+                                                GROUP BY c.club_id
+                                                ORDER BY activity_count DESC";                                  
                                             $stmt = $pdo->query($query);
                                             $rank = 1;
 
