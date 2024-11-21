@@ -755,29 +755,8 @@ unset($pdo);
                                      class="img-fluid" style="width: 300px; height: auto; border-radius: 5px; object-fit: cover;">
                                      <!-- class="img-fluid" style="width: 300px; height: 171px; border-radius: 5px; object-fit: cover;"> -->
                                 <div>
-                                    <p class="m-0 mt-2 p-0"><strong>Date Created:<br></strong><?php echo date("F j, Y", strtotime($dateAdded)); ?></p>
-                                    <p class="m-0 p-0"><strong><?php echo $moderatorLabel; ?><br></strong>
-                                        <?php
-                                            if (!empty($moderatorNames)) {
-                                                // Split the moderator details into an array (moderator_id:name)
-                                                $moderatorArray = explode(', ', $moderatorNames);
-
-                                                // Loop through each moderator's details
-                                                foreach ($moderatorArray as $moderatorDetail) {
-                                                    // Split the moderator_id and name
-                                                    list($moderator_id, $moderator) = explode(':', $moderatorDetail);
-
-                                                    // Create a link for each moderator using the moderator_id, and wrap the moderator name in <strong> tag to make it bold
-                                                    echo '<a href="/esas/esas_admin/public/crud/moderators/moderator_read.php?moderator_id=' . urlencode($moderator_id) . '" class="text-decoration-underline"><strong>';
-                                                    echo $moderator . '</strong></a><br>';
-                                                }
-                                            } else {
-                                                echo "None";
-                                            }
-                                        ?>
-                                    </p>
-
-
+                                    <p class="m-0 mt-3 p-0"><strong>Date Created:<br></strong><?php echo date("F j, Y", strtotime($dateAdded)); ?></p>
+                                    <p class="m-0 mt-0 p-0"><strong>Founder:<br></strong><?php echo $founder; ?></p>
                                 </div>
                             </div>
                             <div class="row col-md-8">
@@ -971,7 +950,8 @@ unset($pdo);
                             </div>
                         </div>
                         <!-- <hr> -->
-                        <div class="row p-3 mt-4">
+                        
+                        <div class="row p-3 mt-2">
                             <!-- Left Column -->
                             <div class="col-md-4 p-0 pr-3">
 
@@ -1029,6 +1009,28 @@ unset($pdo);
                             </div>
                             <!-- Right Column -->
                             <div class="card col-md-8 p-3 bg-light">
+                                <div class="card text-center mt-1 mb-3 p-2">
+                                    <p class="m-0 p-0"><strong><?php echo $moderatorLabel; ?><br></strong>
+                                        <?php
+                                            if (!empty($moderatorNames)) {
+                                                // Split the moderator details into an array (moderator_id:name)
+                                                $moderatorArray = explode(', ', $moderatorNames);
+
+                                                // Loop through each moderator's details
+                                                foreach ($moderatorArray as $moderatorDetail) {
+                                                    // Split the moderator_id and name
+                                                    list($moderator_id, $moderator) = explode(':', $moderatorDetail);
+
+                                                    // Create a link for each moderator using the moderator_id, and wrap the moderator name in <strong> tag to make it bold
+                                                    echo '<a href="/esas/esas_admin/public/crud/moderators/moderator_read.php?moderator_id=' . urlencode($moderator_id) . '" class="text-decoration-underline"><strong>';
+                                                    echo $moderator . '</strong></a><br>';
+                                                }
+                                            } else {
+                                                echo "None";
+                                            }
+                                        ?>
+                                    </p>
+                                </div>
                                 <h5>Description:</h5>
                                 <p style="text-align: justify; text-indent: 30px;"><?php echo $description; ?></p>
                                 <h5>Mission:</h5>
@@ -1037,8 +1039,8 @@ unset($pdo);
                                 <p style="text-align: justify; text-indent: 30px;"><?php echo $vision; ?></p>
                                 <h5>History:</h5>
                                 <p style="text-align: justify; text-indent: 30px;"><?php echo $history; ?></p>
-                                <h5>Founder:</h5>
-                                <p style="text-align: justify; text-indent: 30px;"><?php echo $founder; ?></p>
+                                <!-- <h5>Founder:</h5>
+                                <p style="text-align: justify; text-indent: 30px;"><?php echo $founder; ?></p> -->
                             </div>
                         </div>
 

@@ -194,7 +194,8 @@ unset($pdo);
                     </div>
                     <div class="card-footer text-center">
                         <a href="moderator_update.php?moderator_id=<?php echo $moderator_id; ?>" class="btn btn-warning">Update</a>
-                        <a href="../../moderators.php" class="btn btn-secondary">Go Back</a>
+                        <!-- <a href="../../moderators.php" class="btn btn-secondary">Go Back</a> -->
+                        <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
                     </div>
                 </div>
             </div>
