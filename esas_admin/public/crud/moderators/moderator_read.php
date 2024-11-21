@@ -374,10 +374,12 @@ unset($pdo);
 
                                     <div class="row col-md-7 moderator-trends-section m-0 p-0">
                                         <select id="club-dropdown" class="form-control" onchange="filterClubData()">
-                                            <option value="all">All Clubs</option>
                                             <?php
                                             // Assuming $row contains the moderator's associated clubs
                                             if (!empty($row)) {
+                                                if (count($row) > 1) {
+                                                    echo '<option value="all"' . (!isset($_GET['club_id']) || $_GET['club_id'] == 'all' ? ' selected' : '') . '>All Clubs</option>';
+                                                }
                                                 foreach ($row as $club) {
                                                     $clubId = $club["club_id"];
                                                     $clubName = htmlspecialchars($club["clubName"]);
