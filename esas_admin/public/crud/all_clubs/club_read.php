@@ -760,14 +760,14 @@ unset($pdo);
                                 </div>
                             </div>
                             <div class="row col-md-8">
-                                <div class="col-9">
+                                <div class="col-md-9">
                                     <h3 class="text-muted mb-0"><?php echo $clubName; ?></h3>
                                     <span class="status-dot" style="position: absolute; top: 18px; left: 16px; color: red; font-size: 2em;">&#8226;</span><small class="ml-3"> <?php echo $clubStatus; ?></small>
 
                                     <!-- <hr> -->
-                                    <div class="row col-12 m-0 mt-2 p-0">
+                                    <div class="row col-md-12 m-0 mt-2 p-0">
                                         <!-- MEMBERS CARD START -->
-                                        <div class="col-4 p-1">
+                                        <div class="col-md-4 p-1">
                                             <div class="card card-members p-2">
                                                 <p class="m-0 p-0"><i class="fas fa-user text-info"></i><strong> Members</strong></p>
 
@@ -803,7 +803,7 @@ unset($pdo);
                                         </div>
                                         <!-- MEMBERS CARD END -->
                                         <!-- POSTS CARD START -->
-                                        <div class="col-4 p-1">
+                                        <div class="col-md-4 p-1">
                                             <div class="card card-posts p-2">
                                                 <p class="m-0 p-0"><i class="fas fa-bullhorn text-info"></i><strong> Posts</strong></p>
 
@@ -838,7 +838,7 @@ unset($pdo);
                                         </div>
                                         <!-- POSTS CARD END -->
                                         <!-- EVENTS CARD START -->
-                                        <div class="col-4 p-1">
+                                        <div class="col-md-4 p-1">
                                             <div class="card card-events p-2">
                                                 <p class="m-0 p-0"><i class="fas fa-calendar text-info"></i><strong> Events</strong></p>
 
@@ -873,7 +873,7 @@ unset($pdo);
                                         <!-- EVENTS CARD END -->
                                     </div>
                                 </div>
-                                <div class="col-3 d-flex flex-column align-items-center justify-content-start m-0 p-0">
+                                <div class="col-md-3 d-flex flex-column align-items-center justify-content-start m-0 p-0">
                                     <!-- Circle Bar Section -->
                                     <div class="w-100 d-flex justify-content-center align-items-center">
                                         <div class="circle-bar" title="Slot occupancy - <?php echo $activeCount ?> students, <?php echo $slots ?> slots">
