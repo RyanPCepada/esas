@@ -1208,7 +1208,7 @@ try {
                             <!-- COL-MD-3 FASTEST GROWING CLUB START -->
                             <div class="fastest-growing-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
                                 <p class="text-muted"><strong>Fastest Growing</strong> <i class="fas fa-bolt text-warning"></i></p>
-                                <div class="auto-scroll" style="max-height: 500px;">
+                                <div class="auto-scroll" style="max-height: 555px;">
                                     <table class="table table-sm">
                                         <tbody>
                                             <?php
