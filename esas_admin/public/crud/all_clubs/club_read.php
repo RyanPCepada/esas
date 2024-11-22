@@ -916,6 +916,9 @@ unset($pdo);
                                         <div class="club-rating" data-rating="<?php echo $ratingThisYear; ?>" title="Club Rating This Year">
                                             <p class="text-dark mb-0 p-0">This Year: <strong class="text-info"><?php echo $ratingThisYear; ?>/10</strong></p>
                                         </div>
+                                        <small style="line-height: 15px; display: block; font-size: 11px;">
+                                            (In progress)
+                                        </small>
                                     </div>
                                     
                                 </div>
