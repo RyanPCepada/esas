@@ -773,7 +773,7 @@ unset($pdo);
 
                                                 <!-- <h5 class="text-dark m-0 p-0"><strong><?php echo $totalMembersThisYearCount; ?></strong></h5> -->
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $totalMembersOverallCount; ?></strong></h5>
-                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">members this year</p>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">members this S.Y.</p>
 
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $newMembersCount; ?></strong></h5>
                                                 <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">new members</p>
@@ -808,7 +808,7 @@ unset($pdo);
                                                 <p class="m-0 p-0"><i class="fas fa-bullhorn text-info"></i><strong> Posts</strong></p>
 
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $totalPostsThisYearCount; ?></strong></h5>
-                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this year</p>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this S.Y.</p>
 
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $newPostsCount; ?></strong></h5>
                                                 <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this week</p>
@@ -843,7 +843,7 @@ unset($pdo);
                                                 <p class="m-0 p-0"><i class="fas fa-calendar text-info"></i><strong> Events</strong></p>
 
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $totalEventsThisYearCount; ?></strong></h5>
-                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events this year</p>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events this S.Y.</p>
 
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $newEventsCount; ?></strong></h5>
                                                 <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events this month</p>

@@ -133,21 +133,32 @@ if (isset($_GET["moderator_id"]) && !empty(trim($_GET["moderator_id"]))) {
 $club_id = isset($_GET['club_id']) && $_GET['club_id'] !== 'all' ? $_GET['club_id'] : null;
 
 
-// Current year and week
-$currentYear = date('Y');
-$currentWeek = date('W');
-$currentMonth = date('m');
 
-// Count of posts this year
+
+// Get the current and previous year
+$currentYear = date('Y');
+$nextYear = $currentYear + 1;
+$previousYear = $currentYear - 1;
+
+// Define the start and end dates for the current school year (Aug to Jul)
+$startDate = "$currentYear-08-01";
+$endDate = "$nextYear-07-31";
+
+// Define the previous school year range (Aug to Jul)
+$prevStartDate = "$previousYear-08-01";
+$prevEndDate = "$currentYear-07-31";
+
+// Count of posts this school year (current school year)
 $postThisYearQuery = "SELECT COUNT(*) as postCountThisYear FROM tbl_posts 
                       WHERE moderator_id = :moderator_id 
-                      AND YEAR(dateAdded) = :currentYear";
+                      AND dateAdded BETWEEN :startDate AND :endDate";
 if ($club_id) {
     $postThisYearQuery .= " AND club_id = :club_id";
 }
 $stmtPostThisYear = $pdo->prepare($postThisYearQuery);
 $stmtPostThisYear->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-$stmtPostThisYear->bindParam(':currentYear', $currentYear, PDO::PARAM_INT);
+$stmtPostThisYear->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+$stmtPostThisYear->bindParam(':endDate', $endDate, PDO::PARAM_STR);
 if ($club_id) {
     $stmtPostThisYear->bindParam(':club_id', $club_id, PDO::PARAM_INT);
 }
@@ -155,12 +166,12 @@ $stmtPostThisYear->execute();
 $postThisYearData = $stmtPostThisYear->fetch(PDO::FETCH_ASSOC);
 $moderatorPostsThisYearCount = $postThisYearData['postCountThisYear'];
 
-
 // Count of posts this week
 $postThisWeekQuery = "SELECT COUNT(*) as postCountThisWeek FROM tbl_posts 
                       WHERE moderator_id = :moderator_id 
                       AND YEAR(dateAdded) = :currentYear 
-                      AND WEEK(dateAdded, 1) = :currentWeek";
+                      AND WEEK(dateAdded, 1) = :currentWeek 
+                      AND dateAdded BETWEEN :startDate AND :endDate";
 if ($club_id) {
     $postThisWeekQuery .= " AND club_id = :club_id";
 }
@@ -168,6 +179,8 @@ $stmtPostThisWeek = $pdo->prepare($postThisWeekQuery);
 $stmtPostThisWeek->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
 $stmtPostThisWeek->bindParam(':currentYear', $currentYear, PDO::PARAM_INT);
 $stmtPostThisWeek->bindParam(':currentWeek', $currentWeek, PDO::PARAM_INT);
+$stmtPostThisWeek->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+$stmtPostThisWeek->bindParam(':endDate', $endDate, PDO::PARAM_STR);
 if ($club_id) {
     $stmtPostThisWeek->bindParam(':club_id', $club_id, PDO::PARAM_INT);
 }
@@ -175,17 +188,17 @@ $stmtPostThisWeek->execute();
 $postThisWeekData = $stmtPostThisWeek->fetch(PDO::FETCH_ASSOC);
 $moderatorNewPostsCount = $postThisWeekData['postCountThisWeek'];
 
-
 // Average posts per week
 $postAveragePerWeekQuery = "SELECT COUNT(*) as postCount FROM tbl_posts 
                             WHERE moderator_id = :moderator_id 
-                            AND YEAR(dateAdded) = :currentYear";
+                            AND dateAdded BETWEEN :startDate AND :endDate";
 if ($club_id) {
     $postAveragePerWeekQuery .= " AND club_id = :club_id";
 }
 $stmtPostAverage = $pdo->prepare($postAveragePerWeekQuery);
 $stmtPostAverage->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-$stmtPostAverage->bindParam(':currentYear', $currentYear, PDO::PARAM_INT);
+$stmtPostAverage->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+$stmtPostAverage->bindParam(':endDate', $endDate, PDO::PARAM_STR);
 if ($club_id) {
     $stmtPostAverage->bindParam(':club_id', $club_id, PDO::PARAM_INT);
 }
@@ -193,16 +206,17 @@ $stmtPostAverage->execute();
 $postAverageData = $stmtPostAverage->fetch(PDO::FETCH_ASSOC);
 $moderatorPostAveragePerWeek = round($postAverageData['postCount'] / 52, 2); // Assume 52 weeks in a year
 
-// Performance change (compared to previous year)
+// Performance change (compared to previous school year)
 $postChangeQuery = "SELECT COUNT(*) as postCountPreviousYear FROM tbl_posts 
                     WHERE moderator_id = :moderator_id 
-                    AND YEAR(dateAdded) = :previousYear";
+                    AND dateAdded BETWEEN :prevStartDate AND :prevEndDate";
 if ($club_id) {
     $postChangeQuery .= " AND club_id = :club_id";
 }
 $stmtPostChange = $pdo->prepare($postChangeQuery);
 $stmtPostChange->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-$stmtPostChange->bindParam(':previousYear', $previousYear, PDO::PARAM_INT);
+$stmtPostChange->bindParam(':prevStartDate', $prevStartDate, PDO::PARAM_STR);
+$stmtPostChange->bindParam(':prevEndDate', $prevEndDate, PDO::PARAM_STR);
 if ($club_id) {
     $stmtPostChange->bindParam(':club_id', $club_id, PDO::PARAM_INT);
 }
@@ -213,17 +227,17 @@ $moderatorPostsChanges = $moderatorPostsThisYearCount - $postChangeData['postCou
 
 
 
-
-// Count of events this year
+// Count of events this year (from August to July)
 $eventThisYearQuery = "SELECT COUNT(*) as eventCountThisYear FROM tbl_events 
                        WHERE moderator_id = :moderator_id 
-                       AND YEAR(dateAdded) = :currentYear";
+                       AND dateAdded BETWEEN :startDate AND :endDate";
 if ($club_id) {
     $eventThisYearQuery .= " AND club_id = :club_id";
 }
 $stmtEventThisYear = $pdo->prepare($eventThisYearQuery);
 $stmtEventThisYear->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-$stmtEventThisYear->bindParam(':currentYear', $currentYear, PDO::PARAM_INT);
+$stmtEventThisYear->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+$stmtEventThisYear->bindParam(':endDate', $endDate, PDO::PARAM_STR);
 if ($club_id) {
     $stmtEventThisYear->bindParam(':club_id', $club_id, PDO::PARAM_INT);
 }
@@ -231,17 +245,18 @@ $stmtEventThisYear->execute();
 $eventThisYearData = $stmtEventThisYear->fetch(PDO::FETCH_ASSOC);
 $moderatorEventsThisYearCount = $eventThisYearData['eventCountThisYear'];
 
-// Count of events this month
+// Count of events this month (current school year)
 $eventThisMonthQuery = "SELECT COUNT(*) as eventCountThisMonth FROM tbl_events 
                         WHERE moderator_id = :moderator_id 
-                        AND YEAR(dateAdded) = :currentYear 
+                        AND dateAdded BETWEEN :startDate AND :endDate
                         AND MONTH(dateAdded) = :currentMonth";
 if ($club_id) {
     $eventThisMonthQuery .= " AND club_id = :club_id";
 }
 $stmtEventThisMonth = $pdo->prepare($eventThisMonthQuery);
 $stmtEventThisMonth->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-$stmtEventThisMonth->bindParam(':currentYear', $currentYear, PDO::PARAM_INT);
+$stmtEventThisMonth->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+$stmtEventThisMonth->bindParam(':endDate', $endDate, PDO::PARAM_STR);
 $stmtEventThisMonth->bindParam(':currentMonth', $currentMonth, PDO::PARAM_INT);
 if ($club_id) {
     $stmtEventThisMonth->bindParam(':club_id', $club_id, PDO::PARAM_INT);
@@ -250,17 +265,18 @@ $stmtEventThisMonth->execute();
 $eventThisMonthData = $stmtEventThisMonth->fetch(PDO::FETCH_ASSOC);
 $moderatorNewEventsCount = $eventThisMonthData['eventCountThisMonth'];
 
-// Count of events this week
+// Count of events this week (current school year)
 $eventThisWeekQuery = "SELECT COUNT(*) as eventCountThisWeek FROM tbl_events 
                        WHERE moderator_id = :moderator_id 
-                       AND YEAR(dateAdded) = :currentYear 
+                       AND dateAdded BETWEEN :startDate AND :endDate
                        AND WEEK(dateAdded, 1) = :currentWeek";
 if ($club_id) {
     $eventThisWeekQuery .= " AND club_id = :club_id";
 }
 $stmtEventThisWeek = $pdo->prepare($eventThisWeekQuery);
 $stmtEventThisWeek->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-$stmtEventThisWeek->bindParam(':currentYear', $currentYear, PDO::PARAM_INT);
+$stmtEventThisWeek->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+$stmtEventThisWeek->bindParam(':endDate', $endDate, PDO::PARAM_STR);
 $stmtEventThisWeek->bindParam(':currentWeek', $currentWeek, PDO::PARAM_INT);
 if ($club_id) {
     $stmtEventThisWeek->bindParam(':club_id', $club_id, PDO::PARAM_INT);
@@ -269,17 +285,17 @@ $stmtEventThisWeek->execute();
 $eventThisWeekData = $stmtEventThisWeek->fetch(PDO::FETCH_ASSOC);
 $moderatorEventsThisWeekCount = $eventThisWeekData['eventCountThisWeek'];
 
-
 // Average events per month
 $eventAveragePerMonthQuery = "SELECT COUNT(*) as eventCount FROM tbl_events 
                               WHERE moderator_id = :moderator_id 
-                              AND YEAR(dateAdded) = :currentYear";
+                              AND dateAdded BETWEEN :startDate AND :endDate";
 if ($club_id) {
     $eventAveragePerMonthQuery .= " AND club_id = :club_id";
 }
 $stmtEventAverage = $pdo->prepare($eventAveragePerMonthQuery);
 $stmtEventAverage->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-$stmtEventAverage->bindParam(':currentYear', $currentYear, PDO::PARAM_INT);
+$stmtEventAverage->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+$stmtEventAverage->bindParam(':endDate', $endDate, PDO::PARAM_STR);
 if ($club_id) {
     $stmtEventAverage->bindParam(':club_id', $club_id, PDO::PARAM_INT);
 }
@@ -290,13 +306,14 @@ $moderatorEventsAveragePerMonth = round($eventAverageData['eventCount'] / 12, 2)
 // Performance change (compared to the previous year)
 $eventChangeQuery = "SELECT COUNT(*) as eventCountPreviousYear FROM tbl_events 
                      WHERE moderator_id = :moderator_id 
-                     AND YEAR(dateAdded) = :previousYear";
+                     AND dateAdded BETWEEN :prevStartDate AND :prevEndDate";
 if ($club_id) {
     $eventChangeQuery .= " AND club_id = :club_id";
 }
 $stmtEventChange = $pdo->prepare($eventChangeQuery);
 $stmtEventChange->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
-$stmtEventChange->bindParam(':previousYear', $previousYear, PDO::PARAM_INT);
+$stmtEventChange->bindParam(':prevStartDate', $prevStartDate, PDO::PARAM_STR);
+$stmtEventChange->bindParam(':prevEndDate', $prevEndDate, PDO::PARAM_STR);
 if ($club_id) {
     $stmtEventChange->bindParam(':club_id', $club_id, PDO::PARAM_INT);
 }
@@ -430,7 +447,7 @@ unset($pdo);
                                             <div class="card card-posts p-2">
                                                 <p class="m-0 p-0"><i class="fas fa-bullhorn text-info"></i><strong> Posts</strong></p>
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorPostsThisYearCount; ?></strong></h5>
-                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this year</p>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this S.Y.</p>
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorNewPostsCount; ?></strong></h5>
                                                 <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">posts this week</p>
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorPostAveragePerWeek; ?></strong></h5>
@@ -461,7 +478,7 @@ unset($pdo);
                                             <div class="card card-events p-2">
                                                 <p class="m-0 p-0"><i class="fas fa-calendar-day text-warning"></i><strong> Events</strong></p>
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorEventsThisYearCount; ?></strong></h5>
-                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events this year</p>
+                                                <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events this S.Y.</p>
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorNewEventsCount; ?></strong></h5>
                                                 <p class="text-dark mb-1 p-0" style="margin-top: -6px !important;">events this month</p>
                                                 <h5 class="text-dark m-0 p-0"><strong><?php echo $moderatorEventsAveragePerMonth; ?></strong></h5>
