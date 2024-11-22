@@ -959,6 +959,12 @@ unset($pdo);
                             <!-- Left Column -->
                             <div class="col-md-4 p-0 pr-3">
 
+                                <p class="text-muted mt-0" style="font-size: 24px;">
+                                    <i class="fa fa-trophy" style="color: gold; font-size: 30px;"></i>
+                                    <br>
+                                    <strong>Performance This S.Y.</strong>
+                                </p>
+
                                 <!-- Most Active Club -->
                                 <div class="card text-center mb-3 p-5 bg-dark" style="border-radius: 15px;">
                                     <div class="row">
