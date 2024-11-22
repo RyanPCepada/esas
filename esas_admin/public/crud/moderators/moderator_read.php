@@ -306,6 +306,8 @@ $moderatorEventsChanges = $moderatorEventsThisYearCount - $eventChangeData['even
 
 
 
+// MODERATOR RATING
+
 // Fetch relevant data using PDO
 $activityLogsCount = $pdo->query("SELECT COUNT(*) AS count FROM tbl_activity_logs WHERE moderator_id = $moderator_id")->fetch(PDO::FETCH_ASSOC)['count'];
 $postsCount = $pdo->query("SELECT COUNT(*) AS count FROM tbl_posts WHERE moderator_id = $moderator_id")->fetch(PDO::FETCH_ASSOC)['count'];
@@ -320,7 +322,7 @@ $postsThisYear = $pdo->query("SELECT COUNT(*) AS count FROM tbl_posts WHERE mode
 $eventsThisYear = $pdo->query("SELECT COUNT(*) AS count FROM tbl_events WHERE moderator_id = $moderator_id AND YEAR(dateAdded) = $currentYear")->fetch(PDO::FETCH_ASSOC)['count'];
 
 // Rating calculations with the updated weights
-$ratingAllYears = ($activityLogsCount * 0.2) + ($postsCount * 0.3) + ($eventsCount * 0.2) + ($applicationsProcessed * 0.2) + ($chatsCount * 0.1);
+$ratingAllYears = ($activityLogsCount * 0.25) + ($postsCount * 0.25) + ($eventsCount * 0.25) + ($applicationsProcessed * 0.10) + ($chatsCount * 0.15);
 $ratingThisYear = ($activityLogsThisYear * 0.25) + ($postsThisYear * 0.25) + ($eventsThisYear * 0.25) + ($chatsCount * 0.15) + ($applicationsProcessed * 0.10);
 
 // Normalize to a scale of 10
