@@ -306,6 +306,29 @@ $moderatorEventsChanges = $moderatorEventsThisYearCount - $eventChangeData['even
 
 
 
+// Fetch relevant data using PDO
+$activityLogsCount = $pdo->query("SELECT COUNT(*) AS count FROM tbl_activity_logs WHERE moderator_id = $moderator_id")->fetch(PDO::FETCH_ASSOC)['count'];
+$postsCount = $pdo->query("SELECT COUNT(*) AS count FROM tbl_posts WHERE moderator_id = $moderator_id")->fetch(PDO::FETCH_ASSOC)['count'];
+$eventsCount = $pdo->query("SELECT COUNT(*) AS count FROM tbl_events WHERE moderator_id = $moderator_id")->fetch(PDO::FETCH_ASSOC)['count'];
+$applicationsProcessed = $pdo->query("SELECT COUNT(*) AS count FROM tbl_application WHERE moderator_id = $moderator_id")->fetch(PDO::FETCH_ASSOC)['count'];
+$chatsCount = $pdo->query("SELECT COUNT(*) AS count FROM tbl_chats WHERE sender_id = $moderator_id OR recipient_id = $moderator_id")->fetch(PDO::FETCH_ASSOC)['count'];
+$reportsCount = $pdo->query("SELECT COUNT(*) AS count FROM tbl_accomplishment_reports WHERE club_id IN (SELECT club_id FROM tbl_clubs_and_moderators WHERE moderator_id = $moderator_id)")->fetch(PDO::FETCH_ASSOC)['count'];
+
+// Fetch data for the current year
+$activityLogsThisYear = $pdo->query("SELECT COUNT(*) AS count FROM tbl_activity_logs WHERE moderator_id = $moderator_id AND YEAR(dateAdded) = $currentYear")->fetch(PDO::FETCH_ASSOC)['count'];
+$postsThisYear = $pdo->query("SELECT COUNT(*) AS count FROM tbl_posts WHERE moderator_id = $moderator_id AND YEAR(dateAdded) = $currentYear")->fetch(PDO::FETCH_ASSOC)['count'];
+$eventsThisYear = $pdo->query("SELECT COUNT(*) AS count FROM tbl_events WHERE moderator_id = $moderator_id AND YEAR(dateAdded) = $currentYear")->fetch(PDO::FETCH_ASSOC)['count'];
+
+// Rating calculations with the updated weights
+$ratingAllYears = ($activityLogsCount * 0.2) + ($postsCount * 0.3) + ($eventsCount * 0.2) + ($applicationsProcessed * 0.2) + ($chatsCount * 0.1);
+$ratingThisYear = ($activityLogsThisYear * 0.25) + ($postsThisYear * 0.25) + ($eventsThisYear * 0.25) + ($chatsCount * 0.15) + ($applicationsProcessed * 0.10);
+
+// Normalize to a scale of 10
+$moderatorRatingAllYears = min(max(round($ratingAllYears / 10, 1), 0), 10);
+$moderatorRatingThisYear = min(max(round($ratingThisYear / 10, 1), 0), 10);
+
+
+
 
 unset($pdo);
 
@@ -461,6 +484,19 @@ unset($pdo);
                                             </div>
                                         </div>
                                         <!-- EVENTS CARD END -->
+
+                                        <!-- Ratings Section -->
+                                        <div class="w-100 text-center p-3">
+                                            <p class="m-0 mt-2 p-0"><i class="fas fa-star text-warning"></i><strong> Rating</strong></p>
+                                            <div class="club-rating" data-rating="<?php echo $moderatorRatingAllYears; ?>" title="Club Rating">
+                                                <p class="text-dark mb-0 p-0">Overall: <strong class="text-info"><?php echo $moderatorRatingAllYears; ?>/10</strong></p>
+                                            </div>
+                                            <div class="club-rating" data-rating="<?php echo $moderatorRatingThisYear; ?>" title="Club Rating This Year">
+                                                <p class="text-dark mb-0 p-0">This Year: <strong class="text-info"><?php echo $moderatorRatingThisYear; ?>/10</strong></p>
+                                            </div>
+                                        </div>
+
+
                                     </div>
 
 

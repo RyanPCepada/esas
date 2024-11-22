@@ -4,6 +4,7 @@ $host = 'localhost';
 $dbname = 'esas';
 $username = 'root';
 $password =''; 
+//u593341949.dev_esas
 
 // $port =3307;
 // $password ='root'; 

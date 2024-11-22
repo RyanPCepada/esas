@@ -917,6 +917,7 @@ unset($pdo);
                                             <p class="text-dark mb-0 p-0">This Year: <strong class="text-info"><?php echo $ratingThisYear; ?>/10</strong></p>
                                         </div>
                                     </div>
+                                    
                                 </div>
 
 
