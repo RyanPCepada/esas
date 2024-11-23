@@ -54,11 +54,6 @@
                                             window.location.search = queryParams.toString();
                                         }
                                     </script>
-
-                                    <?php
-                                    // Extract the start year of the selected school year
-                                    $startYear = explode('-', $selectedSchoolYear)[0];
-                                    ?>
                                 </div>
                                 <!-- DROPDOWN END -->
 
@@ -73,17 +68,30 @@
                                     <table class="table table-sm">
                                         <tbody>
                                             <?php
+                                            // Extract school year from GET parameter or default to the latest year
+                                            $selectedYear = $_GET['club_performance_year'] ?? $defaultSchoolYear;
+                                            $selectedYearParts = explode('-', $selectedYear);
+                                            $startYear = $selectedYearParts[0];
+                                            $endYear = $selectedYearParts[1];
+
+                                            // Convert school year range to a date range (August of start year to July of next year)
+                                            $startDate = "$startYear-08-01";
+                                            $endDate = "$endYear-07-31";
+
+                                            // Modify the query to accumulate activity data from all years, but filter by the selected school year
                                             $query = "SELECT c.clubName, COUNT(a.activity_id) AS activity_count
                                                     FROM tbl_activity_logs a
                                                     INNER JOIN tbl_clubs c ON a.club_id = c.club_id
                                                     WHERE a.club_id IS NOT NULL
+                                                    AND c.dateAdded <= :endDate
                                                     GROUP BY c.clubName
                                                     ORDER BY activity_count DESC";
-                                            $stmt = $pdo->query($query);
+                                            $stmt = $pdo->prepare($query);
+                                            $stmt->bindParam(':endDate', $endDate);
+                                            $stmt->execute();
+
                                             $rank = 1;
-
                                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-
                                                 $goldClass = '';
                                                 if ($rank == 1) {
                                                     $goldClass = 'style="background-color: rgba(255, 215, 0, .8);"'; // Pure Gold
