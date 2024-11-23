@@ -238,7 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Assign Moderator to Another Club -->
         <div class="assign-section">
             <h4>Assign to Another Club</h4>
-            <form action="" method="POST">
+            <form action="" method="POST" id="assignForm">
                 <input type="hidden" name="moderator_id" value="<?php echo htmlspecialchars($moderator_id); ?>">
                 <div class="form-group">
                     <label for="club">Select Club:</label>
@@ -289,11 +289,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="text-center d-flex justify-content-between mt-2">
                     <button type="submit" class="btn assign-btn text-light">Assign to Club</button>
-                    <!-- <a href="../../moderators.php" class="btn btn-secondary">Go Back</a> -->
                     <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
                 </div>
             </form>
         </div>
+
+        <script>
+            document.getElementById('assignForm').addEventListener('submit', function(event) {
+                var clubSelect = document.getElementById('club');
+                var clubId = clubSelect.value;
+
+                // Check if no club is selected
+                if (!clubId) {
+                    // Display the alert
+                    alert('Please select a club before assigning a moderator.');
+                    event.preventDefault(); // Prevent form submission
+                }
+            });
+        </script>
+
     </div>
 
 </body>
