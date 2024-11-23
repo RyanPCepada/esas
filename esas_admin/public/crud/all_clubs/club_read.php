@@ -962,7 +962,7 @@ unset($pdo);
                                 <p class="text-muted mt-0" style="font-size: 24px;">
                                     <i class="fa fa-trophy" style="color: gold; font-size: 30px;"></i>
                                     <br>
-                                    <strong>Performance This S.Y.</strong>
+                                    <strong>Club Performance This S.Y.</strong>
                                 </p>
 
                                 <!-- Most Active Club -->

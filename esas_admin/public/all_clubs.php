@@ -285,7 +285,7 @@ try {
                                             LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                                             LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
                                             GROUP BY c.club_id
-                                            ORDER BY c.dateAdded ASC";
+                                            ORDER BY c.clubName ASC";
 
                                     if ($result = $pdo->query($sql)) {
                                         $totalRows = $result->rowCount();
@@ -480,7 +480,7 @@ try {
 
 
 
-    <script>
+    <!-- <script>
         function submitClubRequest() {
             document.getElementById('clubRequestForm').submit();
         }
@@ -515,7 +515,7 @@ try {
                                             <h4>${club.clubName}</h4>
                                             <!--<div class="moderators-container">
                                                 ${club.formattedModerators}
-                                            </div>-->
+                                            </div>-- >
                                         </div>
                                     </a>
                                 </div>
@@ -534,7 +534,7 @@ try {
             });
 
 
-    </script>
+    </script> -->
 
 
     <script>

@@ -26,6 +26,7 @@ switch ($method) {
                 LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
                 WHERE c.club_id = ?
                 GROUP BY c.club_id
+                ORDER BY clubName ASC
             ');
             $stmt->execute([$club_id]);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -75,6 +76,7 @@ switch ($method) {
                 LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
                 WHERE cr.department = ?
                 GROUP BY c.club_id
+                ORDER BY clubName ASC
             ');
             $stmt->execute([$department]);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -113,6 +115,7 @@ switch ($method) {
                 LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                 LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
                 GROUP BY c.club_id
+                ORDER BY clubName ASC
             ');
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
