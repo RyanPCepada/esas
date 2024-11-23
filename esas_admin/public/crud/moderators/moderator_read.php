@@ -398,20 +398,26 @@ unset($pdo);
                                         <p><strong>Gender: </strong><?php echo $gender; ?></p>
                                         <p><strong>Age: </strong><?php echo $age; ?></p>
                                         <p><strong>Birthday: </strong><?php echo $birthday; ?></p>
-                                        <p><strong>Clubs: </strong><br>
-                                            <?php 
-                                                if (!empty($row)) {
-                                                    foreach ($row as $club) {
-                                                        $clubId = $club["club_id"];
-                                                        $clubName = htmlspecialchars($club["clubName"]);
-                                                        echo '<strong><a href="/esas/esas_admin/public/crud/all_clubs/club_read.php?club_id=' . $clubId . '" class="text-decoration-underline">' . $clubName . '</a></strong>';
-                                                        echo "<br>"; 
-                                                    }
-                                                } else {
-                                                    echo "None";
+                                        <p>
+                                        <?php 
+                                            if (!empty($row)) {
+                                                // Check if there is only one club
+                                                $clubLabel = count($row) === 1 ? "<strong>Current Club: </strong>" : "<strong>Current Clubs: </strong>";
+                                                echo $clubLabel . "<br>";
+
+                                                // Loop through the clubs and display them
+                                                foreach ($row as $club) {
+                                                    $clubId = $club["club_id"];
+                                                    $clubName = htmlspecialchars($club["clubName"]);
+                                                    echo '<strong><a href="/esas/esas_admin/public/crud/all_clubs/club_read.php?club_id=' . $clubId . '" class="text-decoration-underline">' . $clubName . '</a></strong>';
+                                                    echo "<br>"; 
                                                 }
-                                            ?>
-                                        </p>
+                                            } else {
+                                                echo "<strong>Clubs: </strong><br>None";
+                                            }
+                                        ?>
+                                    </p>
+
                                     </div>
 
                                     <div class="row col-md-7 moderator-trends-section m-0 p-0">
