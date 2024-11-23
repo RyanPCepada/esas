@@ -251,83 +251,103 @@
                             <!-- COL-MD-3 HIGHEST MEMBERS END -->
 
                             <!-- COL-MD-3 FASTEST GROWING CLUB START -->
-                            <div class="fastest-growing-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
-                                <p class="text-muted"><strong>Fastest Growing</strong> <i class="fas fa-bolt text-warning"></i></p>
-                                <div class="auto-scroll" style="max-height: 555px;">
-                                    <table class="table table-sm">
-                                        <tbody>
-                                            <?php
-                                            try {
-                                                $stmt = $pdo->prepare("
-                                                    SELECT tbl_clubs.clubName,
-                                                        (SELECT COUNT(application_id) 
-                                                            FROM tbl_application 
-                                                            WHERE club_id = tbl_clubs.club_id 
-                                                            AND status = 'active' 
-                                                            AND YEAR(dateApplied) = YEAR(CURDATE())) AS current_year_members,
+<div class="fastest-growing-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
+    <p class="text-muted"><strong>Fastest Growing</strong> <i class="fas fa-bolt text-warning"></i></p>
+    <div class="auto-scroll" style="max-height: 555px;">
+        <table class="table table-sm">
+            <tbody>
+                <?php
+                try {
+                    // Get the selected school year from the query parameter or default to the latest school year
+                    $selectedSchoolYear = $_GET['club_performance_year'] ?? $defaultSchoolYear;
+                    $yearRange = explode('-', $selectedSchoolYear);
+                    $startYear = $yearRange[0];
+                    $endYear = $yearRange[1];
 
-                                                        (SELECT COUNT(application_id) 
-                                                            FROM tbl_application 
-                                                            WHERE club_id = tbl_clubs.club_id 
-                                                            AND status = 'active' 
-                                                            AND YEAR(dateApplied) = YEAR(CURDATE()) - 1) AS previous_year_members,
+                    // Modify the query to filter based on the selected school year
+                    $sql = "
+                        SELECT tbl_clubs.clubName,
+                            (SELECT COUNT(application_id) 
+                                FROM tbl_application 
+                                WHERE club_id = tbl_clubs.club_id 
+                                AND status = 'active' 
+                                AND YEAR(dateApplied) = :year) AS current_year_members,
 
-                                                        (SELECT COUNT(post_id) 
-                                                            FROM tbl_posts 
-                                                            WHERE club_id = tbl_clubs.club_id 
-                                                            AND YEAR(dateAdded) = YEAR(CURDATE())) AS current_year_posts,
+                            (SELECT COUNT(application_id) 
+                                FROM tbl_application 
+                                WHERE club_id = tbl_clubs.club_id 
+                                AND status = 'active' 
+                                AND YEAR(dateApplied) = :prev_year) AS previous_year_members,
 
-                                                        (SELECT COUNT(post_id) 
-                                                            FROM tbl_posts 
-                                                            WHERE club_id = tbl_clubs.club_id 
-                                                            AND YEAR(dateAdded) = YEAR(CURDATE()) - 1) AS previous_year_posts,
+                            (SELECT COUNT(post_id) 
+                                FROM tbl_posts 
+                                WHERE club_id = tbl_clubs.club_id 
+                                AND YEAR(dateAdded) = :year) AS current_year_posts,
 
-                                                        (SELECT COUNT(event_id) 
-                                                            FROM tbl_events 
-                                                            WHERE club_id = tbl_clubs.club_id 
-                                                            AND YEAR(dateAdded) = YEAR(CURDATE())) AS current_year_events,
+                            (SELECT COUNT(post_id) 
+                                FROM tbl_posts 
+                                WHERE club_id = tbl_clubs.club_id 
+                                AND YEAR(dateAdded) = :prev_year) AS previous_year_posts,
 
-                                                        (SELECT COUNT(event_id) 
-                                                            FROM tbl_events 
-                                                            WHERE club_id = tbl_clubs.club_id 
-                                                            AND YEAR(dateAdded) = YEAR(CURDATE()) - 1) AS previous_year_events
-                                                    FROM tbl_clubs
-                                                    ORDER BY 
-                                                        GREATEST(current_year_members - previous_year_members, current_year_posts - previous_year_posts, current_year_events - previous_year_events) DESC
-                                                ");
-                                                $stmt->execute();
-                                                $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                                                $rank = 1;
+                            (SELECT COUNT(event_id) 
+                                FROM tbl_events 
+                                WHERE club_id = tbl_clubs.club_id 
+                                AND YEAR(dateAdded) = :year) AS current_year_events,
 
-                                                foreach ($clubs as $club) {
+                            (SELECT COUNT(event_id) 
+                                FROM tbl_events 
+                                WHERE club_id = tbl_clubs.club_id 
+                                AND YEAR(dateAdded) = :prev_year) AS previous_year_events
+                        FROM tbl_clubs
+                        WHERE EXISTS (
+                            SELECT 1
+                            FROM tbl_application
+                            WHERE tbl_application.club_id = tbl_clubs.club_id
+                            AND YEAR(tbl_application.dateApplied) = :year
+                        )
+                        ORDER BY 
+                            GREATEST(current_year_members - previous_year_members, current_year_posts - previous_year_posts, current_year_events - previous_year_events) DESC
+                    ";
+                    
+                    $stmt = $pdo->prepare($sql);
 
-                                                    $goldClass = '';
-                                                    if ($rank == 1) {
-                                                        $goldClass = 'style="background-color: rgba(255, 215, 0, .8);"'; // Pure Gold
-                                                    } elseif ($rank == 2) {
-                                                        $goldClass = 'style="background-color: rgba(255, 215, 0, 0.65);"'; // Light Pure Gold
-                                                    } elseif ($rank == 3) {
-                                                        $goldClass = 'style="background-color: rgba(255, 215, 0, 0.5);"'; // Lighter Pure Gold
-                                                    } elseif ($rank == 4) {
-                                                        $goldClass = 'style="background-color: rgba(255, 215, 0, 0.35);"'; // Slightly Fading Pure Gold
-                                                    } elseif ($rank == 5) {
-                                                        $goldClass = 'style="background-color: rgba(255, 215, 0, 0.2);"'; // Faded Gold
-                                                    } else {
-                                                        $goldClass = 'style="background-color: rgba(255, 215, 0, 0);"'; // White
-                                                    }
-                                                    
-                                                    echo "<tr {$goldClass}>
-                                                            <td>{$rank}</td>
-                                                            <td>" . htmlspecialchars($club['clubName']) . "</td>
-                                                        </tr>";
-                                                    $rank++;
-                                                }
-                                            } catch (PDOException $e) {
-                                                echo "Error fetching fastest growing clubs: " . $e->getMessage();
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <!-- COL-MD-3 FASTEST GROWING CLUB END -->
+                    // Bind the year variables
+                    $previousYear = $startYear - 1;
+                    $stmt->bindValue(':year', $startYear, PDO::PARAM_INT);
+                    $stmt->bindValue(':prev_year', $previousYear, PDO::PARAM_INT);
+                    $stmt->execute();
+
+                    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $rank = 1;
+
+                    foreach ($clubs as $club) {
+                        $goldClass = '';
+                        if ($rank == 1) {
+                            $goldClass = 'style="background-color: rgba(255, 215, 0, .8);"'; // Pure Gold
+                        } elseif ($rank == 2) {
+                            $goldClass = 'style="background-color: rgba(255, 215, 0, 0.65);"'; // Light Pure Gold
+                        } elseif ($rank == 3) {
+                            $goldClass = 'style="background-color: rgba(255, 215, 0, 0.5);"'; // Lighter Pure Gold
+                        } elseif ($rank == 4) {
+                            $goldClass = 'style="background-color: rgba(255, 215, 0, 0.35);"'; // Slightly Fading Pure Gold
+                        } elseif ($rank == 5) {
+                            $goldClass = 'style="background-color: rgba(255, 215, 0, 0.2);"'; // Faded Gold
+                        } else {
+                            $goldClass = 'style="background-color: rgba(255, 215, 0, 0);"'; // White
+                        }
+
+                        echo "<tr {$goldClass}>
+                                <td>{$rank}</td>
+                                <td>" . htmlspecialchars($club['clubName']) . "</td>
+                            </tr>";
+                        $rank++;
+                    }
+                } catch (PDOException $e) {
+                    echo "Error fetching fastest growing clubs: " . $e->getMessage();
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- COL-MD-3 FASTEST GROWING CLUB END -->
