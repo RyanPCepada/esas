@@ -192,20 +192,33 @@
                                         <tbody>
                                             <?php
                                             try {
+                                                // Extract selected year from GET parameter or default to the latest school year
+                                                $selectedYear = $_GET['club_performance_year'] ?? $defaultSchoolYear;
+                                                $selectedYearParts = explode('-', $selectedYear);
+                                                $startYear = $selectedYearParts[0];
+                                                $endYear = $selectedYearParts[1];
+
+                                                // Convert school year range to date range (August of start year to July of next year)
+                                                $startDate = "$startYear-08-01";
+                                                $endDate = "$endYear-07-31";
+
+                                                // Query to fetch cumulative member counts up to the selected school year's end date
                                                 $stmt = $pdo->prepare("
-                                                    SELECT tbl_clubs.clubName, COUNT(tbl_application.application_id) AS active_member_count 
-                                                    FROM tbl_application 
-                                                    INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_application.club_id
-                                                    WHERE tbl_application.status = 'active' 
-                                                    GROUP BY tbl_clubs.club_id 
-                                                    ORDER BY active_member_count DESC
+                                                    SELECT c.clubName, COUNT(a.application_id) AS member_count
+                                                    FROM tbl_application a
+                                                    INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+                                                    WHERE a.status = 'active'
+                                                    AND c.dateAdded <= :endDate
+                                                    GROUP BY c.club_id
+                                                    ORDER BY member_count DESC
                                                 ");
+                                                $stmt->bindParam(':endDate', $endDate);
                                                 $stmt->execute();
+
                                                 $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 $rank = 1;
 
                                                 foreach ($clubs as $club) {
-
                                                     $goldClass = '';
                                                     if ($rank == 1) {
                                                         $goldClass = 'style="background-color: rgba(255, 215, 0, .8);"'; // Pure Gold
@@ -220,7 +233,7 @@
                                                     } else {
                                                         $goldClass = 'style="background-color: rgba(255, 215, 0, 0);"'; // White
                                                     }
-                                                    
+
                                                     echo "<tr {$goldClass}>
                                                             <td>{$rank}</td>
                                                             <td>" . htmlspecialchars($club['clubName']) . "</td>
