@@ -128,19 +128,31 @@
                                         <tbody>
                                             <?php
                                             try {
-                                                $stmt = $pdo->prepare("
-                                                    SELECT tbl_clubs.clubName, COUNT(tbl_application.application_id) AS application_count 
-                                                    FROM tbl_application 
-                                                    INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_application.club_id
-                                                    GROUP BY tbl_clubs.club_id 
+                                                // Extract selected year from GET parameter or use default
+                                                $selectedYear = $_GET['club_performance_year'] ?? $defaultSchoolYear;
+                                                $selectedYearParts = explode('-', $selectedYear);
+                                                $startYear = $selectedYearParts[0];
+                                                $endYear = $selectedYearParts[1];
+
+                                                // Convert school year range to a date range (August of start year to July of next year)
+                                                $startDate = "$startYear-08-01";
+                                                $endDate = "$endYear-07-31";
+
+                                                // Query to get the most applied clubs within the selected school year
+                                                $query = "
+                                                    SELECT c.clubName, COUNT(a.application_id) AS application_count
+                                                    FROM tbl_application a
+                                                    INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+                                                    WHERE c.dateAdded <= :endDate
+                                                    GROUP BY c.clubName
                                                     ORDER BY application_count DESC
-                                                ");
+                                                ";
+                                                $stmt = $pdo->prepare($query);
+                                                $stmt->bindParam(':endDate', $endDate);
                                                 $stmt->execute();
-                                                $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
                                                 $rank = 1;
-
-                                                foreach ($clubs as $club) {
-
+                                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                                     $goldClass = '';
                                                     if ($rank == 1) {
                                                         $goldClass = 'style="background-color: rgba(255, 215, 0, .8);"'; // Pure Gold
@@ -158,12 +170,12 @@
 
                                                     echo "<tr {$goldClass}>
                                                             <td>{$rank}</td>
-                                                            <td>" . htmlspecialchars($club['clubName']) . "</td>
+                                                            <td>" . htmlspecialchars($row['clubName']) . "</td>
                                                         </tr>";
                                                     $rank++;
                                                 }
                                             } catch (PDOException $e) {
-                                                echo "Error fetching most applied clubs: " . $e->getMessage();
+                                                echo "Error fetching most applied clubs: " . htmlspecialchars($e->getMessage());
                                             }
                                             ?>
                                         </tbody>
