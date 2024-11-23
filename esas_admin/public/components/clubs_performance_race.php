@@ -151,13 +151,11 @@
                                                     SELECT c.clubName, COUNT(a.application_id) AS application_count
                                                     FROM tbl_application a
                                                     INNER JOIN tbl_clubs c ON a.club_id = c.club_id
-                                                    WHERE a.dateApplied BETWEEN :startDate AND :endDate
-                                                    AND c.dateAdded <= :endDate
+                                                    WHERE a.dateApplied <= :endDate
                                                     GROUP BY c.clubName
                                                     ORDER BY application_count DESC, c.clubName
                                                 ";
                                                 $stmt = $pdo->prepare($query);
-                                                $stmt->bindParam(':startDate', $startDate);
                                                 $stmt->bindParam(':endDate', $endDate);
                                                 $stmt->execute();
 
@@ -197,6 +195,7 @@
                                                 echo "Error fetching most applied clubs: " . htmlspecialchars($e->getMessage());
                                             }
                                             ?>
+
                                         </tbody>
                                     </table>
                                 </div>

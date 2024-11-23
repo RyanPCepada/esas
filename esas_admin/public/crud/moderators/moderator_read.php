@@ -474,7 +474,7 @@ unset($pdo);
                                                             $formattedAssignedDate = date("F j, Y", strtotime($dateAssigned)); // Example: 'January 1, 2024'
                                                             $formattedUnassignedDate = date("F j, Y", strtotime($dateUnassigned)); // Example: 'January 1, 2024'
 
-                                                            echo '<strong><a href="/esas/esas_admin/public/crud/all_clubs/club_read.php?club_id=' . $clubId . '" class="text-decoration-underline text-primary">' . $previousClubName . '</a></strong><br>';
+                                                            echo '<strong class="text-decoration-none text-muted">' . $previousClubName . '</strong><br>';
                                                             echo '<small>' . $formattedAssignedDate . ' - ' . $formattedUnassignedDate . '</small><br>';
                                                         }
                                                     }
