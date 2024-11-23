@@ -43,7 +43,7 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
                 $firstName = $data['firstName'];
                 $middleName = $data['middleName'];
                 $lastName = $data['lastName'];
-                $clubName = $data['clubName'] ? $data['clubName'] : "None"; // Use "None" if no club is associated
+                $clubName = $data['clubName'] ;
                 $dateAssigned = $data['dateAssigned'];
                 $dateUnassigned = date("Y-m-d H:i:s"); // Date when moderator is unassigned
 

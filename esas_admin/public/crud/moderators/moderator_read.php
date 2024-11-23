@@ -53,6 +53,23 @@ if (isset($_GET["moderator_id"]) && !empty(trim($_GET["moderator_id"]))) {
                 $department = !empty($row[0]["department"]) ? htmlspecialchars($row[0]["department"]) : 'None';
                 $profession = !empty($row[0]["profession"]) ? htmlspecialchars($row[0]["profession"]) : 'None';
                 $profilePic = !empty($row[0]["profilePic"]) ? htmlspecialchars($row[0]["profilePic"]) : "default-profile.jpg";
+                
+                // Query to fetch previous clubs and their assigned/unassigned dates from the archive
+                $archiveSql = "SELECT 
+                ma.clubName, ma.dateAssigned, ma.dateUnassigned 
+                FROM tbl_moderator_archive ma 
+                WHERE ma.moderator_id = :moderator_id 
+                ORDER BY ma.dateUnassigned DESC";
+
+                if ($archiveStmt = $pdo->prepare($archiveSql)) {
+                    $archiveStmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT);
+                    if ($archiveStmt->execute()) {
+                        $archiveRow = $archiveStmt->fetchAll(PDO::FETCH_ASSOC);
+                    } else {
+                        echo "Error fetching previous clubs";
+                    }
+                    unset($archiveStmt);
+                }
 
                 // Function to convert timestamp to human-readable format
                 function timeAgo($timestamp) {
@@ -399,24 +416,61 @@ unset($pdo);
                                         <p><strong>Age: </strong><?php echo $age; ?></p>
                                         <p><strong>Birthday: </strong><?php echo $birthday; ?></p>
                                         <p>
-                                        <?php 
-                                            if (!empty($row)) {
-                                                // Check if there is only one club
-                                                $clubLabel = count($row) === 1 ? "<strong>Current Club: </strong>" : "<strong>Current Clubs: </strong>";
-                                                echo $clubLabel . "<br>";
+                                            <?php 
+                                                if (!empty($row)) {
+                                                    // Check if there is only one club
+                                                    $clubLabel = count($row) === 1 ? "<strong>Current Club: </strong>" : "<strong>Current Clubs: </strong>";
+                                                    echo $clubLabel . "<br>";
 
-                                                // Loop through the clubs and display them
-                                                foreach ($row as $club) {
-                                                    $clubId = $club["club_id"];
-                                                    $clubName = htmlspecialchars($club["clubName"]);
-                                                    echo '<strong><a href="/esas/esas_admin/public/crud/all_clubs/club_read.php?club_id=' . $clubId . '" class="text-decoration-underline">' . $clubName . '</a></strong>';
-                                                    echo "<br>"; 
+                                                    // Loop through the clubs and display them
+                                                    foreach ($row as $club) {
+                                                        $clubId = $club["club_id"];
+                                                        $clubName = htmlspecialchars($club["clubName"]);
+                                                        echo '<strong><a href="/esas/esas_admin/public/crud/all_clubs/club_read.php?club_id=' . $clubId . '" class="text-decoration-underline">' . $clubName . '</a></strong>';
+                                                        echo "<br>"; 
+                                                    }
+                                                } else {
+                                                    echo "<strong>Clubs: </strong><br>None";
                                                 }
-                                            } else {
-                                                echo "<strong>Clubs: </strong><br>None";
-                                            }
-                                        ?>
-                                    </p>
+                                            ?>
+                                        </p>
+                                        <p>
+                                            <?php 
+                                                if (!empty($archiveRow)) {
+                                                    // Check if there are any previous clubs with non-null club names
+                                                    $previousClubLabel = count($archiveRow) === 1 ? "<strong>Previous Club: </strong>" : "<strong>Previous Clubs: </strong>";
+                                                    echo $previousClubLabel . "<br>";
+
+                                                    // Initialize a flag to check if there are valid previous clubs
+                                                    $hasPreviousClubs = false;
+
+                                                    // Loop through the previous clubs and display them
+                                                    foreach ($archiveRow as $archive) {
+                                                        $previousClubName = htmlspecialchars($archive["clubName"]);
+                                                        $dateAssigned = htmlspecialchars($archive["dateAssigned"]);
+                                                        $dateUnassigned = htmlspecialchars($archive["dateUnassigned"]);
+
+                                                        // If the clubName is not NULL, display it along with the dates
+                                                        if (!empty($previousClubName)) {
+                                                            $hasPreviousClubs = true;
+
+                                                            // Format the dates as needed (for example, using date() function)
+                                                            $formattedAssignedDate = date("F j, Y", strtotime($dateAssigned)); // Example: 'January 1, 2024'
+                                                            $formattedUnassignedDate = date("F j, Y", strtotime($dateUnassigned)); // Example: 'January 1, 2024'
+
+                                                            echo '<strong><a href="/esas/esas_admin/public/crud/all_clubs/club_read.php?club_id=' . $clubId . '" class="text-decoration-underline text-primary">' . $previousClubName . '</a></strong><br>';
+                                                            echo ' <small>' . $formattedAssignedDate . ' - ' . $formattedUnassignedDate . '</small><br>';
+                                                        }
+                                                    }
+
+                                                    // If no previous clubs are found (i.e., all club names are NULL), display a message
+                                                    if (!$hasPreviousClubs) {
+                                                        echo '<strong class="text-muted">No previous club(s) assigned</strong>';
+                                                    }
+                                                }
+                                            ?>
+                                        </p>
+
 
                                     </div>
 
