@@ -569,7 +569,7 @@ try {
         INNER JOIN tbl_clubs c ON a.club_id = c.club_id
         WHERE a.club_id IS NOT NULL
         GROUP BY c.club_id, c.clubName
-        ORDER BY activity_count DESC
+        ORDER BY activity_count DESC, c.clubName
     ");
     $stmt->execute();
     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -596,7 +596,7 @@ try {
         FROM tbl_application 
         INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_application.club_id
         GROUP BY tbl_clubs.club_id 
-        ORDER BY application_count DESC
+        ORDER BY application_count DESC, tbl_clubs.clubName
     ");
     $stmt->execute();
     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -623,7 +623,7 @@ try {
             INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_application.club_id
             WHERE tbl_application.status = 'active' 
             GROUP BY tbl_clubs.club_id 
-            ORDER BY active_member_count DESC
+            ORDER BY active_member_count DESC, tbl_clubs.clubName
     ");
     $stmt->execute();
     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
