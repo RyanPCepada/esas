@@ -25,7 +25,8 @@ if (isset($_GET["moderator_id"]) && !empty(trim($_GET["moderator_id"]))) {
                 m.profession,
                 m.profilePic,
                 c.club_id, 
-                c.clubName
+                c.clubName,
+                cm.dateAdded
             FROM tbl_moderators m
             LEFT JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
             LEFT JOIN tbl_clubs c ON cm.club_id = c.club_id
@@ -416,24 +417,39 @@ unset($pdo);
                                         <p><strong>Age: </strong><?php echo $age; ?></p>
                                         <p><strong>Birthday: </strong><?php echo $birthday; ?></p>
                                         <p>
-                                            <?php 
-                                                if (!empty($row)) {
-                                                    // Check if there is only one club
-                                                    $clubLabel = count($row) === 1 ? "<strong>Current Club: </strong>" : "<strong>Current Clubs: </strong>";
-                                                    echo $clubLabel . "<br>";
+    <?php 
+        if (!empty($row)) {
+            // Check if there is only one club
+            $clubLabel = count($row) === 1 ? "<strong>Current Club: </strong>" : "<strong>Current Clubs: </strong>";
+            echo $clubLabel . "<br>";
 
-                                                    // Loop through the clubs and display them
-                                                    foreach ($row as $club) {
-                                                        $clubId = $club["club_id"];
-                                                        $clubName = htmlspecialchars($club["clubName"]);
-                                                        echo '<strong><a href="/esas/esas_admin/public/crud/all_clubs/club_read.php?club_id=' . $clubId . '" class="text-decoration-underline">' . $clubName . '</a></strong>';
-                                                        echo "<br>"; 
-                                                    }
-                                                } else {
-                                                    echo "<strong>Clubs: </strong><br>None";
-                                                }
-                                            ?>
-                                        </p>
+            // Loop through the clubs and display them
+            $foundClub = false; // Flag to check if a valid club is found
+            foreach ($row as $club) {
+                $clubId = $club["club_id"];
+                $clubName = htmlspecialchars($club["clubName"]);
+                $dateAssigned = $club["dateAdded"]; // dateAdded from tbl_clubs_and_moderators
+
+                // Format the dateAdded (Date Assigned)
+                $formattedDateAssigned = !empty($dateAssigned) ? date("F j, Y", strtotime($dateAssigned)) : 'Not Assigned';
+
+                // Check if clubName is empty or NULL
+                if (!empty($clubName)) {
+                    echo '<strong><a href="/esas/esas_admin/public/crud/all_clubs/club_read.php?club_id=' . $clubId . '" class="text-decoration-underline">' . $clubName . '</a></strong><br>';
+                    echo '<small>Date Assigned: ' . $formattedDateAssigned . '</small>';
+                    echo "<br>";
+                    $foundClub = true; // Set the flag to true if a valid club is found
+                }
+            }
+
+            // If no valid clubs are found, display "None"
+            if (!$foundClub) {
+                echo '<strong class="text-muted">None</strong><br>';
+            }
+        }
+    ?>
+</p>
+
                                         <p>
                                             <?php 
                                                 if (!empty($archiveRow)) {
@@ -459,7 +475,7 @@ unset($pdo);
                                                             $formattedUnassignedDate = date("F j, Y", strtotime($dateUnassigned)); // Example: 'January 1, 2024'
 
                                                             echo '<strong><a href="/esas/esas_admin/public/crud/all_clubs/club_read.php?club_id=' . $clubId . '" class="text-decoration-underline text-primary">' . $previousClubName . '</a></strong><br>';
-                                                            echo ' <small>' . $formattedAssignedDate . ' - ' . $formattedUnassignedDate . '</small><br>';
+                                                            echo '<small>' . $formattedAssignedDate . ' - ' . $formattedUnassignedDate . '</small><br>';
                                                         }
                                                     }
 
