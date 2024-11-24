@@ -960,15 +960,18 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                             <div class="col-md-4 p-0 pr-3">
 
                                 <p class="text-muted mt-0" style="font-size: 24px;">
-                                    <i class="fa fa-trophy" style="color: gold; font-size: 30px;"></i>
-                                    <strong>Performance This S.Y.</strong>
+                                    <i class="fa fa-trophy m-0 p-0" style="color: gold; font-size: 30px;"></i>
+                                    <strong class="m-0 p-0">Performance This S.Y.</strong>
                                 </p>
-
+                                <!-- <p class="text-muted p-0" style="margin-top: -15px;">
+                                    See how your club is shaping success this school year!
+                                </p> -->
+                                    
                                 <!-- Most Active Club -->
                                 <div class="card text-center mb-3 p-3 bg-dark" style="border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
                                     <div class="row">
                                         <div class="col-5 m-0 p-0">
-                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
+                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 90px; height: 90px;">
                                         </div>
                                         <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
                                             <h1 class="m-0 p-0"><strong class="text-info"><?php echo $mostActiveClubRank; ?></strong></h1>
@@ -981,7 +984,7 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                                 <div class="card text-center mb-3 p-3 bg-dark" style="border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
                                     <div class="row">
                                         <div class="col-5 m-0 p-0">
-                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
+                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 90px; height: 90px;">
                                         </div>
                                         <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
                                             <h1 class="m-0 p-0"><strong class="text-info"><?php echo $mostAppliedClubRank; ?></strong></h1>
@@ -994,7 +997,7 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                                 <div class="card text-center mb-3 p-3 bg-dark" style="border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
                                     <div class="row">
                                         <div class="col-5 m-0 p-0">
-                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
+                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 90px; height: 90px;">
                                         </div>
                                         <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
                                             <h1 class="m-0 p-0"><strong class="text-info"><?php echo $highestInMembersRank; ?></strong></h1>
@@ -1007,7 +1010,7 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                                 <div class="card text-center mb-3 p-3 bg-dark" style="border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
                                     <div class="row">
                                         <div class="col-5 m-0 p-0">
-                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
+                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 90px; height: 90px;">
                                         </div>
                                         <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
                                             <h1 class="m-0 p-0"><strong class="text-info"><?php echo $fastestGrowingClubRank; ?></strong></h1>
@@ -1018,12 +1021,15 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
 
                                 <br>
 
-                                <p class="text-muted mt-0" style="font-size: 24px;">
+                                <p class="text-muted mt-0 mb-0" style="font-size: 24px;">
                                     <i class="fa fa-trophy" style="color: gold; font-size: 30px;"></i>
                                     <strong>Achievements & Awards</strong>
                                 </p>
+                                <!-- <p class="text-muted mb-0 p-0" style="margin-top: -15px;">
+                                    See your clubs achievements and earned awards
+                                </p> -->
 
-                                <div class="row col-md-12 justify-content-between m-0 p-3 auto-scroll" style="max-height: 500px;">
+                                <div class="row col-md-12 justify-content-between m-0 p-3" style="max-height: auto;">
                                     <?php
                                     // Get the club_id from the query string
                                     $club_id = trim($_GET["club_id"]);
@@ -1174,7 +1180,7 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                                     foreach ($achievements as $achievement) {
                                     ?>
                                     <div class="row card col-md-6 mb-3 p-0" style="background-color: #F1F3F5; border: none; border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <div class="card-body text-center">
+                                        <div class="card-body text-center p-3">
                                             <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 70px; height: 70px;" alt="Trophy" class="trophy-img">
                                             <p class="rank" style="font-size: 1.5rem; font-weight: bold; margin: 0;">
                                                 <?php 
@@ -1198,7 +1204,7 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
 
                             </div>
                             <!-- Right Column -->
-                            <div class="card col-md-8 p-3 bg-light">
+                            <div class="card col-md-8 px-4 py-3 bg-light">
                                 <div class="card text-center mt-1 mb-3 p-2">
                                     <p class="m-0 p-0"><strong><?php echo $moderatorLabel; ?><br></strong>
                                         <?php
@@ -1272,7 +1278,7 @@ function fetchAwards() {
                         <div class="card text-center mb-3 p-5 bg-light" style="border-radius: 15px;">
                             <div class="row">
                                 <div class="col-5 m-0 p-0">
-                                    <img src="/esas/esas_admin/icons/${award.icon}" style="width: 100px; height: 100px;">
+                                    <img src="/esas/esas_admin/icons/${award.icon}" style="width: 90px; height: 90px;">
                                 </div>
                                 <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
                                     <h1 class="m-0 p-0"><strong class="text-info">${award.rank}</strong></h1>
