@@ -36,8 +36,8 @@ if (!$student) {
 $sql_all_clubs = "
     SELECT * FROM tbl_application 
     WHERE student_id = ? 
-    AND status IN ('active', 'inactive', 'pending', 'disapproved', 'departed', 'maxed')
-    ORDER BY FIELD(status, 'active', 'inactive', 'pending', 'disapproved', 'departed', 'maxed')
+    AND status IN ('active', 'inactive', 'pending', 'disapproved', 'departed', 'disabled')
+    ORDER BY FIELD(status, 'active', 'inactive', 'pending', 'disapproved', 'departed', 'disabled')
 ";
 $stmt_all_clubs = $pdo->prepare($sql_all_clubs);
 $stmt_all_clubs->execute([$student_id]);
@@ -131,7 +131,7 @@ foreach ($applications as $application) {
     <!-- Navigation Tabs -->
     <ul class="nav nav-tabs" id="statusTabs" role="tablist">
         <?php
-        $statuses = ['active', 'inactive', 'pending', 'disapproved', 'departed', 'maxed'];
+        $statuses = ['active', 'inactive', 'pending', 'disapproved', 'departed', 'disabled'];
         foreach ($statuses as $index => $status) {
             $activeClass = $index === 0 ? 'active' : '';
             $icon = '';
@@ -141,7 +141,7 @@ foreach ($applications as $application) {
                 case 'pending': $icon = '<i class="fas fa-hourglass-start text-warning"></i>'; break;
                 case 'disapproved': $icon = '<i class="fas fa-times-circle text-danger"></i>'; break;
                 case 'departed': $icon = '<i class="fas fa-user-slash text-secondary"></i>'; break;
-                case 'maxed': $icon = '<i class="fas fa-exclamation-triangle text-danger"></i>'; break;
+                case 'disabled': $icon = '<i class="fas fa-exclamation-triangle text-danger"></i>'; break;
                 default: $icon = '<i class="fas fa-question-circle text-muted"></i>'; break;
             }
             echo "<li class='nav-item'>
@@ -240,7 +240,7 @@ foreach ($applications as $application) {
                                     <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>
                                     <p><strong>Date Departed:</strong> <?php echo formatDate($application['dateModified']); ?></p>
                                 </div>
-                            <?php elseif ($status === 'maxed'): ?>
+                            <?php elseif ($status === 'disabled'): ?>
                                 <div class="status-block">
                                     <hr>
                                     <p><strong>Date Applied:</strong> <?php echo formatDate($application['dateApplied']); ?></p>

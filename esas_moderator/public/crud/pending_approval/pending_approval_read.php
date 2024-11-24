@@ -187,7 +187,7 @@ function countActiveMemberships($pdo, $student_id) {
 // Function to update pending applications status
 function updatePendingApplications($pdo, $student_id) {
     echo "<script>console.log('Updating pending applications for student ID: " . $student_id . "');</script>";
-    $updatePendingSql = "UPDATE tbl_application SET status = 'maxed' WHERE student_id = :student_id AND status = 'pending'";
+    $updatePendingSql = "UPDATE tbl_application SET status = 'disabled' WHERE student_id = :student_id AND status = 'pending'";
     $stmt = $pdo->prepare($updatePendingSql);
     $stmt->execute([':student_id' => $student_id]);
 }
