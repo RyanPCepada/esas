@@ -1243,6 +1243,24 @@ try {
                             <!-- CHARTS AND DIAGRAMS END -->
                         </div>
                         <!-- THE MAIN PAGE END -->
+
+                        
+
+
+                        
+                        <!-- THE MAIN PAGE 2 START -->
+                        <div class="row main-page mt-3 p-3">
+
+                            <?php include 'components/club_achievements.php' ?>
+
+                        </div>
+                        <!-- THE MAIN PAGE 2 END -->
+
+
+
+
+
+
                     </div>
                 </div>
             </div>
