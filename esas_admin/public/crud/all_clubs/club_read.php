@@ -1048,7 +1048,7 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
         $schoolYearEnd = ($startYear + 1) . "-07-31"; // July 31st of the next year
         $schoolYear = "{$startYear}-" . ($startYear + 1); // Format the school year (e.g., "2022-2023")
 
-        // Query to get all clubs and their activity count in the current school year
+        // Query for Most Active Clubs
         $sql = "SELECT c.club_id, c.clubName, COUNT(a.activity_id) AS activity_count
                 FROM tbl_activity_logs a
                 INNER JOIN tbl_clubs c ON a.club_id = c.club_id
@@ -1061,7 +1061,6 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
         $stmt->bindParam(':endDate', $schoolYearEnd);
         $stmt->execute();
 
-        // Store the results for ranking
         $rank = 1;
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if ($row['club_id'] == $club_id) {
@@ -1069,13 +1068,13 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                     'clubName' => $row['clubName'],
                     'rank' => $rank,
                     'category' => 'Most Active Club',
-                    'schoolYear' => $schoolYear // Correctly matches the date range
+                    'schoolYear' => $schoolYear
                 ];
             }
             $rank++;
         }
 
-        // Query for Most Applied clubs
+        // Query for Most Applied Clubs
         $mostAppliedSql = "
             SELECT c.club_id, c.clubName, COUNT(a.application_id) AS application_count
             FROM tbl_application a
@@ -1083,6 +1082,7 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
             WHERE a.dateApplied <= :endDate
             GROUP BY c.club_id, c.clubName
             ORDER BY application_count DESC, c.clubName";
+
         $mostAppliedStmt = $pdo->prepare($mostAppliedSql);
         $mostAppliedStmt->bindParam(':endDate', $schoolYearEnd);
         $mostAppliedStmt->execute();
@@ -1100,6 +1100,33 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
             $rank++;
         }
 
+        // Query for Highest Members
+        $highestMembersSql = "
+            SELECT c.club_id, c.clubName, COUNT(a.application_id) AS member_count
+            FROM tbl_application a
+            INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+            WHERE a.status = 'active' AND a.dateDecided <= :endDate
+            AND c.dateAdded <= :endDate
+            GROUP BY c.club_id
+            ORDER BY member_count DESC, c.clubName";
+
+        $highestMembersStmt = $pdo->prepare($highestMembersSql);
+        $highestMembersStmt->bindParam(':endDate', $schoolYearEnd);
+        $highestMembersStmt->execute();
+
+        $rank = 1;
+        while ($row = $highestMembersStmt->fetch(PDO::FETCH_ASSOC)) {
+            if ($row['club_id'] == $club_id) {
+                $achievements[] = [
+                    'clubName' => $row['clubName'],
+                    'rank' => $rank,
+                    'category' => 'Highest Members',
+                    'schoolYear' => $schoolYear
+                ];
+            }
+            $rank++;
+        }
+
         // Move to the next school year
         $startYear++;
     }
@@ -1107,8 +1134,8 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
     // Display the results for the specific club
     foreach ($achievements as $achievement) {
     ?>
-    <div class="row card col-md-6 p-3">
-        <div class="card-body text-center" style="text-align: center;">
+    <div class="row card col-md-6 mb-3 p-2" style="background-color: #F1F3F5; border: none; border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+        <div class="card-body text-center">
             <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;" alt="Trophy" class="trophy-img">
             <p class="rank" style="font-size: 1.5rem; font-weight: bold; margin: 0;">
                 <?php 
@@ -1120,7 +1147,7 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                 ); 
                 ?>
             </p>
-            <p style="margin: 0;"><?php echo $achievement['category']; ?></p>
+            <p class="text-muted" style="margin: 0;"><strong><?php echo $achievement['category']; ?></strong></p>
             <small style="display: block; margin-top: 0.5rem;">S.Y. <?php echo $achievement['schoolYear']; ?></small>
         </div>
     </div>
