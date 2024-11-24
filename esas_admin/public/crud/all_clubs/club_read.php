@@ -711,7 +711,7 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
 
 
 // Close connection
-unset($pdo);
+// unset($pdo);
 
 ?>
 
@@ -961,8 +961,7 @@ unset($pdo);
 
                                 <p class="text-muted mt-0" style="font-size: 24px;">
                                     <i class="fa fa-trophy" style="color: gold; font-size: 30px;"></i>
-                                    <br>
-                                    <strong>Club Performance This S.Y.</strong>
+                                    <strong>Performance This S.Y.</strong>
                                 </p>
 
                                 <!-- Most Active Club -->
@@ -1016,6 +1015,96 @@ unset($pdo);
                                         </div>
                                     </div>
                                 </div>
+                                
+                                <p class="text-muted mt-4" style="font-size: 24px;">
+                                    <i class="fa fa-trophy" style="color: gold; font-size: 30px;"></i>
+                                    <strong>Achievements & Awards</strong>
+                                </p>
+
+                                <div class="row col-md-12 justify-content-between m-0 p-3">
+    <?php
+    // Get the club_id from the query string
+    $club_id = trim($_GET["club_id"]);
+
+    if ($club_id === null) {
+        // Handle error: club_id not passed
+        echo "Club ID is required.";
+        exit;
+    }
+
+    // Initialize achievements array
+    $achievements = [];
+
+    // Get the current year
+    $currentYear = date("Y");
+
+    // Define the start and end years for each school year
+    $startYear = 2022;
+
+    // Loop through each school year from 2022-2023 up to the current school year
+    while ($startYear < $currentYear) { // Exclude current school year
+        // Define the start and end dates of the school year
+        $schoolYearStart = "{$startYear}-08-01"; // August 1st of the starting year
+        $schoolYearEnd = ($startYear + 1) . "-07-31"; // July 31st of the next year
+        $schoolYear = "{$startYear}-" . ($startYear + 1); // Format the school year (e.g., "2022-2023")
+
+        // Query to get all clubs and their activity count in the current school year
+        $sql = "SELECT c.club_id, c.clubName, COUNT(a.activity_id) AS activity_count
+                FROM tbl_activity_logs a
+                INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+                WHERE a.dateAdded BETWEEN :startDate AND :endDate
+                GROUP BY c.club_id, c.clubName
+                ORDER BY activity_count DESC, c.clubName";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':startDate', $schoolYearStart);
+        $stmt->bindParam(':endDate', $schoolYearEnd);
+        $stmt->execute();
+
+        // Store the results for ranking
+        $rank = 1;
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if ($row['club_id'] == $club_id) {
+                $achievements[] = [
+                    'clubName' => $row['clubName'],
+                    'rank' => $rank,
+                    'category' => 'Most Active Club',
+                    'schoolYear' => $schoolYear // Correctly matches the date range
+                ];
+            }
+            $rank++;
+        }
+
+        // Move to the next school year
+        $startYear++;
+    }
+
+    // Display the results for the specific club
+    foreach ($achievements as $achievement) {
+    ?>
+    <div class="row card col-md-6 p-3">
+        <div class="card-body text-center" style="text-align: center;">
+            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;" alt="Trophy" class="trophy-img">
+            <p class="rank" style="font-size: 1.5rem; font-weight: bold; margin: 0;">
+                <?php 
+                // Combine rank and suffix directly without spaces
+                echo $achievement['rank'] . (
+                    $achievement['rank'] == 1 ? 'st' :
+                    ($achievement['rank'] == 2 ? 'nd' :
+                    ($achievement['rank'] == 3 ? 'rd' : 'th'))
+                ); 
+                ?>
+            </p>
+            <p style="margin: 0;">Most Active Club</p>
+            <small style="display: block; margin-top: 0.5rem;">S.Y. <?php echo $achievement['schoolYear']; ?></small>
+        </div>
+    </div>
+    <?php
+    } // End foreach
+    ?>
+</div>
+
+
                             </div>
                             <!-- Right Column -->
                             <div class="card col-md-8 p-3 bg-light">
