@@ -43,6 +43,46 @@ try {
 
 
 
+
+
+
+
+
+    // Fetch the default club_id from tbl_clubs_and_moderators
+    $sqlClub = "
+        SELECT club_id 
+        FROM tbl_clubs_and_moderators 
+        WHERE moderator_id = :moderator_id 
+        ORDER BY dateAdded ASC 
+        LIMIT 1
+    ";
+    $stmtClub = $pdo->prepare($sqlClub);
+    $stmtClub->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+    $stmtClub->execute();
+    $clubResult = $stmtClub->fetch(PDO::FETCH_ASSOC);
+
+    if ($clubResult) {
+        $defaultClubId = $clubResult['club_id'];
+    } else {
+        $defaultClubId = null; // No clubs assigned to this moderator
+    }
+
+    // Set the club_id from the query or default to the first club if not in URL
+    if (isset($_GET["club_id"])) {
+        $club_id = trim($_GET["club_id"]);
+    } else {
+        $club_id = $defaultClubId ?: 'no_club_assigned'; // Fallback if no default club found
+    }
+    
+
+
+
+
+
+
+
+
+
 // AWARDS RANKS
 
 // Helper function to determine the correct suffix for a rank
@@ -57,8 +97,6 @@ function getRankWithSuffix($rank) {
     return $rank . "th";
 }
 
-// Get the club_id from the query string
-$club_id = trim($_GET["club_id"]);
 
 // Initialize rank variables
 $mostAppliedClubRank = "";
@@ -933,9 +971,34 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                                                 <p id="noDataMessageSY" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;"><em>No students.</em></p>
 
                                                 <?php
-                                                try {
-                                                    // Get the selected club_id from the URL
-                                                    $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                    try {
+                                                    
+                                                        // Fetch the default club_id from tbl_clubs_and_moderators
+                                                        $sqlClub = "
+                                                        SELECT club_id 
+                                                        FROM tbl_clubs_and_moderators 
+                                                        WHERE moderator_id = :moderator_id 
+                                                        ORDER BY dateAdded ASC 
+                                                        LIMIT 1
+                                                    ";
+                                                    $stmtClub = $pdo->prepare($sqlClub);
+                                                    $stmtClub->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                                    $stmtClub->execute();
+                                                    $clubResult = $stmtClub->fetch(PDO::FETCH_ASSOC);
+
+                                                    if ($clubResult) {
+                                                        $defaultClubId = $clubResult['club_id'];
+                                                    } else {
+                                                        $defaultClubId = null; // No clubs assigned to this moderator
+                                                    }
+
+                                                    // Set the club_id from the query or default to the first club if not in URL
+                                                    if (isset($_GET["club_id"])) {
+                                                        $club_id = trim($_GET["club_id"]);
+                                                    } else {
+                                                        $club_id = $defaultClubId ?: 'no_club_assigned'; // Fallback if no default club found
+                                                    }
+
 
                                                     // SQL query to fetch the count of members per academic year (June to May)
                                                     $sql = "
@@ -1425,10 +1488,10 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
 
 
                             <p class="text-muted mt-0" style="font-size: 24px;">
-                                <strong class="p-0" style="margin-left: -10px;">Performance This S.Y.</strong>
+                                <strong class="p-0" style="margin-left: -6px;">Performance This S.Y.</strong>
                                     <i class="fa fa-trophy m-0 p-0" style="color: gold; font-size: 30px;"></i>
                                 </p>
-                                <p class="text-muted p-0" style="margin-top: -15px;">
+                                <p class="text-muted p-0" style="margin-top: -15px; margin-left: 7px;">
                                     Currently shaping improvements in progress
                                 </p>
                                     

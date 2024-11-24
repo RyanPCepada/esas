@@ -1,15 +1,46 @@
+<?php
+
+
+    // Fetch the default club_id from tbl_clubs_and_moderators
+    $sqlClub = "
+    SELECT club_id 
+    FROM tbl_clubs_and_moderators 
+    WHERE moderator_id = :moderator_id 
+    ORDER BY dateAdded ASC 
+    LIMIT 1
+";
+$stmtClub = $pdo->prepare($sqlClub);
+$stmtClub->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+$stmtClub->execute();
+$clubResult = $stmtClub->fetch(PDO::FETCH_ASSOC);
+
+if ($clubResult) {
+    $defaultClubId = $clubResult['club_id'];
+} else {
+    $defaultClubId = null; // No clubs assigned to this moderator
+}
+
+// Set the club_id from the query or default to the first club if not in URL
+if (isset($_GET["club_id"])) {
+    $club_id = trim($_GET["club_id"]);
+} else {
+    $club_id = $defaultClubId ?: 'no_club_assigned'; // Fallback if no default club found
+}
+
+
+?>
+
+
 <p class="text-muted mt-0" style="font-size: 24px; margin-bottom: 15px;">
-                                    <strong style="margin-left: -10px;">Achievements & Awards</strong>
+                                    <strong style="margin-left: -6px;">Achievements & Awards</strong>
                                     <i class="fa fa-trophy" style="color: gold; font-size: 30px;"></i>
                                 </p>
-                                <p class="text-muted mb-0 p-0" style="margin-top: -15px;">
+                                <p class="text-muted mb-0 p-0" style="margin-top: -15px; margin-left: 7px;">
                                     Your club's performances that reached top 10
                                 </p>
 
                                 <div class="row col-md-12 justify-content-between m-0 p-3" style="max-height: auto; gap: 1px;">
                                     <?php
-                                    // Get the club_id from the query string
-                                    $club_id = trim($_GET["club_id"]);
 
                                     if ($club_id === null) {
                                         // Handle error: club_id not passed
