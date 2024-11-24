@@ -6,7 +6,7 @@
                                         <i class="fa fa-trophy" style="color: gold; font-size: 30px;"></i>
                                     </p>
                                     <p class="text-muted mb-1">
-                                        See what clubs are on top of excellence this S.Y.
+                                        See what clubs are on top of excellence every S.Y.
                                     </p>
                                 </div>
 
@@ -398,71 +398,87 @@
                                         <i class="fa fa-trophy" style="color: gold; font-size: 30px;"></i>
                                     </p>
                                 </div>
-                                <div class="top-moderators-section col-md-8 m-0 p-3" style="position: relative; z-index: 1;">
-                                    <div class="auto-scroll" style="max-height: 555px;">
-                                        <table class="table table-sm">
-                                            <tbody>
-                                            <?php
-                                            try {
-                                                // Fetch moderators and calculate their ratings
-                                                $sql = "
-                                                    SELECT 
-                                                        tbl_moderators.moderator_id,
-                                                        CONCAT(tbl_moderators.firstName, ' ', tbl_moderators.lastName) AS fullName,
-                                                        tbl_moderators.profilePic,
-                                                        COUNT(tbl_clubs_and_moderators.club_id) AS clubCount,
-                                                        (
-                                                            (SELECT COUNT(*) FROM tbl_activity_logs WHERE tbl_activity_logs.moderator_id = tbl_moderators.moderator_id) * 0.25 +
-                                                            (SELECT COUNT(*) FROM tbl_posts WHERE tbl_posts.moderator_id = tbl_moderators.moderator_id) * 0.25 +
-                                                            (SELECT COUNT(*) FROM tbl_events WHERE tbl_events.moderator_id = tbl_moderators.moderator_id) * 0.25 +
-                                                            (SELECT COUNT(*) FROM tbl_application WHERE tbl_application.moderator_id = tbl_moderators.moderator_id) * 0.10 +
-                                                            (SELECT COUNT(*) FROM tbl_chats WHERE tbl_chats.sender_id = tbl_moderators.moderator_id OR tbl_chats.recipient_id = tbl_moderators.moderator_id) * 0.15
-                                                        ) AS moderatorRatingAllYears
-                                                    FROM 
-                                                        tbl_moderators
-                                                    LEFT JOIN 
-                                                        tbl_clubs_and_moderators 
-                                                    ON 
-                                                        tbl_moderators.moderator_id = tbl_clubs_and_moderators.moderator_id
-                                                    GROUP BY 
-                                                        tbl_moderators.moderator_id
-                                                    ORDER BY 
-                                                        moderatorRatingAllYears DESC, clubCount DESC
-                                                    LIMIT 30;
-                                                ";
+                                <!-- Top Moderators Section -->
+<div class="top-moderators-section col-md-8 m-0 p-3" style="position: relative; z-index: 1;">
+<p>Selected School Year: <?php echo htmlspecialchars($endDate); ?></p>
+    <div class="auto-scroll" style="max-height: 555px;">
+        <table class="table table-sm">
+            <tbody>
+            <?php
+            try {
+                // Extract school year from GET parameter or default to the latest year
+                $selectedYear = $_GET['club_performance_year'] ?? $defaultSchoolYear;
+                $selectedYearParts = explode('-', $selectedYear);
+                $startYear = $selectedYearParts[0];
+                $endYear = $selectedYearParts[1];
 
-                                                $stmt = $pdo->prepare($sql);
-                                                $stmt->execute();
-                                                $moderators = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                // Convert school year range to a date range (August of start year to July of next year)
+                $startDate = "$startYear-08-01";
+                $endDate = "$endYear-07-31";
 
-                                                if ($moderators) {
-                                                    $rank = 1;
-                                                    foreach ($moderators as $moderator) {
-                                                        $goldClass = '';
-                                                        if ($rank <= 5) {
-                                                            $opacity = 0.8 - (($rank - 1) * 0.15); // Adjust gold opacity
-                                                            $goldClass = 'style="background-color: rgba(255, 215, 0, ' . $opacity . '); font-size: 16px;"'; // Add font size here
-                                                        }
-                                                
-                                                        echo "<tr {$goldClass} class='align-middle' style='font-size: 16px;'>"; // Fallback font size for all rows
-                                                        echo "<td><img src='/esas/esas_moderator/images/" . htmlspecialchars($moderator['profilePic']) . "' alt='Profile Picture' class='img-thumbnail' style='width: 50px; height: 50px; border-radius: 50%;'></td>";
-                                                        echo "<td><strong class='text-dark'>" . htmlspecialchars($moderator['fullName']) . "</strong></td>";
-                                                        echo "<td><strong class='text-success'>" . htmlspecialchars($moderator['clubCount']) . " " . ($moderator['clubCount'] == 1 ? "Club" : "Clubs") . "</strong></td>";
-                                                        echo "<td><strong class='text-dark'>" . htmlspecialchars(min(max(round($moderator['moderatorRatingAllYears'] / 10, 1), 0), 10)) . "/10</strong></td>";
-                                                        echo "</tr>";
-                                                
-                                                        $rank++;
-                                                    }
-                                                } else {
-                                                    echo "<tr><td colspan='4' class='text-center text-muted'>No moderators found</td></tr>";
-                                                }
-                                            } catch (PDOException $e) {
-                                                echo "<tr><td colspan='4' class='text-danger'>Error fetching top moderators: " . htmlspecialchars($e->getMessage()) . "</td></tr>";
-                                            }
-                                            ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                // Fetch moderators and calculate their ratings, filtered by the selected school year
+                $sql = "
+                    SELECT 
+    tbl_moderators.moderator_id,
+    CONCAT(tbl_moderators.firstName, ' ', tbl_moderators.lastName) AS fullName,
+    tbl_moderators.profilePic,
+    COUNT(tbl_clubs_and_moderators.club_id) AS clubCount,
+    (
+        (SELECT COUNT(*) FROM tbl_activity_logs WHERE tbl_activity_logs.moderator_id = tbl_moderators.moderator_id) * 0.25 +
+        (SELECT COUNT(*) FROM tbl_posts WHERE tbl_posts.moderator_id = tbl_moderators.moderator_id) * 0.25 +
+        (SELECT COUNT(*) FROM tbl_events WHERE tbl_events.moderator_id = tbl_moderators.moderator_id) * 0.25 +
+        (SELECT COUNT(*) FROM tbl_application WHERE tbl_application.moderator_id = tbl_moderators.moderator_id) * 0.10 +
+        (SELECT COUNT(*) FROM tbl_chats WHERE tbl_chats.sender_id = tbl_moderators.moderator_id OR tbl_chats.recipient_id = tbl_moderators.moderator_id) * 0.15
+    ) AS moderatorRatingAllYears
+FROM 
+    tbl_moderators
+LEFT JOIN 
+    tbl_clubs_and_moderators 
+ON 
+    tbl_moderators.moderator_id = tbl_clubs_and_moderators.moderator_id
+WHERE
+    tbl_clubs_and_moderators.dateAdded <= :endDate
+GROUP BY 
+    tbl_moderators.moderator_id
+ORDER BY 
+    moderatorRatingAllYears DESC, clubCount DESC
+LIMIT 30;
+
+                ";
+
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(':endDate', $endDate);
+                $stmt->execute();
+                $moderators = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                if ($moderators) {
+                    $rank = 1;
+                    foreach ($moderators as $moderator) {
+                        $goldClass = '';
+                        if ($rank <= 5) {
+                            $opacity = 0.8 - (($rank - 1) * 0.15); // Adjust gold opacity
+                            $goldClass = 'style="background-color: rgba(255, 215, 0, ' . $opacity . '); font-size: 16px;"'; // Add font size here
+                        }
+
+                        echo "<tr {$goldClass} class='align-middle' style='font-size: 16px;'>"; // Fallback font size for all rows
+                        echo "<td><img src='/esas/esas_moderator/images/" . htmlspecialchars($moderator['profilePic']) . "' alt='Profile Picture' class='img-thumbnail' style='width: 50px; height: 50px; border-radius: 50%;'></td>";
+                        echo "<td><strong class='text-dark'>" . htmlspecialchars($moderator['fullName']) . "</strong></td>";
+                        echo "<td><strong class='text-success'>" . htmlspecialchars($moderator['clubCount']) . " " . ($moderator['clubCount'] == 1 ? "Club" : "Clubs") . "</strong></td>";
+                        echo "<td><strong class='text-dark'>" . htmlspecialchars(min(max(round($moderator['moderatorRatingAllYears'] / 10, 1), 0), 10)) . "/10</strong></td>";
+                        echo "</tr>";
+
+                        $rank++;
+                    }
+                } else {
+                    echo "<tr><td colspan='4' class='text-center text-muted'>No moderators found</td></tr>";
+                }
+            } catch (PDOException $e) {
+                echo "<tr><td colspan='4' class='text-danger'>Error fetching top moderators: " . htmlspecialchars($e->getMessage()) . "</td></tr>";
+            }
+            ?>
+            </tbody>
+        </table>
+    </div>
+</div>
                             </div>
 
