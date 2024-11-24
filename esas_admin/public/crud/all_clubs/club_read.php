@@ -963,9 +963,9 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                                     <i class="fa fa-trophy m-0 p-0" style="color: gold; font-size: 30px;"></i>
                                     <strong class="m-0 p-0">Performance This S.Y.</strong>
                                 </p>
-                                <!-- <p class="text-muted p-0" style="margin-top: -15px;">
-                                    See how your club is shaping success this school year!
-                                </p> -->
+                                <p class="text-muted p-0" style="margin-top: -15px;">
+                                    Currently shaping improvements in progress
+                                </p>
                                     
                                 <!-- Most Active Club -->
                                 <div class="card text-center mb-3 p-3 bg-dark" style="border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
@@ -1021,13 +1021,13 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
 
                                 <br>
 
-                                <p class="text-muted mt-0 mb-0" style="font-size: 24px;">
+                                <p class="text-muted mt-0" style="font-size: 24px; margin-bottom: 15px;">
                                     <i class="fa fa-trophy" style="color: gold; font-size: 30px;"></i>
                                     <strong>Achievements & Awards</strong>
                                 </p>
-                                <!-- <p class="text-muted mb-0 p-0" style="margin-top: -15px;">
-                                    See your clubs achievements and earned awards
-                                </p> -->
+                                <p class="text-muted mb-0 p-0" style="margin-top: -15px;">
+                                    Your club's performances that reached top 10
+                                </p>
 
                                 <div class="row col-md-12 justify-content-between m-0 p-3" style="max-height: auto;">
                                     <?php
@@ -1138,29 +1138,47 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                                         // Query for Fastest Growing Club
                                         $fastestGrowingSql = "
                                             SELECT c.club_id, c.clubName,
-                                                (SELECT COUNT(application_id) 
-                                                FROM tbl_application 
-                                                WHERE club_id = c.club_id AND status = 'active' AND YEAR(dateApplied) = :year) AS current_year_members,
-                                                (SELECT COUNT(application_id) 
-                                                FROM tbl_application 
-                                                WHERE club_id = c.club_id AND status = 'active' AND YEAR(dateApplied) = :prev_year) AS previous_year_members
+                                                (SELECT COUNT(a.application_id) 
+                                                    FROM tbl_application a 
+                                                    WHERE a.club_id = c.club_id AND a.status = 'active' 
+                                                    AND YEAR(a.dateApplied) = :currentYear) - 
+                                                (SELECT COUNT(a.application_id) 
+                                                    FROM tbl_application a 
+                                                    WHERE a.club_id = c.club_id AND a.status = 'active' 
+                                                    AND YEAR(a.dateApplied) = :previousYear) AS growth_members,
+
+                                                (SELECT COUNT(p.post_id) 
+                                                    FROM tbl_posts p 
+                                                    WHERE p.club_id = c.club_id 
+                                                    AND YEAR(p.dateAdded) = :currentYear) - 
+                                                (SELECT COUNT(p.post_id) 
+                                                    FROM tbl_posts p 
+                                                    WHERE p.club_id = c.club_id 
+                                                    AND YEAR(p.dateAdded) = :previousYear) AS growth_posts,
+
+                                                (SELECT COUNT(e.event_id) 
+                                                    FROM tbl_events e 
+                                                    WHERE e.club_id = c.club_id 
+                                                    AND YEAR(e.dateAdded) = :currentYear) - 
+                                                (SELECT COUNT(e.event_id) 
+                                                    FROM tbl_events e 
+                                                    WHERE e.club_id = c.club_id 
+                                                    AND YEAR(e.dateAdded) = :previousYear) AS growth_events
+
                                             FROM tbl_clubs c
-                                            WHERE EXISTS (
-                                                SELECT 1 
-                                                FROM tbl_application 
-                                                WHERE tbl_application.club_id = c.club_id AND YEAR(tbl_application.dateApplied) = :year
-                                            )
-                                            ORDER BY (current_year_members - previous_year_members) DESC
+                                            WHERE EXISTS (SELECT 1 FROM tbl_application a WHERE a.club_id = c.club_id 
+                                                AND YEAR(a.dateApplied) = :currentYear)
+                                            ORDER BY 
+                                                GREATEST(growth_members, growth_posts, growth_events) DESC
                                         ";
 
-                                        $fastestGrowingStmt = $pdo->prepare($fastestGrowingSql);
-                                        $previousYear = $startYear - 1; // Calculate the previous year
-                                        $fastestGrowingStmt->bindValue(':year', $startYear, PDO::PARAM_INT);
-                                        $fastestGrowingStmt->bindValue(':prev_year', $previousYear, PDO::PARAM_INT);
-                                        $fastestGrowingStmt->execute();
+                                        $stmt = $pdo->prepare($fastestGrowingSql);
+                                        $stmt->bindValue(':currentYear', $startYear, PDO::PARAM_INT);
+                                        $stmt->bindValue(':previousYear', $startYear - 1, PDO::PARAM_INT);
+                                        $stmt->execute();
 
                                         $rank = 1;
-                                        while ($row = $fastestGrowingStmt->fetch(PDO::FETCH_ASSOC)) {
+                                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                             if ($row['club_id'] == $club_id) {
                                                 $achievements[] = [
                                                     'clubName' => $row['clubName'],
@@ -1184,7 +1202,7 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                                         
                                         foreach ($achievements as $achievement) {
                                             // Check if the rank is between 1 and 5 (inclusive)
-                                            if ($achievement['rank'] <= 5) {
+                                            if ($achievement['rank'] <= 10) {
                                                 ?>
                                                 <div class="row card col-md-6 mb-3 p-0" style="background-color: #F1F3F5; border: none; border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
                                                     <div class="card-body text-center p-3">
