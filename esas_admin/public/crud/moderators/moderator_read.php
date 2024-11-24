@@ -361,8 +361,8 @@ $ratingAllYears = ($activityLogsCount * 0.25) + ($postsCount * 0.25) + ($eventsC
 $ratingThisYear = ($activityLogsThisYear * 0.25) + ($postsThisYear * 0.25) + ($eventsThisYear * 0.25) + ($chatsCount * 0.15) + ($applicationsProcessed * 0.10);
 
 // Normalize to a scale of 10
-$moderatorRatingAllYears = min(max(round($ratingAllYears / 10, 1), 0), 10);
-$moderatorRatingThisYear = min(max(round($ratingThisYear / 10, 1), 0), 10);
+$moderatorRatingAllYears = min(max(round($ratingAllYears / 10, 2), 0), 10);
+$moderatorRatingThisYear = min(max(round($ratingThisYear / 10, 2), 0), 10);
 
 
 

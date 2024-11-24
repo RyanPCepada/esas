@@ -966,7 +966,7 @@ unset($pdo);
                                 </p>
 
                                 <!-- Most Active Club -->
-                                <div class="card text-center mb-3 p-5 bg-dark" style="border-radius: 15px;">
+                                <div class="card text-center mb-3 p-3 bg-dark" style="border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
                                     <div class="row">
                                         <div class="col-5 m-0 p-0">
                                             <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
@@ -979,7 +979,7 @@ unset($pdo);
                                 </div>
 
                                 <!-- Most Applied Club -->
-                                <div class="card text-center mb-3 p-5 bg-dark" style="border-radius: 15px;">
+                                <div class="card text-center mb-3 p-3 bg-dark" style="border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
                                     <div class="row">
                                         <div class="col-5 m-0 p-0">
                                             <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
@@ -992,7 +992,7 @@ unset($pdo);
                                 </div>
 
                                 <!-- Highest Number of Members -->
-                                <div class="card text-center mb-3 p-5 bg-dark" style="border-radius: 15px;">
+                                <div class="card text-center mb-3 p-3 bg-dark" style="border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
                                     <div class="row">
                                         <div class="col-5 m-0 p-0">
                                             <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
@@ -1005,7 +1005,7 @@ unset($pdo);
                                 </div>
 
                                 <!-- Fastest Growing Club -->
-                                <div class="card text-center mb-3 p-5 bg-dark" style="border-radius: 15px;">
+                                <div class="card text-center mb-3 p-3 bg-dark" style="border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
                                     <div class="row">
                                         <div class="col-5 m-0 p-0">
                                             <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;">
