@@ -1015,146 +1015,185 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                                         </div>
                                     </div>
                                 </div>
+
                                 <br>
+
                                 <p class="text-muted mt-0" style="font-size: 24px;">
                                     <i class="fa fa-trophy" style="color: gold; font-size: 30px;"></i>
                                     <strong>Achievements & Awards</strong>
                                 </p>
 
-                                <div class="row col-md-12 justify-content-between m-0 p-3">
-    <?php
-    // Get the club_id from the query string
-    $club_id = trim($_GET["club_id"]);
+                                <div class="row col-md-12 justify-content-between m-0 p-3 auto-scroll" style="max-height: 500px;">
+                                    <?php
+                                    // Get the club_id from the query string
+                                    $club_id = trim($_GET["club_id"]);
 
-    if ($club_id === null) {
-        // Handle error: club_id not passed
-        echo "Club ID is required.";
-        exit;
-    }
+                                    if ($club_id === null) {
+                                        // Handle error: club_id not passed
+                                        echo "Club ID is required.";
+                                        exit;
+                                    }
 
-    // Initialize achievements array
-    $achievements = [];
+                                    // Initialize achievements array
+                                    $achievements = [];
 
-    // Get the current year
-    $currentYear = date("Y");
+                                    // Get the current year
+                                    $currentYear = date("Y");
 
-    // Define the start and end years for each school year
-    $startYear = 2022;
+                                    // Define the start and end years for each school year
+                                    $startYear = 2022;
 
-    // Loop through each school year from 2022-2023 up to the current school year
-    while ($startYear < $currentYear) { // Exclude current school year
-        // Define the start and end dates of the school year
-        $schoolYearStart = "{$startYear}-08-01"; // August 1st of the starting year
-        $schoolYearEnd = ($startYear + 1) . "-07-31"; // July 31st of the next year
-        $schoolYear = "{$startYear}-" . ($startYear + 1); // Format the school year (e.g., "2022-2023")
+                                    // Loop through each school year from 2022-2023 up to the current school year
+                                    while ($startYear < $currentYear) { // Exclude current school year
+                                        // Define the start and end dates of the school year
+                                        $schoolYearStart = "{$startYear}-08-01"; // August 1st of the starting year
+                                        $schoolYearEnd = ($startYear + 1) . "-07-31"; // July 31st of the next year
+                                        $schoolYear = "{$startYear}-" . ($startYear + 1); // Format the school year (e.g., "2022-2023")
 
-        // Query for Most Active Clubs
-        $sql = "SELECT c.club_id, c.clubName, COUNT(a.activity_id) AS activity_count
-                FROM tbl_activity_logs a
-                INNER JOIN tbl_clubs c ON a.club_id = c.club_id
-                WHERE a.dateAdded BETWEEN :startDate AND :endDate
-                GROUP BY c.club_id, c.clubName
-                ORDER BY activity_count DESC, c.clubName";
+                                        // Query for Most Active Clubs
+                                        $sql = "SELECT c.club_id, c.clubName, COUNT(a.activity_id) AS activity_count
+                                                FROM tbl_activity_logs a
+                                                INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+                                                WHERE a.dateAdded BETWEEN :startDate AND :endDate
+                                                GROUP BY c.club_id, c.clubName
+                                                ORDER BY activity_count DESC, c.clubName";
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':startDate', $schoolYearStart);
-        $stmt->bindParam(':endDate', $schoolYearEnd);
-        $stmt->execute();
+                                        $stmt = $pdo->prepare($sql);
+                                        $stmt->bindParam(':startDate', $schoolYearStart);
+                                        $stmt->bindParam(':endDate', $schoolYearEnd);
+                                        $stmt->execute();
 
-        $rank = 1;
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if ($row['club_id'] == $club_id) {
-                $achievements[] = [
-                    'clubName' => $row['clubName'],
-                    'rank' => $rank,
-                    'category' => 'Most Active Club',
-                    'schoolYear' => $schoolYear
-                ];
-            }
-            $rank++;
-        }
+                                        $rank = 1;
+                                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                            if ($row['club_id'] == $club_id) {
+                                                $achievements[] = [
+                                                    'clubName' => $row['clubName'],
+                                                    'rank' => $rank,
+                                                    'category' => 'Most Active Club',
+                                                    'schoolYear' => $schoolYear
+                                                ];
+                                            }
+                                            $rank++;
+                                        }
 
-        // Query for Most Applied Clubs
-        $mostAppliedSql = "
-            SELECT c.club_id, c.clubName, COUNT(a.application_id) AS application_count
-            FROM tbl_application a
-            INNER JOIN tbl_clubs c ON a.club_id = c.club_id
-            WHERE a.dateApplied <= :endDate
-            GROUP BY c.club_id, c.clubName
-            ORDER BY application_count DESC, c.clubName";
+                                        // Query for Most Applied Clubs
+                                        $mostAppliedSql = "
+                                            SELECT c.club_id, c.clubName, COUNT(a.application_id) AS application_count
+                                            FROM tbl_application a
+                                            INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+                                            WHERE a.dateApplied <= :endDate
+                                            GROUP BY c.club_id, c.clubName
+                                            ORDER BY application_count DESC, c.clubName";
 
-        $mostAppliedStmt = $pdo->prepare($mostAppliedSql);
-        $mostAppliedStmt->bindParam(':endDate', $schoolYearEnd);
-        $mostAppliedStmt->execute();
+                                        $mostAppliedStmt = $pdo->prepare($mostAppliedSql);
+                                        $mostAppliedStmt->bindParam(':endDate', $schoolYearEnd);
+                                        $mostAppliedStmt->execute();
 
-        $rank = 1;
-        while ($row = $mostAppliedStmt->fetch(PDO::FETCH_ASSOC)) {
-            if ($row['club_id'] == $club_id) {
-                $achievements[] = [
-                    'clubName' => $row['clubName'],
-                    'rank' => $rank,
-                    'category' => 'Most Applied Club',
-                    'schoolYear' => $schoolYear
-                ];
-            }
-            $rank++;
-        }
+                                        $rank = 1;
+                                        while ($row = $mostAppliedStmt->fetch(PDO::FETCH_ASSOC)) {
+                                            if ($row['club_id'] == $club_id) {
+                                                $achievements[] = [
+                                                    'clubName' => $row['clubName'],
+                                                    'rank' => $rank,
+                                                    'category' => 'Most Applied Club',
+                                                    'schoolYear' => $schoolYear
+                                                ];
+                                            }
+                                            $rank++;
+                                        }
 
-        // Query for Highest Members
-        $highestMembersSql = "
-            SELECT c.club_id, c.clubName, COUNT(a.application_id) AS member_count
-            FROM tbl_application a
-            INNER JOIN tbl_clubs c ON a.club_id = c.club_id
-            WHERE a.status = 'active' AND a.dateDecided <= :endDate
-            AND c.dateAdded <= :endDate
-            GROUP BY c.club_id
-            ORDER BY member_count DESC, c.clubName";
+                                        // Query for Highest Members
+                                        $highestMembersSql = "
+                                            SELECT c.club_id, c.clubName, COUNT(a.application_id) AS member_count
+                                            FROM tbl_application a
+                                            INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+                                            WHERE a.status = 'active' AND a.dateDecided <= :endDate
+                                            AND c.dateAdded <= :endDate
+                                            GROUP BY c.club_id
+                                            ORDER BY member_count DESC, c.clubName";
 
-        $highestMembersStmt = $pdo->prepare($highestMembersSql);
-        $highestMembersStmt->bindParam(':endDate', $schoolYearEnd);
-        $highestMembersStmt->execute();
+                                        $highestMembersStmt = $pdo->prepare($highestMembersSql);
+                                        $highestMembersStmt->bindParam(':endDate', $schoolYearEnd);
+                                        $highestMembersStmt->execute();
 
-        $rank = 1;
-        while ($row = $highestMembersStmt->fetch(PDO::FETCH_ASSOC)) {
-            if ($row['club_id'] == $club_id) {
-                $achievements[] = [
-                    'clubName' => $row['clubName'],
-                    'rank' => $rank,
-                    'category' => 'Highest Members',
-                    'schoolYear' => $schoolYear
-                ];
-            }
-            $rank++;
-        }
+                                        $rank = 1;
+                                        while ($row = $highestMembersStmt->fetch(PDO::FETCH_ASSOC)) {
+                                            if ($row['club_id'] == $club_id) {
+                                                $achievements[] = [
+                                                    'clubName' => $row['clubName'],
+                                                    'rank' => $rank,
+                                                    'category' => 'Highest Members',
+                                                    'schoolYear' => $schoolYear
+                                                ];
+                                            }
+                                            $rank++;
+                                        }
 
-        // Move to the next school year
-        $startYear++;
-    }
+                                        // Query for Fastest Growing Club
+                                        $fastestGrowingSql = "
+                                            SELECT c.club_id, c.clubName,
+                                                (SELECT COUNT(application_id) 
+                                                FROM tbl_application 
+                                                WHERE club_id = c.club_id AND status = 'active' AND YEAR(dateApplied) = :year) AS current_year_members,
+                                                (SELECT COUNT(application_id) 
+                                                FROM tbl_application 
+                                                WHERE club_id = c.club_id AND status = 'active' AND YEAR(dateApplied) = :prev_year) AS previous_year_members
+                                            FROM tbl_clubs c
+                                            WHERE EXISTS (
+                                                SELECT 1 
+                                                FROM tbl_application 
+                                                WHERE tbl_application.club_id = c.club_id AND YEAR(tbl_application.dateApplied) = :year
+                                            )
+                                            ORDER BY (current_year_members - previous_year_members) DESC
+                                        ";
 
-    // Display the results for the specific club
-    foreach ($achievements as $achievement) {
-    ?>
-    <div class="row card col-md-6 mb-3 p-2" style="background-color: #F1F3F5; border: none; border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-        <div class="card-body text-center">
-            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 100px; height: 100px;" alt="Trophy" class="trophy-img">
-            <p class="rank" style="font-size: 1.5rem; font-weight: bold; margin: 0;">
-                <?php 
-                // Combine rank and suffix directly without spaces
-                echo $achievement['rank'] . (
-                    $achievement['rank'] == 1 ? 'st' :
-                    ($achievement['rank'] == 2 ? 'nd' :
-                    ($achievement['rank'] == 3 ? 'rd' : 'th'))
-                ); 
-                ?>
-            </p>
-            <p class="text-muted" style="margin: 0;"><strong><?php echo $achievement['category']; ?></strong></p>
-            <small style="display: block; margin-top: 0.5rem;">S.Y. <?php echo $achievement['schoolYear']; ?></small>
-        </div>
-    </div>
-    <?php
-    } // End foreach
-    ?>
-</div>
+                                        $fastestGrowingStmt = $pdo->prepare($fastestGrowingSql);
+                                        $previousYear = $startYear - 1; // Calculate the previous year
+                                        $fastestGrowingStmt->bindValue(':year', $startYear, PDO::PARAM_INT);
+                                        $fastestGrowingStmt->bindValue(':prev_year', $previousYear, PDO::PARAM_INT);
+                                        $fastestGrowingStmt->execute();
+
+                                        $rank = 1;
+                                        while ($row = $fastestGrowingStmt->fetch(PDO::FETCH_ASSOC)) {
+                                            if ($row['club_id'] == $club_id) {
+                                                $achievements[] = [
+                                                    'clubName' => $row['clubName'],
+                                                    'rank' => $rank,
+                                                    'category' => 'Fastest Growing Club',
+                                                    'schoolYear' => $schoolYear
+                                                ];
+                                            }
+                                            $rank++;
+                                        }
+
+                                        // Move to the next school year
+                                        $startYear++;
+                                    }
+
+                                    // Display the results for the specific club
+                                    foreach ($achievements as $achievement) {
+                                    ?>
+                                    <div class="row card col-md-6 mb-3 p-0" style="background-color: #F1F3F5; border: none; border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                        <div class="card-body text-center">
+                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 70px; height: 70px;" alt="Trophy" class="trophy-img">
+                                            <p class="rank" style="font-size: 1.5rem; font-weight: bold; margin: 0;">
+                                                <?php 
+                                                // Combine rank and suffix directly without spaces
+                                                echo $achievement['rank'] . (
+                                                    $achievement['rank'] == 1 ? 'st' :
+                                                    ($achievement['rank'] == 2 ? 'nd' :
+                                                    ($achievement['rank'] == 3 ? 'rd' : 'th'))
+                                                ); 
+                                                ?>
+                                            </p>
+                                            <p class="text-muted m-0 p-0" style="margin: 0;"><strong><?php echo $achievement['category']; ?></strong></p>
+                                            <small style="display: block; margin-top: 0.5rem;">S.Y. <?php echo $achievement['schoolYear']; ?></small>
+                                        </div>
+                                    </div>
+                                    <?php
+                                    } // End foreach
+                                    ?>
+                                </div>
 
 
                             </div>
