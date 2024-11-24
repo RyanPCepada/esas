@@ -43,6 +43,176 @@ try {
 
 
 
+// AWARDS RANKS
+
+// Helper function to determine the correct suffix for a rank
+function getRankWithSuffix($rank) {
+    if (!in_array(($rank % 100), [11, 12, 13])) { // Handle special cases for 11th, 12th, 13th
+        switch ($rank % 10) {
+            case 1: return $rank . "st";
+            case 2: return $rank . "nd";
+            case 3: return $rank . "rd";
+        }
+    }
+    return $rank . "th";
+}
+
+// Get the club_id from the query string
+$club_id = trim($_GET["club_id"]);
+
+// Initialize rank variables
+$mostAppliedClubRank = "";
+$highestInMembersRank = "";
+$mostActiveClubRank = "";
+$fastestGrowingClubRank = "";
+
+// Rank for Most Active Club
+try {
+    $stmt = $pdo->prepare("
+        SELECT c.club_id, c.clubName, COUNT(a.activity_id) AS activity_count
+        FROM tbl_activity_logs a
+        INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+        WHERE a.club_id IS NOT NULL
+        GROUP BY c.club_id, c.clubName
+        ORDER BY activity_count DESC, c.clubName
+    ");
+    $stmt->execute();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $rank = 1;
+    foreach ($clubs as $club) {
+        if ($club['club_id'] == $club_id) {
+            $mostActiveClubRank = getRankWithSuffix($rank);
+            break;
+        }
+        $rank++;
+    }
+} catch (PDOException $e) {
+    echo "Error fetching most active club rank: " . $e->getMessage();
+}
+// Default rank value if no rank is fetched
+$mostActiveClubRank = $mostActiveClubRank ?: "<small>Unqualified</small>";
+
+
+// Rank for Most Applied Club
+try {
+    $stmt = $pdo->prepare("
+        SELECT tbl_clubs.club_id, tbl_clubs.clubName, COUNT(tbl_application.application_id) AS application_count 
+        FROM tbl_application 
+        INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_application.club_id
+        GROUP BY tbl_clubs.club_id 
+        ORDER BY application_count DESC, tbl_clubs.clubName
+    ");
+    $stmt->execute();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $rank = 1;
+    foreach ($clubs as $club) {
+        if ($club['club_id'] == $club_id) {
+            $mostAppliedClubRank = getRankWithSuffix($rank);
+            break;
+        }
+        $rank++;
+    }
+} catch (PDOException $e) {
+    echo "Error fetching most applied club rank: " . $e->getMessage();
+}
+$mostAppliedClubRank = $mostAppliedClubRank ?: "<small>Unqualified</small>";
+
+
+// Rank for Highest in Members
+try {
+    $stmt = $pdo->prepare("
+        SELECT tbl_clubs.clubName, tbl_clubs.club_id, COUNT(tbl_application.application_id) AS active_member_count 
+            FROM tbl_application 
+            INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_application.club_id
+            WHERE tbl_application.status = 'active' 
+            GROUP BY tbl_clubs.club_id 
+            ORDER BY active_member_count DESC, tbl_clubs.clubName
+    ");
+    $stmt->execute();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $rank = 1;
+    foreach ($clubs as $club) {
+        if ($club['club_id'] == $club_id) {
+            $highestInMembersRank = getRankWithSuffix($rank);
+            break;
+        }
+        $rank++;
+    }
+} catch (PDOException $e) {
+    echo "Error fetching highest members rank: " . $e->getMessage();
+}
+// Default rank value if no rank is fetched
+$highestInMembersRank = $highestInMembersRank ?: "<small>Unqualified</small>";
+
+
+// Rank for Fastest Growing Club considering members, posts, and events growth
+try {
+    $stmt = $pdo->prepare("
+        SELECT 
+            club_id, 
+            -- Current year's active members
+            (SELECT COUNT(application_id) 
+                FROM tbl_application 
+                WHERE club_id = tbl_clubs.club_id 
+                AND status = 'active' 
+                AND YEAR(dateApplied) = YEAR(CURDATE())) AS current_year_members,
+            
+            -- Previous year's active members
+            (SELECT COUNT(application_id) 
+                FROM tbl_application 
+                WHERE club_id = tbl_clubs.club_id 
+                AND status = 'active' 
+                AND YEAR(dateApplied) = YEAR(CURDATE()) - 1) AS previous_year_members,
+
+            -- Current year's posts
+            (SELECT COUNT(post_id) 
+                FROM tbl_posts 
+                WHERE club_id = tbl_clubs.club_id 
+                AND YEAR(dateAdded) = YEAR(CURDATE())) AS current_year_posts,
+
+            -- Previous year's posts
+            (SELECT COUNT(post_id) 
+                FROM tbl_posts 
+                WHERE club_id = tbl_clubs.club_id 
+                AND YEAR(dateAdded) = YEAR(CURDATE()) - 1) AS previous_year_posts,
+
+            -- Current year's events
+            (SELECT COUNT(event_id) 
+                FROM tbl_events 
+                WHERE club_id = tbl_clubs.club_id 
+                AND YEAR(dateAdded) = YEAR(CURDATE())) AS current_year_events,
+
+            -- Previous year's events
+            (SELECT COUNT(event_id) 
+                FROM tbl_events 
+                WHERE club_id = tbl_clubs.club_id 
+                AND YEAR(dateAdded) = YEAR(CURDATE()) - 1) AS previous_year_events
+        FROM tbl_clubs
+        ORDER BY 
+            -- Prioritize based on the overall growth (in any category)
+            GREATEST(current_year_members - previous_year_members, current_year_posts - previous_year_posts, current_year_events - previous_year_events) DESC
+    ");
+    $stmt->execute();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $rank = 1;
+    foreach ($clubs as $club) {
+        if ($club['club_id'] == $club_id) {
+            $fastestGrowingClubRank = getRankWithSuffix($rank);
+            break;
+        }
+        $rank++;
+    }
+} catch (PDOException $e) {
+    echo "Error fetching fastest growing club rank: " . $e->getMessage();
+}
+// Default rank value if no rank is fetched
+$fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>";
+
+
 
 ?>
 
@@ -1252,6 +1422,71 @@ try {
                         <div class="row main-page mt-3 p-3">
 
                             <?php include 'components/club_achievements.php' ?>
+
+
+                            <p class="text-muted mt-0" style="font-size: 24px;">
+                                <strong class="p-0" style="margin-left: -10px;">Performance This S.Y.</strong>
+                                    <i class="fa fa-trophy m-0 p-0" style="color: gold; font-size: 30px;"></i>
+                                </p>
+                                <p class="text-muted p-0" style="margin-top: -15px;">
+                                    Currently shaping improvements in progress
+                                </p>
+                                    
+                                <div class="row col-md-12 justify-content-between m-2 p-0">
+                                    <!-- Most Active Club -->
+                                    <div class="card col-md-3 text-center m-0 p-3 bg-dark" style="width: 250px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
+                                        <div class="row">
+                                            <div class="col-5 m-0 p-0">
+                                                <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 90px; height: 90px;">
+                                            </div>
+                                            <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                                <h1 class="m-0 p-0"><strong class="text-info"><?php echo $mostActiveClubRank; ?></strong></h1>
+                                                <p class="m-0 p-0"><strong class="text-info">Most active club</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Most Applied Club -->
+                                    <div class="card col-md-3 text-center m-0 p-3 bg-dark" style="width: 250px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
+                                        <div class="row">
+                                            <div class="col-5 m-0 p-0">
+                                                <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 90px; height: 90px;">
+                                            </div>
+                                            <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                                <h1 class="m-0 p-0"><strong class="text-info"><?php echo $mostAppliedClubRank; ?></strong></h1>
+                                                <p class="m-0 p-0"><strong class="text-info">Most applied club</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Highest Number of Members -->
+                                    <div class="card col-md-3 text-center m-0 p-3 bg-dark" style="width: 250px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
+                                        <div class="row">
+                                            <div class="col-5 m-0 p-0">
+                                                <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 90px; height: 90px;">
+                                            </div>
+                                            <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                                <h1 class="m-0 p-0"><strong class="text-info"><?php echo $highestInMembersRank; ?></strong></h1>
+                                                <p class="m-0 p-0"><strong class="text-info">Highest in members</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Fastest Growing Club -->
+                                    <div class="card col-md-3 text-center m-0 p-3 bg-dark" style="width: 250px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
+                                        <div class="row">
+                                            <div class="col-5 m-0 p-0">
+                                                <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 90px; height: 90px;">
+                                            </div>
+                                            <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                                <h1 class="m-0 p-0"><strong class="text-info"><?php echo $fastestGrowingClubRank; ?></strong></h1>
+                                                <p class="m-0 p-0"><strong class="text-info">Fastest growing club</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
 
                         </div>
                         <!-- THE MAIN PAGE 2 END -->

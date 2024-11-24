@@ -1026,7 +1026,7 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                                     <strong>Achievements & Awards</strong>
                                 </p>
                                 <p class="text-muted mb-0 p-0" style="margin-top: -15px;">
-                                    Your club's performances that reached top 10
+                                    This club's performances that reached top 10
                                 </p>
 
                                 <div class="row col-md-12 justify-content-between m-0 p-3" style="max-height: auto;">
