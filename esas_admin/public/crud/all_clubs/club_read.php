@@ -1015,8 +1015,8 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <p class="text-muted mt-4" style="font-size: 24px;">
+                                <br>
+                                <p class="text-muted mt-0" style="font-size: 24px;">
                                     <i class="fa fa-trophy" style="color: gold; font-size: 30px;"></i>
                                     <strong>Achievements & Awards</strong>
                                 </p>
@@ -1075,6 +1075,31 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
             $rank++;
         }
 
+        // Query for Most Applied clubs
+        $mostAppliedSql = "
+            SELECT c.club_id, c.clubName, COUNT(a.application_id) AS application_count
+            FROM tbl_application a
+            INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+            WHERE a.dateApplied <= :endDate
+            GROUP BY c.club_id, c.clubName
+            ORDER BY application_count DESC, c.clubName";
+        $mostAppliedStmt = $pdo->prepare($mostAppliedSql);
+        $mostAppliedStmt->bindParam(':endDate', $schoolYearEnd);
+        $mostAppliedStmt->execute();
+
+        $rank = 1;
+        while ($row = $mostAppliedStmt->fetch(PDO::FETCH_ASSOC)) {
+            if ($row['club_id'] == $club_id) {
+                $achievements[] = [
+                    'clubName' => $row['clubName'],
+                    'rank' => $rank,
+                    'category' => 'Most Applied Club',
+                    'schoolYear' => $schoolYear
+                ];
+            }
+            $rank++;
+        }
+
         // Move to the next school year
         $startYear++;
     }
@@ -1095,7 +1120,7 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                 ); 
                 ?>
             </p>
-            <p style="margin: 0;">Most Active Club</p>
+            <p style="margin: 0;"><?php echo $achievement['category']; ?></p>
             <small style="display: block; margin-top: 0.5rem;">S.Y. <?php echo $achievement['schoolYear']; ?></small>
         </div>
     </div>
