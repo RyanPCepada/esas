@@ -1176,28 +1176,33 @@ $fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>
                                         $startYear++;
                                     }
 
-                                    // Display the results for the specific club
-                                    foreach ($achievements as $achievement) {
-                                    ?>
-                                    <div class="row card col-md-6 mb-3 p-0" style="background-color: #F1F3F5; border: none; border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                        <div class="card-body text-center p-3">
-                                            <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 70px; height: 70px;" alt="Trophy" class="trophy-img">
-                                            <p class="rank" style="font-size: 1.5rem; font-weight: bold; margin: 0;">
-                                                <?php 
-                                                // Combine rank and suffix directly without spaces
-                                                echo $achievement['rank'] . (
-                                                    $achievement['rank'] == 1 ? 'st' :
-                                                    ($achievement['rank'] == 2 ? 'nd' :
-                                                    ($achievement['rank'] == 3 ? 'rd' : 'th'))
-                                                ); 
-                                                ?>
-                                            </p>
-                                            <p class="text-muted m-0 p-0" style="margin: 0;"><strong><?php echo $achievement['category']; ?></strong></p>
-                                            <small style="display: block; margin-top: 0.5rem;">S.Y. <?php echo $achievement['schoolYear']; ?></small>
-                                        </div>
-                                    </div>
-                                    <?php
-                                    } // End foreach
+                                    // Check if there are any achievements
+                                    if (empty($achievements)) {
+                                        echo '<p class="text-center text-muted mt-5">Nothing for now. Just keep everything going!</p>';
+                                    } else {
+                                        // Display the results for the specific club
+                                        foreach ($achievements as $achievement) {
+                                        ?>
+                                            <div class="row card col-md-6 mb-3 p-0" style="background-color: #F1F3F5; border: none; border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+                                                <div class="card-body text-center p-3">
+                                                    <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 70px; height: 70px;" alt="Trophy" class="trophy-img">
+                                                    <p class="rank" style="font-size: 1.5rem; font-weight: bold; margin: 0;">
+                                                        <?php 
+                                                        // Combine rank and suffix directly without spaces
+                                                        echo $achievement['rank'] . (
+                                                            $achievement['rank'] == 1 ? 'st' :
+                                                            ($achievement['rank'] == 2 ? 'nd' :
+                                                            ($achievement['rank'] == 3 ? 'rd' : 'th'))
+                                                        ); 
+                                                        ?>
+                                                    </p>
+                                                    <p class="text-muted m-0 p-0" style="margin: 0;"><strong><?php echo $achievement['category']; ?></strong></p>
+                                                    <small style="display: block; margin-top: 0.5rem;">S.Y. <?php echo $achievement['schoolYear']; ?></small>
+                                                </div>
+                                            </div>
+                                        <?php
+                                        } // End foreach
+                                    }
                                     ?>
                                 </div>
 
