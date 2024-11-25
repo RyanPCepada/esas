@@ -1277,7 +1277,7 @@ function fetchClubTrends() {
                                 </div>
                                 <div class="col-9">
                                     <div class="row ml-1">
-                                        <strong><span class="card-title club-name mb-0 text-muted" title="${club.clubName}">${club.clubName}</span></strong>
+                                        <strong><span class="card-title club-name mb-0 text-muted" style="font-size: 16px;" title="${club.clubName}">${club.clubName}</span></strong>
                                     </div>
                                     <!-- <div class="row mt-1 px-2">
                                         <div class="card card-members col-md-4" title="Active and Departed Members This School Year">
@@ -1337,7 +1337,6 @@ function fetchClubTrends() {
                                         <div class="club-rating col-7" data-rating="${club.rating}" title="Club Rating">
                                             ${generateStars(club.rating)}
                                             <!-- rate: ${club.rating}/10 -->
-                                            rate: ${club.rating}/10
                                         </div>
                                         <div class="club-status col-5" data-status="${club.status}" title="Active Status">
                                             <!-- <span class="status-dot" style="position: absolute; top: -10px; left: 0; color: red; font-size: 2em;">&#8226;</span>

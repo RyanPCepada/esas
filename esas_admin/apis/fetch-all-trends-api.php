@@ -83,71 +83,77 @@ try {
         // Calculate the rating for this club (same logic as in club_read.php)
         $club_id = $club['club_id'];
 
-        // Fetch number of applications for this year
+        // Number of Applications (filtered by the school year date range)
         $appCountSql = "SELECT COUNT(*) AS appCount FROM tbl_application 
-                        WHERE club_id = :club_id AND YEAR(dateDecided) = YEAR(CURRENT_DATE)";
+                WHERE club_id = :club_id AND dateDecided <= :endDate";
         $appCountStmt = $pdo->prepare($appCountSql);
         $appCountStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $appCountStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
         $appCountStmt->execute();
         $appCountRow = $appCountStmt->fetch(PDO::FETCH_ASSOC);
         $appCount = $appCountRow['appCount'];
 
-        // Fetch active members count for this year
+        // Active Members (filtered by the school year date range)
         $activeMembersSql = "SELECT COUNT(*) AS activeMembers FROM tbl_application 
-                             WHERE club_id = :club_id AND status = 'active' 
-                             AND YEAR(dateDecided) = YEAR(CURRENT_DATE)";
+                WHERE club_id = :club_id AND status = 'active' 
+                AND dateDecided <= :endDate";
         $activeMembersStmt = $pdo->prepare($activeMembersSql);
         $activeMembersStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $activeMembersStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
         $activeMembersStmt->execute();
         $activeMembersRow = $activeMembersStmt->fetch(PDO::FETCH_ASSOC);
         $activeMembersCount = $activeMembersRow['activeMembers'];
 
-        // Fetch posts per week for this year
+        // Posts per Week (filtered by the school year date range)
         $postsSql = "SELECT COUNT(*) AS totalPosts FROM tbl_posts 
-                     WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+        WHERE club_id = :club_id AND dateAdded <= :endDate";
         $postsStmt = $pdo->prepare($postsSql);
         $postsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $postsStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
         $postsStmt->execute();
         $postsRow = $postsStmt->fetch(PDO::FETCH_ASSOC);
         $totalPosts = $postsRow['totalPosts'];
         $postsPerWeek = $totalPosts / 4.345; // Assuming 4 weeks per month
 
-        // Fetch events per month for this year
+        // Events per Month (filtered by the school year date range)
         $eventsSql = "SELECT COUNT(*) AS totalEvents FROM tbl_events 
-                      WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+        WHERE club_id = :club_id AND dateAdded <= :endDate";
         $eventsStmt = $pdo->prepare($eventsSql);
         $eventsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $eventsStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
         $eventsStmt->execute();
         $eventsRow = $eventsStmt->fetch(PDO::FETCH_ASSOC);
         $totalEvents = $eventsRow['totalEvents'];
         $eventsPerMonth = $totalEvents / 12; // Assuming 12 months per year
 
-        // Fetch accomplishment reports count for this year
+        // Accomplishment Reports (filtered by the school year date range)
         $accReportsSql = "SELECT COUNT(*) AS accReportCount FROM tbl_accomplishment_reports 
-                          WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+            WHERE club_id = :club_id AND dateAdded <= :endDate";
         $accReportsStmt = $pdo->prepare($accReportsSql);
         $accReportsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $accReportsStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
         $accReportsStmt->execute();
         $accReportsRow = $accReportsStmt->fetch(PDO::FETCH_ASSOC);
         $accReportCount = $accReportsRow['accReportCount'];
 
-        // Fetch recommendations count for this year
+        // Recommendations (filtered by the school year date range)
         $recSql = "SELECT COUNT(*) AS recCount FROM tbl_club_recommendations 
-                   WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+        WHERE club_id = :club_id AND dateAdded <= :endDate";
         $recStmt = $pdo->prepare($recSql);
         $recStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $recStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
         $recStmt->execute();
         $recRow = $recStmt->fetch(PDO::FETCH_ASSOC);
         $recCount = $recRow['recCount'];
 
-        // Calculate the club rating for this year
+        // Calculate the club rating for this year based on the filtered data
         $ratingThisYear = (
-            ($appCount * 0.15) +        // Number of Applications
-            ($activeMembersCount * 0.15) + // Active Members
-            ($postsPerWeek * 0.15) +       // Posts per Week
-            ($eventsPerMonth * 0.20) +     // Events per Month
-            ($accReportCount * 0.25) +     // Accomplishment Reports
-            ($recCount * 0.10)            // Club Recommendations
+        ($appCount * 0.15) +        // Number of Applications
+        ($activeMembersCount * 0.15) + // Active Members
+        ($postsPerWeek * 0.15) +       // Posts per Week
+        ($eventsPerMonth * 0.20) +     // Events per Month
+        ($accReportCount * 0.25) +     // Accomplishment Reports
+        ($recCount * 0.10)            // Club Recommendations
         );
 
         // Ensure rating is within 10
