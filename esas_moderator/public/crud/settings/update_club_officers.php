@@ -227,7 +227,6 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="modal-body">
                     <!-- Dropdown for Select Position -->
                     <div class="form-group">
-                        <label for="officer_position">Select Position</label>
                         <select class="form-control" id="officer_position" name="position">
                             <option value="" disabled selected>-- Select Position --</option>
                             <option value="President">President</option>
@@ -239,9 +238,15 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
                         </select>
                     </div>
 
+                    <div class="row m-0">
+                        <div class="col-md-5 p-0"><hr></div>
+                        <div class="col-md-2 text-center"><label>or</label></div>
+                        <div class="col-md-5 p-0"><hr></div>
+                    </div>
+
                     <!-- Input for custom position -->
                     <div class="form-group">
-                        <label for="new_position">+New Position</label>
+                        <label for="new_position">Add New Position</label>
                         <input type="text" class="form-control" id="new_position" name="new_position" placeholder="Enter Position (Optional)">
                     </div>
 
