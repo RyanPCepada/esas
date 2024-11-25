@@ -213,7 +213,6 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
     <p>No officers found for this moderator.</p>
 <?php endif; ?>
 
-
 <!-- Add New Officer Modal -->
 <div class="modal fade" id="addOfficerModal" tabindex="-1" aria-labelledby="addOfficerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -226,35 +225,27 @@ $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <form id="addOfficerForm" action="../esas_moderator/actions/add_officer_action.php" method="post">
                 <div class="modal-body">
+                    <!-- Dropdown for Select Position -->
                     <div class="form-group">
-                        <label for="officer_position">Position</label>
-                        <input type="text" class="form-control" id="officer_position" name="position" placeholder="Enter Position" required>
-                    </div>
-                    <!-- <div class="form-group">
-                        <label for="officer_student">Select Student</label>
-                        <select class="form-control" id="officer_student" name="student_id">
-                            <option value="">None</option>
-                            <php
-                            // Fetch students for the current club
-                            $studentsSql = "
-                                SELECT DISTINCT s.student_id, CONCAT(s.firstName, ' ', s.lastName) AS fullName
-                                FROM tbl_students s
-                                JOIN tbl_application a ON s.student_id = a.student_id
-                                WHERE a.status = 'active' AND a.club_id = :club_id
-                                ORDER BY fullName
-                            ";
-                            $studentsStmt = $pdo->prepare($studentsSql);
-                            $studentsStmt->execute(['club_id' => $club_id]); // Use the dynamic club_id
-                            $students = $studentsStmt->fetchAll(PDO::FETCH_ASSOC);
-
-                            foreach ($students as $student): ?>
-                                <option value="<php echo htmlspecialchars($student['student_id']); ?>">
-                                    <php echo htmlspecialchars($student['fullName']); ?>
-                                </option>
-                            <php endforeach; ?>
+                        <label for="officer_position">Select Position</label>
+                        <select class="form-control" id="officer_position" name="position">
+                            <option value="" disabled selected>-- Select Position --</option>
+                            <option value="President">President</option>
+                            <option value="Vice-President">Vice-President</option>
+                            <option value="Secretary">Secretary</option>
+                            <option value="Treasurer">Treasurer</option>
+                            <option value="P.I.O.">P.I.O.</option>
+                            <option value="Sergeant At Arms">Sergeant At Arms</option>
                         </select>
-                    </div> -->
-                    <!-- Use the first officer's club_id to populate the modal -->
+                    </div>
+
+                    <!-- Input for custom position -->
+                    <div class="form-group">
+                        <label for="new_position">+New Position</label>
+                        <input type="text" class="form-control" id="new_position" name="new_position" placeholder="Enter Position (Optional)">
+                    </div>
+
+                    <!-- Hidden club_id -->
                     <input type="hidden" id="club_id" name="club_id" value="<?php echo htmlspecialchars($officersArray[0]['club_id']); ?>">
                 </div>
                 <div class="modal-footer">
