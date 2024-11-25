@@ -60,166 +60,16 @@ try {
     // Fetch all results as an associative array
     $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Function to convert timestamp to human-readable format
-    function timeAgo($timestamp) {
-        $timeDifference = time() - strtotime($timestamp);
-        $seconds = $timeDifference;
-        $minutes      = round($seconds / 60);           // value 60 is seconds
-        $hours        = round($seconds / 3600);         // value 3600 is 60 minutes * 60 sec
-        $days         = round($seconds / 86400);        // value 86400 is 24 hours * 60 minutes * 60 sec
-        $weeks        = round($seconds / 604800);       // value 604800 is 7 days * 24 hours * 60 minutes * 60 sec
-        $months       = round($seconds / 2629440);      // value 2629440 is ((365+365+365+365)/4/12) * 24 * 60 * 60
-        $years        = round($seconds / 31553280);     // value 31553280 is (365+365+365+365)/4 * 24 * 60 * 60
-
-        if ($seconds <= 60) {
-            return "Just Now";
-        } else if ($minutes <= 60) {
-            if ($minutes == 1) {
-                return "1 min ago";
-            } else {
-                return "$minutes mins ago";
-            }
-        } else if ($hours <= 24) {
-            if ($hours == 1) {
-                return "1 hr ago";
-            } else {
-                return "$hours hrs ago";
-            }
-        } else if ($days <= 7) {
-            if ($days == 1) {
-                return "yesterday";
-            } else {
-                return "$days days ago";
-            }
-        } else if ($weeks <= 4.3) { // 4.3 == 30/7
-            if ($weeks == 1) {
-                return "1 week ago";
-            } else {
-                return "$weeks weeks ago";
-            }
-        } else if ($months <= 12) {
-            if ($months == 1) {
-                return "1 month ago";
-            } else {
-                return "$months months ago";
-            }
-        } else {
-            if ($years == 1) {
-                return "1 year ago";
-            } else {
-                return "$years years ago";
-            }
-        }
-    }
-
     // Process the fetched clubs data
     $clubTrends = array_map(function ($club) use ($pdo, $startDate, $endDate, $startYear) {
-        // Get latest activity date for the club
-        $activityQuery = "
-            SELECT dateAdded
-            FROM tbl_activity_logs
-            WHERE club_id = :club_id
-            ORDER BY dateAdded DESC
-            LIMIT 1
-        ";
+        // Get the club name (you can adjust based on your database)
+        $clubNameQuery = "SELECT clubName FROM tbl_clubs WHERE club_id = :club_id";
+        $clubNameStmt = $pdo->prepare($clubNameQuery);
+        $clubNameStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
+        $clubNameStmt->execute();
+        $clubNameResult = $clubNameStmt->fetch(PDO::FETCH_ASSOC);
+        $club['clubName'] = $clubNameResult['clubName']; // Assign the club name
 
-        $activityStmt = $pdo->prepare($activityQuery);
-        $activityStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
-        $activityStmt->execute();
-        $activityResult = $activityStmt->fetch(PDO::FETCH_ASSOC);
-
-        // If there's an activity, calculate the time ago
-        if ($activityResult) {
-            $club['status'] = timeAgo($activityResult['dateAdded']);
-        } else {
-            $club['status'] = 'Inactive';
-        }
-
-        // Calculate posts per week for this school year
-        $postQuery = "
-            SELECT COUNT(*) AS postCount
-            FROM tbl_posts
-            WHERE club_id = :club_id
-            AND dateAdded BETWEEN :startDate AND :endDate
-        ";
-    
-        $postStmt = $pdo->prepare($postQuery);
-        $postStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
-        $postStmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
-        $postStmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
-        $postStmt->execute();
-        $postCount = $postStmt->fetch(PDO::FETCH_ASSOC)['postCount'];
-    
-        // Calculate the number of weeks in the school year
-        $start = new DateTime($startDate);
-        $end = new DateTime($endDate);
-        $interval = $start->diff($end);
-        $weeks = ceil($interval->days / 7);  // Round up to ensure a full week is counted
-    
-        // Calculate posts per week for this year
-        $club['postPerWeek'] = $weeks > 0 ? number_format($postCount / $weeks, 2) : 0;
-    
-        // Get last school year's data for comparison (same range, previous year)
-        $lastYearStartDate = ($startYear - 1) . "-08-01"; // Last year starts on August 1st
-        $lastYearEndDate = ($startYear) . "-07-31"; // Last year ends on July 31st
-    
-        $lastYearPostStmt = $pdo->prepare($postQuery);
-        $lastYearPostStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
-        $lastYearPostStmt->bindParam(':startDate', $lastYearStartDate, PDO::PARAM_STR);
-        $lastYearPostStmt->bindParam(':endDate', $lastYearEndDate, PDO::PARAM_STR);
-        $lastYearPostStmt->execute();
-        $lastYearPostCount = $lastYearPostStmt->fetch(PDO::FETCH_ASSOC)['postCount'];
-    
-        // Calculate posts per week for last year
-        $lastYearStart = new DateTime($lastYearStartDate);
-        $lastYearEnd = new DateTime($lastYearEndDate);
-        $lastYearInterval = $lastYearStart->diff($lastYearEnd);
-        $lastYearWeeks = ceil($lastYearInterval->days / 7);  // Round up weeks
-    
-        $lastYearPostsPerWeek = $lastYearWeeks > 0 ? $lastYearPostCount / $lastYearWeeks : 0;
-    
-        // Calculate the difference in posts per week (this year - last year)
-        $postDifference = $club['postPerWeek'] - $lastYearPostsPerWeek;
-    
-        // Add the "+" sign if the difference is positive
-        $club['postsChanges'] = $postDifference > 0 
-            ? '+' . number_format($postDifference, 2)  // Add "+" if positive
-            : number_format($postDifference, 2);       // Otherwise, just show the number
-    
-        // Calculate events per month for this school year
-        $averageEventsSql = "
-        SELECT COUNT(*) / TIMESTAMPDIFF(MONTH, :startDate, :endDate) AS averageEvents 
-        FROM tbl_events 
-        WHERE club_id = :club_id 
-        AND dateAdded BETWEEN :startDate AND :endDate
-        ";
-
-        // Calculate events per month for this school year
-        $averageEventsStmt = $pdo->prepare($averageEventsSql);
-        $averageEventsStmt->bindParam(":club_id", $club['club_id'], PDO::PARAM_INT);
-        $averageEventsStmt->bindParam(":startDate", $startDate, PDO::PARAM_STR);
-        $averageEventsStmt->bindParam(":endDate", $endDate, PDO::PARAM_STR);
-        $averageEventsStmt->execute();
-        $eventsAverageRow = $averageEventsStmt->fetch(PDO::FETCH_ASSOC);
-        $club['eventPerMonth'] = round($eventsAverageRow['averageEvents'], 2);
-
-        // Calculate events per month for last school year (same range, previous year)
-        $averageEventsLastYearStmt = $pdo->prepare($averageEventsSql);
-        $averageEventsLastYearStmt->bindParam(":club_id", $club['club_id'], PDO::PARAM_INT);
-        $averageEventsLastYearStmt->bindParam(":startDate", $lastYearStartDate, PDO::PARAM_STR);
-        $averageEventsLastYearStmt->bindParam(":endDate", $lastYearEndDate, PDO::PARAM_STR);
-        $averageEventsLastYearStmt->execute();
-        $averageEventsLastYearRow = $averageEventsLastYearStmt->fetch(PDO::FETCH_ASSOC);
-        $lastYearEventsPerMonth = round($averageEventsLastYearRow['averageEvents'], 2);
-
-        // Calculate the difference in events per month
-        $eventDifference = $club['eventPerMonth'] - $lastYearEventsPerMonth;
-
-        // Add "+" sign for positive differences and format the result
-        $club['eventsChanges'] = $eventDifference > 0
-        ? '+' . number_format($eventDifference, 2)
-        : number_format($eventDifference, 2);
-    
         // Calculate club membership percentage
         if ($club['slots'] == 0) {
             $club['percentage'] = -1;
@@ -229,46 +79,85 @@ try {
             $club['percentage'] = number_format(($club['activeMembers'] / $club['slots']) * 100, 2);
             $club['percentageText'] = $club['percentage'] . '%';
         }
-    
-        // Add newly active and departed members
-        $club['newlyActive'] = $club['activeMembers'];
-        $club['newlyDeparted'] = $club['departedMembers'];
-    
-        // Rating calculation based on club metrics
-        $appQuery = "SELECT COUNT(*) AS appCount FROM tbl_application WHERE club_id = :club_id";
-        $appStmt = $pdo->prepare($appQuery);
-        $appStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
-        $appStmt->execute();
-        $appCount = $appStmt->fetch(PDO::FETCH_ASSOC)['appCount'];
-    
-        $accReportQuery = "SELECT COUNT(*) AS accReportCount FROM tbl_accomplishment_reports WHERE club_id = :club_id";
-        $accReportStmt = $pdo->prepare($accReportQuery);
-        $accReportStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
-        $accReportStmt->execute();
-        $accReportCount = $accReportStmt->fetch(PDO::FETCH_ASSOC)['accReportCount'];
-    
-        $recQuery = "SELECT COUNT(*) AS recCount FROM tbl_club_recommendations WHERE club_id = :club_id";
-        $recStmt = $pdo->prepare($recQuery);
-        $recStmt->bindParam(':club_id', $club['club_id'], PDO::PARAM_INT);
+
+        // Calculate the rating for this club (same logic as in club_read.php)
+        $club_id = $club['club_id'];
+
+        // Fetch number of applications for this year
+        $appCountSql = "SELECT COUNT(*) AS appCount FROM tbl_application 
+                        WHERE club_id = :club_id AND YEAR(dateDecided) = YEAR(CURRENT_DATE)";
+        $appCountStmt = $pdo->prepare($appCountSql);
+        $appCountStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $appCountStmt->execute();
+        $appCountRow = $appCountStmt->fetch(PDO::FETCH_ASSOC);
+        $appCount = $appCountRow['appCount'];
+
+        // Fetch active members count for this year
+        $activeMembersSql = "SELECT COUNT(*) AS activeMembers FROM tbl_application 
+                             WHERE club_id = :club_id AND status = 'active' 
+                             AND YEAR(dateDecided) = YEAR(CURRENT_DATE)";
+        $activeMembersStmt = $pdo->prepare($activeMembersSql);
+        $activeMembersStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $activeMembersStmt->execute();
+        $activeMembersRow = $activeMembersStmt->fetch(PDO::FETCH_ASSOC);
+        $activeMembersCount = $activeMembersRow['activeMembers'];
+
+        // Fetch posts per week for this year
+        $postsSql = "SELECT COUNT(*) AS totalPosts FROM tbl_posts 
+                     WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+        $postsStmt = $pdo->prepare($postsSql);
+        $postsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $postsStmt->execute();
+        $postsRow = $postsStmt->fetch(PDO::FETCH_ASSOC);
+        $totalPosts = $postsRow['totalPosts'];
+        $postsPerWeek = $totalPosts / 4.345; // Assuming 4 weeks per month
+
+        // Fetch events per month for this year
+        $eventsSql = "SELECT COUNT(*) AS totalEvents FROM tbl_events 
+                      WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+        $eventsStmt = $pdo->prepare($eventsSql);
+        $eventsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $eventsStmt->execute();
+        $eventsRow = $eventsStmt->fetch(PDO::FETCH_ASSOC);
+        $totalEvents = $eventsRow['totalEvents'];
+        $eventsPerMonth = $totalEvents / 12; // Assuming 12 months per year
+
+        // Fetch accomplishment reports count for this year
+        $accReportsSql = "SELECT COUNT(*) AS accReportCount FROM tbl_accomplishment_reports 
+                          WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+        $accReportsStmt = $pdo->prepare($accReportsSql);
+        $accReportsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+        $accReportsStmt->execute();
+        $accReportsRow = $accReportsStmt->fetch(PDO::FETCH_ASSOC);
+        $accReportCount = $accReportsRow['accReportCount'];
+
+        // Fetch recommendations count for this year
+        $recSql = "SELECT COUNT(*) AS recCount FROM tbl_club_recommendations 
+                   WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+        $recStmt = $pdo->prepare($recSql);
+        $recStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
         $recStmt->execute();
-        $recCount = $recStmt->fetch(PDO::FETCH_ASSOC)['recCount'];
-    
-        // Calculate the total rating based on the weighted formula
-        $rating = (
-            ($appCount * 0.20) + // Number of Applications
-            ($club['activeMembers'] * 0.20) + // Number of Active Members
-            ($club['postPerWeek'] * 0.20) + // Posts (adjusted per week)
-            ($club['eventPerMonth'] * 0.20) + // Events (adjusted per month)
-            ($accReportCount * 0.10) + // Accomplishment Reports
-            ($recCount * 0.10) // Club Recommendations
+        $recRow = $recStmt->fetch(PDO::FETCH_ASSOC);
+        $recCount = $recRow['recCount'];
+
+        // Calculate the rating for this year
+        $ratingThisYear = (
+            ($appCount * 0.20) +        // Number of Applications
+            ($activeMembersCount * 0.20) + // Active Members
+            ($postsPerWeek * 0.20) +       // Posts per Week
+            ($eventsPerMonth * 0.20) +     // Events per Month
+            ($accReportCount * 0.10) +     // Accomplishment Reports
+            ($recCount * 0.10)            // Club Recommendations
         );
-    
-        // Round the rating to 2 decimal places
-        $club['rating'] = number_format($rating/6, 2);
-    
+
+        // Ensure rating is within 10
+        $ratingThisYear = min(10, round($ratingThisYear / 6, 2)); // Divide by 6 to normalize the formula
+
+        $club['rating'] = $ratingThisYear; // Add the rating to the club data
+
         return $club;
-    }, $clubs);    
-    
+    }, $clubs);
+
     // Sort clubs based on percentage (descending order)
     usort($clubTrends, function ($a, $b) {
         if ($a['percentage'] == -1) return 1;

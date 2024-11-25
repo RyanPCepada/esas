@@ -392,6 +392,16 @@ unset($newEventsStmt, $averageEventsStmt, $averageEventsLastYearStmt);
 
 // RATING
 
+
+// Fetch number of applications for this year
+$appCountSql = "SELECT COUNT(*) AS appCount FROM tbl_application 
+                WHERE club_id = :club_id AND YEAR(dateDecided) = YEAR(CURRENT_DATE)";
+$appCountStmt = $pdo->prepare($appCountSql);
+$appCountStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$appCountStmt->execute();
+$appCountRow = $appCountStmt->fetch(PDO::FETCH_ASSOC);
+$appCount = $appCountRow['appCount'];
+
 // Fetch active members count for this year
 $activeMembersSql = "SELECT COUNT(*) AS activeMembers FROM tbl_application 
                      WHERE club_id = :club_id AND status = 'active' 
@@ -402,14 +412,25 @@ $activeMembersStmt->execute();
 $activeMembersRow = $activeMembersStmt->fetch(PDO::FETCH_ASSOC);
 $activeMembersCount = $activeMembersRow['activeMembers'];
 
-// Fetch number of applications for this year
-$appCountSql = "SELECT COUNT(*) AS appCount FROM tbl_application 
-                WHERE club_id = :club_id AND YEAR(dateDecided) = YEAR(CURRENT_DATE)";
-$appCountStmt = $pdo->prepare($appCountSql);
-$appCountStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-$appCountStmt->execute();
-$appCountRow = $appCountStmt->fetch(PDO::FETCH_ASSOC);
-$appCount = $appCountRow['appCount'];
+// Fetch posts per week for this year
+$postsSql = "SELECT COUNT(*) AS totalPosts FROM tbl_posts 
+             WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+$postsStmt = $pdo->prepare($postsSql);
+$postsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$postsStmt->execute();
+$postsRow = $postsStmt->fetch(PDO::FETCH_ASSOC);
+$totalPosts = $postsRow['totalPosts'];
+$postsPerWeek = $totalPosts / 4.345; // Assuming 4 weeks per month
+
+// Fetch events per month for this year
+$eventsSql = "SELECT COUNT(*) AS totalEvents FROM tbl_events 
+              WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
+$eventsStmt = $pdo->prepare($eventsSql);
+$eventsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
+$eventsStmt->execute();
+$eventsRow = $eventsStmt->fetch(PDO::FETCH_ASSOC);
+$totalEvents = $eventsRow['totalEvents'];
+$eventsPerMonth = $totalEvents / 12; // Assuming 12 months per year
 
 // Fetch accomplishment reports count for this year
 $accReportsSql = "SELECT COUNT(*) AS accReportCount FROM tbl_accomplishment_reports 
@@ -428,26 +449,6 @@ $recStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
 $recStmt->execute();
 $recRow = $recStmt->fetch(PDO::FETCH_ASSOC);
 $recCount = $recRow['recCount'];
-
-// Fetch posts per week for this year
-$postsSql = "SELECT COUNT(*) AS totalPosts FROM tbl_posts 
-             WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
-$postsStmt = $pdo->prepare($postsSql);
-$postsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-$postsStmt->execute();
-$postsRow = $postsStmt->fetch(PDO::FETCH_ASSOC);
-$totalPosts = $postsRow['totalPosts'];
-$postsPerWeek = $totalPosts / 4; // Assuming 4 weeks per month
-
-// Fetch events per month for this year
-$eventsSql = "SELECT COUNT(*) AS totalEvents FROM tbl_events 
-              WHERE club_id = :club_id AND YEAR(dateAdded) = YEAR(CURRENT_DATE)";
-$eventsStmt = $pdo->prepare($eventsSql);
-$eventsStmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-$eventsStmt->execute();
-$eventsRow = $eventsStmt->fetch(PDO::FETCH_ASSOC);
-$totalEvents = $eventsRow['totalEvents'];
-$eventsPerMonth = $totalEvents / 12; // Assuming 12 months per year
 
 // Calculate the rating for this year
 $ratingThisYear = (
