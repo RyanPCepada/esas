@@ -521,11 +521,11 @@ $eventsPerMonthAllYears = $totalEventsAllYears / 12; // Assuming 12 months per y
 
 // Calculate the rating for all school years
 $ratingAllYears = (
-    ($appCountAllYears * 0.20) +        // Number of Applications
-    ($activeMembersCountAllYears * 0.20) + // Active Members
-    ($postsPerWeekAllYears * 0.20) +       // Posts per Week
+    ($appCountAllYears * 0.15) +        // Number of Applications
+    ($activeMembersCountAllYears * 0.15) + // Active Members
+    ($postsPerWeekAllYears * 0.15) +       // Posts per Week
     ($eventsPerMonthAllYears * 0.20) +     // Events per Month
-    ($accReportCountAllYears * 0.10) +     // Accomplishment Reports
+    ($accReportCountAllYears * 0.25) +     // Accomplishment Reports
     ($recCountAllYears * 0.10)            // Club Recommendations
 );
 

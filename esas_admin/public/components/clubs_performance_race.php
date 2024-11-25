@@ -60,7 +60,7 @@
                             </div>
 
 
-                            <div class="row d-flex align-items-start justify-content-between mx-auto p-0">
+                            <div class="row d-flex align-items-start justify-content-between mx-auto mb-0 p-0">
 
                                 <!-- COL-MD-3 MOST ACTIVE CLUB START -->
                                 <div class="most-active-club-section col-md-3 m-0 p-3" style="position: relative; z-index: 1;">
@@ -391,7 +391,7 @@
 
 
                             
-                            <div class="row d-flex align-items-start justify-content-center mx-auto p-0">
+                            <div class="row d-flex align-items-start justify-content-center mx-auto mt-0 p-0">
                                 <div class="row col-auto">
                                     <p class="text-muted text-center mb-0" style="font-size: 24px;">
                                         <strong>Top Performing<br>Club Moderators</strong>
