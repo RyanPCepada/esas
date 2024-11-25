@@ -430,7 +430,7 @@
                                                             (SELECT COUNT(*) 
                                                             FROM tbl_activity_logs 
                                                             WHERE tbl_activity_logs.moderator_id = tbl_moderators.moderator_id 
-                                                            AND tbl_activity_logs.dateAdded <= :endDate) * 0.25 +
+                                                            AND tbl_activity_logs.dateAdded <= :endDate) * 0.20 +
                                                             (SELECT COUNT(*) 
                                                             FROM tbl_posts 
                                                             WHERE tbl_posts.moderator_id = tbl_moderators.moderator_id 
@@ -442,7 +442,7 @@
                                                             (SELECT COUNT(*) 
                                                             FROM tbl_application 
                                                             WHERE tbl_application.moderator_id = tbl_moderators.moderator_id 
-                                                            AND tbl_application.dateDecided <= :endDate) * 0.10 +
+                                                            AND tbl_application.dateDecided <= :endDate) * 0.15 +
                                                             (SELECT COUNT(*) 
                                                             FROM tbl_chats 
                                                             WHERE (tbl_chats.sender_id = tbl_moderators.moderator_id OR tbl_chats.recipient_id = tbl_moderators.moderator_id)
