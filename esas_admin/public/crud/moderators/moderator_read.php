@@ -357,8 +357,8 @@ $postsThisYear = $pdo->query("SELECT COUNT(*) AS count FROM tbl_posts WHERE mode
 $eventsThisYear = $pdo->query("SELECT COUNT(*) AS count FROM tbl_events WHERE moderator_id = $moderator_id AND YEAR(dateAdded) = $currentYear")->fetch(PDO::FETCH_ASSOC)['count'];
 
 // Rating calculations with the updated weights
-$ratingAllYears = ($activityLogsCount * 0.25) + ($postsCount * 0.25) + ($eventsCount * 0.25) + ($applicationsProcessed * 0.10) + ($chatsCount * 0.15);
-$ratingThisYear = ($activityLogsThisYear * 0.25) + ($postsThisYear * 0.25) + ($eventsThisYear * 0.25) + ($chatsCount * 0.15) + ($applicationsProcessed * 0.10);
+$ratingAllYears = ($activityLogsCount * 0.20) + ($postsCount * 0.25) + ($eventsCount * 0.25) + ($applicationsProcessed * 0.15) + ($chatsCount * 0.15);
+$ratingThisYear = ($activityLogsThisYear * 0.20) + ($postsThisYear * 0.25) + ($eventsThisYear * 0.25) + ($applicationsProcessed * 0.15) + ($chatsCount * 0.15);
 
 // Normalize to a scale of 10
 $moderatorRatingAllYears = min(max(round($ratingAllYears / 10, 2), 0), 10);
