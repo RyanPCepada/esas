@@ -1334,11 +1334,10 @@ function fetchClubTrends() {
                                         </div>
                                     </div> -->
                                     <div class="row ml-1 mb-1">
-                                        <div class="club-rating col-7" data-rating="${club.rating}" title="Club Rating">
+                                        <div class="club-rating col-7" data-rating="${club.rating}" title="rating: ${club.rating}/5">
                                             ${generateStars(club.rating)}
                                             <!-- rate: ${club.rating}/10 -->
                                             <!-- rate: ${club.rating}/5 -->
-                                            rate: ${club.rating}/5
                                         </div>
                                         <div class="club-status col-5" data-status="${club.status}" title="Active Status">
                                             <!-- <span class="status-dot" style="position: absolute; top: -10px; left: 0; color: red; font-size: 2em;">&#8226;</span>
