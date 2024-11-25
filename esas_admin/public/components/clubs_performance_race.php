@@ -394,7 +394,7 @@
                             <div class="row d-flex align-items-start justify-content-center mx-auto mt-0 p-0">
                                 <div class="row col-auto">
                                     <p class="text-muted text-center mb-0" style="font-size: 24px;">
-                                        <strong>Top Performing<br>Club Moderators</strong>
+                                        <strong>Outstanding Club Moderators</strong>
                                         <i class="fa fa-medal" style="color: gold; font-size: 30px;"></i>
                                     </p>
                                     <p class="text-muted text-center mb-1">
