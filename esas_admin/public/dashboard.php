@@ -1371,9 +1371,12 @@ function generateStars(rating) {
 
     let starsHTML = '';
 
-    // Check if the rating is 0, and if so, only display one empty star
-    if (numRating === 0) {
-        starsHTML += '<i class="far fa-star star-rating text-warning"></i>'; // One empty star
+    // If the rating is 0 or less, show 5 empty stars by default
+    if (numRating <= 0) {
+        // Display five empty stars
+        for (let i = 0; i < 5; i++) {
+            starsHTML += '<i class="far fa-star star-rating text-warning"></i>'; // Empty star
+        }
     } else {
         // Add full stars
         for (let i = 0; i < fullStars; i++) {
@@ -1393,6 +1396,7 @@ function generateStars(rating) {
 
     return starsHTML;
 }
+
 
 </script>
 
