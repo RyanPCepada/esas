@@ -461,7 +461,7 @@ $ratingThisYear = (
 );
 
 // Ensure rating is within 10
-$ratingThisYear = min(10, round($ratingThisYear / 6, 2)); // Divide by 6 to normalize the formula
+$ratingThisYear = min(10, round(($ratingThisYear / 6) / 2, 2)); // Divide by 6 to normalize the formula
 
 // Calculate the rating for all years (total accumulated values)
 $activeMembersSqlAllYears = "SELECT COUNT(*) AS activeMembers FROM tbl_application 
@@ -530,7 +530,7 @@ $ratingAllYears = (
 );
 
 // Ensure rating is within 10
-$ratingAllYears = min(10, round($ratingAllYears / 6, 2)); // Divide by 6 to normalize the formula
+$ratingAllYears = min(10, round(($ratingAllYears / 6) / 2, 2)); // Divide by 6 to normalize the formula
 
 // Output or use the ratings
 // echo "Rating: " . $ratingAllYears . " (All School Years) <br>";

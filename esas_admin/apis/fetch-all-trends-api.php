@@ -157,7 +157,7 @@ try {
         );
 
         // Ensure rating is within 10
-        $ratingThisYear = min(10, round($ratingThisYear / 6, 2)); // Divide by 6 to normalize the formula
+        $ratingThisYear = min(10, round(($ratingThisYear / 6) / 2, 2)); // Divide by 6 to normalize the formula
 
         $club['rating'] = $ratingThisYear; // Add the rating to the club data
 
