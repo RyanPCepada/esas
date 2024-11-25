@@ -140,13 +140,13 @@ try {
         $recRow = $recStmt->fetch(PDO::FETCH_ASSOC);
         $recCount = $recRow['recCount'];
 
-        // Calculate the rating for this year
+        // Calculate the club rating for this year
         $ratingThisYear = (
-            ($appCount * 0.20) +        // Number of Applications
-            ($activeMembersCount * 0.20) + // Active Members
-            ($postsPerWeek * 0.20) +       // Posts per Week
+            ($appCount * 0.15) +        // Number of Applications
+            ($activeMembersCount * 0.15) + // Active Members
+            ($postsPerWeek * 0.15) +       // Posts per Week
             ($eventsPerMonth * 0.20) +     // Events per Month
-            ($accReportCount * 0.10) +     // Accomplishment Reports
+            ($accReportCount * 0.25) +     // Accomplishment Reports
             ($recCount * 0.10)            // Club Recommendations
         );
 
