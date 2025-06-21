@@ -1,6 +1,14 @@
-<div class="about-section auto-scroll">
-    <!-- Club information will be dynamically inserted here -->
+<div class="about-section">
+    <div class="row d-flex align-items-center">
+        <div class="col-12 d-flex justify-content-start">
+            <h5 class="text-muted mb-3" style="font-size: 1.2em;">Club Details</h5>
+        </div>
+    </div>
+    <div class="about-list" id="aboutList">
+        <!-- Club description will be dynamically inserted here -->
+    </div>
 </div>
+
 
 <style>
     .club-info {
@@ -23,18 +31,18 @@
     }
 
     .club-info .date-created,
-    .club-info .information {
+    .club-info .description {
         margin-bottom: 20px; /* Space between sections */
     }
 
     .club-info .date-created {
-        font-size: 1.1em;
+        /* font-size: 1.1em; */
         color: #666; /* Softer color for the date */
         font-style: italic; /* Italic for date */
     }
 
-    .club-info .information {
-        font-size: 1.1em; /* Slightly larger font for club information */
+    .club-info .description {
+        /* font-size: 1.1em; Slightly larger font for club description */
         color: #333; /* Darker color for better readability */
         line-height: 1.5; /* Improved line spacing for readability */
     }
@@ -49,7 +57,7 @@
     }
 
     .club-info .club_moderators, .club-info .members {
-        font-size: 1.3em;
+        font-size: 1em;
         font-weight: bold;
         color: #007bff; /* Primary color for section titles */
     }
@@ -64,15 +72,15 @@
     .about-card {
         border: 1px solid #ddd; /* Border around the card */
         border-radius: 8px; /* Rounded corners */
-        padding: 10px; /* Padding inside the card */
+        padding: 12px 0px; /* Padding inside the card */
         display: flex;
         align-items: center; /* Center items vertically */
         margin: 3px; /* Space between rows */
     }
 
     .about-card img {
-        width: 30px; /* Set the width of the profile picture */
-        height: 30px; /* Set the height of the profile picture */
+        width: 35px; /* Set the width of the profile picture */
+        height: 35px; /* Set the height of the profile picture */
         object-fit: cover; /* Maintain aspect ratio */
         border-radius: 50%; /* Circular image */
     }
@@ -91,6 +99,29 @@
     .about-card-body .col-10 h6 {
         margin: 0;
     }
+
+    .description, .mission, .vision, .history {
+        text-align: justify;     /* Center-align text horizontally */
+        text-indent: 2em;
+    }
+    .mission-container, .vision-container {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+    .dashed-border {
+        height: 2px; /* Thickness of the border */
+        border-top: 2px dashed #ccc; /* Dashed line */
+        margin: 30px 0; /* Space above and below */
+    }
+
+    
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .about-card-body {
+            margin-left: 10px;
+        }
+    }
+
 </style>
 
 <script>
@@ -105,10 +136,10 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                     const club = response.club;
-                    const aboutSection = $('.about-section');
+                    const aboutSection = $('.about-list');
 
-                    // Format the registration date
-                    const formattedDate = new Date(club.registrationDate).toLocaleDateString('en-US', {
+                    // Format the application date
+                    const formattedDate = new Date(club.clubDateAdded).toLocaleDateString('en-US', {
                         year: 'numeric', month: 'long', day: 'numeric'
                     });
 
@@ -116,23 +147,47 @@ $(document).ready(function() {
                     const moderatorsCount = club.moderators ? club.moderators.split(', ').length : 0;
                     const membersCount = club.members ? club.members.split(', ').length : 0;
 
-                    // Build the club information HTML
+                    // Build the club description HTML
                     aboutSection.append(`
-                        <div class="club-info">
+                        <div class="club-info mb-5">
                             <div class="club-info-top">
-                                <p class="section-title">Club Details</p>
-                                <p class="date-created"><strong>Date of Creation:</strong> ${formattedDate}</p>
-                                <p class="information"><strong>Information:</strong> ${club.information}</p>
+                                <p class="date-created"><strong>Date of Creation: </strong>${formattedDate}</p>
+                                <p><i class="fas fa-lightbulb text-warning" style="font-size: 35px;"></i><strong>Why ${club.clubName}?</strong></p>
+                                <p class="description">${club.description}</p>
+                                <!-- <div class="dashed-border"></div> -->
+                                <div class="row" style="margin-top: 30px; margin-bottom: 30px;">
+                                    <div class="col-md-6">
+                                        <div class="mission-container text-center p-3 mb-3 border rounded bg-light">
+                                            <em><p><strong>Mission</strong></p></em>
+                                            <em><p class="mission">${club.mission}</p></em>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="vision-container text-center p-3 mb-3 border rounded bg-light">
+                                            <em><p><strong>Vision</strong></p></em>
+                                            <em><p class="vision">${club.vision}</p></em>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- <div class="dashed-border"></div> -->
+                                <p><i class="fas fa-history text-warning" style="font-size: 30px;"></i><strong> History</strong></p>
+                                <p class="history">${club.history}</p>
+                                <p><i class="fas fa-user text-warning" style="font-size: 30px;"></i><strong> Founder</strong></p>
+                                <p class="founder">${club.founder}</p>
                                 <a href="../settings.php">Edit Information in Settings</a>
-                            </div>
-                            <br>
-                            <p class="club_moderators text-primary my-2">Club Moderators <em>(${moderatorsCount})</em></p>
-                            <div class="about-row">
-                                ${buildCards(club.moderators, 'moderator')}
-                            </div>
-                            <p class="members text-primary my-2">Members <em>(${membersCount})</em></p>
-                            <div class="about-row">
-                                ${buildCards(club.members, 'member')}
+
+                                <div class="dashed-border"></div>
+                                <p class="club_moderators text-muted my-2">
+                                    ${moderatorsCount} ${moderatorsCount === 1 ? "Club Moderator" : "Club Moderators"} 
+                                    <i class="fas fa-shield-alt text-danger" style="font-size: 20px;"></i>
+                                </p>
+                                <div class="about-row">
+                                    ${buildCards(club.moderators, 'moderator')}
+                                </div>
+                                <p class="members text-muted my-2">${membersCount} Students <i class="fas fa-users text-primary" style="font-size: 20px;"></i></p>
+                                <div class="about-row">
+                                    ${buildCards(club.members, 'member')}
+                                </div>
                             </div>
                         </div>
                     `);
@@ -141,11 +196,11 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                $('.about-section').append('<p>An error occurred while fetching club information.</p>');
+                $('.about-section').append('<p>An error occurred while fetching club details.</p>');
             }
         });
     } else {
-        $('.about-section').append('<p>Club ID is required to display information.</p>');
+        $('.about-section').append('<p>Club ID is required to display details.</p>');
     }
 
     // Function to build cards for moderators and members
@@ -168,15 +223,15 @@ $(document).ready(function() {
                 return `
                     <div class="col-md-6 p-0">
                         <div class="about-card" style="background-color: ${getColor('', type)}">
-                            <div class="row col-12 text-start d-flex align-items-start justify-content-start">
+                            <div class="row col-12 m-0 text-start d-flex align-items-start justify-content-start">
                                 <div class="col-2">
                                     <img src="${profilePicUrl}" alt="${firstName} ${lastName}" class="img-fluid">
                                 </div>
                                 <div class="col-10">
                                     <div class="about-card-body p-0">
-                                        <div class="d-flex flex-column">
-                                            <h6 class="card-title mb-1">${firstName} ${middleName} ${lastName}</h6>
-                                            <p class="text-primary mb-0">Assigned: ${new Date(dateAssigned).toLocaleDateString('en-US', {
+                                        <div class="d-flex flex-column" style="line-height: 1em;">
+                                            <h7 class="card-title mb-1"><strong>${firstName} ${middleName} ${lastName}</strong></h7>
+                                            <p class="text-muted mb-0">Assigned: ${new Date(dateAssigned).toLocaleDateString('en-US', {
                                                 year: 'numeric', month: 'long', day: 'numeric'
                                             })}</p>
                                         </div>
@@ -187,7 +242,7 @@ $(document).ready(function() {
                     </div>
                 `;
             } else {
-                const [fullName, profilePic, department, yearLevel, dateApproved] = details;
+                const [fullName, profilePic, department, yearLevel, dateDecided] = details;
                 const nameParts = fullName.split(' ');
                 const firstName = nameParts[0];
                 const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
@@ -198,16 +253,16 @@ $(document).ready(function() {
                 return `
                     <div class="col-md-6 p-0">
                         <div class="about-card" style="background-color: ${getColor(department, type)}">
-                            <div class="row col-12 text-start d-flex align-items-start justify-content-start">
+                            <div class="row col-12 m-0 text-start d-flex align-items-start justify-content-center">
                                 <div class="col-2">
                                     <img src="${profilePicUrl}" alt="${firstName} ${lastName}" class="img-fluid">
                                 </div>
                                 <div class="col-10">
                                     <div class="about-card-body p-0">
-                                        <div class="d-flex flex-column">
-                                            <h6 class="card-title mb-1">${firstName} ${middleName} ${lastName}</h6>
+                                        <div class="d-flex flex-column" style="line-height: 1em;">
+                                            <h7 class="card-title mb-1"><strong>${firstName} ${middleName} ${lastName}</strong></h7>
                                             <p class="mb-1 text-muted"><strong>${department} ${yearLevel}</strong></p>
-                                            <p class="text-primary mb-0">Member since: ${new Date(dateApproved).toLocaleDateString('en-US', {
+                                            <p class="text-muted mb-0">Member since: ${new Date(dateDecided).toLocaleDateString('en-US', {
                                                 year: 'numeric', month: 'long', day: 'numeric'
                                             })}</p>
                                         </div>

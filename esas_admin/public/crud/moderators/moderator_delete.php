@@ -23,21 +23,45 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
         // First, fetch the moderator's details from tbl_moderators
         $moderator_id = trim($_POST["moderator_id"]);
 
-        // Fetch moderator's full name
+        // Fetch moderator's full name and club associations
         $fetchModeratorSQL = "
-            SELECT firstName, middleName, lastName 
-            FROM tbl_moderators 
-            WHERE moderator_id = :moderator_id
+            SELECT m.firstName, m.middleName, m.lastName, c.clubName, cm.dateAdded AS dateAssigned
+            FROM tbl_moderators m
+            LEFT JOIN tbl_clubs_and_moderators cm ON m.moderator_id = cm.moderator_id
+            LEFT JOIN tbl_clubs c ON cm.club_id = c.club_id
+            WHERE m.moderator_id = :moderator_id
         ";
         $fetchModeratorStmt = $pdo->prepare($fetchModeratorSQL);
         $fetchModeratorStmt->bindParam(":moderator_id", $moderator_id);
         $fetchModeratorStmt->execute();
-        $moderatorData = $fetchModeratorStmt->fetch(PDO::FETCH_ASSOC);
+        $moderatorData = $fetchModeratorStmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Ensure we have the moderator details
         if ($moderatorData) {
-            // Store the moderator's full name
-            $moderatorFullName = $moderatorData['firstName'] . ' ' . $moderatorData['middleName'] . ' ' . $moderatorData['lastName'];
+            // Loop through the clubs and insert the data into tbl_moderator_archive
+            foreach ($moderatorData as $data) {
+                $firstName = $data['firstName'];
+                $middleName = $data['middleName'];
+                $lastName = $data['lastName'];
+                $clubName = $data['clubName'] ;
+                $dateAssigned = $data['dateAssigned'];
+                $dateUnassigned = date("Y-m-d H:i:s"); // Date when moderator is unassigned
+
+                // Insert into tbl_moderator_archive
+                $archiveSQL = "
+                    INSERT INTO tbl_moderator_archive (moderator_id, firstName, middleName, lastName, clubName, dateAssigned, dateUnassigned)
+                    VALUES (:moderator_id, :firstName, :middleName, :lastName, :clubName, :dateAssigned, :dateUnassigned)
+                ";
+                $archiveStmt = $pdo->prepare($archiveSQL);
+                $archiveStmt->bindParam(":moderator_id", $moderator_id); // Store moderator_id
+                $archiveStmt->bindParam(":firstName", $firstName);
+                $archiveStmt->bindParam(":middleName", $middleName);
+                $archiveStmt->bindParam(":lastName", $lastName);
+                $archiveStmt->bindParam(":clubName", $clubName); // Insert "None" if no club
+                $archiveStmt->bindParam(":dateAssigned", $dateAssigned);
+                $archiveStmt->bindParam(":dateUnassigned", $dateUnassigned);
+                $archiveStmt->execute();
+            }
 
             // Prepare a delete statement for the moderators table
             $sql = "DELETE FROM tbl_moderators WHERE moderator_id = :moderator_id";
@@ -80,6 +104,7 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
     unset($stmt);
     unset($stmt2);
     unset($logStmt);
+    unset($archiveStmt);
     unset($pdo);
 } else {
     // Check existence of moderator_id parameter
@@ -92,19 +117,21 @@ if (isset($_POST["moderator_id"]) && !empty($_POST["moderator_id"])) {
 ?>
 
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Delete Moderator</title>
+    <title>ESAS - Delete Moderator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         .wrapper {
             width: 100%;

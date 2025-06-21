@@ -12,6 +12,35 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 
+//FOR VAV_MAIN FULL NAME PURPOSES
+try {
+    // Use the existing PDO instance from config.php
+    global $pdo;
+
+    // Prepare and execute the SQL statement
+    $sql = "SELECT firstName, middleName, lastName FROM tbl_moderators WHERE moderator_id = :moderator_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    // Fetch the result
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check if a result was found
+    if ($result) {
+        $firstName = strtoupper($result['firstName']);
+        $middleName = strtoupper($result['middleName']);
+        $lastName = strtoupper($result['lastName']);
+    } else {
+        // Handle the case where no data is found
+        $firstName = $middleName = $lastName = "UNKNOWN";
+    }
+
+} catch (PDOException $e) {
+    // Handle database connection or query error
+    die("Database error: " . $e->getMessage());
+}
+
 try {
     // Use the existing PDO instance from config.php
     global $pdo;
@@ -57,12 +86,12 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - Reports</title>
+    <title>ESAS - Reports</title>
     <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/img/NBSC_LOGO.png" rel="icon"> <!-- TAB LOGO -->
     <style>
         .nav-link.active {
           color: white !important;
@@ -86,6 +115,7 @@ try {
 
         .label {
             width: 110px;
+            width: auto;
             text-align: left;
             padding-left: 15px;
             vertical-align: top;
@@ -122,7 +152,7 @@ try {
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
                     <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
-                    eSAS - Moderator</a>
+                    ESAS - Moderator</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
                     <span class="navbar-toggler-icon"></span>
@@ -168,6 +198,21 @@ try {
                             <i class="fas fa-file-alt"></i> Reports
                         </a>
                     </li>
+                    <br>
+                    Others
+                    <li>
+                        <a href="../../esas_moderator/public/accomplishment_reports.php" class="nav-link left-sidebar text-dark" id="accomplishment_reports" 
+                            style="display: flex; gap: 7px; align-items: flex-start;">
+                        
+                            <span class="icon-column" style="flex-shrink: 0;">
+                                <i class="fas fa-file-alt"></i>
+                            </span>
+                                
+                            <span class="text-column" style="line-height: 1.2;">
+                                Accomplishment Reports
+                            </span>
+                        </a>
+                    </li>
                 </ul>
             </div>
 
@@ -183,12 +228,12 @@ try {
 
                         <!-- THE MAIN PAGE START --> 
                         <div class="card p-2">
-                            <!-- ALL STUDENT TABLE START -->
-                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
-                                <div class="row mb-3">
+
+                            <div class="row mb-2 p-2">
                                     <!-- Report Type Dropdown -->
+                                    <label for="clubDropdown" class="col-auto col-form-label">Report Type:</label>
                                     <div class="col-md-2">
-                                        <select id="reportType" class="form-control">
+                                        <select id="reportType" class="form-select form-select-sm">
                                             <option value="">-- Select Report Type --</option>
                                             <option value="club_students_list">List of Students in Club</option>
                                             <option value="pending_approvals">Pending Club Application Approvals</option>
@@ -199,39 +244,106 @@ try {
                                     </div>
 
                                     <!-- Club Dropdown -->
-                                    <div class="col-md-2">
-                                        <select id="clubSelect" class="form-control">
-                                            <option value="">Select Club</option>
-                                            <?php foreach ($clubs as $club): ?>
-                                                <option value="<?= $club['club_id']; ?>"><?= $club['clubName']; ?></option>
+                                    <label for="clubDropdown" class="col-auto col-form-label">Club:</label>
+                                    <div class="col-auto">
+                                        <select id="clubDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                                            <?php
+                                            // Prepare the SQL query to fetch clubs managed by the current moderator
+                                            $sql = "
+                                                SELECT c.club_id, c.clubName 
+                                                FROM tbl_clubs c
+                                                JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
+                                                WHERE cm.moderator_id = :moderator_id
+                                            ";
+
+                                            // Execute the query
+                                            $stmt = $pdo->prepare($sql);
+                                            $stmt->execute(['moderator_id' => $moderator_id]);
+
+                                            // Fetch the results
+                                            $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                            // Change: Fetch the first club for default value
+                                            $defaultClubId = $clubs[0]['club_id'] ?? null; // Use the first club ID if available
+
+                                            // Generate the dropdown options
+                                            foreach ($clubs as $club): ?>
+                                                <option value="<?php echo htmlspecialchars($club['club_id']); ?>"
+                                                    <?php if (isset($_GET['club_id']) && $_GET['club_id'] == $club['club_id']) echo 'selected'; ?>>
+                                                    <?php echo htmlspecialchars($club['clubName']); ?>
+                                                </option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
 
                                     <!-- Date Inputs and Buttons -->
-                                    <div class="col-md-2">
-                                        <input type="text" id="startDate" class="form-control" placeholder="Start Date" onfocus="(this.type='date')">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <input type="text" id="endDate" class="form-control" placeholder="End Date" onfocus="(this.type='date')">
-                                    </div>
-                                    <div class="text-end col-md-4">
-                                        <button id="generateReport" class="btn btn-primary">Generate Report</button>
-                                        <button id="printReport" class="btn btn-secondary"><i class="fas fa-print"></i> Print Report</button>
-                                    </div>
-                                </div>
+                                    <label for="schoolYearDropdown" class="col-auto col-form-label">School Year:</label>
+                                    <div class="col-auto">
+                                        <select id="schoolYearDropdown" class="form-select form-select-sm" style="width: 150px;" onchange="filterDashboard()">
+                                            <?php
+                                            try {
+                                                // Fetch distinct years where clubs were added
+                                                $sql = "SELECT DISTINCT YEAR(dateAdded) as year FROM tbl_clubs ORDER BY year DESC";
+                                                $stmt = $pdo->prepare($sql);
+                                                $stmt->execute();
+                                                $years = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+                                                // Latest school year by default (if not set via URL)
+                                                $latestYear = $years[0]['year'] ?? null;
+                                                $defaultSchoolYear = $latestYear . '-' . ($latestYear + 1);
+
+                                                // Selected school year from the URL, or default to the latest school year
+                                                $selectedSchoolYear = isset($_GET['school_year']) ? $_GET['school_year'] : $defaultSchoolYear;
+
+                                                // Create school year ranges starting from August and ending in July next year
+                                                foreach ($years as $year) {
+                                                    $startYear = $year['year'];
+                                                    $endYear = $startYear + 1;
+                                                    $schoolYear = $startYear . '-' . $endYear;
+
+                                                    echo "<option value=\"" . htmlspecialchars($schoolYear) . "\"";
+                                                    if ($selectedSchoolYear === $schoolYear) {
+                                                        echo " selected";
+                                                    }
+                                                    echo ">" . htmlspecialchars($schoolYear) . "</option>";
+                                                }
+                                            } catch (PDOException $e) {
+                                                echo "Error: " . htmlspecialchars($e->getMessage());
+                                            }
+                                            ?>
+                                            <option value="all">All</option>
+                                        </select>
+
+                                    </div>
+
+
+                                    <div class="text-end col-md-3">
+                                        <button id="generateReport" class="btn btn-primary">Generate Report</button>
+                                        <button id="printReport" class="btn btn-secondary"><i class="fas fa-print"></i> Print</button>
+                                    </div>
+
+                            </div>
+
+
+                            <!-- ALL STUDENT TABLE START -->
+                            <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
+                                
                                 <!-- Report Title and Description -->
                                 <table>
                                     <tr>
-                                        <td class="label"><strong>Report Title:</strong></td>
-                                        <td id="reportTitle"></td>
+                                        <h3 class="label"><strong></strong></h3>
+                                        <h3 id="reportTitle"></h3>
                                     </tr>
                                     <tr>
-                                        <td class="label"><strong>Description:</strong></td>
-                                        <td id="reportDescription"></td>
+                                        <td class="label"><strong></strong></td>
+                                        <p id="reportDescription"></p>
                                     </tr>
                                 </table>
+
+                                <div class="mt-3">
+                                    <!-- Date will be dynamically added here -->
+                                    <div id="currentDate"></div>
+                                </div>
 
                                 <div class="mt-3" id="reportContent">
                                     <!-- Dynamically generated table will be inserted here -->
@@ -267,64 +379,28 @@ try {
     <script>
 document.getElementById('generateReport').addEventListener('click', function () {
     const reportType = document.getElementById('reportType').value;
-    const clubId = document.getElementById('clubSelect').value; // Get the selected club ID
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
+    const clubId = document.getElementById('clubDropdown').value; // Updated to use 'clubDropdown'
+    const schoolYear = document.getElementById('schoolYearDropdown').value;
 
-    // Validate that a report type, club, and date range are selected
-    if (!reportType || !clubId) {
-        alert('Please select a report type and a club.');
-        return;
-    }
-    
-    if (startDate && endDate && startDate > endDate) {
-        alert('Start Date cannot be after End Date.');
+    // Validate that a report type, club, and school year are selected
+    if (!reportType || !clubId || !schoolYear) {
+        alert('Please select a report type, club, and school year.');
         return;
     }
 
     // Dynamically generate title and description
     generateTitleAndDescription(reportType);
 
-    // Fetch and display report data, pass start and end dates
-    fetchReportData(reportType, clubId, startDate, endDate); // Pass the dates as well
+    // Display the current date when report is generated
+    const today = new Date();
+    const currentDate = today.toLocaleDateString(); // Format the date as needed (e.g., 'MM/DD/YYYY')
+    document.getElementById('currentDate').innerText = `Date: ${currentDate}`;
+
+    // Fetch and display report data, pass school year
+    fetchReportData(reportType, clubId, schoolYear); // Updated to pass 'schoolYear'
 });
 
-function generateTitleAndDescription(reportType) {
-    let reportTitle = '';
-    let reportDescription = '';
-
-    switch (reportType) {
-        case 'club_students_list':
-            reportTitle = "List of Students in Club";
-            reportDescription = "This report shows the basic information of all students registered in this club.";
-            break;
-        case 'pending_approvals':
-            reportTitle = "Pending Club Application Approvals";
-            reportDescription = "This report lists all the basic information of students whose applications are pending for this club.";
-            break;
-        case 'disapproved_applications':
-            reportTitle = "Disapproved Student Applications";
-            reportDescription = "This report provides a summary of the basic information of students whose applications were disapproved for this club.";
-            break;
-        case 'pending_departure_requests':
-            reportTitle = "Pending Departure Requests";
-            reportDescription = "This report lists all pending requests from students wanting to leave this club.";
-            break;
-        case 'upcoming_events':
-            reportTitle = "Upcoming Events";
-            reportDescription = "This report displays all upcoming events organized by this club.";
-            break;
-        default:
-            reportTitle = "Report";
-            reportDescription = "This is a dynamically generated report for this club.";
-    }
-
-    document.getElementById('reportTitle').innerText = reportTitle;
-    document.getElementById('reportDescription').innerText = reportDescription;
-}
-
-
-function fetchReportData(reportType, clubId, startDate, endDate) {
+function fetchReportData(reportType, clubId, schoolYear) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '../apis/fetch-report-api.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -332,22 +408,133 @@ function fetchReportData(reportType, clubId, startDate, endDate) {
     xhr.onload = function () {
         if (this.status === 200) {
             document.getElementById('reportContent').innerHTML = this.responseText;
+        } else {
+            document.getElementById('reportContent').innerHTML = "<div class='alert alert-danger'>Failed to load report data.</div>";
         }
     };
 
-    // Send reportType, clubId, startDate, and endDate in the request
-    xhr.send(`reportType=${reportType}&club_id=${clubId}&startDate=${startDate}&endDate=${endDate}`);
+    // If 'All' is selected, send an empty string to the backend for school year
+    if (schoolYear === 'all') {
+        schoolYear = ''; // Send empty to fetch all records
+    }
+
+    // Send reportType, clubId, and schoolYear in the request
+    xhr.send(`reportType=${reportType}&club_id=${clubId}&schoolYear=${schoolYear}`);
 }
+
+
+function generateTitleAndDescription(reportType) {
+    let reportTitle = '';
+    let reportDescription = '';
+
+    // Get selected club name and school year
+    const clubDropdown = document.getElementById('clubDropdown');
+    const clubName = clubDropdown.options[clubDropdown.selectedIndex].text;
+    const schoolYear = document.getElementById('schoolYearDropdown').value;
+
+    // Check if 'All' is selected for the school year
+    const schoolYearText = schoolYear === 'all' ? 'all School Years' : `School Year ${schoolYear}`;
+
+    switch (reportType) {
+        case 'club_students_list':
+            reportTitle = `List of Students - ${clubName}`;
+            reportDescription = `This report shows the basic information of all students registered in ${clubName} in ${schoolYearText}`;
+            break;
+        case 'pending_approvals':
+            reportTitle = `Pending Club Application Approvals - ${clubName}`;
+            reportDescription = `This report lists all basic information of students whose applications are pending for ${clubName} in ${schoolYearText}`;
+            break;
+        case 'disapproved_applications':
+            reportTitle = `Disapproved Student Applications - ${clubName}`;
+            reportDescription = `This report provides a summary of basic information of students whose applications were disapproved for ${clubName} in ${schoolYearText}`;
+            break;
+        case 'pending_departure_requests':
+            reportTitle = `Pending Departure Requests - ${clubName}`;
+            reportDescription = `This report lists all pending requests from students wanting to leave ${clubName} in ${schoolYearText}`;
+            break;
+        case 'upcoming_events':
+            reportTitle = `Upcoming Events - ${clubName}`;
+            reportDescription = `This report displays all upcoming events organized by ${clubName} in ${schoolYearText}`;
+            break;
+        default:
+            reportTitle = `Report for ${clubName}`;
+            reportDescription = `This is a dynamically generated report for ${clubName} in ${schoolYearText}`;
+    }
+
+    document.getElementById('reportTitle').innerText = reportTitle;
+    document.getElementById('reportDescription').innerText = reportDescription;
+}
+
 
 // Print report functionality
 document.getElementById('printReport').addEventListener('click', function () {
-    const printContent = document.getElementById('reportContent').innerHTML;
-    const originalContent = document.body.innerHTML;
+    // Preload the images
+    const NBSCLogoPath = "../../assets/img/NBSC_LOGO.png"; // Update the path if necessary
+    const SASLogoPath = "../../assets/img/SAS_LOGO.png"; // Update the path if necessary
+    
+    // Check if images are loaded before printing
+    const preloadLogo = new Image();
+    preloadLogo.src = NBSCLogoPath;
 
-    document.body.innerHTML = printContent;
-    window.print();
-    document.body.innerHTML = originalContent;
+    const preloadSasLogo = new Image();
+    preloadSasLogo.src = SASLogoPath;
+
+    // Wait until both images are loaded
+    Promise.all([imageLoad(preloadLogo), imageLoad(preloadSasLogo)]).then(function () {
+        // Get the current date dynamically
+        const today = new Date();
+        const currentDate = today.toLocaleDateString();
+
+        // Generate print content after images are loaded
+        const reportTitle = document.getElementById('reportTitle').outerHTML;
+        const reportDescription = document.getElementById('reportDescription').outerHTML;
+        const reportContent = document.getElementById('reportContent').outerHTML;
+
+        // Combine all sections into one printable format
+        const printContent = `
+            <div>
+                <div style="display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 50px;">
+                    <img src="${NBSCLogoPath}" style="height: 1in; margin-right: 10px;">
+                    <div style="text-align: center; line-height: 1.2; padding: 0;">
+                        <div style="margin: 0;">Republic of the Philippines</div>
+                        <div style="margin: 0;"><strong>NORTHERN BUKIDNON STATE COLLEGE</strong></div>
+                        <div style="margin: 0;"><em>(Formerly Northern Bukidnon Community College)</em> R.A.11284</div>
+                        <div style="margin: 0;">Manolo Fortich, 8703 Bukidnon • 535-3873 • <span class="text-primary">nbscadmin@nbsc.edu.ph</span></div>
+                        <div style="margin: 0;">Creando futura, Transformationis vitae, Ductae a Deo</div>
+                    </div>
+                    <img src="${SASLogoPath}" style="height: .75in; margin-left: 10px;">
+                </div>
+
+                <!-- Add the current date to the printable content -->
+                <div style="text-align: center; margin-bottom: 20px;">Date: ${currentDate}</div>
+
+                <h2>${reportTitle}</h2>
+                <p>${reportDescription}</p>
+                ${reportContent}
+            </div>
+        `;
+
+        const originalContent = document.body.innerHTML;
+
+        // Set the body content to only the printable content
+        document.body.innerHTML = printContent;
+
+        // Trigger the print dialog
+        window.print();
+
+        // Restore the original content after printing
+        document.body.innerHTML = originalContent;
+    });
 });
+
+// Helper function to check if an image is loaded
+function imageLoad(img) {
+    return new Promise(function (resolve, reject) {
+        img.onload = resolve;
+        img.onerror = reject;
+    });
+}
+
 </script>
 
 

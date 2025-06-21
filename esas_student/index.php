@@ -44,18 +44,18 @@ if ($result) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - Index</title>
+    <title>ESAS - Index</title>
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../assets/js/jquery-3.6.0.js"></script>
     <link href="../assets/css/styles.css" rel="stylesheet" />
-    <link href="../assets/img/nbsclogo.png" rel="icon">
+    <link href="../assets/img/NBSC_LOGO.png" rel="icon">
 </head>
 
 <body class="sb-nav-fixed">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
         <a class="navbar-brand ps-2" href="#">
-            <img src="../assets/img/nbsclogo.png" style="height: 0.3in;">
+            <img src="../assets/img/NBSC_LOGO.png" style="height: 0.3in;">
             NBSC SIS</a>
         </button>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
@@ -75,7 +75,7 @@ if ($result) {
                     <!-- LOAD MAIN DATA HERE -->
                     <div class="row">
                         <div class="col-12" style="text-align: -webkit-center;">
-                            <img src="../assets/img/nbsclogo.png" style="height: 1.5in; margin-top:100px; font-family: fantasy;color: #002d54 !important;">
+                            <img src="../assets/img/NBSC_LOGO.png" style="height: 1.5in; margin-top:100px; font-family: fantasy;color: #002d54 !important;">
                         </div>
                     </div>
                     <div class="row">

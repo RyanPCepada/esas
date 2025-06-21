@@ -40,92 +40,6 @@ if (isset($_GET['club_id'])) {
     exit(); // Make sure to call exit after redirecting
 }
 
-// Handle post submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validate post content
-    $input_postContent = trim($_POST["postContent"]);
-    if (empty($input_postContent)) {
-        $postContent_err = "Please enter the post content.";
-    } else {
-        $postContent = $input_postContent;
-    }
-
-    // Check for errors before inserting into the database
-    if (empty($postContent_err)) {
-        try {
-            // Begin transaction
-            $pdo->beginTransaction();
-
-            // Prepare an insert statement for the post
-            $sql = "INSERT INTO tbl_posts (post, dateAdded, club_id, moderator_id) VALUES (:post, NOW(), :club_id, :moderator_id)";
-            $stmt = $pdo->prepare($sql);
-
-            // Bind variables to the prepared statement as parameters
-            $stmt->bindParam(":post", $postContent);
-            $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT); 
-            $stmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT);
-
-            // Execute the statement
-            if ($stmt->execute()) {
-                // Get the ID of the inserted post
-                $post_id = $pdo->lastInsertId();
-
-                // Notify all students registered in the club
-                $sql = "SELECT student_id FROM tbl_registration WHERE club_id = :club_id AND status = 'active'";
-                $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-                $stmt->execute();
-                $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                // Check if any students were found
-                if (!empty($students)) {
-                    foreach ($students as $student) {
-                        // Insert notification for each student
-                        $sql = "INSERT INTO tbl_notifications (notification, student_id, club_id, post_id, is_read, dateAdded)
-                                VALUES ('Posted an announcement', :student_id, :club_id, :post_id, 0, NOW())";
-                        $stmt = $pdo->prepare($sql);
-                        $stmt->bindParam(":student_id", $student['student_id'], PDO::PARAM_INT);
-                        $stmt->bindParam(":club_id", $club_id, PDO::PARAM_INT);
-                        $stmt->bindParam(":post_id", $post_id, PDO::PARAM_INT);
-                        $stmt->execute();
-                    }
-                }
-
-                // Log the post creation activity in tbl_activity_logs
-                $activity = "You created a post in {$clubName}";
-                $sql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) 
-                        VALUES (:activity, NOW(), NULL, :moderator_id, NULL)";
-                $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(":activity", $activity);
-                $stmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT);
-                $stmt->execute();
-
-                // Commit transaction
-                $pdo->commit();
-
-                // Return a JSON response
-                echo json_encode([
-                    "success" => true,
-                    "message" => "Post created successfully!",
-                    "redirect_url" => "home.php?club_id={$club_id}"
-                ]);
-            } else {
-                throw new Exception("Post insertion failed.");
-            }
-
-        } catch (Exception $e) {
-            // Rollback transaction on error
-            $pdo->rollBack();
-            echo json_encode(["success" => false, "message" => "Oops! Something went wrong. Please try again later."]);
-        }
-    } else {
-        echo json_encode(["success" => false, "message" => $postContent_err]);
-    }
-
-    // Close connection
-    unset($pdo);
-    exit();
-}
 
 // Close connection
 unset($pdo);
@@ -139,7 +53,7 @@ unset($pdo);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Moderator Home</title>
+    <title>ESAS - Moderator Home</title>
     <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -158,7 +72,7 @@ unset($pdo);
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/img/NBSC_LOGO.png" rel="icon">
 
 
     <style>
@@ -380,7 +294,7 @@ unset($pdo);
             <!-- Main Body Section with Cover Photo -->
             <div class="">
                 <div class="cover-photo-container mb-3">
-                    <img src="/esas/esas_moderator/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
+                    <img src="/esas/esas_admin/images/<?php echo htmlspecialchars($coverPhoto); ?>" alt="Cover Photo" class="img-fluid mb-3">
                 </div>
                 <div class="overlay-text">
                     <div class="d-flex align-items-center">
@@ -413,36 +327,43 @@ unset($pdo);
                                         <h4 class="mb-0">Share Something Exciting!</h4>
                                     </div>
                                     <div class="card-body">
-                                        <form id="postForm" method="POST" action="home.php?club_id=<?php echo $club_id; ?>" enctype="multipart/form-data">
+                                        <!-- Form to Post Content -->
+                                        <form id="postForm" method="POST" action="../actions/add_post_action.php" enctype="multipart/form-data">
+                                            <input type="hidden" name="club_id" value="<?php echo $club_id; ?>"> <!-- Add this hidden field -->
                                             <div class="form-group mb-0">
                                                 <label for="postContent">What's on your mind?</label>
                                                 <textarea name="postContent" class="form-control" id="postContent" rows="3" placeholder="Share <?php echo htmlspecialchars($clubName); ?>'s latest news, events, or updates..."><?php echo htmlspecialchars($postContent); ?></textarea>
                                                 <span class="text-danger"><?php echo $postContent_err; ?></span>
                                             </div>
 
-                                            <!-- Icon Buttons for Uploading Images, Files, and Videos -->
-                                            <!-- <div class="form-group d-flex justify-content-end mt-0 mb-0">
-                                                <button type="button" class="btn btn-outline px-1 py-0 m-1" id="imageUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
-                                                    <i class="fa fa-image text-info"></i>
-                                                    <input type="file" name="images[]" id="imageUpload" accept="image/*" multiple style="display: none;">
-                                                </button>
-                                                <button type="button" class="btn btn-outline px-1 py-0 m-1" id="fileUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
-                                                    <i class="fa fa-file text-info"></i>
-                                                    <input type="file" name="files[]" id="fileUpload" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" multiple style="display: none;">
-                                                </button>
-                                                <button type="button" class="btn btn-outline px-1 py-0 m-1" id="videoUploadBtn" style="background: transparent; border: none; font-size: 1.5rem;">
-                                                    <i class="fa fa-video text-info"></i>
-                                                    <input type="file" name="videos[]" id="videoUpload" accept="video/*" multiple style="display: none;">
-                                                </button>
-                                            </div> -->
-
                                             <div class="d-flex justify-content-between align-items-center mt-3">
-                                                <button type="submit" class="btn btn-primary" style="border-radius: 3px;"><i class="fa fa-paper-plane"></i> Post</button>
+                                                <button type="submit" class="btn btn-primary" style="border-radius: 3px;" id="postButton"><i class="fa fa-paper-plane"></i> Post</button>
                                                 <div class="text-muted ml-2">
                                                     <p>Let your club members know what's happening!</p>
                                                 </div>
                                             </div>
                                         </form>
+
+                                        <script>
+                                            // Ensure no other handlers are attached to the form
+                                            document.getElementById('postForm').addEventListener('submit', function(event) {
+                                                event.preventDefault(); // Prevent form from submitting immediately
+
+                                                // Check if the button is already disabled to prevent multiple submissions
+                                                if (document.getElementById('postButton').disabled) {
+                                                    return; // Exit the function if the button is already disabled
+                                                }
+
+                                                // Disable the post button to prevent multiple submissions
+                                                document.getElementById('postButton').disabled = true;
+
+                                                // Change the button text to "Posting..."
+                                                document.getElementById('postButton').innerHTML = 'Posting...';
+                                            });
+
+                                        </script>
+
+
                                     </div>
                                 </div>
                             </div>

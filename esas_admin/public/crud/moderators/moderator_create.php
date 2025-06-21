@@ -54,6 +54,27 @@ function getNextModeratorIncrement($pdo, $schoolYearCode) {
     return $nextIncrement;
 }
 
+// Function to check if the generated moderator ID already exists
+function checkModeratorIdExistence($pdo, $moderator_id) {
+    // Check in tbl_moderators
+    $sql = "SELECT COUNT(*) FROM tbl_moderators WHERE moderator_id = :moderator_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':moderator_id', $moderator_id);
+    $stmt->execute();
+    $moderatorExists = $stmt->fetchColumn() > 0;
+
+    // Check in tbl_moderator_archive
+    if (!$moderatorExists) {
+        $sql = "SELECT COUNT(*) FROM tbl_moderator_archive WHERE moderator_id = :moderator_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':moderator_id', $moderator_id);
+        $stmt->execute();
+        $moderatorExists = $stmt->fetchColumn() > 0;
+    }
+
+    return $moderatorExists;
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input_firstName = trim($_POST["firstName"]);
     if (empty($input_firstName)) {
@@ -88,8 +109,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nextIncrement = getNextModeratorIncrement($pdo, $schoolYearCode);
     $moderator_id = $schoolYearCode . $nextIncrement; // Example: '24250022'
 
+    // Check if the generated ID already exists
+    while (checkModeratorIdExistence($pdo, $moderator_id)) {
+        $nextIncrement = str_pad((int)substr($moderator_id, 4, 4) + 1, 4, '0', STR_PAD_LEFT); 
+        $moderator_id = $schoolYearCode . $nextIncrement; // Regenerate ID if it exists
+    }
+
     // Set default profile picture
     $profilePic = PROF_PIC_DEFAULT;
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     if (empty($firstName_err) && empty($middleName_err) && empty($lastName_err) && empty($password_err)) {
         $sql = "INSERT INTO tbl_moderators (firstName, middleName, lastName, moderator_id, password, profilePic, dateAdded) 
@@ -99,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(":middleName", $middleName);
             $stmt->bindParam(":lastName", $lastName);
             $stmt->bindParam(":moderator_id", $moderator_id);
-            $stmt->bindParam(":password", $password);
+            $stmt->bindParam(":password", $hashed_password);
             $stmt->bindParam(":profilePic", $profilePic);
 
             if ($stmt->execute()) {
@@ -146,21 +174,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, name-scale=1.0">
-    <title>eSAS - Add Moderator</title>
+    <title>ESAS - Add Moderator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../../assets/img/NBSC_LOGO.png" rel="icon">
 
     <style>
         .wrapper {

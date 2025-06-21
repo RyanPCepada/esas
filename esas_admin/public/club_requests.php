@@ -50,12 +50,12 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - Club Requests</title>
+    <title>ESAS - Club Requests</title>
     <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         .nav-link.active {
           color: white !important;
@@ -95,7 +95,7 @@ try {
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
                     <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
-                    eSAS - Admin</a>
+                    ESAS - Admin</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
                     <span class="navbar-toggler-icon"></span>
@@ -146,6 +146,19 @@ try {
                     <li>
                         <a href="../../esas_admin/public/officers_charts.php" class="nav-link left-sidebar text-dark" id="officers_charts">
                             <i class="fas fa-user-tie"></i> CSG & SBO Officers
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../../esas_admin/public/accomplishment_reports.php" class="nav-link left-sidebar text-dark" id="accomplishment_reports" 
+                            style="display: flex; gap: 7px; align-items: flex-start;">
+                        
+                            <span class="icon-column" style="flex-shrink: 0;">
+                                <i class="fas fa-file-alt"></i>
+                            </span>
+                            
+                            <span class="text-column" style="line-height: 1.2;">
+                                Accomplishment Reports
+                            </span>
                         </a>
                     </li>
                 </ul>
@@ -221,13 +234,14 @@ try {
                                             s.department,
                                             s.course,  -- Added Course field
                                             s.profilePic,
+                                            r.dateRequested,
                                             GROUP_CONCAT(DISTINCT r.clubName ORDER BY r.clubName ASC SEPARATOR ', ') AS clubNames
                                         FROM tbl_club_requests r
                                         JOIN tbl_students s ON r.student_id = s.student_id
-                                        LEFT JOIN tbl_registration reg ON s.student_id = reg.student_id
+                                        LEFT JOIN tbl_application reg ON s.student_id = reg.student_id
                                         WHERE reg.status = 'active' -- Filter for active students
                                         GROUP BY r.request_id
-                                        ORDER BY r.dateRequested DESC";
+                                        ORDER BY r.dateRequested ASC";
 
                                 if ($result = $pdo->query($sql)) {
                                     $totalRows = $result->rowCount();
@@ -244,6 +258,7 @@ try {
                                                         <th>Department</th>
                                                         <th>Course</th>
                                                         <th>Status</th>
+                                                        <th>Date Requested</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                 </thead>
@@ -255,10 +270,12 @@ try {
                                             $course = htmlspecialchars($row['course']);
                                             $clubName = htmlspecialchars($row['clubName']);
                                             $status = htmlspecialchars($row['status']);
+                                            $dateRequested = htmlspecialchars($row['dateRequested']);
                                             $requestId = htmlspecialchars($row['request_id']);
                                             $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
                                             $coverPhoto = htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-club.jpg'); // Use a default if no cover photo
 
+                                            $dateRequestedFormatted = (new DateTime($dateRequested))->format('F j, Y');
                                             echo '
                                             <tr class="request-row">
                                                 <td class="text-center p-1">
@@ -276,10 +293,11 @@ try {
                                                 <td>' . $department . '</td>
                                                 <td>' . $course . '</td>  <!-- Course data -->
                                                 <td>' . $status . '</td>
+                                                <td>' . $dateRequestedFormatted . '</td>
                                                 <td class="text-center">
                                                     <a href="../public/crud/club_requests/club_request_read.php?request_id=' . $requestId . '" class="mr-2" title="View Request" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                                     <!--<a href="../public/crud/club_requests/club_request_update.php?request_id=' . $requestId . '" class="mr-2" title="Update Request" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>-->
-                                                    <a href="../public/crud/club_requests/club_request_delete.php?request_id=' . $requestId . '" class="text-danger" title="Delete Request" data-toggle="tooltip"><span class="fa fa-trash"></span></a>
+                                                    <!--<a href="../public/crud/club_requests/club_request_delete.php?request_id=' . $requestId . '" class="text-danger" title="Delete Request" data-toggle="tooltip"><span class="fa fa-trash"></span></a>-->
                                                 </td>
                                             </tr>';
                                         }

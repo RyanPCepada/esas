@@ -85,7 +85,7 @@ if ($post_id) {
             $pdo->commit();
 
             $response['success'] = true;
-            $response['message'] = 'Post deleted and activity logged successfully.';
+            $response['message'] = 'Post deleted successfully.';
         } else {
             // If post not found, rollback and set response message
             $pdo->rollBack();

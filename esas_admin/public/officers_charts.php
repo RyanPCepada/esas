@@ -55,12 +55,12 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - CSG & SBO OFFICERS</title>
+    <title>ESAS - CSG & SBO OFFICERS</title>
     <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         .nav-link.active {
           color: white !important;
@@ -160,7 +160,7 @@ try {
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
                     <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
-                    eSAS - Admin</a>
+                    ESAS - Admin</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
                     <span class="navbar-toggler-icon"></span>
@@ -211,6 +211,19 @@ try {
                     <li>
                         <a href="../../esas_admin/public/officers_charts.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="officers_charts">
                             <i class="fas fa-user-tie"></i> CSG & SBO Officers
+                        </a>
+                    </li>
+                    <li>
+                        <a href="../../esas_admin/public/accomplishment_reports.php" class="nav-link left-sidebar text-dark" id="accomplishment_reports" 
+                            style="display: flex; gap: 7px; align-items: flex-start;">
+                        
+                            <span class="icon-column" style="flex-shrink: 0;">
+                                <i class="fas fa-file-alt"></i>
+                            </span>
+                            
+                            <span class="text-column" style="line-height: 1.2;">
+                                Accomplishment Reports
+                            </span>
                         </a>
                     </li>
                 </ul>
@@ -300,7 +313,7 @@ try {
                     </div>
                     <div class="col text-center d-flex flex-column align-items-center">
                         <h5>New Chart:</h5>
-                        <img id="newChartImage" src="" alt="New Chart" class="img-fluid" style="border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5); display: none; max-width: 300px; max-height: 300px;" />
+                        <img id="newChartImage" src="" alt="New Chart" class="img-fluid" style="border-radius: 15px; box-shadow: 0 5px 10px rgba(0, 0, 0, .5); display: none; max-width: 230px; max-height: 300px;" />
                     </div>
                 </div>
                 <form id="changeForm" action="/esas/esas_admin/public/crud/officers_charts/chart_update.php" method="POST" enctype="multipart/form-data" class="mt-3">

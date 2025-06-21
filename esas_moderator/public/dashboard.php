@@ -12,6 +12,7 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 
+//FOR VAV_MAIN FULL NAME PURPOSES
 try {
     // Use the existing PDO instance from config.php
     global $pdo;
@@ -43,6 +44,214 @@ try {
 
 
 
+
+
+
+
+    // Fetch the default club_id from tbl_clubs_and_moderators
+    $sqlClub = "
+        SELECT club_id 
+        FROM tbl_clubs_and_moderators 
+        WHERE moderator_id = :moderator_id 
+        ORDER BY dateAdded ASC 
+        LIMIT 1
+    ";
+    $stmtClub = $pdo->prepare($sqlClub);
+    $stmtClub->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+    $stmtClub->execute();
+    $clubResult = $stmtClub->fetch(PDO::FETCH_ASSOC);
+
+    if ($clubResult) {
+        $defaultClubId = $clubResult['club_id'];
+    } else {
+        $defaultClubId = null; // No clubs assigned to this moderator
+    }
+
+    // Set the club_id from the query or default to the first club if not in URL
+    if (isset($_GET["club_id"])) {
+        $club_id = trim($_GET["club_id"]);
+    } else {
+        $club_id = $defaultClubId ?: 'no_club_assigned'; // Fallback if no default club found
+    }
+    
+
+
+
+
+
+
+
+
+
+// AWARDS RANKS
+
+// Helper function to determine the correct suffix for a rank
+function getRankWithSuffix($rank) {
+    if (!in_array(($rank % 100), [11, 12, 13])) { // Handle special cases for 11th, 12th, 13th
+        switch ($rank % 10) {
+            case 1: return $rank . "st";
+            case 2: return $rank . "nd";
+            case 3: return $rank . "rd";
+        }
+    }
+    return $rank . "th";
+}
+
+
+// Initialize rank variables
+$mostAppliedClubRank = "";
+$highestInMembersRank = "";
+$mostActiveClubRank = "";
+$fastestGrowingClubRank = "";
+
+// Rank for Most Active Club
+try {
+    $stmt = $pdo->prepare("
+        SELECT c.club_id, c.clubName, COUNT(a.activity_id) AS activity_count
+        FROM tbl_activity_logs a
+        INNER JOIN tbl_clubs c ON a.club_id = c.club_id
+        WHERE a.club_id IS NOT NULL
+        GROUP BY c.club_id, c.clubName
+        ORDER BY activity_count DESC, c.clubName
+    ");
+    $stmt->execute();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $rank = 1;
+    foreach ($clubs as $club) {
+        if ($club['club_id'] == $club_id) {
+            $mostActiveClubRank = getRankWithSuffix($rank);
+            break;
+        }
+        $rank++;
+    }
+} catch (PDOException $e) {
+    echo "Error fetching most active club rank: " . $e->getMessage();
+}
+// Default rank value if no rank is fetched
+$mostActiveClubRank = $mostActiveClubRank ?: "<small>Unqualified</small>";
+
+
+// Rank for Most Applied Club
+try {
+    $stmt = $pdo->prepare("
+        SELECT tbl_clubs.club_id, tbl_clubs.clubName, COUNT(tbl_application.application_id) AS application_count 
+        FROM tbl_application 
+        INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_application.club_id
+        GROUP BY tbl_clubs.club_id 
+        ORDER BY application_count DESC, tbl_clubs.clubName
+    ");
+    $stmt->execute();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $rank = 1;
+    foreach ($clubs as $club) {
+        if ($club['club_id'] == $club_id) {
+            $mostAppliedClubRank = getRankWithSuffix($rank);
+            break;
+        }
+        $rank++;
+    }
+} catch (PDOException $e) {
+    echo "Error fetching most applied club rank: " . $e->getMessage();
+}
+$mostAppliedClubRank = $mostAppliedClubRank ?: "<small>Unqualified</small>";
+
+
+// Rank for Highest in Members
+try {
+    $stmt = $pdo->prepare("
+        SELECT tbl_clubs.clubName, tbl_clubs.club_id, COUNT(tbl_application.application_id) AS active_member_count 
+            FROM tbl_application 
+            INNER JOIN tbl_clubs ON tbl_clubs.club_id = tbl_application.club_id
+            WHERE tbl_application.status = 'active' 
+            GROUP BY tbl_clubs.club_id 
+            ORDER BY active_member_count DESC, tbl_clubs.clubName
+    ");
+    $stmt->execute();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $rank = 1;
+    foreach ($clubs as $club) {
+        if ($club['club_id'] == $club_id) {
+            $highestInMembersRank = getRankWithSuffix($rank);
+            break;
+        }
+        $rank++;
+    }
+} catch (PDOException $e) {
+    echo "Error fetching highest members rank: " . $e->getMessage();
+}
+// Default rank value if no rank is fetched
+$highestInMembersRank = $highestInMembersRank ?: "<small>Unqualified</small>";
+
+
+// Rank for Fastest Growing Club considering members, posts, and events growth
+try {
+    $stmt = $pdo->prepare("
+        SELECT 
+            club_id, 
+            -- Current year's active members
+            (SELECT COUNT(application_id) 
+                FROM tbl_application 
+                WHERE club_id = tbl_clubs.club_id 
+                AND status = 'active' 
+                AND YEAR(dateApplied) = YEAR(CURDATE())) AS current_year_members,
+            
+            -- Previous year's active members
+            (SELECT COUNT(application_id) 
+                FROM tbl_application 
+                WHERE club_id = tbl_clubs.club_id 
+                AND status = 'active' 
+                AND YEAR(dateApplied) = YEAR(CURDATE()) - 1) AS previous_year_members,
+
+            -- Current year's posts
+            (SELECT COUNT(post_id) 
+                FROM tbl_posts 
+                WHERE club_id = tbl_clubs.club_id 
+                AND YEAR(dateAdded) = YEAR(CURDATE())) AS current_year_posts,
+
+            -- Previous year's posts
+            (SELECT COUNT(post_id) 
+                FROM tbl_posts 
+                WHERE club_id = tbl_clubs.club_id 
+                AND YEAR(dateAdded) = YEAR(CURDATE()) - 1) AS previous_year_posts,
+
+            -- Current year's events
+            (SELECT COUNT(event_id) 
+                FROM tbl_events 
+                WHERE club_id = tbl_clubs.club_id 
+                AND YEAR(dateAdded) = YEAR(CURDATE())) AS current_year_events,
+
+            -- Previous year's events
+            (SELECT COUNT(event_id) 
+                FROM tbl_events 
+                WHERE club_id = tbl_clubs.club_id 
+                AND YEAR(dateAdded) = YEAR(CURDATE()) - 1) AS previous_year_events
+        FROM tbl_clubs
+        ORDER BY 
+            -- Prioritize based on the overall growth (in any category)
+            GREATEST(current_year_members - previous_year_members, current_year_posts - previous_year_posts, current_year_events - previous_year_events) DESC
+    ");
+    $stmt->execute();
+    $clubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $rank = 1;
+    foreach ($clubs as $club) {
+        if ($club['club_id'] == $club_id) {
+            $fastestGrowingClubRank = getRankWithSuffix($rank);
+            break;
+        }
+        $rank++;
+    }
+} catch (PDOException $e) {
+    echo "Error fetching fastest growing club rank: " . $e->getMessage();
+}
+// Default rank value if no rank is fetched
+$fastestGrowingClubRank = $fastestGrowingClubRank ?: "<small>Unqualified</small>";
+
+
+
 ?>
 
 
@@ -54,12 +263,12 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - Moderator Dashboard</title>
+    <title>ESAS - Moderator Dashboard</title>
     <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         .nav-link.active {
           color: white !important;
@@ -134,7 +343,7 @@ try {
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
                     <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
-                    eSAS - Moderator</a>
+                    ESAS - Moderator</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
                     <span class="navbar-toggler-icon"></span>
@@ -178,6 +387,21 @@ try {
                         <li>
                             <a href="../../esas_moderator/public/reports.php" class="nav-link left-sidebar text-dark" id="reports">
                                 <i class="fas fa-file-alt"></i> Reports
+                            </a>
+                        </li>
+                        <br>
+                        Others
+                        <li>
+                            <a href="../../esas_moderator/public/accomplishment_reports.php" class="nav-link left-sidebar text-dark" id="accomplishment_reports" 
+                                style="display: flex; gap: 7px; align-items: flex-start;">
+                            
+                                <span class="icon-column" style="flex-shrink: 0;">
+                                    <i class="fas fa-file-alt"></i>
+                                </span>
+                                    
+                                <span class="text-column" style="line-height: 1.2;">
+                                    Accomplishment Reports
+                                </span>
                             </a>
                         </li>
                     </ul>
@@ -364,7 +588,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-university mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Club</p>
+                                        <p class="mb-2 p-0">Total Club</p>
                                     </div>
                                 </div>
 
@@ -393,12 +617,12 @@ try {
                                             // Base SQL query to count cumulative active students for clubs handled by the moderator
                                             $sql = "
                                                 SELECT COUNT(DISTINCT tr.student_id) AS total_students 
-                                                FROM tbl_registration tr 
+                                                FROM tbl_application tr 
                                                 JOIN tbl_clubs tc ON tr.club_id = tc.club_id 
                                                 JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id 
                                                 WHERE cm.moderator_id = :moderator_id 
                                                 AND tr.status = 'active'
-                                                AND tr.dateApproved <= :end_date
+                                                AND tr.dateDecided <= :end_date
                                             ";
 
                                             // Parameters for the query
@@ -425,7 +649,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-users mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Student</p>
+                                        <p class="mb-2 p-0">Total Student</p>
                                     </div>
                                 </div>
 
@@ -452,10 +676,10 @@ try {
                                                 $endDate = ($latestYear + 1) . "-07-31"; // End date for the latest school year
                                             }
 
-                                            // Base SQL query to count total pending registrations for clubs handled by the moderator
+                                            // Base SQL query to count total pending applications for clubs handled by the moderator
                                             $sql = "
-                                                SELECT COUNT(tr.registration_id) AS total_pending 
-                                                FROM tbl_registration tr
+                                                SELECT COUNT(tr.application_id) AS total_pending 
+                                                FROM tbl_application tr
                                                 JOIN tbl_clubs tc ON tr.club_id = tc.club_id
                                                 JOIN tbl_clubs_and_moderators tcm ON tc.club_id = tcm.club_id
                                                 WHERE tr.status = 'pending' 
@@ -479,7 +703,7 @@ try {
                                             $stmt_pending = $pdo->prepare($sql);
                                             $stmt_pending->execute($params);
 
-                                            // Fetch the total number of pending registrations
+                                            // Fetch the total number of pending applications
                                             $total_pending = $stmt_pending->fetchColumn();
                                             echo "<h3>$total_pending</h3>";
                                         } catch (PDOException $e) {
@@ -487,7 +711,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-hourglass-half mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Pending Approval</p>
+                                        <p class="mb-2 p-0">Total Pending Approval</p>
                                     </div>
                                 </div>
 
@@ -548,7 +772,7 @@ try {
                                         }
                                         ?>
                                         <i class="fas fa-door-open mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Departure Request</p>
+                                        <p class="mb-2 p-0">Total Departure Request</p>
                                     </div>
                                 </div>
 
@@ -586,12 +810,12 @@ try {
                                                 $sql = "
                                                     SELECT ts.department, COUNT(DISTINCT tr.student_id) AS member_count
                                                     FROM tbl_students ts
-                                                    JOIN tbl_registration tr ON ts.student_id = tr.student_id
+                                                    JOIN tbl_application tr ON ts.student_id = tr.student_id
                                                     JOIN tbl_clubs tc ON tr.club_id = tc.club_id
                                                     JOIN tbl_clubs_and_moderators cm ON tc.club_id = cm.club_id
                                                     WHERE cm.moderator_id = :moderator_id 
                                                     AND tr.status = 'active'
-                                                    AND tr.dateApproved <= :end_date
+                                                    AND tr.dateDecided <= :end_date
                                                 ";
 
                                                 // Add condition for club_id if it's set
@@ -737,30 +961,55 @@ try {
                                 <div class="col-md-7" style="border: 1px solid transparent; padding: 0;">
                                     <div class="row" style="border: 1px solid transparent; margin: 0;">
                                         
-                                        <!-- Registry per SY -->
+                                        <!-- Apllication per SY -->
                                         <div class="col-md-12 p-1" style="border: 1px solid transparent; padding: 0;">
                                             <div class="card p-2 text-center" style="margin: 0; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-                                                <p>Total Registry per SY</p>
+                                                <p>Total Apllication per SY</p>
                                                 <div style="height: 100%; width: 100%; background-color: transparent;">
                                                     <canvas id="registryPerSYChart"></canvas>
                                                 </div>
                                                 <p id="noDataMessageSY" style="display: none; text-align: center; font-size: 16px; color: red; margin-top: 7%; margin-bottom: 14%;"><em>No students.</em></p>
 
                                                 <?php
-                                                try {
-                                                    // Get the selected club_id from the URL
-                                                    $club_id = isset($_GET['club_id']) ? intval($_GET['club_id']) : null;
+                                                    try {
+                                                    
+                                                        // Fetch the default club_id from tbl_clubs_and_moderators
+                                                        $sqlClub = "
+                                                        SELECT club_id 
+                                                        FROM tbl_clubs_and_moderators 
+                                                        WHERE moderator_id = :moderator_id 
+                                                        ORDER BY dateAdded ASC 
+                                                        LIMIT 1
+                                                    ";
+                                                    $stmtClub = $pdo->prepare($sqlClub);
+                                                    $stmtClub->bindParam(':moderator_id', $moderator_id, PDO::PARAM_INT);
+                                                    $stmtClub->execute();
+                                                    $clubResult = $stmtClub->fetch(PDO::FETCH_ASSOC);
+
+                                                    if ($clubResult) {
+                                                        $defaultClubId = $clubResult['club_id'];
+                                                    } else {
+                                                        $defaultClubId = null; // No clubs assigned to this moderator
+                                                    }
+
+                                                    // Set the club_id from the query or default to the first club if not in URL
+                                                    if (isset($_GET["club_id"])) {
+                                                        $club_id = trim($_GET["club_id"]);
+                                                    } else {
+                                                        $club_id = $defaultClubId ?: 'no_club_assigned'; // Fallback if no default club found
+                                                    }
+
 
                                                     // SQL query to fetch the count of members per academic year (June to May)
                                                     $sql = "
                                                         SELECT 
                                                             CASE 
-                                                                WHEN MONTH(r.dateApproved) >= 6 THEN CONCAT(YEAR(r.dateApproved), '-', YEAR(r.dateApproved) + 1)
-                                                                ELSE CONCAT(YEAR(r.dateApproved) - 1, '-', YEAR(r.dateApproved))
+                                                                WHEN MONTH(r.dateDecided) >= 6 THEN CONCAT(YEAR(r.dateDecided), '-', YEAR(r.dateDecided) + 1)
+                                                                ELSE CONCAT(YEAR(r.dateDecided) - 1, '-', YEAR(r.dateDecided))
                                                             END AS academicYear, 
                                                             COUNT(DISTINCT s.student_id) AS memberCount
                                                         FROM tbl_students s
-                                                        JOIN tbl_registration r ON s.student_id = r.student_id
+                                                        JOIN tbl_application r ON s.student_id = r.student_id
                                                         JOIN tbl_clubs c ON r.club_id = c.club_id
                                                         JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                                                         WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
@@ -795,19 +1044,21 @@ try {
                                                         $memberCountsPerSY[] = $row['memberCount'];  // Number of members for each year
                                                     }
 
-                                                    // Fetch the total number of students for the max value
-                                                    $totalStudentsStmt = $pdo->prepare("SELECT COUNT(*) AS totalCount FROM tbl_students");
-                                                    $totalStudentsStmt->execute();
-                                                    $totalStudentsData = $totalStudentsStmt->fetch(PDO::FETCH_ASSOC);
-                                                    $totalStudentCount = $totalStudentsData ? (int)$totalStudentsData['totalCount'] : 0;
+                                                    // Find the maximum value in the memberCountsPerSY array
+                                                    $maxMemberCount = max($memberCountsPerSY);  // Get the highest count
+
+                                                    // Define a 10% buffer to ensure the peak doesn't touch the highest count
+                                                    $bufferPercentage = 0.10;  // 10% buffer
+                                                    $buffer = $maxMemberCount * $bufferPercentage;  // Calculate 10% of the highest count
+                                                    $maxMemberCountWithBuffer = $maxMemberCount + $buffer;  // Add the buffer to the max value
 
                                                     // Function to round up to the nearest even number
                                                     function roundUpToEven($number) {
                                                         return $number % 2 === 0 ? $number : $number + 1;
                                                     }
 
-                                                    // Adjust max value to nearest even number
-                                                    $maxMemberCount = roundUpToEven($totalStudentCount);
+                                                    // Round the new value with buffer to the nearest even number
+                                                    $maxMemberCountWithBuffer = roundUpToEven($maxMemberCountWithBuffer);
 
                                                     // Fill in missing academic years with zero counts
                                                     $allAcademicYears = [];
@@ -826,6 +1077,8 @@ try {
                                                             $memberCountsAllYears[$index] = $row['memberCount'];
                                                         }
                                                     }
+
+
                                                 } catch (PDOException $e) {
                                                     echo "Error: " . $e->getMessage();
                                                 }
@@ -838,7 +1091,7 @@ try {
                                                     // PHP arrays passed into JavaScript
                                                     const academicYears = <?php echo json_encode($allAcademicYears); ?>;
                                                     const memberCountsPerSY = <?php echo json_encode($memberCountsAllYears); ?>;
-                                                    const maxMemberCount = <?php echo $maxMemberCount; ?>;
+                                                    const maxMemberCountWithBuffer = <?php echo $maxMemberCountWithBuffer; ?>;  // Use the buffered value
 
                                                     // Check if there is no data to display
                                                     const hasDataSY = memberCountsPerSY.some(count => count > 0);
@@ -855,7 +1108,7 @@ try {
                                                         const registryPerSYData = {
                                                             labels: academicYears,
                                                             datasets: [{
-                                                                label: 'Registry per SY',
+                                                                label: 'Apllication per SY',
                                                                 data: memberCountsPerSY,
                                                                 fill: true,
                                                                 borderColor: 'rgba(75, 192, 192, 1)',
@@ -878,7 +1131,14 @@ try {
                                                                     },
                                                                     y: {
                                                                         beginAtZero: true,
-                                                                        max: maxMemberCount // Adjust max count dynamically to even number
+                                                                        max: maxMemberCountWithBuffer, // Use the buffered value to set the max for y-axis
+                                                                        ticks: {
+                                                                            // Ensure the y-axis ticks are integers
+                                                                            stepSize: 1, // Force step size to be 1 (no decimals)
+                                                                            callback: function(value) {
+                                                                                return value.toFixed(0); // Display as integer
+                                                                            }
+                                                                        }
                                                                     }
                                                                 },
                                                                 plugins: {
@@ -895,6 +1155,7 @@ try {
                                                         const registryPerSYChart = new Chart(registryPerSYChartElement, registryPerSYConfig);
                                                     }
                                                 </script>
+
                                             </div>
                                         </div>
 
@@ -930,12 +1191,12 @@ try {
                                                         $sql = "
                                                         SELECT s.year, COUNT(DISTINCT s.student_id) AS count
                                                         FROM tbl_students s
-                                                        JOIN tbl_registration r ON s.student_id = r.student_id
+                                                        JOIN tbl_application r ON s.student_id = r.student_id
                                                         JOIN tbl_clubs_and_moderators cm ON r.club_id = cm.club_id
                                                         WHERE r.status = 'active'
                                                         AND cm.moderator_id = :moderator_id
                                                         AND r.club_id = :club_id
-                                                        AND r.dateApproved <= :endDate
+                                                        AND r.dateDecided <= :endDate
                                                         GROUP BY s.year";
 
                                                         // Prepare and execute the query
@@ -1013,17 +1274,25 @@ try {
                                                                 }]
                                                             };
 
-                                                            // Configurations for the chart with total student count as the peak limit
+                                                            const maxDataCount = Math.max(...dataCounts); // Get the highest count from dataCounts
+                                                            const buffer = Math.ceil(maxDataCount * 0.1); // Calculate 10% buffer space
+
                                                             const config = {
                                                                 type: 'bar',
                                                                 data: data,
                                                                 options: {
-                                                                    responsive: true, // Ensure the chart resizes with the container
-                                                                    maintainAspectRatio: false, // Allow chart to adjust height and width dynamically
+                                                                    responsive: true,
+                                                                    maintainAspectRatio: false,
                                                                     scales: {
                                                                         y: {
                                                                             beginAtZero: true,
-                                                                            suggestedMax: totalStudentCount // Set the total student count as the maximum y-axis value
+                                                                            suggestedMax: maxDataCount + buffer, // Set max to highest data value plus buffer
+                                                                            ticks: {
+                                                                                callback: function(value) {
+                                                                                    return Number.isInteger(value) ? value : Math.floor(value); // Ensure no decimal points
+                                                                                },
+                                                                                stepSize: 1 // Force y-axis steps of 1 to avoid decimals
+                                                                            }
                                                                         }
                                                                     },
                                                                     plugins: {
@@ -1065,11 +1334,11 @@ try {
                                                         $sqlCounts = "
                                                             SELECT s.gender, COUNT(DISTINCT s.student_id) AS count
                                                             FROM tbl_students s
-                                                            JOIN tbl_registration r ON s.student_id = r.student_id
+                                                            JOIN tbl_application r ON s.student_id = r.student_id
                                                             JOIN tbl_clubs c ON r.club_id = c.club_id
                                                             JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                                                             WHERE r.status = 'active' AND cm.moderator_id = :moderator_id
-                                                            AND r.dateApproved <= :endDate
+                                                            AND r.dateDecided <= :endDate
                                                         ";
 
                                                         // Add condition for club_id if it's set
@@ -1162,23 +1431,30 @@ try {
                                                                 };
 
                                                                 // Configurations for the chart
+                                                                const maxDataCount = Math.max(...dataCounts); // Get the highest count from dataCounts
+                                                                const buffer = Math.ceil(maxDataCount * 0.1); // Calculate 10% buffer space
+
                                                                 const config = {
                                                                     type: 'bar',
                                                                     data: data,
                                                                     options: {
-                                                                        indexAxis: 'y', // Horizontal bar chart
+                                                                        responsive: true,
+                                                                        maintainAspectRatio: false,
                                                                         scales: {
-                                                                            x: {
-                                                                                beginAtZero: true,
-                                                                                max: peakLimit // Set the maximum value to the nearest higher multiple of 5
-                                                                            },
                                                                             y: {
-                                                                                // Automatically handled by Chart.js for labels
+                                                                                beginAtZero: true,
+                                                                                suggestedMax: maxDataCount + buffer, // Set max to highest data value plus buffer
+                                                                                ticks: {
+                                                                                    callback: function(value) {
+                                                                                        return Number.isInteger(value) ? value : Math.floor(value); // Ensure no decimal points
+                                                                                    },
+                                                                                    stepSize: 1 // Force y-axis steps of 1 to avoid decimals
+                                                                                }
                                                                             }
                                                                         },
                                                                         plugins: {
                                                                             legend: {
-                                                                                display: false // Hide the legend
+                                                                                display: false // Remove the legend
                                                                             }
                                                                         }
                                                                     }
@@ -1200,6 +1476,89 @@ try {
                             <!-- CHARTS AND DIAGRAMS END -->
                         </div>
                         <!-- THE MAIN PAGE END -->
+
+                        
+
+
+                        
+                        <!-- THE MAIN PAGE 2 START -->
+                        <div class="row main-page mt-3 p-3">
+
+                            <?php include 'components/club_achievements.php' ?>
+
+
+                            <p class="text-muted mt-0" style="font-size: 24px;">
+                                <strong class="p-0" style="margin-left: -6px;">Performance This S.Y.</strong>
+                                    <i class="fa fa-trophy m-0 p-0" style="color: gold; font-size: 30px;"></i>
+                                </p>
+                                <p class="text-muted p-0" style="margin-top: -15px; margin-left: 7px;">
+                                    Currently shaping improvements in progress
+                                </p>
+                                    
+                                <div class="row col-md-12 justify-content-between m-2 p-0">
+                                    <!-- Most Active Club -->
+                                    <div class="card col-md-3 text-center m-0 p-3 bg-dark" style="width: 250px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
+                                        <div class="row">
+                                            <div class="col-5 m-0 p-0">
+                                                <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 90px; height: 90px;">
+                                            </div>
+                                            <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                                <h1 class="m-0 p-0"><strong class="text-info"><?php echo $mostActiveClubRank; ?></strong></h1>
+                                                <p class="m-0 p-0"><strong class="text-info">Most active club</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Most Applied Club -->
+                                    <div class="card col-md-3 text-center m-0 p-3 bg-dark" style="width: 250px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
+                                        <div class="row">
+                                            <div class="col-5 m-0 p-0">
+                                                <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 90px; height: 90px;">
+                                            </div>
+                                            <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                                <h1 class="m-0 p-0"><strong class="text-info"><?php echo $mostAppliedClubRank; ?></strong></h1>
+                                                <p class="m-0 p-0"><strong class="text-info">Most applied club</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Highest Number of Members -->
+                                    <div class="card col-md-3 text-center m-0 p-3 bg-dark" style="width: 250px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
+                                        <div class="row">
+                                            <div class="col-5 m-0 p-0">
+                                                <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 90px; height: 90px;">
+                                            </div>
+                                            <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                                <h1 class="m-0 p-0"><strong class="text-info"><?php echo $highestInMembersRank; ?></strong></h1>
+                                                <p class="m-0 p-0"><strong class="text-info">Highest in members</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Fastest Growing Club -->
+                                    <div class="card col-md-3 text-center m-0 p-3 bg-dark" style="width: 250px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.7);">
+                                        <div class="row">
+                                            <div class="col-5 m-0 p-0">
+                                                <img src="/esas/esas_admin/icons/ICON_TROPHEE.png" style="width: 90px; height: 90px;">
+                                            </div>
+                                            <div class="col-7 text-center d-flex flex-column align-items-start justify-content-center m-0 p-0">
+                                                <h1 class="m-0 p-0"><strong class="text-info"><?php echo $fastestGrowingClubRank; ?></strong></h1>
+                                                <p class="m-0 p-0"><strong class="text-info">Fastest growing club</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                        </div>
+                        <!-- THE MAIN PAGE 2 END -->
+
+
+
+
+
+
                     </div>
                 </div>
             </div>

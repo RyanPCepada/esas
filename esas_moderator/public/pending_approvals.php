@@ -12,6 +12,7 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 
+//FOR VAV_MAIN FULL NAME PURPOSES
 try {
     // Fetch moderator's name
     $sqlModerator = "SELECT firstName, middleName, lastName FROM tbl_moderators WHERE moderator_id = :moderator_id";
@@ -36,7 +37,7 @@ try {
     $sqlStudents = "
         SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.age, s.birthday, s.gender, s.instiEmail, s.phoneNumber, s.department, s.course, s.year, s.street, s.barangay, s.municipality, s.province, s.zipcode, s.profilePic
         FROM tbl_students s
-        JOIN tbl_registration r ON s.student_id = r.student_id
+        JOIN tbl_application r ON s.student_id = r.student_id
         WHERE r.status = 'active'
     ";
 
@@ -64,12 +65,12 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - Pending Approvals</title>
+    <title>ESAS - Pending Approvals</title>
     <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         .nav-link.active {
           color: white !important;
@@ -114,8 +115,24 @@ try {
             background-color: #f5f5f5;
             cursor: pointer;
         }
-        
-/*HERE*/
+
+
+.pendingapprovals-notification-badge {
+    position: absolute;
+    min-width: 20px;
+    height: auto;
+    top: 5px;
+    right: 5px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 4px 4px;
+    font-size: 12px;
+    display: inline-block;
+    text-align: center;
+    line-height: 1;
+    z-index: 1000;
+}
 
 
 
@@ -128,7 +145,7 @@ try {
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
                     <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
-                    eSAS - Moderator</a>
+                    ESAS - Moderator</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
                     <span class="navbar-toggler-icon"></span>
@@ -162,8 +179,33 @@ try {
                         <li>
                             <a href="../../esas_moderator/public/pending_approvals.php" class="nav-link left-sidebar text-dark active" aria-current="page" id="pending-approvals">
                                 <i class="fas fa-hourglass-half"></i> Pending Approvals
+                                <span id="pendingapprovals-notification-count" class="pendingapprovals-notification-badge" style="display:none;"></span>
                             </a>
                         </li>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Fetch and display pending approvals notification count
+    function fetchPendingApprovalsNotificationCount() {
+        $.ajax({
+            url: '/esas/esas_moderator/apis/notifications/pendingapprovals-notifications-api.php',
+            method: 'GET',
+            success: function(response) {
+                const data = JSON.parse(response);
+                if (data.unread_count > 0) {
+                    $('#pendingapprovals-notification-count').text(data.unread_count).show();
+                } else {
+                    $('#pendingapprovals-notification-count').hide();
+                }
+            }
+        });
+    }
+
+    // Fetch pending approvals notifications every 10 seconds
+    setInterval(fetchPendingApprovalsNotificationCount, 10000);
+    fetchPendingApprovalsNotificationCount();
+
+</script>
                         <li>
                             <a href="../../esas_moderator/public/departure_requests.php" class="nav-link left-sidebar text-dark" id="departure-requests">
                                 <i class="fas fa-door-open"></i> Departure Requests
@@ -172,6 +214,21 @@ try {
                         <li>
                             <a href="../../esas_moderator/public/reports.php" class="nav-link left-sidebar text-dark" id="reports">
                                 <i class="fas fa-file-alt"></i> Reports
+                            </a>
+                        </li>
+                        <br>
+                        Others
+                        <li>
+                            <a href="../../esas_moderator/public/accomplishment_reports.php" class="nav-link left-sidebar text-dark" id="accomplishment_reports" 
+                                style="display: flex; gap: 7px; align-items: flex-start;">
+                            
+                                <span class="icon-column" style="flex-shrink: 0;">
+                                    <i class="fas fa-file-alt"></i>
+                                </span>
+                                    
+                                <span class="text-column" style="line-height: 1.2;">
+                                    Accomplishment Reports
+                                </span>
                             </a>
                         </li>
                     </ul>
@@ -326,50 +383,56 @@ try {
                                 $selectedClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : $defaultClubId; // Use default club ID if not set
                                 $selectedMonth = isset($_GET['school_year']) ? intval($_GET['school_year']) : date('m');
 
-                                // SQL query to fetch distinct students with their pending registrations, including registration_id
-                                $sql = "SELECT 
-                                            s.student_id,
-                                            s.firstName,
-                                            s.middleName,
-                                            s.lastName,
-                                            s.gender,
-                                            s.department,
-                                            s.course,
-                                            s.profilePic,
-                                            MIN(r.dateApplied) AS dateApplied,
-                                            c.club_id,
-                                            r.registration_id
-                                        FROM tbl_students s
-                                        LEFT JOIN tbl_registration r ON s.student_id = r.student_id
-                                        LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
-                                        WHERE r.status = 'pending'";
+                                // SQL query to fetch distinct students with their pending applications, including application_id
+                           $sql = "SELECT 
+                                        s.student_id,
+                                        s.firstName,
+                                        s.middleName,
+                                        s.lastName,
+                                        s.gender,
+                                        s.department,
+                                        s.course,
+                                        s.profilePic,
+                                        MIN(r.dateApplied) AS dateApplied,
+                                        c.club_id,
+                                        r.application_id
+                                    FROM 
+                                        tbl_students s
+                                    LEFT JOIN 
+                                        tbl_application r ON s.student_id = r.student_id
+                                    LEFT JOIN 
+                                        tbl_clubs c ON r.club_id = c.club_id
+                                    WHERE 
+                                        r.status = 'pending'";
 
-                                // Add filtering by club_id if provided
-                                if ($selectedClubId) {
-                                    $sql .= " AND c.club_id = :club_id";
-                                }
+                            // Add filtering by club_id if provided
+                            if (!empty($selectedClubId)) {
+                                $sql .= " AND c.club_id = :club_id";
+                            }
 
-                                // This condition accumulates students from the start of the selected month to the current month
-                                if ($selectedMonth) {
-                                    $sql .= " AND MONTH(r.dateApplied) <= :selectedMonth";
-                                }
+                            // Condition to filter by month if selected
+                            if (!empty($selectedMonth)) {
+                                $sql .= " AND MONTH(r.dateApplied) <= :selectedMonth";
+                            }
 
-                                $sql .= " GROUP BY s.student_id
-                                        ORDER BY MIN(r.dateApplied) ASC"; // Order by the earliest date applied
+                            $sql .= " GROUP BY 
+                                        s.student_id, s.firstName, s.middleName, s.lastName, s.gender, 
+                                        s.department, s.course, s.profilePic, c.club_id, r.application_id
+                                    ORDER BY 
+                                        dateApplied ASC"; // Order by the earliest date applied
 
-                                $stmt = $pdo->prepare($sql);
+                            $stmt = $pdo->prepare($sql);
 
-                                // Bind parameters
-                                $params = [];
-                                if ($selectedClubId) {
-                                    $params['club_id'] = $selectedClubId;
-                                }
-                                if ($selectedMonth) {
-                                    $params['selectedMonth'] = $selectedMonth;
-                                }
+                            // Bind parameters
+                            if (!empty($selectedClubId)) {
+                                $stmt->bindParam(':club_id', $selectedClubId, PDO::PARAM_INT);
+                            }
+                            if (!empty($selectedMonth)) {
+                                $stmt->bindParam(':selectedMonth', $selectedMonth, PDO::PARAM_INT);
+                            }
 
-                                // Execute the SQL statement
-                                $stmt->execute($params);
+                            // Execute the SQL statement
+                            $stmt->execute();
 
                                 $totalRows = $stmt->rowCount(); // Get the total rows from the prepared statement
 
@@ -378,7 +441,7 @@ try {
                                     <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
                                         <thead>
                                             <tr>
-                                                <!-- <th>Registration ID</th> New column for Registration ID -->
+                                                <!-- <th>Application ID</th> New column for Application ID -->
                                                 <th>Profile</th>
                                                 <th>Student ID</th>
                                                 <th>Full Name</th>
@@ -398,11 +461,11 @@ try {
                                         $department = htmlspecialchars($row['department']);
                                         $course = htmlspecialchars($row['course']);
                                         $dateApplied = htmlspecialchars(date('F j, Y', strtotime($row['dateApplied']))); // Format date
-                                        $registrationId = htmlspecialchars($row['registration_id']); // Get registration_id
+                                        $applicationId = htmlspecialchars($row['application_id']); // Get application_id
 
                                         echo '
                                         <tr class="student-row">
-                                            <!-- <td>' . $registrationId . '</td> Display Registration ID -->
+                                            <!-- <td>' . $applicationId . '</td> Display Application ID -->
                                             <td class="text-center p-1">
                                                 <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
                                                     alt="' . $fullName . ' profile picture" 
@@ -415,7 +478,7 @@ try {
                                             <td>' . $course . '</td>
                                             <td>' . $dateApplied . '</td>
                                             <td class="text-center">
-                                                <a href="../public/crud/pending_approval/pending_approval_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '&registration_id=' . $registrationId . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                <a href="../public/crud/pending_approval/pending_approval_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '&application_id=' . $applicationId . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                                 <!-- <a href="../public/crud/pending_approval/pending_approval_read.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo $club_id; ?>" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a> -->
                                                 <!-- <a href="../public/crud/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a> -->
                                                 <!-- <a href="../public/crud/pending_approval/pending_approval_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($row['club_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a> -->

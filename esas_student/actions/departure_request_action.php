@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $reason = $_POST['reason']; // Reason for leaving the club
     $status = 'pending'; // Default status for a new request
     $dateRequested = date('Y-m-d H:i:s'); // Current timestamp
-    $dateApproved = NULL; // NULL since the request is not approved yet
+    $dateDecided = NULL; // NULL since the request is not approved yet
 
     // Retrieve student_id from the session
     if (isset($_SESSION['student_id'])) {
@@ -30,8 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Insert data into the database
-    $sql = "INSERT INTO tbl_departure_requests (reason, status, dateRequested, dateApproved, student_id, club_id) 
-            VALUES (:reason, :status, :dateRequested, :dateApproved, :student_id, :club_id)";
+    $sql = "INSERT INTO tbl_departure_requests (reason, status, dateRequested, dateDecided, student_id, club_id) 
+            VALUES (:reason, :status, :dateRequested, :dateDecided, :student_id, :club_id)";
 
     try {
         // Prepare the SQL statement
@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(':reason', $reason);
         $stmt->bindParam(':status', $status);
         $stmt->bindParam(':dateRequested', $dateRequested);
-        $stmt->bindParam(':dateApproved', $dateApproved); // NULL for pending requests
+        $stmt->bindParam(':dateDecided', $dateDecided); // NULL for pending requests
         $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT); // Use student_id from session
         $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT); // Use club_id from POST
 

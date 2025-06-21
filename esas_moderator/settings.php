@@ -51,14 +51,14 @@ if (!$club) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Moderator Settings</title>
+    <title>ESAS - Moderator Settings</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../assets/js/jquery-3.6.0.js"></script>
     <link href="../assets/css/styles.css" rel="stylesheet" />
-    <link href="../assets/img/nbsclogo.png" rel="icon">
+    <link href="../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         body {
             background-color: #f4f4f9;
@@ -99,6 +99,35 @@ if (!$club) {
 
         .main-content {
             padding: 30px 40px;
+        }
+
+        .back-button {
+            position: absolute;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            background-color: lightgrey;
+            color: #36454F;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: grey;
+            color: white;
+        }
+
+        @media (max-width: 767px) {
+            h2 {
+                margin-top: 5px;
+            }
+            /* .back-button {
+                position: relative;
+            } */
         }
     </style>
     <script src="../assets/js/jquery-3.6.0.js"></script>
@@ -157,10 +186,26 @@ if (!$club) {
     </script>
 </head>
 <body>
-    
     <div class="wrapper">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fa fa-arrow-left"></i>
+        </a>
         <h2 class="mt-5">Account Settings</h2>
-        <p class="text-muted">Change your profile, account, and club settings</p>
+
+        <div class="row col-md-12 m-0 p-0">
+            <div class="col-md-11 p-0">
+                <p class="text-muted">Change your profile, account, and club settings</p>
+            </div>
+            <div class="col-md-1 p-1 d-flex align-items-center justify-content-end gap-2">
+                <a href="../esas_moderator/public/my_clubs.php" class="myclubs-button" title="Go to My Clubs">
+                    <h5><i class="fas fa-university text-info"></i></h5>
+                </a>
+                <a href="../esas_moderator/public/dashboard.php" class="dashboard-button" title="Go to Dashboard">
+                    <h5><i class="fas fa-chart-line text-info"></i></h5>
+                </a>
+            </div>
+        </div>
+
 
         <div class="container-fluid container">
             <div class="row">
@@ -170,6 +215,7 @@ if (!$club) {
                     <a href="../esas_moderator/public/crud/settings/update_password.php"><i class="fas fa-lock"></i> Password</a>
                     <a href="../esas_moderator/public/crud/settings/update_club_info.php"><i class="fas fa-university"></i> Club Information</a>
                     <a href="../esas_moderator/public/crud/settings/update_club_officers.php"><i class="fas fa-user-tie"></i> Club Officers</a>
+                    <a href="../esas_moderator/public/crud/settings/update_application_form.php"><i class="fas fa-file-alt"></i> Application Form</a>
                 </div>
                 <!-- Main Content Area -->
                 <div class="col-md-9 main-content">

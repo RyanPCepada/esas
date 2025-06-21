@@ -1,7 +1,12 @@
 <?php
 
 require_once "../../../../config.php"; 
+require __DIR__ . '/../../../vendor/autoload.php';
+
 session_start();
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 // Ensure the moderator ID is set in the session
 if (isset($_SESSION['admin_id'])) {
@@ -29,6 +34,7 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
                 r.dateRequested, 
                 r.dateModified,
                 s.firstName,
+                s.middleName,
                 s.lastName,
                 s.profilePic,
                 s.student_id
@@ -54,7 +60,7 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
                 $requestLetter = htmlspecialchars($row["requestLetter"] ?? ''); // New requestLetter variable
                 $dateRequested = !empty($row["dateRequested"]) ? date("F j, Y", strtotime($row["dateRequested"])) : 'None';
                 $dateModified = !empty($row["dateModified"]) ? date("F j, Y", strtotime($row["dateModified"])) : 'None';
-                $requestedByName = htmlspecialchars($row["firstName"] . ' ' . $row["lastName"] ?? '');
+                $requestedByName = htmlspecialchars(trim($row["firstName"] . ' ' . ($row["middleName"] ?? '') . ' ' . $row["lastName"]));
                 $profilePic = htmlspecialchars($row["profilePic"] ?: "default-profile.jpg");
                 $student_id = htmlspecialchars($row["student_id"] ?? ''); 
 
@@ -88,11 +94,10 @@ if (isset($_GET["request_id"]) && !empty(trim($_GET["request_id"]))) {
 } 
 
 
-
 // Handle approval or disapproval
 if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprove'])) {
-    $newStatus = $_POST["action"] === 'approve' ? 'approved' : 'disapproved'; // Changed to lowercase
-    $dateDecided = ($newStatus === 'approved') ? date('Y-m-d H:i:s') : null; // Get current date and time if approved, null if disapproved
+    $newStatus = $_POST["action"] === 'approve' ? 'approved' : 'disapproved'; 
+    $dateDecided = ($newStatus === 'approved') ? date('Y-m-d H:i:s') : null; 
 
     // Update the club request status
     $updateSql = "UPDATE tbl_club_requests 
@@ -103,9 +108,9 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     if ($updateStmt = $pdo->prepare($updateSql)) {
         $updateStmt->bindParam(":status", $newStatus);
         if ($newStatus === 'approved') {
-            $updateStmt->bindParam(":dateDecided", $dateDecided); // Bind actual date
+            $updateStmt->bindParam(":dateDecided", $dateDecided); 
         } else {
-            $nullValue = null; // Bind NULL explicitly for disapproved
+            $nullValue = null; 
             $updateStmt->bindParam(":dateDecided", $nullValue, PDO::PARAM_NULL);
         }
         $updateStmt->bindParam(":request_id", $request_id, PDO::PARAM_INT);
@@ -114,18 +119,53 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 
             // Insert into activity logs after updating the request status
             $activity = "You " . $newStatus . " " . $requestedByName . "'s club request";
-            $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id)
-                       VALUES (:activity, :dateAdded, :admin_id, :moderator_id, :student_id)";
+            $logSql = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id)
+                       VALUES (:activity, :dateAdded, :admin_id)";
 
             if ($logStmt = $pdo->prepare($logSql)) {
                 $logStmt->bindParam(":activity", $activity);
-                $logStmt->bindParam(":dateAdded", date('Y-m-d H:i:s')); // Log current date and time
-                $logStmt->bindParam(":admin_id", $adminId, PDO::PARAM_INT); // Replace with actual admin ID
-                $logStmt->bindParam(":moderator_id", $moderator_id, PDO::PARAM_INT); // Replace with actual moderator ID
-                $logStmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
+                $logStmt->bindParam(":dateAdded", date('Y-m-d H:i:s')); 
+                $logStmt->bindParam(":admin_id", $adminId, PDO::PARAM_INT); 
 
                 // Execute the log statement
                 $logStmt->execute();
+            }
+
+            // Fetch requester instiEmail to notify them about the decision
+            $studentEmailSql = "SELECT instiEmail FROM tbl_students WHERE student_id = :student_id";
+            $studentEmailStmt = $pdo->prepare($studentEmailSql);
+            $studentEmailStmt->execute([':student_id' => $student_id]);
+            $student = $studentEmailStmt->fetch(PDO::FETCH_ASSOC);
+            $studentEmail = $student['instiEmail'];
+
+          
+
+            $mail = new PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username   = 'nbsc.esas@gmail.com';
+            $mail->Password   = 'cxef aobn ozbq qpxv'; 
+     
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+            $mail->setFrom('nbsc.esas@gmail.com', 'NBSC Club Organizations'); 
+                       
+
+            // Send instiEmail to the requester
+            try {
+                $mail->addAddress($studentEmail); 
+                $mail->isHTML(true);
+                $mail->Subject = "Club Request " . ucfirst($newStatus);
+                $mail->Body = "
+                    <p>Dear $requestedByName,</p>
+                    <p>Your club request <strong>" . $clubName . "</strong> has been <strong>" . $newStatus . "</strong>.</p>
+                    <p>If you have any questions, feel free to contact us.</p>
+                    <p>Thank you!</p>";
+
+                $mail->send();
+            } catch (Exception $e) {
+                error_log("Mailer Error: " . $mail->ErrorInfo);
             }
 
             header("location: club_request_read.php?request_id=" . $request_id . "&status=" . strtolower($newStatus));
@@ -138,6 +178,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
     unset($updateStmt);
 }
 
+
 ?>
 
 <!DOCTYPE html>
@@ -145,7 +186,7 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Club Request Details</title>
+    <title>ESAS - Club Request Details</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
@@ -167,11 +208,11 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                                     <div class="card p-3 bg-light" style="width: auto; margin-top: 70px; border-radius: 15px;">
                                         <?php if (!empty($requestLetter)): 
                                             $fileType = pathinfo($requestLetter, PATHINFO_EXTENSION);
-                                            $fileIcon = ($fileType === 'pdf') ? '/esas/esas_student/icons/ICON_PDF.png' :
-                                                        (($fileType === 'doc' || $fileType === 'docx') ? '/esas/esas_student/icons/ICON_WORD.png' : ''); ?>
-                                            <div class="d-flex align-items-center justify-content-center" style="cursor: pointer;" onclick="window.open('/esas/esas_student/request_letters/<?php echo $requestLetter; ?>', '_blank')">
+                                            $fileIcon = ($fileType === 'pdf') ? '/esas/esas_student/icons/ICON_PDF.png' : ''; 
+                                            $linkText = 'View Attached Request Letter'; ?>
+                                            <div class="d-flex align-items-center justify-content-start" style="cursor: pointer;" onclick="window.open('/esas/esas_student/request_letters/<?php echo $requestLetter; ?>', '_blank')">
                                                 <img src="<?php echo $fileIcon; ?>" alt="<?php echo strtoupper($fileType); ?> File" style="width: 70px; margin-right: 10px;">
-                                                <a href="/esas/esas_student/request_letters/<?php echo $requestLetter; ?>" target="_blank" style="color: blue; text-decoration: underline;">See Attached Request Letter</a>
+                                                <a href="/esas/esas_student/request_letters/<?php echo $requestLetter; ?>" target="_blank" style="color: blue; text-decoration: underline;"><?php echo $linkText; ?></a>
                                             </div>
                                         <?php else: ?>
                                             <p>No attached request letter.</p>
@@ -192,19 +233,13 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                                 </p>
                                 <hr>
                                 <div class="container mt-3 p-0">
-                                        <p><strong>Goal: </strong><br><?php echo htmlspecialchars($goal); ?></p>
-                                
-                                
-                                        <p><strong>Mission: </strong><br><?php echo htmlspecialchars($mission); ?></p> <!-- Display mission -->
-                                    
-                                        <p><strong>Vision: </strong><br><?php echo htmlspecialchars($vision); ?></p>   <!-- Display vision -->
-                                    
-                                        <p><strong>Activities: </strong><br><?php echo htmlspecialchars($activities); ?></p>
-                                    
-                                        <hr>
-                                
-                                        <p>Status: </strong><?php echo htmlspecialchars($status); ?></p>
-                                        <p>Date Requested: </strong><?php echo htmlspecialchars($dateRequested); ?></p> 
+                                    <p><strong>Goal: </strong><br><?php echo htmlspecialchars_decode($goal); ?></p>
+                                    <p><strong>Mission: </strong><br><?php echo htmlspecialchars_decode($mission); ?></p>
+                                    <p><strong>Vision: </strong><br><?php echo htmlspecialchars_decode($vision); ?></p>
+                                    <p><strong>Activities: </strong><br><?php echo htmlspecialchars_decode($activities); ?></p>
+                                    <hr>
+                                    <p><strong>Status: </strong><?php echo htmlspecialchars_decode($status); ?></p>
+                                    <p><strong>Date Requested: </strong><?php echo htmlspecialchars_decode($dateRequested); ?></p> 
                                 </div>
                             </div>
                         </div>
@@ -241,8 +276,9 @@ if (isset($_POST["action"]) && in_array($_POST["action"], ['approve', 'disapprov
                         <?php elseif ($status === 'approved' && $clubExists): ?>
                             <a href="../../club_requests.php" class="btn btn-secondary">Go Back</a>
                         <?php elseif ($status === 'approved'): ?>
-                            <a href="../../crud/club_requests/club_add_request.php?clubName=<?php echo urlencode($clubName); ?>&coverPhoto=<?php echo urlencode($coverPhoto); ?>&student_id=<?php echo urlencode($student_id); ?>" 
-                                class="btn btn-success">Add to Clubs List</a>
+                            <a href="../../crud/club_requests/club_add_request.php?clubName=<?php echo urlencode($clubName); ?>&coverPhoto=<?php echo urlencode($coverPhoto); ?>&student_id=<?php echo urlencode($student_id); ?>
+                            &mission=<?php echo urlencode($mission); ?>&vision=<?php echo urlencode($vision); ?>&requestedByName=<?php echo urlencode($requestedByName); ?>"
+                             class="btn btn-success">Add to Clubs List</a>
                             <a href="../../club_requests.php" class="btn btn-secondary">Go Back</a>
                         <?php else: ?>
                             <a href="../../club_requests.php" class="btn btn-secondary">Go Back</a>

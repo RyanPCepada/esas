@@ -13,8 +13,8 @@ if (isset($_SESSION['admin_id'])) {
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
 
-$clubName = $information = $coverPhoto = "";
-$clubName_err = $information_err = $coverPhoto_err = "";
+$clubName = $description = $mission = $vision = $history = $founder = $coverPhoto = "";
+$clubName_err = $description_err = $mission_err = $vision_err = $history_err = $founder_err = $coverPhoto_err = "";
 $moderators = [];
 define('COVERPHOTO_DEFAULT', 'COVERPHOTO_DEFAULT.png');
 define('PROF_PIC_DEFAULT', 'PROF_PIC.png');
@@ -66,7 +66,7 @@ function getNextModeratorIncrement($pdo, $schoolYearCode) {
     return $nextIncrement;
 }
 
-$moderatorQuery = "SELECT moderator_id, CONCAT(firstName, ' ', lastName) AS moderator_name FROM tbl_moderators";
+$moderatorQuery = "SELECT moderator_id, CONCAT(firstName, ' ', lastName) AS moderator_name FROM tbl_moderators GROUP BY firstName ASC";
 if ($stmt = $pdo->prepare($moderatorQuery)) {
     if ($stmt->execute()) {
         $moderators = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -108,16 +108,48 @@ if (isset($_POST['action']) && $_POST['action'] == 'add_moderator') {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input_clubName = trim($_POST["clubName"]);
     if (empty($input_clubName)) {
-        $clubName_err = "Please enter a club name.";
+        // $clubName_err = "Please enter a club name.";
     } else {
         $clubName = $input_clubName;
     }
 
-    $input_information = trim($_POST["information"]);
-    if (empty($input_information)) {
-        $information_err = "Please enter club information.";
+    $input_description = trim($_POST["description"]);
+    if (empty($input_description)) {
+        // $description_err = "Please enter club description.";
     } else {
-        $information = $input_information;
+        $description = $input_description;
+    }
+
+    // Validate mission
+    $input_mission = trim($_POST["mission"]);
+    if (empty($input_mission)) {
+        // $mission_err = "Please enter the club's mission.";
+    } else {
+        $mission = $input_mission;
+    }
+
+    // Validate vision
+    $input_vision = trim($_POST["vision"]);
+    if (empty($input_vision)) {
+        // $vision_err = "Please enter the club's vision.";
+    } else {
+        $vision = $input_vision;
+    }
+
+    // Validate history
+    $input_history = trim($_POST["history"]);
+    if (empty($input_history)) {
+        // $history_err = "Please enter the club's history.";
+    } else {
+        $history = $input_history;
+    }
+
+    // Validate founder
+    $input_founder = trim($_POST["founder"]);
+    if (empty($input_founder)) {
+        // $founder_err = "Please enter the club's founder's name.";
+    } else {
+        $founder = $input_founder;
     }
 
     if (isset($_FILES['coverPhoto']) && $_FILES['coverPhoto']['name']) {
@@ -151,11 +183,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $coverPhoto = COVERPHOTO_DEFAULT;
     }
 
-    if (empty($clubName_err) && empty($information_err) && empty($coverPhoto_err)) {
-        $sql = "INSERT INTO tbl_clubs (clubName, information, coverPhoto, founder_id, dateAdded) VALUES (:clubName, :information, :coverPhoto, :admin_id, NOW())";
+    if (empty($clubName_err) && empty($description_err) && empty($coverPhoto_err)) {
+        $sql = "INSERT INTO tbl_clubs (clubName, description, mission, vision, history, founder, coverPhoto, slots, founder_id, dateAdded) 
+        VALUES (:clubName, :description, :mission, :vision, :history, :founder, :coverPhoto, 0, :admin_id, NOW())";
+
         if ($stmt = $pdo->prepare($sql)) {
+            // Bind parameters
             $stmt->bindParam(":clubName", $clubName);
-            $stmt->bindParam(":information", $information);
+            $stmt->bindParam(":description", $description);
+            $stmt->bindParam(":mission", $mission);
+            $stmt->bindParam(":vision", $vision);
+            $stmt->bindParam(":history", $history);
+            $stmt->bindParam(":founder", $founder);
             $stmt->bindParam(":coverPhoto", $coverPhoto);
             $stmt->bindParam(":admin_id", $adminId);
             
@@ -230,14 +269,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Add Club</title>
+    <title>ESAS - Add Club</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../../assets/img/NBSC_LOGO.png" rel="icon">
 
     <style>
         .wrapper {
@@ -263,13 +302,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <form id="clubForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data" onsubmit="saveImageData()">
                     <div class="form-group mb-2">
                         <label>Club Name</label>
-                        <input type="text" name="clubName" class="form-control <?php echo (!empty($clubName_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $clubName; ?>">
+                        <input type="text" name="clubName" class="form-control <?php echo (!empty($clubName_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $clubName; ?>" required>
                         <span class="invalid-feedback"><?php echo $clubName_err; ?></span>
                     </div>
                     <div class="form-group mb-2">
-                        <label>Information</label>
-                        <textarea name="information" class="form-control <?php echo (!empty($information_err)) ? 'is-invalid' : ''; ?>"><?php echo $information; ?></textarea>
-                        <span class="invalid-feedback"><?php echo $information_err; ?></span>
+                        <label>Description</label>
+                        <textarea name="description" class="form-control <?php echo (!empty($description_err)) ? 'is-invalid' : ''; ?>"><?php echo $description; ?></textarea>
+                        <span class="invalid-feedback"><?php echo $description_err; ?></span>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label>Mission</label>
+                        <textarea name="mission" class="form-control <?php echo (!empty($mission_err)) ? 'is-invalid' : ''; ?>"><?php echo $mission; ?></textarea>
+                        <span class="invalid-feedback"><?php echo $mission_err; ?></span>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label>Vision</label>
+                        <textarea name="vision" class="form-control <?php echo (!empty($vision_err)) ? 'is-invalid' : ''; ?>"><?php echo $vision; ?></textarea>
+                        <span class="invalid-feedback"><?php echo $vision_err; ?></span>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label>History</label>
+                        <textarea name="history" class="form-control <?php echo (!empty($history_err)) ? 'is-invalid' : ''; ?>"><?php echo $history; ?></textarea>
+                        <span class="invalid-feedback"><?php echo $history_err; ?></span>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label>Founder</label>
+                        <textarea name="founder" class="form-control <?php echo (!empty($founder_err)) ? 'is-invalid' : ''; ?>" rows="1"><?php echo $founder; ?></textarea>
+                        <span class="invalid-feedback"><?php echo $founder_err; ?></span>
                     </div>
                     <div class="form-group mb-2">
                         <label>Cover Photo</label>
@@ -390,46 +449,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <!-- Include Cropper.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-
-
-<script>
-    document.getElementById("moderatorSelect").addEventListener("change", function() {
-        if (this.value === "add_new_moderator") {
-            $("#addModeratorModal").modal("show");
-        }
-    });
-
-    document.getElementById("addModeratorForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-        const form = this;
-        const formData = new FormData(form);
-        formData.append('action', 'add_moderator');
-
-        fetch("<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>", {
-            method: 'POST',
-            body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const select = document.getElementById("moderatorSelect");
-                const newOption = document.createElement("option");
-                newOption.value = data.moderatorId;
-                newOption.text = data.fullName;
-                select.appendChild(newOption);
-                select.value = data.moderatorId;
-
-                $("#addModeratorModal").modal("hide");
-                document.getElementById('newModeratorId').value = data.moderatorId;
-            } else {
-                alert("Error adding moderator.");
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    });
-</script>
-
-
 
 
 

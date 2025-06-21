@@ -1,4 +1,4 @@
-MODAL CONVO
+Please wait...
 
 <?php
 $studentId = isset($_GET['student_id']) ? intval($_GET['student_id']) : 0; // Get the student_id dynamically

@@ -12,9 +12,11 @@ $student_id = $_SESSION['student_id'];
 $postContent = "";
 $postContent_err = "";
 $club_id = ""; // Initialize club_id variable
+$application_id = ""; // Initialize application_id variable
 $clubName = ""; // Initialize clubName variable
 $coverPhoto = ""; // Initialize coverPhoto variable
 $profilePic = ""; // Initialize profilePic variable
+$isSecretary = false; // Initialize isSecretary flag
 
 try {
     // Use the existing PDO instance from config.php
@@ -25,12 +27,29 @@ try {
         $club_id = $_GET['club_id']; // Use the passed club_id
     } else {
         // Default behavior if no club_id is passed (fallback)
-        $sql = "SELECT club_id FROM tbl_registration WHERE student_id = :student_id LIMIT 1";
+        $sql = "SELECT club_id FROM tbl_application WHERE student_id = :student_id LIMIT 1";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
         $stmt->execute();
         $student = $stmt->fetch(PDO::FETCH_ASSOC);
         $club_id = $student['club_id']; // Default to the first club
+    }
+
+    // Check if application_id is passed in the URL
+    if (isset($_GET['application_id']) && is_numeric($_GET['application_id'])) {
+        $application_id = $_GET['application_id']; // Use the passed application_id
+    }
+
+    // Check if the student is a Secretary for the current club
+    $sql = "SELECT position FROM tbl_club_officers WHERE student_id = :student_id AND club_id = :club_id AND position = 'Secretary'";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
+    $stmt->bindParam(':club_id', $club_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $officer = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($officer) {
+        $isSecretary = true; // Set isSecretary to true if student is Secretary
     }
 
     // Fetch the student's profile picture
@@ -56,10 +75,10 @@ try {
 
             // Update the is_read field to 1 for notifications for this student and club
             $sql = "UPDATE tbl_notifications 
-            SET is_read = 1 
-            WHERE student_id = :student_id 
-            AND club_id = :club_id 
-            AND notification = 'Posted an announcement'"; 
+                    SET is_read = 1 
+                    WHERE student_id = :student_id 
+                    AND club_id = :club_id 
+                    AND (notification = 'Posted an announcement' OR notification = 'Posted an event')"; 
 
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(":student_id", $student_id, PDO::PARAM_INT);
@@ -68,26 +87,7 @@ try {
         }
     }
 
-    // Fetch the student's full name
-    $sql = "SELECT firstName, middleName, lastName FROM tbl_students WHERE student_id = :student_id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-    $stmt->execute();
-    
-    // Fetch the result
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Check if a result was found
-    if ($result) {
-        $firstName = strtoupper($result['firstName']);
-        $middleName = strtoupper($result['middleName']);
-        $lastName = strtoupper($result['lastName']);
-    } else {
-        // Handle the case where no data is found
-        $firstName = $middleName = $lastName = "UNKNOWN";
-    }
-
-    // Initialize the variable
+    // Initialize the variable for departure requests
     $hasDepartureRequest = false;
 
     // Check if the student has already submitted a departure request for the current club
@@ -99,16 +99,13 @@ try {
     $departureRequest = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($departureRequest) {
-        // If a departure request exists, set the flag to true
         $hasDepartureRequest = true;
     }
 
 } catch (PDOException $e) {
-    // Handle database connection or query error
     die("Database error: " . $e->getMessage());
 }
 ?>
-
 
 
 <!DOCTYPE html>
@@ -116,7 +113,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Student Home</title>
+    <title>ESAS - Student Home</title>
     <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -134,7 +131,7 @@ try {
     <script src="../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../assets/js/jquery-3.6.0.js"></script>
     <link href="../assets/css/styles.css" rel="stylesheet" />
-    <link href="../assets/img/nbsclogo.png" rel="icon">
+    <link href="../assets/img/NBSC_LOGO.png" rel="icon">
 
     <style>
         /* body {
@@ -396,7 +393,7 @@ try {
 
         .dropdown a {
             color: black; /* Link color */
-            padding: 12px 16px; /* Link padding */
+            padding: 4px 16px; /* Link padding */
             text-decoration: none; /* No underline */
             display: block; /* Make it a block */
         }
@@ -436,6 +433,13 @@ try {
                     </div>
 
                     <div id="dropdownMenu" class="dropdown mt-4">
+                        <a href="../esas_student/ellipsis/club_profile.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo urlencode($club_id); ?>&application_id=<?php echo urlencode($application_id); ?>">Club Profile</a>
+                        <a href="../esas_student/ellipsis/application_details.php?club_id=<?php echo urlencode($club_id); ?>&application_id=<?php echo urlencode($application_id); ?>">Application Details</a>
+                        <?php if ($isSecretary): ?>
+                            <a href="../esas_student/ellipsis/accomplishment_reports.php?student_id=<?php echo $student_id; ?>&club_id=<?php echo urlencode($club_id); ?>&application_id=<?php echo urlencode($application_id); ?>">Accomplishment Reports</a>
+                        <?php endif; ?>
+    
+                        <a href="../esas_student/ellipsis/history.php?student_id=<?php echo $student_id; ?>">History</a>
                         <?php if ($hasDepartureRequest): ?>
                             <a href="../esas_student/crud/departure_requests/departure_request_read.php?club_id=<?php echo $_GET['club_id']; ?>">See Departure Request</a>
                         <?php else: ?>

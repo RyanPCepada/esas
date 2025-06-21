@@ -26,13 +26,14 @@ switch ($method) {
                 LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
                 WHERE c.club_id = ?
                 GROUP BY c.club_id
+                ORDER BY clubName ASC
             ');
             $stmt->execute([$club_id]);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             if ($result) {
                 // Fetch count of students in this club (only active members)
-                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_registration WHERE club_id = ? AND status = \'active\'');
+                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_application WHERE club_id = ? AND status = \'active\'');
                 $stmt_count->execute([$club_id]);
                 $member_count = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
 
@@ -65,7 +66,7 @@ switch ($method) {
             // Read operation (fetch clubs by department)
             $department = $_GET['department'];
             $stmt = $pdo->prepare('
-                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, c.dateAdded, c.dateModified,
+                SELECT c.club_id, c.clubName, c.description, c.coverPhoto, c.dateAdded, c.dateModified,
                        GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderators,
                        GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS profilePics,
                        c.slots  -- Make sure to select the slots field here
@@ -75,13 +76,14 @@ switch ($method) {
                 LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
                 WHERE cr.department = ?
                 GROUP BY c.club_id
+                ORDER BY clubName ASC
             ');
             $stmt->execute([$department]);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Fetch counts of students for the filtered clubs (only active members)
             foreach ($result as &$club) {
-                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_registration WHERE club_id = ? AND status = \'active\'');
+                $stmt_count = $pdo->prepare('SELECT COUNT(*) as member_count FROM tbl_application WHERE club_id = ? AND status = \'active\'');
                 $stmt_count->execute([$club['club_id']]);
                 $club['membersCount'] = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
 
@@ -105,7 +107,7 @@ switch ($method) {
         } else {
             // Read operation (fetch all clubs)
             $stmt = $pdo->query('
-                SELECT c.club_id, c.clubName, c.information, c.coverPhoto, c.dateAdded, c.dateModified,
+                SELECT c.club_id, c.clubName, c.description, c.coverPhoto, c.dateAdded, c.dateModified,
                        GROUP_CONCAT(m.firstName ORDER BY m.firstName SEPARATOR ", ") AS moderators,
                        GROUP_CONCAT(m.profilePic ORDER BY m.firstName SEPARATOR ", ") AS profilePics,
                        c.slots  -- Make sure to select the slots field here
@@ -113,12 +115,13 @@ switch ($method) {
                 LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                 LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
                 GROUP BY c.club_id
+                ORDER BY clubName ASC
             ');
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Fetch counts of students for all clubs (only active members)
             foreach ($result as &$club) {
-                $stmt_count = $pdo->prepare('SELECT COUNT(DISTINCT student_id) as member_count FROM tbl_registration WHERE club_id = ? AND status = \'active\'');
+                $stmt_count = $pdo->prepare('SELECT COUNT(DISTINCT student_id) as member_count FROM tbl_application WHERE club_id = ? AND status = \'active\'');
                 $stmt_count->execute([$club['club_id']]);
                 $club['membersCount'] = $stmt_count->fetch(PDO::FETCH_ASSOC)['member_count'];
 

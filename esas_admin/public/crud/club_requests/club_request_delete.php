@@ -49,11 +49,10 @@ if (isset($_POST["request_id"]) && !empty($_POST["request_id"])) {
 
             // Log the activity in tbl_activity_logs
             $activity = "You deleted {$studentName}'s club request";
-            $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, student_id) VALUES (:activity, NOW(), :admin_id, :student_id)";
+            $logSQL = "INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id) VALUES (:activity, NOW(), :admin_id)";
             $logStmt = $pdo->prepare($logSQL);
             $logStmt->bindParam(":activity", $activity);
             $logStmt->bindParam(":admin_id", $adminId);
-            $logStmt->bindParam(":student_id", $student_id);
             $logStmt->execute();
 
             // Commit the transaction
@@ -90,7 +89,7 @@ if (isset($_POST["request_id"]) && !empty($_POST["request_id"])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Delete Club Request</title>
+    <title>ESAS - Delete Club Request</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         .wrapper {

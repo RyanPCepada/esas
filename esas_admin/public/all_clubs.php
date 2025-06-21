@@ -50,12 +50,12 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - All Clubs List</title>
+    <title>ESAS - All Clubs List</title>
     <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         .nav-link.active {
           color: white !important;
@@ -160,7 +160,7 @@ try {
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
                     <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
-                    eSAS - Admin</a>
+                    ESAS - Admin</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
                     <span class="navbar-toggler-icon"></span>
@@ -213,6 +213,19 @@ try {
                             <i class="fas fa-user-tie"></i> CSG & SBO Officers
                         </a>
                     </li>
+                    <li>
+                        <a href="../../esas_admin/public/accomplishment_reports.php" class="nav-link left-sidebar text-dark" id="accomplishment_reports" 
+                            style="display: flex; gap: 7px; align-items: flex-start;">
+                        
+                            <span class="icon-column" style="flex-shrink: 0;">
+                                <i class="fas fa-file-alt"></i>
+                            </span>
+                            
+                            <span class="text-column" style="line-height: 1.2;">
+                                Accomplishment Reports
+                            </span>
+                        </a>
+                    </li>
                 </ul>
             </div>
 
@@ -259,20 +272,20 @@ try {
                                     // Include config file
                                     require_once "../../config.php";
 
-                                    // SQL query to fetch all clubs with related information, moderators, member count, and actions
+                                    // SQL query to fetch all clubs with related description, moderators, member count, and actions
                                     $sql = "SELECT 
                                                 c.club_id,
                                                 c.clubName, 
-                                                c.information, 
+                                                c.description, 
                                                 c.coverPhoto, 
                                                 GROUP_CONCAT(DISTINCT CONCAT(m.firstName, ' ', m.lastName, ':::', m.profilePic) SEPARATOR '|||') AS moderators,
-                                                (SELECT COUNT(DISTINCT r.student_id) FROM tbl_registration r WHERE r.club_id = c.club_id AND r.status = 'active') AS member_count,
+                                                (SELECT COUNT(DISTINCT r.student_id) FROM tbl_application r WHERE r.club_id = c.club_id AND r.status = 'active') AS member_count,
                                                 c.dateAdded
                                             FROM tbl_clubs c
                                             LEFT JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                                             LEFT JOIN tbl_moderators m ON cm.moderator_id = m.moderator_id
                                             GROUP BY c.club_id
-                                            ORDER BY c.dateAdded ASC";
+                                            ORDER BY c.clubName ASC";
 
                                     if ($result = $pdo->query($sql)) {
                                         $totalRows = $result->rowCount();
@@ -312,13 +325,13 @@ try {
                                                 $rowCount++;
                                                 
                                                 echo '  
-                                                <div class="row ms-0 mb-3 p-4 club-row" style="' . $rowStyle . '">
+                                                <div class="row ms-0 mb-3 px-1 py-3 club-row" style="' . $rowStyle . '">
                                                     <!-- Club Cover Photo -->
                                                     <div class="col-md-5">
                                                         <div style="text-align: start;">
                                                             <img class="club-cover-photo" src="/esas/esas_admin/images/' . htmlspecialchars($row['coverPhoto'] ? $row['coverPhoto'] : 'default-cover.jpg') . '" 
                                                                 alt="' . htmlspecialchars($row['clubName']) . ' cover photo" 
-                                                                style="width: 100%; height: 225px; border-radius: 5px; object-fit: cover; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
+                                                                style="width: 100%; height: auto; border-radius: 5px; object-fit: cover; box-shadow: 0 5px 10px rgba(0, 0, 0, .5);">
                                                         </div>
                                                     </div>
                                                     <!-- Club Details -->
@@ -467,7 +480,7 @@ try {
 
 
 
-    <script>
+    <!-- <script>
         function submitClubRequest() {
             document.getElementById('clubRequestForm').submit();
         }
@@ -502,7 +515,7 @@ try {
                                             <h4>${club.clubName}</h4>
                                             <!--<div class="moderators-container">
                                                 ${club.formattedModerators}
-                                            </div>-->
+                                            </div>-- >
                                         </div>
                                     </a>
                                 </div>
@@ -521,7 +534,7 @@ try {
             });
 
 
-    </script>
+    </script> -->
 
 
     <script>

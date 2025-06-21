@@ -1,6 +1,7 @@
 <div class="events-section">
 
     <div class="row d-flex align-items-center">
+        <!-- <?php echo $club_id; ?> -->
         <div class="col-5 d-flex justify-content-start">
             <h5 class="text-muted mb-3" style="font-size: 1.2em;">Upcoming Events</h5>
         </div>
@@ -20,7 +21,7 @@
     <script>
         // Redirect to events-all-clubs.php when the button is clicked
         document.getElementById('viewOtherEventsBtn').addEventListener('click', function() {
-            window.location.href = '../../esas_moderator/public/components/events_all_clubs.php'; // Update this path as needed
+            window.location.href = '../../esas_moderator/public/components/events_all_clubs.php?club_id=<?php echo $club_id; ?>';
         });
     </script>
 

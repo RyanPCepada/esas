@@ -51,13 +51,13 @@ if (isset($_POST["student_id"]) && !empty($_POST["student_id"])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Delete Pending Approval</title>
+    <title>ESAS - Delete Pending Approval</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         .wrapper {
             width: 100%;

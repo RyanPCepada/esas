@@ -12,14 +12,19 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        // Fetch all events from all clubs
-        $stmt = $pdo->query('
+        // Get the current club's ID from query parameters
+        $currentClubId = isset($_GET['club_id']) ? intval($_GET['club_id']) : 0;
+
+        // Fetch only upcoming events from other clubs
+        $stmt = $pdo->prepare('
             SELECT e.event_id, e.title, e.date, e.timeStarts, e.timeEnds, e.location,
                 c.clubName 
             FROM tbl_events e
             LEFT JOIN tbl_clubs c ON e.club_id = c.club_id
+            WHERE e.date >= CURDATE() AND e.club_id != :currentClubId
             ORDER BY e.date, e.timeStarts
         ');
+        $stmt->execute(['currentClubId' => $currentClubId]);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode($result);

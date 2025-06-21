@@ -1,9 +1,12 @@
 <?php
-// Start the session
+
+require_once "../../../../config.php";
+require __DIR__ . '/../../../vendor/autoload.php';
+
 session_start();
 
-// Include the configuration file
-require_once '../../../../config.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -11,13 +14,15 @@ date_default_timezone_set('Asia/Manila');
 // Get the moderator ID from the URL or session
 $moderator_id = $_GET['moderator_id'] ?? $_SESSION['moderator_id'];
 
-// Fetch moderator information (name, etc.)
+// Fetch moderator information (name, email, etc.)
 $moderatorName = '';
+$moderatorEmail = '';
 try {
-    $stmt = $pdo->prepare("SELECT CONCAT(firstName, ' ', COALESCE(middleName, ''), ' ', lastName) AS fullName FROM tbl_moderators WHERE moderator_id = ?");
+    $stmt = $pdo->prepare("SELECT CONCAT(firstName, ' ', COALESCE(middleName, ''), ' ', lastName) AS fullName, email FROM tbl_moderators WHERE moderator_id = ?");
     $stmt->execute([$moderator_id]);
     $moderator = $stmt->fetch(PDO::FETCH_ASSOC);
     $moderatorName = htmlspecialchars($moderator['fullName']);
+    $moderatorEmail = htmlspecialchars($moderator['email']);
 } catch (PDOException $e) {
     die("Error fetching moderator details: " . $e->getMessage());
 }
@@ -46,9 +51,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $logStmt = $pdo->prepare("INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (?, NOW(), ?, ?, ?)");
         $logStmt->execute([$activity, $admin_id, null, null]);
 
+        // Send email notification to the moderator
+        $mail = new PHPMailer(true);
+        try {
+            // SMTP settings
+            $mail->isSMTP();                                       // Send using SMTP
+            $mail->Host       = 'smtp.gmail.com';                  // Set the SMTP server to send through
+            $mail->SMTPAuth   = true;                              // Enable SMTP authentication
+            $mail->Username   = 'nbsc.esas@gmail.com';         // SMTP username
+            $mail->Password   = 'cxef aobn ozbq qpxv';             // SMTP password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;    // Enable TLS encryption
+            $mail->Port       = 587;                               // TCP port to connect to
+
+            // Email content
+            $mail->setFrom('nbsc.esas@gmail.com', 'Club Assignment Update');      
+            $mail->addAddress($moderatorEmail, $moderatorName); // Add the moderator's email
+
+            // Content
+            $mail->isHTML(true); // Set email format to HTML
+            $mail->Subject = 'Assigned as Club Moderator';
+            $mail->Body = "Hello {$moderatorName}
+                           You have been assigned as a moderator for the {$clubName} club.
+                           Best regards, Your Admin Team";
+
+            // Send the email
+            $mail->send();
+            // Optionally log or handle successful email sending
+        } catch (Exception $e) {
+            echo "Email could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
+
         // Redirect back to the moderator update page with a success message
-        $_SESSION['message'] = 'Moderator assigned successfully!';
-        header("Location: moderator_update.php?moderator_id=" . htmlspecialchars($moderator_id));
+        $_SESSION['message'] = 'Moderator assigned successfully and email sent!';
+         header("Location: moderator_update.php?moderator_id=" . htmlspecialchars($moderator_id));
         exit;
 
     } catch (PDOException $e) {
@@ -62,19 +97,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Update Moderator</title>
+    <title>ESAS - Update Moderator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         /* Use the same font and wrapper styles as previous pages */
         body {
@@ -202,7 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Assign Moderator to Another Club -->
         <div class="assign-section">
             <h4>Assign to Another Club</h4>
-            <form action="" method="POST">
+            <form action="" method="POST" id="assignForm">
                 <input type="hidden" name="moderator_id" value="<?php echo htmlspecialchars($moderator_id); ?>">
                 <div class="form-group">
                     <label for="club">Select Club:</label>
@@ -216,6 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 FROM tbl_clubs c
                                 JOIN tbl_clubs_and_moderators cm ON c.club_id = cm.club_id
                                 WHERE cm.moderator_id = ?
+                                ORDER BY c.clubName ASC
                             ");
                             $stmt->execute([$moderator_id]);
                             $currentClubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -235,6 +272,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 WHERE c.club_id NOT IN (
                                     SELECT club_id FROM tbl_clubs_and_moderators WHERE moderator_id = ?
                                 )
+                                ORDER BY c.clubName ASC
                             ");
                             $stmt->execute([$moderator_id]);
                             $availableClubs = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -251,10 +289,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="text-center d-flex justify-content-between mt-2">
                     <button type="submit" class="btn assign-btn text-light">Assign to Club</button>
+                    <!-- <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a> -->
                     <a href="../../moderators.php" class="btn btn-secondary">Go Back</a>
                 </div>
             </form>
         </div>
+
+        <script>
+            document.getElementById('assignForm').addEventListener('submit', function(event) {
+                var clubSelect = document.getElementById('club');
+                var clubId = clubSelect.value;
+
+                // Check if no club is selected
+                if (!clubId) {
+                    // Display the alert
+                    alert('Please select a club before assigning a moderator.');
+                    event.preventDefault(); // Prevent form submission
+                }
+            });
+        </script>
+
     </div>
 
 </body>

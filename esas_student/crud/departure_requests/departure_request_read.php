@@ -52,14 +52,14 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Departure Request Details</title>
+    <title>ESAS - Departure Request Details</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         body {
             background-color: #f4f4f9;
@@ -76,11 +76,47 @@ try {
             background-color: white;
             padding: 20px;
         }
+        h2 {
+            margin-top: 48px;
+        }
+
+        .back-button {
+            position: absolute;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            background-color: lightgrey;
+            color: #36454F;
+            font-size: 18px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: grey;
+            color: white;
+        }
+
+        
+        @media (max-width: 767px) {
+            h2 {
+                margin-top: 5px;
+            }
+            .back-button {
+                position: relative;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="wrapper">
-    <h3 class="text-muted mt-5 mb-3">Departure Request</h3>
+    <a href="../../home.php?club_id=<?php echo htmlspecialchars($club_id); ?>" class="back-button">
+        <i class="fa fa-arrow-left"></i>
+    </a>
+    <h2 class="text-muted mb-3">Departure Request</h2>
     <div class="container-fluid container">
         <div class="row">
             <?php if (!empty($departureRequests)): ?>
@@ -123,9 +159,9 @@ try {
                                     Withdraw Request
                                 </button>
                             </div>
-                            <button class="btn btn-primary btn-sm mt-2">
+                            <!-- <button class="btn btn-primary btn-sm mt-2">
                                 <a class="text-light" href="../../home.php?club_id=<?php echo $_GET['club_id']; ?>" style="text-decoration: none;">Go Back</a>
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -136,11 +172,11 @@ try {
                         <div>Departure request has been withdrawn.</div>
                     </div>
                 </div>
-                <div class="p-3 d-flex justify-content-end">
+                <!-- <div class="p-3 d-flex justify-content-end">
                     <button class="btn btn-outline-info btn-sm mt-2">
                         <a class="text-dark" style="text-decoration: none;" href="../../home.php?club_id=<?php echo $_GET['club_id']; ?>">Go Back</a>
                     </button>
-                </div> 
+                </div>  -->
             <?php endif; ?>
         </div>
     </div>

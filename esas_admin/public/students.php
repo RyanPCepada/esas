@@ -50,12 +50,12 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - Students List</title>
+    <title>ESAS - Students List</title>
     <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         .nav-link.active {
           color: white !important;
@@ -95,7 +95,7 @@ try {
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
                     <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
-                    eSAS - Admin</a>
+                    ESAS - Admin</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
                     <span class="navbar-toggler-icon"></span>
@@ -148,6 +148,21 @@ try {
                             <i class="fas fa-user-tie"></i> CSG & SBO Officers
                         </a>
                     </li>
+                    <li>
+                        <a href="../../esas_admin/public/accomplishment_reports.php" class="nav-link left-sidebar text-dark" id="accomplishment_reports" 
+                            style="display: flex; gap: 7px; align-items: flex-start;">
+                        
+                            <span class="icon-column" style="flex-shrink: 0;">
+                                <i class="fas fa-file-alt"></i>
+                            </span>
+                            
+                            <span class="text-column" style="line-height: 1.2;">
+                                Accomplishment Reports
+                            </span>
+                        </a>
+                    </li>
+
+
                 </ul>
             </div>
 
@@ -174,15 +189,33 @@ try {
                                         <i class="fa fa-plus"></i> Add New Student
                                     </a>
                                 </div>
-                            
-                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> <!-- Lighter stripe style -->
+
+                                <!-- Dropdown for clubs and search input -->
+                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;"> 
                                     <thead>
                                         <tr>
-                                            <th>
-                                                <input id="studentSearch" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                                            </th>
-                                            <th class="text-center" colspan="8">
-                                                <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6> <!-- Updated row count display -->
+                                            <th colspan="9">
+                                                <div class="row">
+                                                    <div class="col-12 col-md-8 d-flex align-items-center">
+                                                        <select id="clubSelect" class="form-select me-2" style="width: 20%;">
+                                                            <optgroup label="Select Club">
+                                                                <option value="" selected>All</option>
+                                                                <?php
+                                                                // Fetch clubs from tbl_clubs
+                                                                $clubSql = "SELECT club_id, clubName FROM tbl_clubs ORDER BY clubName ASC";
+                                                                $clubs = $pdo->query($clubSql);
+                                                                while ($club = $clubs->fetch()) {
+                                                                    echo '<option value="' . htmlspecialchars($club['club_id']) . '">' . htmlspecialchars($club['clubName']) . '</option>';
+                                                                }
+                                                                ?>
+                                                            </optgroup>
+                                                        </select>
+                                                        <input id="studentSearch" class="form-control" type="search" placeholder="Search for students here..." aria-label="Search">
+                                                    </div>
+                                                    <div class="col-12 col-md-4 d-flex align-items-center justify-content-center mt-2">
+                                                        <h6 id="rowCountDisplay">Showing 0 / 0 Records</h6> <!-- Updated row count display -->
+                                                    </div>
+                                                </div>
                                             </th>
                                         </tr>
                                     </thead>
@@ -192,95 +225,116 @@ try {
                                     // Include config file
                                     require_once "../../config.php";
 
-                                    // SQL query to fetch all students with their registered clubs and active status
+                                    $club_id = isset($_GET['club_id']) ? $_GET['club_id'] : null;
+
+
+                                    
                                     $sql = "SELECT 
-                                                s.student_id,
-                                                s.firstName,
-                                                s.middleName,
-                                                s.lastName,
-                                                s.instiEmail,
-                                                s.phoneNumber,
-                                                s.department,
-                                                s.course,
-                                                s.year,
-                                                s.profilePic,
-                                                GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
-                                            FROM tbl_students s
-                                            LEFT JOIN tbl_registration r ON s.student_id = r.student_id
-                                            LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
-                                            WHERE r.status = 'active' -- Filter for active status
-                                            GROUP BY s.student_id
-                                            ORDER BY s.student_id ASC";
+                                    s.student_id,
+                                    s.firstName,
+                                    s.middleName,
+                                    s.lastName,
+                                    s.instiEmail,
+                                    s.phoneNumber,
+                                    s.department,
+                                    s.course,
+                                    s.year,
+                                    s.profilePic,
+                                    r.application_id,
+                                    r.club_id,  -- Add this line to select club_id
+                                    GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
+                                FROM 
+                                    tbl_students s
+                                LEFT JOIN 
+                                    tbl_application r ON s.student_id = r.student_id AND r.status = 'active' 
+                                LEFT JOIN 
+                                    tbl_clubs c ON r.club_id = c.club_id
+                                WHERE
+                                    r.status = 'active' 
+                                GROUP BY 
+                                    s.student_id, s.firstName, s.middleName, s.lastName, s.instiEmail, s.phoneNumber, s.department, s.course, s.year, s.profilePic
+                                ORDER BY 
+                                    s.student_id ASC;";
 
-                                    if ($result = $pdo->query($sql)) {
-                                        $totalRows = $result->rowCount();
-
-                                        if ($totalRows > 0) {
+                            
+                            if ($result = $pdo->query($sql)) {
+                                $totalRows = $result->rowCount();
+                            
+                                if ($totalRows > 0) {
+                                    echo '
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
+                                            <thead>
+                                                <tr>
+                                                    <!-- <th>Application ID</th> -->
+                                                    <!-- <th>Club ID</th> -->
+                                                    <th>Student ID</th>
+                                                    <th>Profile</th>
+                                                    <th>Full Name</th>
+                                                    <th>Department</th>
+                                                    <th>Course</th>
+                                                    <th>Club</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>';
+                            
+                                            while ($row = $result->fetch()) {
+                                                $application_id = htmlspecialchars($row['application_id']);
+                                                $club_id = isset($row['club_id']) ? htmlspecialchars($row['club_id']) : ''; // Check if club_id is set
+                                                $student_id = isset($row['student_id']) ? htmlspecialchars($row['student_id']) : '';
+                                                $firstName = htmlspecialchars($row['firstName']);
+                                                $middleName = htmlspecialchars($row['middleName']);
+                                                $lastName = htmlspecialchars($row['lastName']);
+                                                $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
+                                                $clubNames = htmlspecialchars($row['clubNames']);
+                                                $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
+                            
+                                                echo '
+                                                <tr class="student-row" data-club="' . htmlspecialchars($clubNames) . '">
+                                                    <!-- <td>' . $application_id . '</td> -->
+                                                    <!-- <td>' . $club_id . '</td> -->
+                                                    <td>' . $student_id . '</td>
+                                                    <td class="text-center p-1">
+                                                        <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
+                                                            alt="' . $fullName . ' profile picture" 
+                                                            style="width: 35px; height: 35px; border-radius: 50%;">
+                                                    </td>
+                                                    <td>' . $fullName . '</td>
+                                                    <td>' . htmlspecialchars($row['department']) . '</td>
+                                                    <td>' . htmlspecialchars($row['course']) . '</td>
+                                                    <td>' . $clubNames . '</td>
+                                                    <td class="text-center">
+                                                        <a href="../public/crud/students/student_read.php?application_id=' . htmlspecialchars($row['application_id']) . '&student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($club_id) 
+                                                        . '&fullName=' . htmlspecialchars($fullName) . '&firstName=' . htmlspecialchars($firstName) . '&middleName=' . htmlspecialchars($middleName) . '&lastName=' . htmlspecialchars($lastName) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                    </td>
+                                                </tr>';
+                                            }
+                            
                                             echo '
-                                            <div class="table-responsive">
-                                                <table class="table table-bordered table-striped" style="background-color: #f9f9f9;">
-                                                    <thead>
-                                                        <tr>
-                                                            <th></th>
-                                                            <th>Full Name</th>
-                                                            <th>Department</th>
-                                                            <th>Course</th>
-                                                            <th>Club</th>
-                                                            <th>Actions</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>';
-
-                                                    while ($row = $result->fetch()) {
-                                                        $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
-                                                        $clubNames = htmlspecialchars($row['clubNames']);
-                                                        $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
-                                                        $email = htmlspecialchars($row['instiEmail']);
-                                                        $phoneNumber = htmlspecialchars($row['phoneNumber']);
-                                                        $department = htmlspecialchars($row['department']);
-                                                        $course = htmlspecialchars($row['course']);
-
-                                                        echo '
-                                                        <tr class="student-row">
-                                                            <td class="text-center p-1">
-                                                                <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
-                                                                    alt="' . $fullName . ' profile picture" 
-                                                                    style="width: 35px; height: 35px; border-radius: 50%;">
-                                                            </td>
-                                                            <td>' . $fullName . '</td>
-                                                            <td>' . $department . '</td>
-                                                            <td>' . $course . '</td>
-                                                            <td>' . $clubNames . '</td>
-                                                            <td class="text-center">
-                                                                <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
-                                                                <!-- <a href="../public/crud/students/student_update.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="mr-2" title="Update Record" data-toggle="tooltip"><span class="fa fa-pencil"></span></a>
-                                                                <a href="../public/crud/students/student_delete.php?student_id=' . htmlspecialchars($row['student_id']) . '" class="text-danger" title="Delete Record" data-toggle="tooltip"><span class="fa fa-trash"></span></a> -->
-                                                            </td>
-                                                        </tr>';
-                                                    }
-
-                                                    echo '
-                                                    </tbody>
-                                                </table>
-                                            </div>'; // End of table-responsive
-                                        } else {
-                                            echo '<div class="alert alert-danger"><em>No students were found.</em></div>';
-                                        }
-                                    } else {
-                                        echo "Oops! Something went wrong. Please try again later.";
-                                    }
+                                            </tbody>
+                                        </table>
+                                    </div>'; // End of table-responsive
+                                } else {
+                                    echo '<div class="alert alert-danger"><em>No students were found.</em></div>';
+                                }
+                            } else {
+                                echo "Oops! Something went wrong. Please try again later.";
+                            }
+                            
                                 ?>
 
                             </div>
                             <!-- ALL STUDENT TABLE END -->
 
                             <div id="noResultsMessage" class="alert alert-danger p-2 ps-3" style="display: none;">
-                                <em>No results found.</em>
+                                <em>No students found.</em>
                             </div>
 
                             <script>
                                 document.addEventListener('DOMContentLoaded', function () {
                                     const searchInput = document.getElementById('studentSearch');
+                                    const clubSelect = document.getElementById('clubSelect');
                                     const studentRows = document.querySelectorAll('.student-row');
                                     const rowCountDisplay = document.getElementById('rowCountDisplay');
                                     const noResultsMessage = document.getElementById('noResultsMessage');
@@ -288,23 +342,26 @@ try {
 
                                     rowCountDisplay.textContent = `Showing ${totalRows} / ${totalRows} Records`;
 
-                                    searchInput.addEventListener('input', function () {
+                                    function applyFilters() {
+                                        const selectedClub = clubSelect.value;
                                         const searchTerm = searchInput.value.trim().toLowerCase();
                                         let visibleRowCount = 0;
 
                                         studentRows.forEach(function (row) {
+                                            const clubCell = row.getAttribute('data-club').toLowerCase(); // Club data for filtering
                                             const cells = row.querySelectorAll('td');
                                             let rowContainsTerm = false;
 
+                                            // Reset cell content and apply highlight if it matches the search term
                                             cells.forEach(function (cell) {
-                                                // Reset cell content and apply highlight
                                                 cell.innerHTML = removeHighlight(cell.innerHTML);
                                                 if (highlightText(cell, searchTerm)) {
                                                     rowContainsTerm = true;
                                                 }
                                             });
 
-                                            if (rowContainsTerm) {
+                                            // Display row only if it matches both club selection and search term
+                                            if ((selectedClub === '' || clubCell.includes(clubSelect.options[clubSelect.selectedIndex].text.toLowerCase())) && rowContainsTerm) {
                                                 row.style.display = '';
                                                 visibleRowCount++;
                                             } else {
@@ -314,7 +371,11 @@ try {
 
                                         rowCountDisplay.textContent = `Showing ${visibleRowCount} / ${totalRows} Records`;
                                         noResultsMessage.style.display = (visibleRowCount === 0) ? 'block' : 'none';
-                                    });
+                                    }
+
+                                    // Attach applyFilters to both events
+                                    clubSelect.addEventListener('change', applyFilters);
+                                    searchInput.addEventListener('input', applyFilters);
 
                                     function highlightText(cell, term) {
                                         const textNodes = getTextNodes(cell);
@@ -352,6 +413,7 @@ try {
                                         return html.replace(/<span[^>]*style="[^"]*background-color:[^"]*"[^>]*>(.*?)<\/span>/gi, '$1');
                                     }
                                 });
+
                             </script>
 
                         </div>

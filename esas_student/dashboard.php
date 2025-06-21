@@ -34,7 +34,7 @@ try {
     // Handle database connection or query error
     die("Database error: " . $e->getMessage());
 }
-
+// echo "<script>alert('Hi!');</script>;"
 ?>
 
 
@@ -386,7 +386,7 @@ try {
                 <div class="row g-0 h-100">
                     <div class="row g-0 p-4 px-2 pt-2 h-100">
                         
-
+                        <!-- <php echo "Club ID: $student_id"; ?> -->
 
                         <!-- THE MAIN PAGE START -->
                         <div class="card p-2">
@@ -454,8 +454,8 @@ try {
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 
                                 <div class="mt-3 mb-3 d-flex justify-content-between align-items-center">
-                                    <!-- <h4 class="text-muted mb-0">Registrations Overview</h4> -->
-                                    <h4 class="text-muted mb-0">Registration Status Summary</h4>
+                                    <!-- <h4 class="text-muted mb-0">Applications Overview</h4> -->
+                                    <h4 class="text-muted mb-0">Application Status Summary</h4>
                                 </div>
 
                                 <!-- Card for STUDENT TOTAL REGISTRATIONS -->
@@ -465,8 +465,8 @@ try {
                                         try {
                                             // Base SQL query to count total active clubs for the student
                                             $sql = "
-                                                SELECT COUNT(r.club_id) AS total_registrations 
-                                                FROM tbl_registration r
+                                                SELECT COUNT(r.club_id) AS total_applications 
+                                                FROM tbl_application r
                                                 WHERE r.student_id = :student_id
                                             ";
 
@@ -474,18 +474,18 @@ try {
                                             $params = ['student_id' => $student_id];
 
                                             // Prepare and execute the query
-                                            $stmt_registrations = $pdo->prepare($sql);
-                                            $stmt_registrations->execute($params);
+                                            $stmt_applications = $pdo->prepare($sql);
+                                            $stmt_applications->execute($params);
 
-                                            // Fetch the total number of registrations
-                                            $total_registrations = $stmt_registrations->fetchColumn();
-                                            echo "<h3>$total_registrations</h3>";
+                                            // Fetch the total number of applications
+                                            $total_applications = $stmt_applications->fetchColumn();
+                                            echo "<h3>$total_applications</h3>";
                                         } catch (PDOException $e) {
                                             echo "Error: " . $e->getMessage();
                                         }
                                         ?>
                                         <i class="fas fa-file-signature mt-2 me-2 p-2 icon-style"></i>
-                                        <p>Total Registration</p>
+                                        <p>Total Application</p>
                                     </div>
                                 </div>
                                 
@@ -497,7 +497,7 @@ try {
                                             // Base SQL query to count total active clubs for the student
                                             $sql = "
                                                 SELECT COUNT(DISTINCT r.club_id) AS total_active_clubs 
-                                                FROM tbl_registration r
+                                                FROM tbl_application r
                                                 WHERE r.student_id = :student_id
                                                 AND r.status = 'active'
                                             ";
@@ -530,7 +530,7 @@ try {
                                             // Base SQL query to count total pending approval students for the logged-in student
                                             $sql = "
                                                 SELECT COUNT(*) AS total_pending_students 
-                                                FROM tbl_registration tr 
+                                                FROM tbl_application tr 
                                                 WHERE tr.status = 'pending' 
                                                 AND tr.student_id = :student_id
                                             ";
@@ -560,7 +560,7 @@ try {
                                             // Base SQL query to count total pending approval students for the logged-in student
                                             $sql = "
                                                 SELECT COUNT(*) AS total_disapproved_students 
-                                                FROM tbl_registration tr 
+                                                FROM tbl_application tr 
                                                 WHERE tr.status = 'disapproved' 
                                                 AND tr.student_id = :student_id
                                             ";
@@ -589,7 +589,7 @@ try {
                             <div class="row card-row1 col-md-12 mb-1" style="border: 1px solid transparent; margin: 0;">
                                 
                                 <div class="mt-3 mb-3 d-flex justify-content-between align-items-center">
-                                    <!-- <h4 class="text-muted mb-0">Registrations Overview</h4> -->
+                                    <!-- <h4 class="text-muted mb-0">Applications Overview</h4> -->
                                     <h4 class="text-muted mb-0">Club Requests Overview</h4>
                                 </div>
 

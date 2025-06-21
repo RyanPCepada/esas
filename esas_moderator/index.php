@@ -7,12 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - Index</title>
+    <title>ESAS - Index</title>
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../assets/js/jquery-3.6.0.js"></script>
     <link href="../assets/css/styles.css" rel="stylesheet" />
-    <link href="../assets/img/nbsclogo.png" rel="icon">
+    <link href="../assets/img/NBSC_LOGO.png" rel="icon">
 </head>
 <body>
     <script>

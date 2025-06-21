@@ -18,8 +18,8 @@
                     <a class="dropdown-item py-1">Admission</a>
                     <a class="dropdown-item py-1">Library Resource</a>
                     <a class="dropdown-item py-1">Election Voting</a>
-                    <a class="dropdown-item py-1" href="all_clubs.php">Club Registration</a>
-                    <a class="dropdown-item py-1" href="clubs_old_v2.php">Club Registration Old</a>
+                    <a class="dropdown-item py-1" href="all_clubs.php">Club Application</a>
+                    <a class="dropdown-item py-1" href="clubs_old_v2.php">Club Application Old</a>
                 </div>
                 <!-- <div>
                     <div class="dropdown-header py-0">Settings</div>
@@ -47,7 +47,8 @@
         <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
             <li>
-                <div class="dropdown-account"><?php echo "$email"; ?></div>
+                <!-- <div class="dropdown-account"><?php echo "$email"; ?></div> -->
+                <div class="dropdown-account">ADMIN</div>
             </li>
             <!-- <li>
                 <div class="dropdown-account">ID: <?php echo $student_id; ?></div>
@@ -55,7 +56,7 @@
             <li>
                 <hr class="dropdown-divider" />
             </li>
-            <!-- <li><a class="dropdown-item" href="/esas/esas_admin/settings.php">Settings</a></li> -->
+            <li><a class="dropdown-item" href="/esas/esas_admin/settings.php">Settings</a></li>
             <li><a class="dropdown-item" href="/esas/esas_admin/history.php">History</a></li>
             <li><a class="dropdown-item" href="/esas/esas_admin/logout.php">Logout</a></li>
         </ul>

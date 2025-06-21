@@ -1,9 +1,12 @@
 <?php
-// Start the session
+
+require_once "../../../../config.php";
+require __DIR__ . '/../../../vendor/autoload.php';
+
 session_start();
 
-// Include the configuration file
-require_once '../../../../config.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 // Set the default timezone to Asia/Manila
 date_default_timezone_set('Asia/Manila');
@@ -13,15 +16,22 @@ if (isset($_POST['club_id']) && isset($_POST['moderator_id'])) {
     $club_id = $_POST['club_id'];
     $moderator_id = $_POST['moderator_id'];
 
-    // Fetch the moderator's full name
-    $stmt = $pdo->prepare("SELECT firstName, middleName, lastName FROM tbl_moderators WHERE moderator_id = ?");
+    // Fetch the moderator's first name, middle name, last name, and email
+    $stmt = $pdo->prepare("SELECT firstName, middleName, lastName, email FROM tbl_moderators WHERE moderator_id = ?");
     $stmt->execute([$moderator_id]);
     $moderator = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($moderator) {
+        // Combine first, middle, and last names into the full name
         $moderator_name = trim($moderator['firstName'] . ' ' . $moderator['middleName'] . ' ' . $moderator['lastName']);
+        $moderator_email = $moderator['email']; // Get the moderator's email
+        // Store the individual names for later use
+        $firstName = $moderator['firstName'];
+        $middleName = $moderator['middleName'];
+        $lastName = $moderator['lastName'];
     } else {
         $moderator_name = "Unknown Moderator";
+        $moderator_email = ''; // Default empty email if not found
     }
 
     // Fetch the club's name
@@ -34,6 +44,11 @@ if (isset($_POST['club_id']) && isset($_POST['moderator_id'])) {
     } else {
         $club_name = "Unknown Club";
     }
+
+    // Fetch the dateAssigned (dateAdded from tbl_clubs_and_moderators)
+    $stmt = $pdo->prepare("SELECT dateAdded FROM tbl_clubs_and_moderators WHERE club_id = ? AND moderator_id = ?");
+    $stmt->execute([$club_id, $moderator_id]);
+    $dateAssigned = $stmt->fetchColumn();
 } else {
     // Missing club_id or moderator_id
     $_SESSION['error_message'] = "Invalid request. Club ID or Moderator ID is missing.";
@@ -57,8 +72,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm'])) {
             $admin_id = $_SESSION['admin_id']; // Assuming admin_id is stored in session
             
             $log_stmt = $pdo->prepare("INSERT INTO tbl_activity_logs (activity, dateAdded, admin_id, moderator_id, student_id) VALUES (?, NOW(), ?, ?, ?)");
-            // $log_stmt->execute([$activity, $admin_id, $moderator_id, null]);
             $log_stmt->execute([$activity, $admin_id, null, null]); // Assuming student_id is not relevant here
+            
+            // Insert into tbl_moderator_archive before removal
+            $dateUnassigned = date('Y-m-d H:i:s'); // Capture the current timestamp when unassigned
+
+            // Insert into the archive table with moderator_id, firstName, middleName, lastName
+            $archive_stmt = $pdo->prepare("INSERT INTO tbl_moderator_archive (moderator_id, firstName, middleName, lastName, clubName, dateAssigned, dateUnassigned) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $archive_stmt->execute([$moderator_id, $firstName, $middleName, $lastName, $club_name, $dateAssigned, $dateUnassigned]);
+
+            // Send email notification to the moderator about the removal
+            $mail = new PHPMailer(true);
+            try {
+                // SMTP settings
+                $mail->isSMTP();                                       // Send using SMTP
+                $mail->Host       = 'smtp.gmail.com';                  // Set the SMTP server to send through
+                $mail->SMTPAuth   = true;                              // Enable SMTP authentication
+                $mail->Username   = 'nbsc.esas@gmail.com';         // SMTP username
+                $mail->Password   = 'cxef aobn ozbq qpxv';             // SMTP password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;    // Enable TLS encryption
+                $mail->Port       = 587;                               // TCP port to connect to
+    
+                // Email content
+                $mail->setFrom('nbsc.esas@gmail.com', 'Club Assignment Removed');      
+                $mail->addAddress($moderator_email, $moderator_name); 
+
+                // Content
+                $mail->isHTML(true); // Set email format to HTML
+                $mail->Subject = 'Removed as Club Moderator';
+                $mail->Body = "Hello {$moderator_name},
+                               You have been removed as a moderator of the {$club_name} club.
+                               If you have any questions, please contact the admin team.
+                               Best regards, Your Admin Team";
+
+                // Send the email
+                $mail->send();
+                // Optionally log or handle successful email sending
+            } catch (Exception $e) {
+                echo "Email could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            }
 
         } else {
             // No rows affected, meaning the moderator wasn't assigned to this club
@@ -75,19 +127,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm'])) {
 ?>
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Remove Moderator</title>
+    <title>ESAS - Remove Moderator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         .wrapper {
             width: 100%;

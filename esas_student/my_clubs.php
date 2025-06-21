@@ -7,6 +7,7 @@ date_default_timezone_set('Asia/Manila');
 
 // Fetch the current student's ID from the session
 $student_id = $_SESSION['student_id'];
+$fromPendingPage = 'yes';
 
 try {
     // Use the existing PDO instance from config.php
@@ -46,12 +47,12 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - My Clubs</title>
+    <title>ESAS - My Clubs</title>
     <link href="../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../assets/js/jquery-3.6.0.js"></script>
     <link href="../assets/css/styles.css" rel="stylesheet" />
-    <link href="../assets/img/nbsclogo.png" rel="icon">
+    <link href="../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         .left-sidebar {
             font-size: 16px;
@@ -225,7 +226,7 @@ try {
             }
             .card-img-only {
                 width: 315px;
-                height: 177px;
+                height: 163px !important;
                 width: auto;
                 height: 145px;
                 margin-top: 10px;
@@ -249,7 +250,7 @@ try {
         <div class="row g-0 h-100">
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
-                    <img src="../assets/img/nbsclogo.png" style="height: 0.3in;">
+                    <img src="../assets/img/NBSC_LOGO.png" style="height: 0.3in;">
                     NBSC SIS</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
@@ -416,39 +417,39 @@ try {
         $(document).ready(function() {
             let clubs = [];
 
-        function loadClubs(tab, containerId, dateLabel) {
-            $.ajax({
-                url: `/esas/esas_student/apis/student-clubs-${tab}-api.php`,
-                type: "GET",
-                success: function(response) {
-                    const clubsContainer = document.getElementById(containerId);
-                    if (response && response.length > 0) {
-                        clubs = response.map(club => club.club_id); // Populate clubs array
-                        clubsContainer.innerHTML = response.map(club => `
-                            <div class="col-md-4 card-container"> 
-                                <span class="club-notification-badge" id="club-notification-${club.club_id}" style="display:none;"></span>
-                                <div class="card card-img-only">
-                                    <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}` : `/esas/esas_student/club_info.php?club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}`}" 
-                                    onclick="markClubNotificationsAsRead(${club.club_id})">
-                                        <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
-                                        <div class="overlay-text">
-                                            <h4>${club.clubName}</h4>
-                                        </div>
-                                    </a>
+            function loadClubs(tab, containerId) {
+                $.ajax({
+                    url: `/esas/esas_student/apis/student-clubs-${tab}-api.php`,
+                    type: "GET",
+                    success: function(response) {
+                        const clubsContainer = document.getElementById(containerId);
+                        if (response && response.length > 0) {
+                            clubs = response.map(club => club.club_id); // Populate clubs array
+                            clubsContainer.innerHTML = response.map(club => `
+                                <div class="col-md-4 card-container"> 
+                                    <span class="club-notification-badge" id="club-notification-${club.club_id}" style="display:none;"></span>
+                                    <div class="card card-img-only">
+                                        <a href="${tab === 'active' ? `/esas/esas_student/home.php?club_id=${club.club_id}&application_id=${club.application_id}` : `/esas/esas_student/ellipsis/application_details.php?application_id=${club.application_id}&club_id=${club.club_id}&club_name=${encodeURIComponent(club.clubName)}&from_pending_page=${encodeURIComponent(club.fromPendingPage)}&status=${tab}`}" 
+                                        onclick="markClubNotificationsAsRead(${club.club_id})">
+                                            <img src="/esas/esas_admin/images/${club.coverPhoto}" alt="Cover Photo">
+                                            <div class="overlay-text">
+                                                <h4>${club.clubName}</h4>
+                                            </div>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                        `).join('');
-                        fetchClubNotificationCounts();
-                    } else {
-                        clubsContainer.innerHTML = '<p>No clubs found.</p>';
+                            `).join('');
+                            fetchClubNotificationCounts();
+                        } else {
+                            clubsContainer.innerHTML = '<p>No clubs found.</p>';
+                        }
+                    },
+                    error: function() {
+                        const clubsContainer = document.getElementById(containerId);
+                        clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
                     }
-                },
-                error: function() {
-                    const clubsContainer = document.getElementById(containerId);
-                    clubsContainer.innerHTML = '<p>Failed to fetch clubs. Please try again later.</p>';
-                }
-            });
-        }
+                });
+            }
 
 
             function fetchClubNotificationCounts() {

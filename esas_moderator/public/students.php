@@ -12,6 +12,7 @@ if (!isset($_SESSION['moderator_id'])) {
 
 $moderator_id = $_SESSION['moderator_id']; // Get moderator ID from session
 
+//FOR VAV_MAIN FULL NAME PURPOSES
 try {
     // Fetch moderator's name
     $sqlModerator = "SELECT firstName, middleName, lastName FROM tbl_moderators WHERE moderator_id = :moderator_id";
@@ -36,7 +37,7 @@ try {
     $sqlStudents = "
         SELECT s.student_id, s.firstName, s.middleName, s.lastName, s.age, s.birthday, s.gender, s.instiEmail, s.phoneNumber, s.department, s.course, s.year, s.street, s.barangay, s.municipality, s.province, s.zipcode, s.profilePic
         FROM tbl_students s
-        JOIN tbl_registration r ON s.student_id = r.student_id
+        JOIN tbl_application r ON s.student_id = r.student_id
         WHERE r.status = 'active'
     ";
 
@@ -64,12 +65,12 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>eSAS - Students List</title>
+    <title>ESAS - Students List</title>
     <link href="../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         .nav-link.active {
           color: white !important;
@@ -129,7 +130,7 @@ try {
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-2">
                 <a class="navbar-brand ps-2" href="#">
                     <img src="../../assets/img/SAS_LOGO.png" style="height: 0.3in;">
-                    eSAS - Moderator</a>
+                    ESAS - Moderator</a>
                 </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="true">
                     <span class="navbar-toggler-icon"></span>
@@ -173,6 +174,21 @@ try {
                         <li>
                             <a href="../../esas_moderator/public/reports.php" class="nav-link left-sidebar text-dark" id="reports">
                                 <i class="fas fa-file-alt"></i> Reports
+                            </a>
+                        </li>
+                        <br>
+                        Others
+                        <li>
+                            <a href="../../esas_moderator/public/accomplishment_reports.php" class="nav-link left-sidebar text-dark" id="accomplishment_reports" 
+                                style="display: flex; gap: 7px; align-items: flex-start;">
+                            
+                                <span class="icon-column" style="flex-shrink: 0;">
+                                    <i class="fas fa-file-alt"></i>
+                                </span>
+                                
+                                <span class="text-column" style="line-height: 1.2;">
+                                    Accomplishment Reports
+                                </span>
                             </a>
                         </li>
                     </ul>
@@ -313,12 +329,12 @@ try {
                                                     <!-- Dropdown for filtering by status -->
                                                     <div class="col-12 col-md-8 d-flex align-items-center">
                                                         <select id="statusSelect" class="form-select me-2" style="width: 20%;">
-                                                            <optgroup label="Select Club Request Status">
+                                                            <optgroup label="Select Status">
                                                                 <option value="" selected>All</option>
                                                                 <option value="active">Active</option>
                                                                 <option value="inactive">Inactive</option>
-                                                                <option value="departed">Departed</option>
                                                                 <option value="disapproved">Disapproved</option>
+                                                                <option value="departed">Departed</option>
                                                             </optgroup>
                                                         </select>
                                                         <!-- Search input -->
@@ -343,27 +359,26 @@ try {
 
                                     // SQL query to fetch cumulative students with "active" status in the selected club
                                     $sql = "SELECT 
-                                        s.student_id,
-                                        s.firstName,
-                                        s.middleName,
-                                        s.lastName,
-                                        s.age,
-                                        s.gender,
-                                        s.instiEmail,
-                                        s.phoneNumber,
-                                        s.department,
-                                        s.course,
-                                        s.year,
-                                        s.profilePic,
-                                        s.dateAdded AS student_dateAdded,
-                                        r.status AS status,  -- Include the status here
-                                        GROUP_CONCAT(DISTINCT c.clubName ORDER BY c.clubName ASC SEPARATOR ', ') AS clubNames
-                                    FROM tbl_students s
-                                    LEFT JOIN tbl_registration r ON s.student_id = r.student_id
-                                    LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
-                                    WHERE r.status IN ('active', 'inactive', 'departed', 'disapproved')";
-
-
+                                                s.student_id,
+                                                s.firstName,
+                                                s.middleName,
+                                                s.lastName,
+                                                s.age,
+                                                s.gender,
+                                                s.instiEmail,
+                                                s.phoneNumber,
+                                                s.department,
+                                                s.course,
+                                                s.year,
+                                                s.profilePic,
+                                                s.dateAdded AS student_dateAdded,
+                                                r.application_id,
+                                                r.status,  -- Include each status as it is
+                                                c.clubName
+                                            FROM tbl_students s
+                                            LEFT JOIN tbl_application r ON s.student_id = r.student_id
+                                            LEFT JOIN tbl_clubs c ON r.club_id = c.club_id
+                                            WHERE r.status IN ('active', 'inactive', 'disapproved', 'departed')";
 
                                     // Check if club ID is set and add to the query
                                     if ($selectedClubId) {
@@ -375,7 +390,8 @@ try {
                                         $sql .= " AND MONTH(s.dateAdded) <= :selectedMonth";
                                     }
 
-                                    $sql .= " GROUP BY s.student_id ORDER BY s.student_id ASC";
+                                    $sql .= " ORDER BY s.student_id ASC, r.application_id ASC";
+
 
                                     // Prepare the SQL statement
                                     $stmt = $pdo->prepare($sql);
@@ -402,6 +418,7 @@ try {
                                         <table class="table table-bordered table-striped" style="background-color: #f9f9f9;" id="studentTable">
                                             <thead>
                                                 <tr>
+                                                    <!-- <th>Application ID</th> -->
                                                     <th>Student ID</th>
                                                     <th>Profile</th>
                                                     <th>Full Name</th>
@@ -409,6 +426,7 @@ try {
                                                     <th>Age</th>
                                                     <th>Email</th>
                                                     <th>Phone</th>
+                                                    <th>Year</th>
                                                     <th>Course</th>
                                                     <th>Status</th>
                                                     <th>Actions</th>
@@ -418,13 +436,18 @@ try {
 
                                         foreach ($result as $row) {
                                             $formattedDate = date('F j, Y', strtotime($row['student_dateAdded']));
+                                            $application_id = htmlspecialchars($row['application_id']);
                                             $student_id = htmlspecialchars($row['student_id']);
+                                            $firstName = htmlspecialchars($row['firstName']);
+                                            $middleName = htmlspecialchars($row['middleName']);
+                                            $lastName = htmlspecialchars($row['lastName']);
                                             $fullName = htmlspecialchars($row['firstName'] . ' ' . $row['middleName'] . ' ' . $row['lastName']);
                                             $profilePic = htmlspecialchars($row['profilePic'] ? $row['profilePic'] : 'default-profile.jpg');
                                             $gender = htmlspecialchars($row['gender']);
                                             $age = htmlspecialchars($row['age']);
                                             $email = htmlspecialchars($row['instiEmail']);
                                             $phoneNumber = htmlspecialchars($row['phoneNumber']);
+                                            $year = htmlspecialchars($row['year']);
                                             $course = htmlspecialchars($row['course']);
                                             $status = htmlspecialchars($row['status']);
 
@@ -432,6 +455,7 @@ try {
 
                                             echo '
                                             <tr class="student-row" data-status="' . htmlspecialchars($row['status']) . '"> 
+                                                <!-- <td>' . $application_id . '</td> -->
                                                 <td>' . $student_id . '</td>
                                                 <td class="text-center p-1">
                                                     <img class="student-profile-pic" src="/esas/esas_student/images/' . $profilePic . '" 
@@ -443,10 +467,12 @@ try {
                                                 <td>' . $age . '</td>
                                                 <td>' . $email . '</td>
                                                 <td>' . $phoneNumber . '</td>
+                                                <td>' . $year . '</td>
                                                 <td>' . $course . '</td>
                                                 <td>' . $status . '</td>
                                                 <td class="text-center">
-                                                    <a href="../public/crud/students/student_read.php?student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($selectedClubId) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
+                                                    <a href="../public/crud/students/student_read.php?application_id=' . htmlspecialchars($row['application_id']) . '&student_id=' . htmlspecialchars($row['student_id']) . '&club_id=' . htmlspecialchars($selectedClubId) . '&status=' . htmlspecialchars($status) 
+                                                    . '&fullName=' . htmlspecialchars($fullName) . '&firstName=' . htmlspecialchars($firstName) . '&middleName=' . htmlspecialchars($middleName) . '&lastName=' . htmlspecialchars($lastName) . '" class="mr-2" title="View Record" data-toggle="tooltip"><span class="fa fa-eye"></span></a>
                                                 </td>
                                             </tr>';
                                         }

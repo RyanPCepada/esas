@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSAS - Add Club Request</title>
+    <title>ESAS - Add Club Request</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
     <link href="../../../assets/css/jquery.dataTables.min.css" rel="stylesheet" />
     <script src="../../../assets/js/all.js" crossorigin="anonymous"></script>
     <script src="../../../assets/js/jquery-3.6.0.js"></script>
     <link href="../../../assets/css/styles.css" rel="stylesheet" />
-    <link href="../../../assets/img/nbsclogo.png" rel="icon">
+    <link href="../../../assets/img/NBSC_LOGO.png" rel="icon">
     <style>
         .wrapper {
             width: 100%;
@@ -67,23 +67,19 @@
                         
                         <div class="form-group mb-3">
                             <label for="coverPhoto">Add a Cover Photo</label>
-                            <input type="file" name="coverPhoto" class="form-control" id="coverPhoto" accept="image/*" required onchange="previewImage(event)" style="border: none;">
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <img id="coverPhotoPreview" src="#" alt="Cover Photo Preview" style="display:none; width: 50%; object-fit: cover;" />
+                            <input type="file" name="coverPhoto" class="form-control" id="coverPhoto" accept="image/*" onchange="previewCoverPhoto(event)">
+                            <img id="coverPhotoPreview" src="#" alt="Cover Photo Preview" style="display:none; width: 100%; object-fit: cover;" />
                         </div>
 
-                        <!-- New section for attaching a letter -->
                         <div class="form-group mb-3">
                             <label for="requestLetter">Attach a Request Letter</label>
-                            <input type="file" name="requestLetter" class="form-control" id="requestLetter" accept=".pdf,.doc,.docx" required onchange="previewFile(event)" style="border: none;">
-                            <small class="form-text text-muted">Accepted formats: PDF, DOC, DOCX.</small>
+                            <input type="file" name="requestLetter" class="form-control" id="requestLetter" accept=".pdf" required onchange="previewFile(event)" style="border: none;">
+                            <small class="form-text text-muted">Accepted format: PDF only.</small>
                         </div>
 
                         <div class="form-group mb-3">
-                            <!-- PDF or DOC icon Preview will appear here -->
-                            <img id="fileIconPreview" src="#" alt="File Icon Preview" />
+                            <!-- PDF icon Preview will appear here -->
+                            <img id="fileIconPreview" src="#" alt="File Icon Preview" style="display: none;" />
                             <p id="fileNamePreview" style="display:none;"></p> <!-- For showing the filename -->
                         </div>
 
@@ -100,43 +96,43 @@
 
     <!-- Preview Image Function -->
     <script>
-        function previewImage(event) {
-            var reader = new FileReader();
-            reader.onload = function(){
-                var output = document.getElementById('coverPhotoPreview');
-                output.src = reader.result;
-                output.style.display = 'block';
-            }
-            reader.readAsDataURL(event.target.files[0]);
+    // Function to preview cover photo
+    function previewCoverPhoto(event) {
+        var reader = new FileReader();
+        reader.onload = function(){
+            var output = document.getElementById('coverPhotoPreview');
+            output.src = reader.result;
+            output.style.display = 'block'; // Show the image
         }
+        reader.readAsDataURL(event.target.files[0]); // Read the file as a data URL
+    }
 
-        // Function to preview PDF or Word icons
-        function previewFile(event) {
-            var file = event.target.files[0];
-            var fileIconPreview = document.getElementById('fileIconPreview');
-            var fileNamePreview = document.getElementById('fileNamePreview');
+    // Function to preview PDF icon
+    function previewFile(event) {
+        var file = event.target.files[0];
+        var fileIconPreview = document.getElementById('fileIconPreview');
+        var fileNamePreview = document.getElementById('fileNamePreview');
 
-            // Clear previous previews
-            fileIconPreview.style.display = 'none';
-            fileNamePreview.style.display = 'none';
+        // Clear previous previews
+        fileIconPreview.style.display = 'none';
+        fileNamePreview.style.display = 'none';
 
+        // Check if a file is selected
+        if (file) {
             // Detect file type
             if (file.type === "application/pdf") {
                 // Show PDF icon
                 fileIconPreview.src = "/esas/esas_student/icons/ICON_PDF.png"; // Path to your PDF icon
                 fileIconPreview.style.display = 'block';
-            } else if (file.type === "application/msword" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-                // Show Word document icon
-                fileIconPreview.src = "/esas/esas_student/icons/ICON_WORD.png"; // Path to your Word icon
-                fileIconPreview.style.display = 'block';
             } else {
-                // For other file types, show just the filename
-                fileNamePreview.textContent = "Selected File: " + file.name;
+                // For invalid file types, show the filename and notify the user
+                fileNamePreview.textContent = "Invalid file type. Please select a PDF file.";
                 fileNamePreview.style.display = 'block';
             }
         }
-    </script>
-    
+    }
+</script>
+
     <!-- Bootstrap JS and Dependencies -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
